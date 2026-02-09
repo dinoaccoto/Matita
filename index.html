@@ -1,0 +1,4430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matita</title>
+  <link rel="icon" type="image/png" href="graphics/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
+  <style>
+    :root {
+      --bg-app: #0f172a;
+      --bg-pane: #1e293b;
+      --bg-header: #334155;
+      --bg-input: #1e293b;
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-console: #38bdf8;
+
+      --border-color: #475569;
+      --accent-color: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --danger-color: #f87171;
+
+      --console-bg: #020617;
+
+      --radius-sm: 4px;
+      --radius-md: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-app);
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+
+    .split-container { display: flex; height: 100vh; width: 100%; padding: 8px; gap: 8px; }
+    .gutter { background: var(--bg-app); flex-shrink: 0; transition: background 0.2s; }
+    .gutter:hover { background: var(--accent-color); }
+    .gutter.gutter-horizontal { cursor: col-resize; width: 8px; }
+    .gutter.gutter-vertical { cursor: row-resize; height: 8px; }
+
+    .pane {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-pane);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      height: 100%;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .pane-header {
+      flex-shrink: 0;
+      padding: 0 12px;
+      height: 48px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-pane);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .header-left-group, .header-right-group { display: flex; align-items: center; gap: 8px; }
+
+    .pane-header-title {
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-right: 8px;
+      background: rgba(255,255,255,0.05);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    button {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--text-secondary);
+    }
+
+    #runButton {
+      background: var(--accent-color);
+      color: #0f172a;
+      border-color: var(--accent-color);
+    }
+    #runButton:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    #runButton:disabled {
+      background: var(--border-color);
+      color: var(--text-secondary);
+      border-color: var(--border-color);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #getMatitalkButton {
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+    }
+    #getMatitalkButton:hover {
+      background: transparent;
+      color: var(--accent-color);
+      text-decoration: underline;
+    }
+
+    .editor-container { flex-grow: 1; position: relative; }
+
+    .output-pane { background: var(--console-bg); }
+
+    #outputArea {
+      flex-grow: 1;
+      padding: 16px;
+      color: var(--text-console);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-y: auto;
+    }
+
+    .error-message {
+      color: var(--danger-color);
+      font-weight: 700;
+      border-left: 3px solid var(--danger-color);
+      padding-left: 8px;
+      display: block;
+      margin: 4px 0;
+      background: rgba(248, 113, 113, 0.1);
+    }
+
+    .canvas-window{
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      width: 42vw;
+      height: 42vh;
+      min-width: 340px;
+      min-height: 240px;
+      background: #e2e8f0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      overflow: auto;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      resize: both;
+    }
+    .canvas-window.hidden{ display:none; }
+
+    .canvas-window-header{
+      height: 44px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 0 10px;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      cursor: move;
+      user-select: none;
+    }
+    .canvas-window-title{
+      font-family: 'Roboto Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .canvas-window-actions{
+      display:flex;
+      gap: 8px;
+    }
+    .canvas-window-body{
+      flex: 1;
+      background: #e2e8f0;
+    }
+    #stage {
+      display:block;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg-app); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 5px; border: 2px solid var(--bg-app); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+    .editor-layer { position: absolute; inset: 0; }
+
+    .editor-shared {
+      font-family: 'Roboto Mono', monospace;
+      font-variant-ligatures: none;
+      font-kerning: none;
+      letter-spacing: 0;
+      font-size: 14px;
+      line-height: 22px;
+      padding: 16px;
+      box-sizing: border-box;
+      tab-size: 4;
+      -moz-tab-size: 4;
+      white-space: pre;
+      overflow: auto;
+      scrollbar-gutter: stable;
+    }
+
+    #highlighting-area, #codeInput { text-rendering: geometricPrecision; }
+
+    #highlighting-area {
+      margin: 0;
+      border: none;
+      background: var(--bg-pane);
+      color: var(--text-primary);
+      pointer-events: none;
+      z-index: 1;
+      display: none;
+    }
+    body.overlay-on #highlighting-area { display: block; }
+    #highlighting-content { display: block; font: inherit; line-height: inherit; white-space: pre; }
+
+    #codeInput {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-pane);
+      color: var(--text-primary);
+      caret-color: var(--text-primary);
+      z-index: 2;
+      -webkit-text-fill-color: currentColor;
+      border: none;
+      resize: none;
+    }
+    body.overlay-on #codeInput{
+      background: transparent;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    #codeInput:focus { outline: none; }
+    #codeInput::selection { background: rgba(56, 189, 248, 0.25); }
+    #codeInput::placeholder {
+      color: rgba(255,255,255,0.25);
+      -webkit-text-fill-color: rgba(255,255,255,0.25);
+    }
+
+    .tok-comment { color: rgba(148, 163, 184, 0.85); }
+    .tok-string  { color: #fbbf24; }
+    .tok-number  { color: #a78bfa; }
+    .tok-keyword { color: #38bdf8; font-weight: 600; }
+    .tok-builtin { color: #34d399; font-weight: 600; }
+    .tok-ident   { color: rgba(248, 250, 252, 0.95); }
+    .tok-op      { color: rgba(248, 250, 252, 0.85); }
+    .tok-punc    { color: rgba(248, 250, 252, 0.70); }
+
+    #suggestionBox {
+      position: absolute;
+      z-index: 3;
+      min-width: 260px;
+      max-width: 520px;
+      max-height: 260px;
+      overflow: auto;
+      display: none;
+      background: rgba(2, 6, 23, 0.92);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
+    }
+    .sugg-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.35);
+    }
+    .sugg-item:last-child { border-bottom: none; }
+    .sugg-title { font-family: 'Roboto Mono', monospace; font-size: 12px; color: var(--text-primary); }
+    .sugg-detail { font-size: 12px; color: var(--text-secondary); }
+    .sugg-item[aria-selected="true"] {
+      background: rgba(56, 189, 248, 0.16);
+      outline: 1px solid rgba(56, 189, 248, 0.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="split-container">
+    <div class="pane" id="editor-pane">
+      <div class="pane-header">
+        <div class="header-left-group">
+          <span id="lineIndicator" class="pane-header-title">riga: 1</span>
+          <button id="openButton" aria-label="Apri File">Apri</button>
+          <button id="saveButton" aria-label="Salva File">Salva</button>
+          <button id="toggleCanvasButton" aria-label="Mostra/Nascondi Grafica">Grafica</button>
+          <button id="runButton" aria-label="Esegui Codice">Esegui</button>
+        </div>
+
+        <button id="getMatitalkButton" aria-label="Scarica Matita IDE">Scarica Matita</button>
+
+        <div class="header-right-group">
+          <button id="helpButton" aria-label="Apri Aiuto">Aiuto</button>
+        </div>
+      </div>
+
+      <div class="editor-container" id="editorContainer">
+        <pre id="highlighting-area" class="editor-shared editor-layer" aria-hidden="true"><code id="highlighting-content" class="editor-content"></code></pre>
+        <textarea id="codeInput" class="editor-shared editor-layer" placeholder="Scrivi il tuo codice qui..." aria-label="Editor di codice" spellcheck="false"></textarea>
+        <div id="suggestionBox" role="listbox" aria-label="Suggerimenti"></div>
+      </div>
+    </div>
+
+    <div class="pane output-pane" id="output-pane">
+      <pre id="outputArea" aria-live="polite" aria-label="Output del programma"></pre>
+    </div>
+  </div>
+
+  <div id="canvasWindow" class="canvas-window" role="dialog" aria-label="Area grafica">
+    <div id="canvasWindowHeader" class="canvas-window-header">
+      <div class="canvas-window-title">canvas</div>
+      <div class="canvas-window-actions">
+        <button id="savePngButton" aria-label="Salva PNG">Salva PNG</button>
+        <button id="closeCanvasButton" aria-label="Chiudi grafica">✕</button>
+      </div>
+    </div>
+    <div id="canvasWindowBody" class="canvas-window-body">
+      <canvas id="stage" aria-label="Output Grafico"></canvas>
+    </div>
+  </div>
+
+<script>
+"use strict";
+
+function initMatita() {
+  const isLanguageIT = true; // UI language; interpreter accepts BOTH Italian and English keywords.
+  const lang = isLanguageIT ? "it" : "en";
+
+  const uiStrings = {
+    it: {
+      title: "Matita", run: "Esegui", open: "Apri", save: "Salva", graphics: "Grafica", savePng: "Salva PNG",
+      download: "Download", help: "Aiuto", lineIndicatorPrefix: "Riga",
+      placeholder: "Scrivi il tuo codice qui...", canvasReady: "Premi 'Esegui' per disegnare.",
+      canvasResized: "Ridimensionato. Riesegui per ridisegnare.",
+      greetingMorning: "Buongiorno", greetingAfternoon: "Buon pomeriggio",
+      greetingEvening: "Buonasera", welcomeMessage: "Matita pronto.",
+      saveFilename: "codice_matita.txt", downloadFilename: "matita.html",
+      errorPrefix: "Errore alla riga", executionStopped: "Programma interrotto:",
+      timeIs: "Sono le", todayIs: "Oggi è",
+      warningShadowing: (name) => `Avviso: La variabile locale '${name}' sta nascondendo una variabile globale con lo stesso nome.`,
+      variableNotFound: (name) => `Non riesco a trovare una variabile di nome '${name}'`,
+      functionExists: (name) => `Una funzione o procedura di nome '${name}' esiste già.`,
+      genericFail: (p) => `${p.msg}${p.expr ? ` nell'espressione: "${p.expr}"` : ""}`,
+      recursionLimit: "Limite di ricorsione superato. Stai chiamando una procedura troppe volte?",
+      invalidProcCallArgs: "Argomenti non validi per la chiamata di procedura. Atteso 'con (...)'.",
+      unexpectedTextAfterProcName: "Testo inatteso dopo il nome della procedura. Usa 'procedura(argomenti)' o 'procedura con (argomenti)'.",
+      mismatchedParen: "Parentesi non corrispondenti negli argomenti della procedura.",
+      procArgCount: (p) => `La procedura '${p.name}' si aspetta ${p.expected} argomenti, ma ne ha ricevuti ${p.got}.`,
+      funcArgCount: (p) => `La funzione '${p.name}' si aspetta ${p.expected} argomenti, ma ne ha ricevuti ${p.got}.`,
+      funcNoReturn: (name) => `La funzione '${name}' ha terminato senza un comando 'return'.`,
+      invalidWait: "La durata dell'attesa deve essere un numero non negativo.",
+      listOnlyOp: (name) => `Puoi eseguire questa operazione solo su una lista. '${name}' non è una lista.`,
+      invalidIndex: (p) => `L'indice ${p.idx} non è valido per la lista '${p.name}'.`,
+      cannotRemoveFromEmpty: "Non puoi rimuovere elementi da una lista vuota.",
+      pointOnlySet: "Puoi impostare 'x' o 'y' solo su una variabile punto.",
+      coordNotNumber: "Il valore per una coordinata deve essere un numero.",
+      getPromptNotText: "Il messaggio per 'get' deve essere un testo.",
+      invalidColor: "Colore non valido. Usa una lista di 3 numeri (r, g, b) con valori da 0 a 100.",
+      backgroundFilenameNotText: "Il nome del file di sfondo deve essere un testo tra virgolette.",
+      backgroundScaleNotNumber: "Il fattore di scala dello sfondo deve essere un numero positivo.",
+      imageLoadError: (name) => `Non è stato possibile caricare l'immagine '${name}'.`,
+      imageEmpty: (name) => `L'immagine '${name}' è vuota o non può essere caricata.`,
+      shapeParamsNotNumeric: (shape) => `I parametri per ${shape} devono essere numerici.`,
+      arcRadiusThicknessPositive: "Raggio e spessore dell'arco devono essere positivi.",
+      graffitiMalformed: "Comando 'graffiti' malformato. Sintassi: graffiti size <N> at <POS> \"TEXT\"",
+      graffitiContentNotString: "Il contenuto del graffito deve essere una stringa.",
+      graffitiSizeNotNumber: "La grandezza del graffito deve essere un numero positivo.",
+      labelMalformed: "Comando 'label' malformato. Sintassi: label (...) as <nome>",
+      importMalformed: "Comando 'import' malformato. Sintassi: import \"file\" as <nome>",
+      labelExists: (name) => `Un'etichetta di nome '${name}' esiste già.`,
+      labelNotFound: (name) => `Non trovo un'etichetta di nome '${name}'`,
+      rotationNotNumber: "L'angolo di rotazione deve essere un numero.",
+      scaleNotNumber: "Il fattore di scala deve essere un numero positivo.",
+      loopNotList: (expr) => `Puoi usare 'for each' solo su una lista. '${expr}' non è una lista.`,
+      infiniteLoop: "Il loop ha superato il numero massimo di iterazioni. È un loop infinito?",
+      unknownCommand: (cmd) => `Non capisco questo comando: "${cmd}"`,
+      pointArgsNotNumeric: "Il punto richiede due argomenti numerici.",
+      pointPropOnlyXY: "Puoi ottenere solo 'x' o 'y' da un punto.",
+      invalidCoordinate: (expr) => `Coordinata non valida: "${expr}". Usa un punto o una lista come (x, y).`,
+      expectedParenAfterKeyword: "Attesa '(' dopo la parola chiave.",
+      unbalancedParens: "Parentesi non bilanciate.",
+      unknownFunction: (name) => `Non conosco una funzione di nome '${name}'`,
+      triangleNeedsThreeVertices: (count) => `Il triangolo richiede 3 vertici, ma ne sono stati forniti ${count}.`,
+      dimensionNeedsList: "Puoi ottenere la dimensione solo di una lista.",
+      tockWithoutTick: "Impossibile usare 'tock': il cronometro non è stato avviato con 'tick'.",
+      programStopped: "Programma fermato."
+    },
+    en: {
+      title: "Matita", run: "Run", open: "Open", save: "Save", graphics: "Graphics", savePng: "Save PNG",
+      download: "Download", help: "Help", lineIndicatorPrefix: "Line",
+      placeholder: "Write your code here...", canvasReady: "Run code to draw.",
+      canvasResized: "Resized. Re-run to redraw.",
+      greetingMorning: "Good morning", greetingAfternoon: "Good afternoon",
+      greetingEvening: "Good evening", welcomeMessage: "Matita ready.",
+      saveFilename: "matita_code.txt", downloadFilename: "matita.html",
+      errorPrefix: "Error on line", executionStopped: "Program interrupted:",
+      timeIs: "The time is", todayIs: "Today is",
+      warningShadowing: (name) => `Warning: Local variable '${name}' is shadowing a global variable with the same name.`,
+      variableNotFound: (name) => `I can't find a variable named '${name}'`,
+      functionExists: (name) => `A function or procedure named '${name}' already exists.`,
+      genericFail: (p) => `${p.msg}${p.expr ? ` in expression: "${p.expr}"` : ""}`,
+      recursionLimit: "Recursion limit exceeded. Are you calling a procedure too many times?",
+      invalidProcCallArgs: "Invalid arguments for procedure call. Expected 'with (...)'.",
+      unexpectedTextAfterProcName: "Unexpected text after procedure name. Use 'procedure(args)' or 'procedure with (args)'.",
+      mismatchedParen: "Mismatched parentheses in procedure arguments.",
+      procArgCount: (p) => `Procedure '${p.name}' expects ${p.expected} arguments, but got ${p.got}.`,
+      funcArgCount: (p) => `Function '${p.name}' expects ${p.expected} arguments, but got ${p.got}.`,
+      funcNoReturn: (name) => `Function '${name}' finished without a 'return' command.`,
+      invalidWait: "The wait duration must be a non-negative number.",
+      listOnlyOp: (name) => `You can only perform this operation on a list. '${name}' is not a list.`,
+      invalidIndex: (p) => `Index ${p.idx} is not valid for the list '${p.name}'.`,
+      cannotRemoveFromEmpty: "You cannot remove items from an empty list.",
+      pointOnlySet: "You can only set 'x' or 'y' on a point variable.",
+      coordNotNumber: "The value for a coordinate must be a number.",
+      getPromptNotText: "The message for 'get' must be text.",
+      invalidColor: "Invalid color. Use a list of 3 numbers (r, g, b) with values from 0 to 100.",
+      backgroundFilenameNotText: "The background filename must be a text string in quotes.",
+      backgroundScaleNotNumber: "The background scale factor must be a positive number.",
+      imageLoadError: (name) => `Could not load the image '${name}'.`,
+      imageEmpty: (name) => `The image '${name}' is empty or could not be loaded.`,
+      shapeParamsNotNumeric: (shape) => `Parameters for ${shape} must be numeric.`,
+      arcRadiusThicknessPositive: "Arc radius and thickness must be positive.",
+      graffitiMalformed: "Malformed 'graffiti' command. Syntax: graffiti size <N> at <POS> \"TEXT\"",
+      graffitiContentNotString: "The graffiti content must be a string.",
+      graffitiSizeNotNumber: "The graffiti size must be a positive number.",
+      labelMalformed: "Malformed 'label' command. Syntax: label (...) as <name>",
+      importMalformed: "Malformed 'import' command. Syntax: import \"file\" as <name>",
+      labelExists: (name) => `A label named '${name}' already exists.`,
+      labelNotFound: (name) => `I can't find a label named '${name}'`,
+      rotationNotNumber: "The rotation angle must be a number.",
+      scaleNotNumber: "The scale factor must be a positive number.",
+      loopNotList: (expr) => `You can only use 'for each' on a list. '${expr}' is not a list.`,
+      infiniteLoop: "The loop has exceeded the maximum number of iterations. Is it an infinite loop?",
+      unknownCommand: (cmd) => `I don't understand this command: "${cmd}"`,
+      pointArgsNotNumeric: "Point requires two numeric arguments.",
+      pointPropOnlyXY: "You can only get 'x' or 'y' from a point.",
+      invalidCoordinate: (expr) => `Invalid coordinate: "${expr}". Use a point or a list like (x, y).`,
+      expectedParenAfterKeyword: "Expected '(' after keyword.",
+      unbalancedParens: "Unbalanced parentheses.",
+      unknownFunction: (name) => `I don't know a function named '${name}'`,
+      triangleNeedsThreeVertices: (count) => `Triangle requires 3 vertices, but ${count} were provided.`,
+      dimensionNeedsList: "You can only get the dimension of a list.",
+      tockWithoutTick: "Cannot use 'tock': stopwatch not started with 'tick'.",
+      programStopped: "Program stopped."
+    }
+  };
+
+  const codeInput = document.getElementById("codeInput");
+  const outputArea = document.getElementById("outputArea");
+  const runButton = document.getElementById("runButton");
+  const helpButton = document.getElementById("helpButton");
+  const gfxCanvas = document.getElementById("stage");
+  const canvasWindow = document.getElementById("canvasWindow");
+  const canvasWindowHeader = document.getElementById("canvasWindowHeader");
+  const canvasWindowBody = document.getElementById("canvasWindowBody");
+  const toggleCanvasButton = document.getElementById("toggleCanvasButton");
+  const closeCanvasButton = document.getElementById("closeCanvasButton");
+  const savePngButton = document.getElementById("savePngButton");
+  let gfxCtx = gfxCanvas.getContext("2d", { alpha: true });
+  let gfxDpr = window.devicePixelRatio || 1;
+  const getMatitalkButton = document.getElementById("getMatitalkButton");
+  const lineIndicator = document.getElementById("lineIndicator");
+  const openButton = document.getElementById("openButton");
+  const saveButton = document.getElementById("saveButton");
+
+  let isRunning = false;
+  const keyState = {};
+
+  function showCanvasWindow() {
+    canvasWindow.classList.remove("hidden");
+    setupCanvas();
+    if (!isRunning) drawReadyScreen(uiStrings[lang].canvasReady);
+  }
+  function hideCanvasWindow() { canvasWindow.classList.add("hidden"); }
+
+  document.title = uiStrings[lang].title;
+  runButton.textContent = uiStrings[lang].run;
+  openButton.textContent = uiStrings[lang].open;
+  saveButton.textContent = uiStrings[lang].save;
+  getMatitalkButton.textContent = uiStrings[lang].download;
+  helpButton.textContent = uiStrings[lang].help;
+  toggleCanvasButton.textContent = uiStrings[lang].graphics;
+  savePngButton.textContent = uiStrings[lang].savePng;
+  codeInput.setAttribute("placeholder", uiStrings[lang].placeholder);
+
+  const CONSOLE_PROMPT = ":) ";
+  const editorContainer = document.getElementById("editorContainer");
+  const highlightingContent = document.getElementById("highlighting-content");
+  const highlightingArea = document.getElementById("highlighting-area");
+  const suggestionBox = document.getElementById("suggestionBox");
+
+  const KEYWORDS_EN = [
+    "alias", "to", "inout",
+    "define","function","procedure","global","return","stop",
+    "if","then","otherwise","as","as long as","you do","for each","index","goes","from","to","and",
+    "put","in","add","remove","insert","first","last","item","of","dimension","list",
+    "output","newline","wait","ms","get","saying",
+    "set","color","clear","screen","graphics","redraw",
+    "circle","radius","circumference","thickness","rectangle","line","triangle","arc","graffiti","draw",
+    "rotate","deg","place","it","at","scale","by","load","paint","background","as background",
+    "true","false","and","or","not","is","equals", "different", "mod","pi","infinity","nan",
+    "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","x","y","key","pressed",
+    "split","decomposition","composition","unicode","indexof","tick","tock","null","import","label", "scientific"
+  ];
+
+  const KEYWORDS_IT = [
+    "alias","a","ed","inout",
+    "definisci","funzione","procedura","globale","restituisci","stop",
+    "se","allora","altrimenti","come","fintanto","esegui","per ogni","variabile","indice","va","da","a","e",
+    "metti","in","aggiungi","rimuovi","inserisci","primo","ultimo","elemento","di","dimensione","lista",
+    "scrivi","accapo","aspetta","ms","chiedi","dicendo",
+    "imposta","colore","cancella","schermo","grafica","ridisegna",
+    "cerchio","raggio","circonferenza","spessore","rettangolo","linea","triangolo","arco","graffiti","disegna",
+    "ruota","gradi","posiziona","scala","carica","dipingi","sfondo","come sfondo",
+    "vero","falso","e","o","non","uguale a","vale","uguale","diverso", "mod","pi","infinito","nan",
+    "radice","arrotonda","casuale","minimo","massimo","punto","x","y","tasto","premuto",
+    "decimali","tronca","scomponi","scomposizione","composizione","unicode","indicedi","tick","tock","null","importa","etichetta","label", "scientifica"
+  ];
+
+  const BUILTINS_EN = ["abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","cast","unicode","indexof","decomposition","composition","split", "dice", "type", "numeric", "valmin", "valmax", "argmin", "argmax"];
+  const BUILTINS_IT = ["radice","arrotonda","casuale","minimo","massimo","punto","tronca","cast","unicode","indicedi","scomposizione","composizione","scomponi", "dado", "numerico", "valmin", "valmax", "argmin", "argmax"];
+
+  const ALL_KEYWORDS = new Set([...KEYWORDS_EN, ...KEYWORDS_IT].map(s => s.toLowerCase()));
+
+  function escapeHtml(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function highlightLine(line) {
+    let out = "";
+    let i = 0;
+    while (i < line.length) {
+      const ch = line[i];
+
+      if (ch === "#") { out += `<span class="tok-comment">${escapeHtml(line.slice(i))}</span>`; break; }
+
+      if (ch === '"') {
+        let j = i + 1, esc = false;
+        while (j < line.length) {
+          const cj = line[j];
+          if (esc) { esc = false; j++; continue; }
+          if (cj === "\\") { esc = true; j++; continue; }
+          if (cj === '"') { j++; break; }
+          j++;
+        }
+        out += `<span class="tok-string">${escapeHtml(line.slice(i, j))}</span>`;
+        i = j;
+        continue;
+      }
+
+      const num = line.slice(i).match(/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+      if (num) { out += `<span class="tok-number">${num[0]}</span>`; i += num[0].length; continue; }
+
+      const id = line.slice(i).match(/^[A-Za-z_àèéìòùÀÈÉÌÒÙ][A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]*/);
+      if (id) {
+        const raw = id[0];
+        const lower = raw.toLowerCase();
+        const isKw = ALL_KEYWORDS.has(lower);
+        const isBuiltin = [...BUILTINS_EN, ...BUILTINS_IT].includes(lower);
+        let cls;
+        if (isBuiltin) cls = "tok-builtin";
+        else if (isKw) cls = (raw === "A") ? "tok-ident" : "tok-keyword";
+        else cls = "tok-ident";
+        out += `<span class="${cls}">${escapeHtml(raw)}</span>`;
+        i += raw.length;
+        continue;
+      }
+
+      if ("()[],".includes(ch)) { out += `<span class="tok-punc">${escapeHtml(ch)}</span>`; i++; continue; }
+      if ("+-*/%<>=!^;".includes(ch)) {
+        const op = line.slice(i).match(/^(===|!==|==|!=|<=|>=|<|>|\+|-|\*|\/|%|\^|=|;)/);
+        const tok = op ? op[0] : ch;
+        out += `<span class="tok-op">${escapeHtml(tok)}</span>`;
+        i += tok.length;
+        continue;
+      }
+
+      out += escapeHtml(ch);
+      i++;
+    }
+    return out;
+  }
+
+  let highlightRaf = 0;
+  function syncHighlightScroll() {
+    highlightingArea.scrollTop = codeInput.scrollTop;
+    highlightingArea.scrollLeft = codeInput.scrollLeft;
+  }
+  function updateHighlighting(immediate = false) {
+    const render = () => {
+      highlightRaf = 0;
+      document.body.classList.add("overlay-on");
+      const code = codeInput.value;
+      const safe = code.endsWith("\n") ? (code + " ") : code;
+      highlightingContent.innerHTML = safe.split(/\r?\n/).map(highlightLine).join("\n");
+      syncHighlightScroll();
+    };
+    if (immediate) { if (highlightRaf) cancelAnimationFrame(highlightRaf); render(); return; }
+    if (highlightRaf) cancelAnimationFrame(highlightRaf);
+    highlightRaf = requestAnimationFrame(render);
+  }
+
+  // Suggestions
+  function buildSuggestions() {
+    if (isLanguageIT) {
+      return [
+        { label: "se (...) allora ( ... )", insert: "se (CONDIZIONE) allora (\n    \n)\n", detail: "Blocco condizionale" },
+        { label: "altrimenti ( ... )", insert: "altrimenti (\n    \n)\n", detail: "Ramo else" },
+        { label: "fintanto (...) esegui ( ... )", insert: "fintanto (CONDIZIONE) esegui (\n    \n)\n", detail: "Loop while" },
+        { label: "per ogni x in LISTA esegui ( ... )", insert: "per ogni x in LISTA esegui (\n    \n)\n", detail: "Loop su lista" },
+        { label: "inserisci VAL in elemento N di LISTA", insert: "inserisci VALORE in elemento INDICE di LISTA\n", detail: "Inserisce elemento in posizione" },
+        { label: "aggiungi val a lista", insert: "aggiungi VALORE a LISTA\n", detail: "Aggiunge in coda alla lista" },
+        { label: "rimuovi elemento n da lista", insert: "rimuovi elemento INDICE da LISTA\n", detail: "Rimuove l'elemento alla posizione n" },
+        { label: "rimuovi primo/ultimo da lista", insert: "rimuovi ultimo elemento da LISTA\n", detail: "Rimuove elemento in testa o coda" },
+        { label: "metti val in elemento n di lista", insert: "metti VALORE in elemento INDICE di LISTA\n", detail: "Sostituisce il valore esistente" },
+        { label: "elemento n di lista", insert: "elemento INDICE di LISTA", detail: "Legge il valore alla posizione n" },
+        { label: "dimensione di lista", insert: "dimensione di LISTA", detail: "Restituisce il numero di elementi" },
+        { label: "indice I va da A a B ed esegui ( ... )", insert: "indice I va da INIZIO a FINE ed esegui (\n    \n)\n", detail: "Loop for" },
+        { label: "definisci procedura nome(args) ( ... )", insert: "definisci procedura nome(a, b) (\n    \n)\n", detail: "Definisce una procedura" },
+        { label: "definisci funzione nome(args) ( ... )", insert: "definisci funzione nome(a, b) (\n    restituisci a + b\n)\n", detail: "Definisce una funzione" },
+        { label: "metti <expr> in <VAR>", insert: "metti ESPRESSIONE in VAR\n", detail: "Assegnamento" },
+        { label: "scrivi <expr>", insert: "scrivi ESPRESSIONE\n", detail: "Stampa a console" },
+        { label: "decimali <n>", insert: "decimali 2\n", detail: "Imposta precisione numeri reali" },
+        { label: "scientifica(N)", insert: "scientifica 1000000\n", detail: "Soglia notazione scientifica" },
+        { label: "accapo", insert: "accapo\n", detail: "Nuova riga" },
+        { label: "imposta colore (r,g,b)", insert: "imposta colore (ROSSO, VERDE, BLU)\n", detail: "Colore (0..100)" },
+        { label: "cancella grafica", insert: "cancella grafica\n", detail: "Svuota lista oggetti grafici" },
+        { label: "cancella schermo", insert: "cancella schermo\n", detail: "Pulisce la console" },
+        { label: "ridisegna", insert: "ridisegna\n", detail: "Ridisegna l'area grafica" },
+        { label: "cerchio raggio R in (x,y)", insert: "cerchio raggio RAGGIO in (X, Y)\n", detail: "Cerchio pieno" },
+        { label: "circonferenza raggio R spessore T in (x,y)", insert: "circonferenza raggio RAGGIO spessore SPESSORE in (X, Y)\n", detail: "Cerchio vuoto" },
+        { label: "rettangolo da (x1,y1) a (x2,y2)", insert: "rettangolo da (X1, Y1) a (X2, Y2)\n", detail: "Rettangolo pieno" },
+        { label: "linea spessore T da (x1,y1) a (x2,y2)", insert: "linea spessore SPESSORE da (X1, Y1) a (X2, Y2)\n", detail: "Segmento" },
+        { label: "triangolo con vertici (x1,y1),(x2,y2),(x3,y3)", insert: "triangolo con vertici (X1, Y1), (X2, Y2), (X3, Y3)\n", detail: "Triangolo pieno" },
+        { label: "arco raggio R spessore T da (x1,y1) a (x2,y2)", insert: "arco raggio RAGGIO spessore SPESSORE da (X1, Y1) a (X2, Y2)\n", detail: "Arco" },
+        { label: "graffiti grandezza N in (x,y) \"TESTO\"", insert: "graffiti grandezza GRANDEZZA in (X, Y) \"TESTO\"\n", detail: "Testo in area grafica" },
+        { label: "etichetta ( ... ) come NOME", insert: "etichetta (\n    \n) come NOME\n", detail: "Definisce un oggetto grafico" },
+        { label: "importa \"file\" come NOME", insert: "importa \"file\" come NOME\n", detail: "Importa immagine come oggetto" },
+        { label: "disegna OGGETTO in (x,y)", insert: "disegna OGGETTO in (X, Y)\n", detail: "Disegna oggetto importato/etichettato" },
+        { label: "ruota OGGETTO di gradi e posiziona in (x,y)", insert: "ruota OGGETTO di ANGOLO gradi e posiziona in (X, Y)\n", detail: "Trasformazione" },
+        { label: "scala OGGETTO di fattore", insert: "scala OGGETTO di FATTORE\n", detail: "Scala" },
+        { label: "carica \"file\" scala F come sfondo", insert: "carica \"file\" scala FATTORE come sfondo\n", detail: "Sfondo immagine" },
+        { label: "dipingi sfondo", insert: "dipingi sfondo\n", detail: "Sfondo colore o immagine" },
+        { label: "aspetta N ms", insert: "aspetta DURATA ms\n", detail: "Pausa" },
+        { label: "chiedi VAR dicendo \"...\"", insert: "chiedi VAR dicendo \"MESSAGGIO\"\n", detail: "Input utente" },
+        { label: "tick", insert: "tick\n", detail: "Avvia il cronometro" },
+        { label: "tock", insert: "tock", detail: "Millisecondi trascorsi da tick" },
+        { label: "casuale(min, max)", insert: "casuale(MIN, MAX)", detail: "Numero casuale tra A e B" },
+        { label: "dado( facce )", insert: "dado(FACCE)", detail: "Numero intero tra 1 e N" },
+        { label: "tipo(x)", insert: "tipo(VALORE)", detail: "Restituisce 'number', 'string', 'list', 'point'..." },
+        { label: "numerico(x)", insert: "numerico(VALORE)", detail: "Vero se l'argomento è un numero valido" }
+    ];
+    }
+    return [
+    // Control Flow
+    { label: "if (...) then ( ... )", insert: "if (CONDITION) then (\n    \n)\n", detail: "Conditional block" },
+    { label: "otherwise ( ... )", insert: "otherwise (\n    \n)\n", detail: "Else branch" },
+    { label: "as long as (...) you do ( ... )", insert: "as long as (CONDITION) you do (\n    \n)\n", detail: "While loop" },
+    { label: "for each x in LIST you do ( ... )", insert: "for each x in LIST you do (\n    \n)\n", detail: "List loop" },
+    { label: "index I goes from A to B and you do ( ... )", insert: "index I goes from START to END and you do (\n    \n)\n", detail: "For loop" },
+    
+    // Lists
+    { label: "insert VAL in item N of LIST", insert: "insert VALUE in item INDEX of LIST\n", detail: "Insert item at position" },
+    { label: "add val to list", insert: "add VALUE to LIST\n", detail: "Append to list" },
+    { label: "remove item n from list", insert: "remove item INDEX from LIST\n", detail: "Remove item at n" },
+    { label: "remove first/last from list", insert: "remove last item from LIST\n", detail: "Remove head/tail" },
+    { label: "put val in item n of list", insert: "put VALUE in item INDEX of LIST\n", detail: "Replace item value" },
+    { label: "item n of list", insert: "item INDEX of LIST", detail: "Read value at n" },
+    { label: "dimension of list", insert: "dimension of LIST", detail: "Get list size" },
+
+    // Definitions & Vars
+    { label: "define procedure name(args) ( ... )", insert: "define procedure name(a, b) (\n    \n)\n", detail: "Define procedure" },
+    { label: "define function name(args) ( ... )", insert: "define function name(a, b) (\n    return a + b\n)\n", detail: "Define function" },
+    { label: "put <expr> in <VAR>", insert: "put EXPRESSION in VAR\n", detail: "Assignment" },
+    { label: "type(x)", insert: "type(VALUE)", detail: "Returns 'number', 'string', 'list', 'point'..." },
+    { label: "numeric(x)", insert: "numeric(VALUE)", detail: "True if the argument is a valid number" },
+    
+    // IO & System
+    { label: "output <expr>", insert: "output EXPRESSION\n", detail: "Print to console" },
+    { label: "digits <n>", insert: "digits 2\n", detail: "Set float precision" },
+    { label: "scientific(N)", insert: "scientific 1000000\n", detail: "Scientific notation threshold" },
+    { label: "newline", insert: "newline\n", detail: "Print new line" },
+    { label: "wait N ms", insert: "wait DURATION ms\n", detail: "Pause execution" },
+    { label: "get VAR saying \"...\"", insert: "get VAR saying \"PROMPT\"\n", detail: "User input" },
+
+    // Graphics - Setup
+    { label: "set color (r,g,b)", insert: "set color (RED, GREEN, BLUE)\n", detail: "Color (0..100)" },
+    { label: "clear graphics", insert: "clear graphics\n", detail: "Clear objects" },
+    { label: "clear screen", insert: "clear screen\n", detail: "Clear console" },
+    { label: "redraw", insert: "redraw\n", detail: "Refresh graphics" },
+    
+    // Graphics - Shapes
+    { label: "circle radius R at (x,y)", insert: "circle radius RADIUS at (X, Y)\n", detail: "Filled circle" },
+    { label: "circumference radius R thickness T at (x,y)", insert: "circumference radius RADIUS thickness THICKNESS at (X, Y)\n", detail: "Empty circle" },
+    { label: "rectangle from (x1,y1) to (x2,y2)", insert: "rectangle from (X1, Y1) to (X2, Y2)\n", detail: "Filled rectangle" },
+    { label: "line thickness T from (x1,y1) to (x2,y2)", insert: "line thickness THICKNESS from (X1, Y1) to (X2, Y2)\n", detail: "Segment" },
+    { label: "triangle with vertices (x1,y1),(x2,y2),(x3,y3)", insert: "triangle with vertices (X1, Y1), (X2, Y2), (X3, Y3)\n", detail: "Filled triangle" },
+    { label: "arc radius R thickness T from (x1,y1) to (x2,y2)", insert: "arc radius RADIUS thickness THICKNESS from (X1, Y1) to (X2, Y2)\n", detail: "Arc" },
+    { label: "graffiti size N at (x,y) \"TEXT\"", insert: "graffiti size SIZE at (X, Y) \"TEXT\"\n", detail: "Text on canvas" },
+    
+    // Graphics - Objects & Transforms
+    { label: "label ( ... ) as NAME", insert: "label (\n    \n) as NAME\n", detail: "Define graphical object" },
+    { label: "import \"file\" as NAME", insert: "import \"file\" as NAME\n", detail: "Import image as object" },
+    { label: "draw OBJECT at (x,y)", insert: "draw OBJECT at (X, Y)\n", detail: "Draw imported/labeled object" },
+    { label: "rotate OBJECT of angle deg and place it at (x,y)", insert: "rotate OBJECT of ANGLE deg and place it at (X, Y)\n", detail: "Transform" },
+    { label: "scale OBJECT by factor", insert: "scale OBJECT by FACTOR\n", detail: "Scale object" },
+    
+    // Backgrounds
+    { label: "load \"file\" scale F as background", insert: "load \"file\" scale FACTOR as background\n", detail: "Image background" },
+    { label: "paint background", insert: "paint background\n", detail: "Fill background with color" },
+
+    // Math & Time
+    { label: "tick", insert: "tick\n", detail: "Start stopwatch" },
+    { label: "tock", insert: "tock", detail: "Elapsed ms since tick" },
+    { label: "random(min, max)", insert: "random(MIN, MAX)", detail: "Random number A to B" },
+    { label: "dice( faces )", insert: "dice(FACES)", detail: "Random integer 1 to N" }
+  ];
+}
+
+  const RAW_SUGGESTIONS = buildSuggestions();
+  function getSuggestionCmd(s) {
+    const src = String(s.insert || s.label || "").trim();
+    return (src.split(/\s+/)[0] || "").toLowerCase();
+  }
+  const _collator = new Intl.Collator(isLanguageIT ? "it" : "en", { sensitivity: "base", numeric: true });
+  const SUGGESTIONS = RAW_SUGGESTIONS
+    .map(s => Object.assign({}, s, { cmd: getSuggestionCmd(s), labelLower: String(s.label || "").toLowerCase() }))
+    .sort((a,b) => {
+      const c = _collator.compare(a.cmd, b.cmd);
+      if (c !== 0) return c;
+      return _collator.compare(String(a.label||""), String(b.label||""));
+    });
+
+  let activeSuggestions = [];
+  let selectedSuggestionIndex = 0;
+  let forceSuggest = false;
+  let suggestionsOpenedExplicitly = false;  // true se aperti con Ctrl+Space
+  let userNavigatedSuggestions = false;     // true se l’utente ha usato frecce nel box
+
+
+  function hideSuggestions() {
+    suggestionBox.style.display = "none";
+    suggestionBox.innerHTML = "";
+    activeSuggestions = [];
+    selectedSuggestionIndex = 0;
+
+    forceSuggest = false;
+    suggestionsOpenedExplicitly = false;
+    userNavigatedSuggestions = false;
+  }
+
+  const caretMirror = document.createElement("div");
+  caretMirror.style.position = "absolute";
+  caretMirror.style.visibility = "hidden";
+  caretMirror.style.whiteSpace = "pre";
+  caretMirror.style.wordWrap = "normal";
+  caretMirror.style.overflow = "hidden";
+  caretMirror.style.pointerEvents = "none";
+  caretMirror.style.zIndex = "-1";
+  editorContainer.appendChild(caretMirror);
+
+  function copyTextAreaStyles() {
+    const cs = window.getComputedStyle(codeInput);
+    const props = ["fontFamily","fontSize","fontWeight","fontStyle","letterSpacing","textTransform",
+      "paddingTop","paddingRight","paddingBottom","paddingLeft","borderTopWidth","borderRightWidth","borderBottomWidth","borderLeftWidth",
+      "lineHeight","tabSize","width","height"
+    ];
+    props.forEach(p => { caretMirror.style[p] = cs[p]; });
+    caretMirror.style.boxSizing = "border-box";
+  }
+
+  function getCaretCoords() {
+    copyTextAreaStyles();
+    const value = codeInput.value;
+    const pos = codeInput.selectionStart || 0;
+    const before = value.substring(0, pos);
+    const after = value.substring(pos);
+
+    caretMirror.textContent = "";
+    const beforeNode = document.createTextNode(before);
+    const caretSpan = document.createElement("span");
+    caretSpan.textContent = "\u200b";
+    const afterNode = document.createTextNode(after.substring(0, 1));
+
+    caretMirror.appendChild(beforeNode);
+    caretMirror.appendChild(caretSpan);
+    caretMirror.appendChild(afterNode);
+
+    caretMirror.scrollTop = codeInput.scrollTop;
+    caretMirror.scrollLeft = codeInput.scrollLeft;
+
+    const rect = caretSpan.getBoundingClientRect();
+    const containerRect = editorContainer.getBoundingClientRect();
+    return {
+      x: rect.left - containerRect.left,
+      y: rect.top - containerRect.top,
+      lineHeight: parseFloat(window.getComputedStyle(codeInput).lineHeight) || 18
+    };
+  }
+
+  function showSuggestions(items) {
+    activeSuggestions = items.slice(0,10);
+    selectedSuggestionIndex = 0;
+    suggestionBox.innerHTML = "";
+
+    for (let i=0;i<activeSuggestions.length;i++) {
+      const it = activeSuggestions[i];
+      const div = document.createElement("div");
+      div.className = "sugg-item";
+      div.setAttribute("role","option");
+      div.setAttribute("aria-selected", i===0 ? "true":"false");
+      div.innerHTML = `<div class="sugg-title">${escapeHtml(it.label)}</div><div class="sugg-detail">${escapeHtml(it.detail||"")}</div>`;
+      div.addEventListener("mousedown",(ev)=>{ ev.preventDefault(); applySuggestion(i); });
+      suggestionBox.appendChild(div);
+    }
+
+    const {x,y,lineHeight} = getCaretCoords();
+    const padding = 6;
+    const boxW = Math.min(520, Math.max(260, editorContainer.clientWidth*0.5));
+    suggestionBox.style.minWidth = boxW + "px";
+    suggestionBox.style.left = Math.max(8, Math.min(editorContainer.clientWidth - boxW - 8, x + padding)) + "px";
+    const desiredTop = y + lineHeight + 8;
+    const maxTop = editorContainer.clientHeight - 8 - 40;
+    suggestionBox.style.top = Math.max(8, Math.min(maxTop, desiredTop)) + "px";
+    suggestionBox.style.display = activeSuggestions.length ? "block" : "none";
+  }
+
+  function isWordChar(ch) { return /[A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]/.test(ch); }
+
+  function getCurrentPrefix() {
+    const text = codeInput.value;
+    const pos = codeInput.selectionStart || 0;
+
+    // 1. Identifica l'inizio della riga corrente (per verificare se siamo dentro una stringa)
+    const lineStart = text.lastIndexOf("\n", pos - 1) + 1;
+    const lineToCursor = text.slice(lineStart, pos);
+
+    // 2. Controllo base: se siamo dentro una stringa "..." non suggerire nulla
+    // Conta le virgolette (ignorando quelle con escape \")
+    let quoteCount = 0;
+    for (let i = 0; i < lineToCursor.length; i++) {
+      if (lineToCursor[i] === '"' && (i === 0 || lineToCursor[i-1] !== '\\')) {
+        quoteCount++;
+      }
+    }
+    // Se le virgolette sono dispari, siamo dentro una stringa aperta -> niente suggerimenti
+    if (quoteCount % 2 !== 0) return "";
+
+    // 3. Scansiona all'indietro dal cursore
+    // Continua a tornare indietro finché il carattere è una lettera, numero o underscore
+    let start = pos;
+    while (start > 0) {
+      const char = text[start - 1];
+      if (!isWordChar(char)) break; // Stop su spazi, parentesi, operatori
+      start--;
+    }
+
+    // Se start è uguale a pos, significa che non c'è nessuna parola attaccata al cursore
+    if (start === pos) return "";
+
+    // Restituisce la porzione di testo trovata (es. in "a = cas|" restituisce "cas")
+    return text.slice(start, pos);
+  }
+
+  // --- Funzione per analisi contesto ---
+ function getDynamicSuggestions(codeUntilCursor) {
+  if (!codeUntilCursor) return [];
+
+  // --- 0) Evita suggerimenti dinamici se il cursore è dentro stringa o commento (ultima riga) ---
+  {
+    const lineStart = codeUntilCursor.lastIndexOf("\n") + 1;
+    const line = codeUntilCursor.slice(lineStart);
+
+    let inStr = false;
+    let esc = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (esc) { esc = false; continue; }
+      if (ch === "\\") { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (!inStr && ch === "#") return []; // commento
+    }
+    if (inStr) return []; // stringa aperta
+  }
+
+  // 1) Lexing ---
+  const lexer = new Lexer(codeUntilCursor);
+  const tokens = lexer.lexAll();
+
+  // Trova ultimo token prima dell'EOF, ignorando eventuali NEWLINE finali
+  let lastRealIndex = tokens.length - 2; // -1 sarebbe EOF; -2 è il candidato reale
+  while (lastRealIndex > 0 && tokens[lastRealIndex].type === "NEWLINE") lastRealIndex--;
+  if (lastRealIndex < 0) return [];
+
+  // Se l'ultimo token reale è un IDENT e coincide col testo in coda, lo considero "in scrittura"
+  // e NON lo trattio come definizione finale.
+  const lastRealTok = tokens[lastRealIndex];
+  const endsWithToken =
+    lastRealTok &&
+    (lastRealTok.type === "IDENT" || lastRealTok.type === "NUMBER" || lastRealTok.type === "STRING") &&
+    codeUntilCursor.toLowerCase().endsWith(String(lastRealTok.value).toLowerCase());
+
+  // --- 2) Helpers ---
+  const found = new Map();
+  const isWordCharLocal = (ch) => /[A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]/.test(ch);
+
+  const add = (name, type, score) => {
+    if (!name) return;
+    const lower = String(name).toLowerCase();
+
+    // evita cose non plausibili
+    if (ALL_KEYWORDS.has(lower)) return;
+
+    // evita echi, ossia di suggerire token ancora in scrittura
+    if (endsWithToken && lastRealTok.type === "IDENT" && lower === String(lastRealTok.value).toLowerCase()) return;
+
+    const prev = found.get(lower);
+    if (!prev || score > prev.score) found.set(lower, { name, type, score });
+  };
+
+  const tokLower = (t) => (t && t.type === "IDENT" ? t.value.toLowerCase() : "");
+
+  const matchPhraseAt = (i, words) => {
+    for (let k = 0; k < words.length; k++) {
+      const t = tokens[i + k];
+      if (!t || t.type !== "IDENT" || t.value.toLowerCase() !== words[k]) return false;
+    }
+    return true;
+  };
+
+  const isEndTypingToken = (idx) => idx === lastRealIndex && endsWithToken;
+
+  const isNextCurrentlyTyped = (idxNext) => idxNext === lastRealIndex && endsWithToken;
+
+  const lineStartTokenIndex = (i) => {
+    let j = i;
+    while (j > 0 && tokens[j - 1].type !== "NEWLINE") j--;
+    return j;
+  };
+
+  const lineHasWordBefore = (i, wordsLowerSet) => {
+    const a = lineStartTokenIndex(i);
+    for (let j = i - 1; j >= a; j--) {
+      const t = tokens[j];
+      if (t.type === "IDENT" && wordsLowerSet.has(t.value.toLowerCase())) return true;
+    }
+    return false;
+  };
+
+  // keyword sets
+  const KW_DEFINE = new Set(["define", "definisci"]);
+  const KW_FUNC = new Set(["function", "funzione"]);
+  const KW_PROC = new Set(["procedure", "procedura"]);
+  const KW_GLOBAL = new Set(["global", "globale"]);
+  const KW_GET = new Set(["get", "chiedi"]);
+  const KW_VARIABLE = new Set(["variable", "variabile", "indice"]);
+  const KW_IN = new Set(["in"]);
+  const KW_AS = new Set(["as", "come"]);
+  const KW_BACKGROUND = new Set(["background", "sfondo"]);
+  const KW_PUT = new Set(["put", "metti"]);
+  const KW_INSERT = new Set(["insert", "inserisci"]);
+  const KW_ITEM = new Set(["item", "elemento"]);
+  const KW_ADD = new Set(["add", "aggiungi"]);
+  const KW_REMOVE = new Set(["remove", "rimuovi"]);
+  const KW_LABEL = new Set(["label", "etichetta"]);
+  const KW_IMPORT = new Set(["import", "importa"]);
+
+  // --- 3) Estrazione pattern-based ---
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t.type !== "IDENT") continue;
+
+    const v = t.value.toLowerCase();
+
+    // 3.1) definisci/define funzione/procedura NOME
+    // pattern: (define|definisci) (function|funzione|procedure|procedura) IDENT
+    if (KW_DEFINE.has(v)) {
+      const t2 = tokens[i + 1], t3 = tokens[i + 2];
+      if (t2 && t2.type === "IDENT" && t3 && t3.type === "IDENT") {
+        const kind = t2.value.toLowerCase();
+        if ((KW_FUNC.has(kind) || KW_PROC.has(kind)) && !isNextCurrentlyTyped(i + 2)) {
+          add(t3.value, KW_FUNC.has(kind) ? "(func)" : "(proc)", 1200);
+        }
+      }
+      continue;
+    }
+
+    // 3.2) global/globale A, B, C
+    if (KW_GLOBAL.has(v)) {
+      let j = i + 1;
+      while (j < tokens.length) {
+        const nt = tokens[j];
+        if (!nt) break;
+        if (nt.type === "IDENT") {
+          if (!isEndTypingToken(j)) add(nt.value, "(var)", 1050);
+          j++;
+          continue;
+        }
+        if (nt.type === "COMMA") { j++; continue; }
+        break;
+      }
+      continue;
+    }
+
+    // 3.3) get/chiedi VAR ...
+    if (KW_GET.has(v)) {
+      const nt = tokens[i + 1];
+      if (nt && nt.type === "IDENT" && !isNextCurrentlyTyped(i + 1)) add(nt.value, "(var)", 1100);
+      continue;
+    }
+
+    // 3.4) variable/variabile/indice I ...
+    if (KW_VARIABLE.has(v)) {
+      const nt = tokens[i + 1];
+      if (nt && nt.type === "IDENT" && !isNextCurrentlyTyped(i + 1)) add(nt.value, "(var)", 1100);
+      continue;
+    }
+
+    // 3.5) for each / per ogni  => variabile di loop
+    // pattern EN: for each IDENT
+    // pattern IT: per ogni IDENT
+    if (matchPhraseAt(i, ["for", "each"])) {
+      const nt = tokens[i + 2];
+      if (nt && nt.type === "IDENT" && !isNextCurrentlyTyped(i + 2)) add(nt.value, "(var)", 1075);
+      continue;
+    }
+    if (matchPhraseAt(i, ["per", "ogni"])) {
+      const nt = tokens[i + 2];
+      if (nt && nt.type === "IDENT" && !isNextCurrentlyTyped(i + 2)) add(nt.value, "(var)", 1075);
+      continue;
+    }
+
+    // 3.6) etichetta/label (...) come/as NOME  oppure importa/import ... come/as NOME
+    if (KW_AS.has(v)) {
+      const nt = tokens[i + 1];
+      if (nt && nt.type === "IDENT" && !KW_BACKGROUND.has(nt.value.toLowerCase()) && !isNextCurrentlyTyped(i + 1)) {
+        // Solo se sulla riga c'è un contesto plausibile (label/import)
+        const okContext = lineHasWordBefore(i, new Set([...KW_LABEL, ...KW_IMPORT]));
+        if (okContext) add(nt.value, "(obj)", 1125);
+      }
+      continue;
+    }
+
+    // 3.7) metti/put ... in VAR  --- definizione/uso var
+    // Regola: se trovo "in" e dopo c'è IDENT, suggerisco quel nome come var
+    // SOLO se sulla stessa riga compare prima un "metti/put".
+    if (KW_IN.has(v)) {
+      const nt = tokens[i + 1];
+      if (nt && nt.type === "IDENT") {
+        const ntLower = nt.value.toLowerCase();
+
+        // evita casi tipo: "inserisci ... in elemento ..."
+        const prevIsInsert = lineHasWordBefore(i, KW_INSERT);
+        const nextIsItem = KW_ITEM.has(ntLower);
+
+        if (!prevIsInsert && !nextIsItem) {
+          const hasPut = lineHasWordBefore(i, KW_PUT);
+          if (hasPut && !isNextCurrentlyTyped(i + 1)) add(nt.value, "(var)", 1025);
+        }
+      }
+      continue;
+    }
+
+    // 3.8) aggiungi/add ... a/to LISTA  e rimuovi/remove ... da/from LISTA
+    if (KW_ADD.has(v)) {
+      // cerca il primo IDENT dopo "a/to" sulla stessa riga
+      // pattern tipico: aggiungi <expr> a LISTA
+      for (let j = i + 1; j < tokens.length; j++) {
+        if (tokens[j].type === "NEWLINE") break;
+        if (tokens[j].type === "IDENT" && (tokens[j].value.toLowerCase() === "a" || tokens[j].value.toLowerCase() === "to")) {
+          const nt = tokens[j + 1];
+          if (nt && nt.type === "IDENT" && !isNextCurrentlyTyped(j + 1)) add(nt.value, "(var)", 900);
+          break;
+        }
+      }
+      continue;
+    }
+
+    if (KW_REMOVE.has(v)) {
+      // pattern tipico: rimuovi ... da LISTA  / remove ... from LIST
+      for (let j = i + 1; j < tokens.length; j++) {
+        if (tokens[j].type === "NEWLINE") break;
+        if (tokens[j].type === "IDENT" && (tokens[j].value.toLowerCase() === "da" || tokens[j].value.toLowerCase() === "from")) {
+          const nt = tokens[j + 1];
+          if (nt && nt.type === "IDENT" && !isNextCurrentlyTyped(j + 1)) add(nt.value, "(var)", 900);
+          break;
+        }
+      }
+      continue;
+    }
+  }
+
+  // --- 4) Output: array di suggestion items ---
+  const coll = (typeof _collator !== "undefined")
+    ? _collator
+    : new Intl.Collator("it", { sensitivity: "base", numeric: true });
+
+  const out = Array.from(found.values())
+    .sort((a, b) => {
+      const ds = (b.score || 0) - (a.score || 0);
+      if (ds !== 0) return ds;
+      return coll.compare(String(a.name), String(b.name));
+    })
+    .map(item => ({
+      label: item.name,
+      insert: item.name,
+      detail: item.type,
+      score: item.score || 0
+    }));
+
+  return out;
+}
+
+
+
+  let suggestRaf = 0;
+  function scheduleSuggestions() {
+    if (suggestRaf) cancelAnimationFrame(suggestRaf);
+    suggestRaf = requestAnimationFrame(() => {
+      suggestRaf = 0;
+      
+      // 1. Ottieni il prefisso attuale (parola che si sta scrivendo)
+      const prefix = getCurrentPrefix();
+      
+      // Se non stiamo forzando (Ctrl+Space) e non c'è prefisso, nascondi
+      const MIN_PREFIX_LEN = 2; // consigliato per ridurre rumore
+      if (!forceSuggest && prefix.length < MIN_PREFIX_LEN) { hideSuggestions(); return; }
+      
+      const p = prefix.toLowerCase();
+
+      // 2. Analisi codice fino al cursore per trovare definizioni
+      const pos = codeInput.selectionStart || 0;
+      const codeUpToCursor = codeInput.value.slice(0, pos);
+      const dynamicItems = getDynamicSuggestions(codeUpToCursor);
+
+      // 3. Unisci suggerimenti dinamici e statici
+      // Diamo priorità a quelli dinamici mettendoli prima nell'array
+      const allSourceItems = [...dynamicItems, ...SUGGESTIONS];
+
+      let items;
+      if (forceSuggest || p.length === 0) {
+        items = allSourceItems;
+      } else {
+        // Filtra in base al prefisso
+        items = allSourceItems.filter(s => {
+           // Supporto per i suggestion statici che hanno 'cmd' e dinamici che hanno 'label'
+           const cmd = s.cmd || s.label.toLowerCase(); 
+           const lbl = s.labelLower || s.label.toLowerCase();
+           return cmd.startsWith(p) || lbl.includes(p);
+        });
+      }
+
+      if (!items.length) { hideSuggestions(); return; }
+      showSuggestions(items);
+    });
+  }
+
+  function applySuggestion(index) {
+    if (!activeSuggestions.length) return;
+
+    const it = activeSuggestions[index];
+    const text = codeInput.value;
+
+    const startSel = codeInput.selectionStart ?? 0;
+    const endSel = codeInput.selectionEnd ?? startSel;
+
+    // Se c’è una selezione, sostituiscila. Altrimenti sostituisci il prefisso corrente.
+    const prefix = getCurrentPrefix();
+    const replaceStart = (startSel !== endSel) ? startSel : Math.max(0, startSel - prefix.length);
+    const replaceEnd = endSel;
+
+    const before = text.slice(0, replaceStart);
+    const after = text.slice(replaceEnd);
+
+    const insertText = it.insert;
+
+    // Inserimento
+    codeInput.value = before + insertText + after;
+
+    // Placeholder selection logic
+    const placeholdersIT = [
+      "VAR","ESPRESSIONE","CONDIZIONE","LISTA","INDICE","INIZIO","FINE","MESSAGGIO","TESTO",
+      "RAGGIO","SPESSORE","GRANDEZZA","ROSSO","VERDE","BLU","OGGETTO","ANGOLO","FATTORE",
+      "DURATA","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACCE"
+    ];
+    const placeholdersEN = [
+      "VARIABLE","EXPRESSION","CONDITION","LIST","INDEX","START","END","PROMPT","TEXT",
+      "RADIUS","THICKNESS","SIZE","RED","GREEN","BLUE","OBJECT","ANGLE","FACTOR",
+      "DURATION","X1","Y1","X2","Y2","X3","Y3","X","Y",  "MIN", "MAX", "FACES"
+    ];
+    const tokens = isLanguageIT ? placeholdersIT : placeholdersEN;
+
+    let best = null;
+    for (const t of tokens) {
+      const re = new RegExp("\\b" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b");
+      const m = re.exec(insertText);
+      if (m && (best === null || m.index < best.index)) {
+        best = { index: m.index, length: m[0].length };
+      }
+    }
+
+    const base = before.length; // nuova base dopo la sostituzione
+    let selStart = base + insertText.length;
+    let selEnd = selStart;
+
+    if (best) {
+      selStart = base + best.index;
+      selEnd = selStart + best.length;
+    }
+
+    // Ripristina focus e selezione
+    codeInput.focus();
+    codeInput.setSelectionRange(selStart, selEnd);
+
+    // Chiudi suggerimenti e aggiorna UI
+    hideSuggestions();
+    updateHighlighting();
+    updateLineNumber();
+  }
+
+
+  function updateSuggestionSelection(newIndex) {
+    if (!activeSuggestions.length) return;
+    userNavigatedSuggestions = true;
+    selectedSuggestionIndex = (newIndex + activeSuggestions.length) % activeSuggestions.length;
+    const nodes=[...suggestionBox.querySelectorAll(".sugg-item")];
+    nodes.forEach((n,i)=>n.setAttribute("aria-selected", i===selectedSuggestionIndex ? "true":"false"));
+    const selected = nodes[selectedSuggestionIndex];
+    if (selected) selected.scrollIntoView({ block:"nearest" });
+  }
+
+  function handleSuggestionKeydown(ev) {
+  // Non interferire con Ctrl+Enter (run)
+  if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") return;
+
+  // Ctrl+Space: apertura esplicita suggerimenti
+  if ((ev.ctrlKey || ev.metaKey) && ev.code === "Space") {
+    ev.preventDefault();
+    forceSuggest = true;
+    suggestionsOpenedExplicitly = true;
+    userNavigatedSuggestions = false;
+    scheduleSuggestions();
+    return;
+  }
+
+  // Se il box non è visibile, non fare nulla
+  if (suggestionBox.style.display !== "block") return;
+
+  // ESC chiude sempre
+  if (ev.key === "Escape") {
+    ev.preventDefault();
+    hideSuggestions();
+    return;
+  }
+
+  // Frecce: navigano il box (e segnano interazione)
+  if (ev.key === "ArrowDown") {
+    ev.preventDefault();
+    updateSuggestionSelection(selectedSuggestionIndex + 1);
+    return;
+  }
+  if (ev.key === "ArrowUp") {
+    ev.preventDefault();
+    updateSuggestionSelection(selectedSuggestionIndex - 1);
+    return;
+  }
+
+  // TAB: accetta sempre
+  if (ev.key === "Tab") {
+    ev.preventDefault();
+    applySuggestion(selectedSuggestionIndex);
+    return;
+  }
+
+  // ENTER: accetta SOLO se interazione esplicita
+  const acceptOnEnter = suggestionsOpenedExplicitly || userNavigatedSuggestions;
+  if (ev.key === "Enter" && acceptOnEnter) {
+    ev.preventDefault();
+    applySuggestion(selectedSuggestionIndex);
+    return;
+  }
+
+}
+
+
+  const EDITOR_TAB_SIZE = 4;
+
+  function getLineStartIndex(text,pos){ const i=text.lastIndexOf("\n",pos-1); return i===-1?0:i+1; }
+  function getLineIndentString(text,lineStart){ const line=text.slice(lineStart); const m=line.match(/^[\t ]*/); return m?m[0]:""; }
+  function computeIndentColumns(indentStr, tabSize){
+    const cols=new Array(indentStr.length+1);
+    let col=0; cols[0]=0;
+    for (let i=0;i<indentStr.length;i++){
+      const ch=indentStr[i];
+      if (ch==="\t") col += tabSize - (col % tabSize);
+      else col += 1;
+      cols[i+1]=col;
+    }
+    return cols;
+  }
+
+  function handleEditorKeydown(ev) {
+    handleSuggestionKeydown(ev);
+    if (ev.defaultPrevented) return;
+
+    const value = codeInput.value;
+    const start = codeInput.selectionStart ?? 0;
+    const end   = codeInput.selectionEnd ?? start;
+
+    if (ev.key==="Enter" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+      ev.preventDefault();
+      const lineStart=getLineStartIndex(value,start);
+      const indent=getLineIndentString(value,lineStart);
+      const before=value.slice(0,start);
+      const after=value.slice(end);
+      const insert="\n"+indent;
+      codeInput.value = before + insert + after;
+      const newPos = before.length + insert.length;
+      codeInput.setSelectionRange(newPos,newPos);
+      updateLineNumber();
+      updateHighlighting(true);
+      scheduleSuggestions();
+      return;
+    }
+
+    if ((ev.key==="Backspace"||ev.key==="Delete") && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+      if (start!==end) return;
+      const lineStart=getLineStartIndex(value,start);
+      const lineEnd=value.indexOf("\n",lineStart);
+      const lineText=value.slice(lineStart, lineEnd===-1?value.length:lineEnd);
+      const indentMatch=lineText.match(/^[\t ]*/);
+      const indentLen=indentMatch?indentMatch[0].length:0;
+      const indentStr=lineText.slice(0,indentLen);
+      if (start<lineStart || start>lineStart+indentLen) return;
+
+      const cols=computeIndentColumns(indentStr, EDITOR_TAB_SIZE);
+      const rel=start-lineStart;
+
+      if (ev.key==="Backspace") {
+        if (rel===0) return;
+        const currentCol=cols[rel];
+        const step=(currentCol % EDITOR_TAB_SIZE) || EDITOR_TAB_SIZE;
+        const targetCol=Math.max(0,currentCol-step);
+        let targetIdx=0;
+        for (let i=0;i<=rel;i++) if (cols[i]<=targetCol) targetIdx=i;
+        const removeCount=rel-targetIdx;
+        if (removeCount<=0) return;
+        ev.preventDefault();
+        codeInput.value=value.slice(0,start-removeCount)+value.slice(start);
+        const newPos=start-removeCount;
+        codeInput.setSelectionRange(newPos,newPos);
+        updateLineNumber(); updateHighlighting(); scheduleSuggestions();
+        return;
+      }
+
+      if (ev.key==="Delete") {
+        if (rel>=indentLen) return;
+        const currentCol=cols[rel];
+        const step=(currentCol % EDITOR_TAB_SIZE) || EDITOR_TAB_SIZE;
+        const targetCol=Math.min(cols[indentLen], currentCol+step);
+        let targetIdx=indentLen;
+        for (let i=rel;i<=indentLen;i++) { if (cols[i]>=targetCol) { targetIdx=i; break; } }
+        const removeCount=targetIdx-rel;
+        if (removeCount<=0) return;
+        ev.preventDefault();
+        codeInput.value=value.slice(0,start)+value.slice(start+removeCount);
+        codeInput.setSelectionRange(start,start);
+        updateLineNumber(); updateHighlighting(); scheduleSuggestions();
+        return;
+      }
+    }
+  }
+
+  // --- Keyboard state ---
+  function normalizeKey(e) {
+    if (e.key === " ") return "SPACE";
+    const map = {
+      " ": "SPACE", Spacebar: "SPACE", Enter: "ENTER", Tab: "TAB", Backspace: "BACKSPACE",
+      Escape: "ESC", ArrowUp: "UP", ArrowDown: "DOWN", ArrowLeft: "LEFT", ArrowRight: "RIGHT",
+      Shift: "SHIFT", Control: "CTRL", Alt: "ALT", Meta: "META"
+    };
+    if (e.key.length === 1) return e.key.toUpperCase();
+    return map[e.key] || e.key.toUpperCase();
+  }
+  function onKeydown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") return;
+    keyState[normalizeKey(e)] = true;
+  }
+  function onKeyup(e) { keyState[normalizeKey(e)] = false; }
+  window.addEventListener("keydown", onKeydown, { passive: true });
+  window.addEventListener("keyup", onKeyup, { passive: true });
+
+  // --- Console formatting ---
+  function needsPrompt() {
+    if (outputArea.childNodes.length === 0) return true;
+    return outputArea.textContent.endsWith("\n");
+  }
+  function clearScreen() { outputArea.textContent = ""; }
+
+  function formatNumber(n, precision = null) {
+    if (!Number.isFinite(n)) return String(n);
+
+    // Recupera la soglia dall'ambiente, default a 1e6 se non settata
+    const threshold = (typeof env.sciThreshold === "number") ? env.sciThreshold : 1e6;
+    const abs = Math.abs(n);
+
+    // Se il numero supera la soglia, usa la notazione esponenziale
+    if (abs >= threshold) {
+      let s;
+      // Se 'decimali' è impostato, lo uso anche nell'esponenziale
+      if (precision !== null && typeof precision === "number" && precision >= 0) {
+        s = n.toExponential(precision);
+      } else {
+        // Default JS (solitamente 6 cifre) se non specificato
+        s = n.toExponential();
+        // Pulizia estetica per rimuovere zeri non necessari (es 1.500000e+9)
+        if (s.indexOf('.') !== -1) {
+            s = s.replace(/0+e/, 'e').replace(/\.e/, 'e');
+        }
+      }
+      
+      // Rimuovo il '+' dall'esponente per estetica (es. 1.2e+5 -> 1.2e5)
+      s = s.replace(/e\+/, "e");
+      return s;
+    }
+
+    // --- LOGICA STANDARD ---
+    // Se 'decimali' è impostato, usa toFixed
+    if (precision !== null && typeof precision === "number" && precision >= 0) {
+      return n.toFixed(precision);
+    }
+    
+    if (Number.isInteger(n)) return String(n);
+    return String(n);
+  }
+
+  function isPoint(p) { return typeof p === "object" && p !== null && p.__type === "point"; }
+
+  function formatForOutput(value, precision = null) {
+    if (value === null) return "null";
+    if (value === undefined) return "undefined";
+    if (typeof value === "number") return formatNumber(value, precision);
+    if (isPoint(value)) return `Point(${formatNumber(value.x, precision)}, ${formatNumber(value.y, precision)})`;
+    if (Array.isArray(value)) return `(${value.map(v => formatForOutput(v, precision)).join(", ")})`;
+    return String(value);
+  }
+
+  function appendLine(message, isError=false, precision=null) {
+    const prefix = needsPrompt() ? CONSOLE_PROMPT : "";
+    const formatted = prefix + formatForOutput(message, precision) + "\n";
+    let node;
+    if (isError) {
+      node = document.createElement("span");
+      node.className = "error-message";
+      node.textContent = formatted;
+    } else {
+      node = document.createTextNode(formatted);
+    }
+    outputArea.appendChild(node);
+    outputArea.scrollTop = outputArea.scrollHeight;
+  }
+
+  function appendText(message, precision=null) {
+    const prefix = needsPrompt() ? CONSOLE_PROMPT : "";
+    const textNode = document.createTextNode(prefix + formatForOutput(message, precision));
+    outputArea.appendChild(textNode);
+    outputArea.scrollTop = outputArea.scrollHeight;
+  }
+
+  function fail(key, params, lineNumber) {
+    let msg = uiStrings[lang][key] || key;
+    if (typeof msg === "function") msg = msg(params);
+    appendLine(`${uiStrings[lang].errorPrefix} ${lineNumber + 1}: ${msg}`, true);
+    throw new Error("Execution stopped.");
+  }
+
+  // --- Deep copy (value semantics) ---
+  function deepCopyValue(v) {
+    if (v === null || typeof v !== "object") return v;
+    if (Array.isArray(v)) {
+      const copy = v.map(deepCopyValue);
+      copy.__id = Math.random();
+      return copy;
+    }
+    if (isPoint(v)) return { __type: "point", x: v.x, y: v.y, __id: Math.random() };
+    try { return JSON.parse(JSON.stringify(v)); } catch { return v; }
+  }
+
+  // --- Canvas grafico ---
+  function calculateBoundingBox(objects) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    const shapes = objects.filter(obj => obj.type !== "background");
+    for (const obj of shapes) {
+      let bounds;
+      if (obj.type === "circle" || obj.type === "circumference") {
+        bounds = { minX: obj.x-obj.r, maxX: obj.x+obj.r, minY: obj.y-obj.r, maxY: obj.y+obj.r };
+      } else if (obj.type === "rectangle") {
+        bounds = {
+          minX: Math.min(obj.v1.x,obj.v2.x,obj.v3.x,obj.v4.x),
+          maxX: Math.max(obj.v1.x,obj.v2.x,obj.v3.x,obj.v4.x),
+          minY: Math.min(obj.v1.y,obj.v2.y,obj.v3.y,obj.v4.y),
+          maxY: Math.max(obj.v1.y,obj.v2.y,obj.v3.y,obj.v4.y)
+        };
+      } else if (obj.type === "triangle") {
+        bounds = {
+          minX: Math.min(obj.v1.x,obj.v2.x,obj.v3.x),
+          maxX: Math.max(obj.v1.x,obj.v2.x,obj.v3.x),
+          minY: Math.min(obj.v1.y,obj.v2.y,obj.v3.y),
+          maxY: Math.max(obj.v1.y,obj.v2.y,obj.v3.y)
+        };
+      } else if (obj.type === "line") {
+        bounds = {
+          minX: Math.min(obj.x1,obj.x2) - obj.t/2,
+          maxX: Math.max(obj.x1,obj.x2) + obj.t/2,
+          minY: Math.min(obj.y1,obj.y2) - obj.t/2,
+          maxY: Math.max(obj.y1,obj.y2) + obj.t/2
+        };
+      } else if (obj.type === "arc") {
+        const { r, x1, y1, x2, y2 } = obj;
+        const dx = x2-x1, dy = y2-y1;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d > 2*r || d === 0) {
+          bounds = { minX: Math.min(x1,x2), maxX: Math.max(x1,x2), minY: Math.min(y1,y2), maxY: Math.max(y1,y2) };
+        } else {
+          const h = Math.sqrt(r*r - d*d/4);
+          const mx = (x1+x2)/2, my = (y1+y2)/2;
+          const cx = mx + h*(-dy/d), cy = my + h*(dx/d);
+          bounds = { minX: cx-r, maxX: cx+r, minY: cy-r, maxY: cy+r };
+        }
+      } else if (obj.type === "image" || obj.type === "text") {
+        const { x, y, width: w, height: h, rotation: theta } = obj;
+        const cx = x + w/2, cy = y + h/2;
+        if (!theta) {
+          bounds = { minX: x, maxX: x+w, minY: y, maxY: y+h };
+        } else {
+          const c=Math.cos(theta), s=Math.sin(theta);
+          const rel=[{x:-w/2,y:-h/2},{x:w/2,y:-h/2},{x:w/2,y:h/2},{x:-w/2,y:h/2}];
+          const abs=rel.map(pt=>({x: cx + pt.x*c - pt.y*s, y: cy + pt.x*s + pt.y*c}));
+          bounds = {
+            minX: Math.min(...abs.map(p=>p.x)), maxX: Math.max(...abs.map(p=>p.x)),
+            minY: Math.min(...abs.map(p=>p.y)), maxY: Math.max(...abs.map(p=>p.y))
+          };
+        }
+      }
+      if (bounds) {
+        minX = Math.min(minX, bounds.minX); maxX = Math.max(maxX, bounds.maxX);
+        minY = Math.min(minY, bounds.minY); maxY = Math.max(maxY, bounds.maxY);
+      }
+    }
+    return { minX, minY, maxX, maxY };
+  }
+
+  function applyFitTransform(objects) {
+    const bounds = calculateBoundingBox(objects);
+    const dpr = gfxDpr || (window.devicePixelRatio || 1);
+    const rect = gfxCanvas.getBoundingClientRect();
+    const cssW = rect.width, cssH = rect.height;
+
+    if (!isFinite(bounds.minX) || !isFinite(bounds.maxX) || cssW<=0 || cssH<=0) {
+      gfxCtx.setTransform(dpr,0,0,-dpr, gfxCanvas.width/2, gfxCanvas.height/2);
+      return;
+    }
+
+    const contentWidth = bounds.maxX - bounds.minX;
+    const contentHeight = bounds.maxY - bounds.minY;
+    let scaleCss;
+    if (contentWidth===0 && contentHeight===0) scaleCss = 50;
+    else {
+      const scaleX = cssW / (contentWidth || 1e-9);
+      const scaleY = cssH / (contentHeight || 1e-9);
+      scaleCss = Math.min(scaleX, scaleY) * 0.95;
+    }
+
+    const scale = scaleCss * dpr;
+    const cx = (bounds.minX + bounds.maxX)/2;
+    const cy = (bounds.minY + bounds.maxY)/2;
+    const tx = (gfxCanvas.width/2) - cx*scale;
+    const ty = (gfxCanvas.height/2) + cy*scale;
+    gfxCtx.setTransform(scale,0,0,-scale, tx, ty);
+  }
+
+  function drawObject(obj) {
+    if (!obj || !obj.type) return;
+    gfxCtx.save();
+    switch (obj.type) {
+      case "rectangle": {
+        gfxCtx.fillStyle = obj.color;
+        gfxCtx.beginPath();
+        gfxCtx.moveTo(obj.v1.x,obj.v1.y);
+        gfxCtx.lineTo(obj.v2.x,obj.v2.y);
+        gfxCtx.lineTo(obj.v3.x,obj.v3.y);
+        gfxCtx.lineTo(obj.v4.x,obj.v4.y);
+        gfxCtx.closePath();
+        gfxCtx.fill();
+        break;
+      }
+      case "circle": {
+        gfxCtx.fillStyle = obj.color;
+        gfxCtx.beginPath();
+        gfxCtx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+        gfxCtx.fill();
+        break;
+      }
+      case "circumference": {
+        gfxCtx.strokeStyle = obj.color;
+        gfxCtx.lineWidth = obj.t;
+        gfxCtx.beginPath();
+        gfxCtx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+        gfxCtx.stroke();
+        break;
+      }
+      case "triangle": {
+        gfxCtx.fillStyle = obj.color;
+        gfxCtx.beginPath();
+        gfxCtx.moveTo(obj.v1.x,obj.v1.y);
+        gfxCtx.lineTo(obj.v2.x,obj.v2.y);
+        gfxCtx.lineTo(obj.v3.x,obj.v3.y);
+        gfxCtx.closePath();
+        gfxCtx.fill();
+        break;
+      }
+      case "line": {
+        gfxCtx.strokeStyle = obj.color;
+        gfxCtx.lineWidth = obj.t;
+        gfxCtx.beginPath();
+        gfxCtx.moveTo(obj.x1,obj.y1);
+        gfxCtx.lineTo(obj.x2,obj.y2);
+        gfxCtx.stroke();
+        break;
+      }
+      case "arc": {
+        const { r, t, x1, y1, x2, y2, color } = obj;
+        const dx=x2-x1, dy=y2-y1;
+        const d2 = dx*dx+dy*dy;
+        if (d2===0 || r < Math.sqrt(d2)/2) break;
+        const d=Math.sqrt(d2);
+        const h=Math.sqrt(r*r - d2/4);
+        const mx=(x1+x2)/2, my=(y1+y2)/2;
+        const cx=mx + h*(-dy/d), cy=my + h*(dx/d);
+        const a1=Math.atan2(y1-cy, x1-cx);
+        const a2=Math.atan2(y2-cy, x2-cx);
+        gfxCtx.strokeStyle=color;
+        gfxCtx.lineWidth=t;
+        gfxCtx.beginPath();
+        gfxCtx.arc(cx,cy,r,a1,a2,false);
+        gfxCtx.stroke();
+        break;
+      }
+      case "image":
+      case "text": {
+        const centerX = obj.x + obj.width/2;
+        const centerY = obj.y + obj.height/2;
+        gfxCtx.translate(centerX, centerY);
+        if (obj.rotation) gfxCtx.rotate(obj.rotation);
+        gfxCtx.scale(1,-1);
+        if (obj.type==="image") {
+          gfxCtx.drawImage(obj.img, -obj.width/2, -obj.height/2, obj.width, obj.height);
+        } else {
+          gfxCtx.fillStyle=obj.color;
+          gfxCtx.font = `${obj.size}px 'Roboto Mono', monospace`;
+          gfxCtx.textAlign="center";
+          gfxCtx.textBaseline="middle";
+          gfxCtx.fillText(obj.content, 0, 0);
+        }
+        break;
+      }
+    }
+    gfxCtx.restore();
+  }
+
+  function clearCanvasScreenSpace() {
+    gfxCtx.save();
+    gfxCtx.setTransform(1,0,0,1,0,0);
+    gfxCtx.clearRect(0,0,gfxCanvas.width,gfxCanvas.height);
+    gfxCtx.restore();
+  }
+
+  function paintBackground(objects, context) {
+    gfxCtx.save();
+    gfxCtx.setTransform(1,0,0,1,0,0);
+
+    if (context && context.backgroundImage) {
+      const { img, scale } = context.backgroundImage;
+      const w = img.naturalWidth*scale, h = img.naturalHeight*scale;
+      const x = (gfxCanvas.width - w)/2, y = (gfxCanvas.height - h)/2;
+      gfxCtx.drawImage(img,x,y,w,h);
+    } else if (context && context.backgroundColor) {
+      gfxCtx.fillStyle=context.backgroundColor;
+      gfxCtx.fillRect(0,0,gfxCanvas.width,gfxCanvas.height);
+    } else {
+      const background = objects.find(o=>o.type==="background");
+      if (background && background.color) {
+        gfxCtx.fillStyle=background.color;
+        gfxCtx.fillRect(0,0,gfxCanvas.width,gfxCanvas.height);
+      }
+    }
+
+    gfxCtx.restore();
+  }
+
+  function redrawAll(objects, context) {
+    setupCanvas();
+    clearCanvasScreenSpace();
+    paintBackground(objects, context);
+    applyFitTransform(objects);
+    const shapes = objects.filter(o=>o.type!=="background");
+    for (const obj of shapes) drawObject(obj);
+  }
+
+  function setupCanvas() {
+    gfxDpr = window.devicePixelRatio || 1;
+    const dpr=gfxDpr;
+    const rect=gfxCanvas.getBoundingClientRect();
+    if (rect.width<=0 || rect.height<=0) return;
+    gfxCanvas.width=Math.floor(rect.width*dpr);
+    gfxCanvas.height=Math.floor(rect.height*dpr);
+    gfxCtx=gfxCanvas.getContext("2d",{alpha:true});
+    gfxCtx.setTransform(dpr,0,0,-dpr, gfxCanvas.width/2, gfxCanvas.height/2);
+  }
+
+  function drawReadyScreen(message) {
+    setupCanvas();
+    const {width,height}=gfxCanvas;
+    if (width<=0 || height<=0) return;
+    const dpr=window.devicePixelRatio||1;
+    gfxCtx.save();
+    gfxCtx.setTransform(1,0,0,1,0,0);
+    gfxCtx.clearRect(0,0,width,height);
+    gfxCtx.fillStyle="#ffffff";
+    gfxCtx.fillRect(0,0,width,height);
+    gfxCtx.fillStyle="#888";
+    gfxCtx.font=`${16*dpr}px monospace`;
+    gfxCtx.textAlign="center";
+    gfxCtx.textBaseline="middle";
+    gfxCtx.fillText(isLanguageIT ? "Area Grafica":"Graphics Area", width/2, height/2 - 12*dpr);
+    gfxCtx.font=`${12*dpr}px monospace`;
+    gfxCtx.fillText(message, width/2, height/2 + 12*dpr);
+    gfxCtx.restore();
+  }
+
+  // === UNIFIED AST PARSER (statements + expressions) ===
+
+  // Keywords/phrases (case-insensitive). Parser accepts either Italian or English forms.
+  const KW = {
+    DEFINE: [["define"],["definisci"]],
+    FUNCTION: [["function"],["funzione"]],
+    PROCEDURE: [["procedure"],["procedura"]],
+    GLOBAL: [["global"],["globale"]],
+    RETURN: [["return"],["restituisci"]],
+    STOP: [["stop"]],
+    IF: [["if"],["se"]],
+    THEN: [["then"],["allora"]],
+    OTHERWISE: [["otherwise"],["altrimenti"]],
+    AS_LONG_AS: [["as","long","as"],["fintanto"]],
+    YOU_DO: [["you","do"],["esegui"]],
+    FOR_EACH: [["for","each"],["per","ogni"]],
+    VARIABLE: [["index"],["variable"],["variabile"],["indice"]],
+    GOES_FROM: [["goes","from"],["va","da"]],
+    TO: [["to"],["a"]],
+    AND: [["and"],["e"],["ed"]],
+    IN: [["in"]],
+    PUT: [["put"],["metti"]],
+    ADD: [["add"],["aggiungi"]],
+    REMOVE: [["remove"],["rimuovi"]],
+    INSERT: [["insert"],["inserisci"]],
+    FIRST: [["first"],["primo"]],
+    LAST: [["last"],["ultimo"]],
+    ITEM: [["item"],["elemento"]],
+    OF: [["of"],["di"]],
+    DIMENSION: [["dimension"],["dimensione"]],
+    LIST: [["list"],["lista"]],
+    OUTPUT: [["output"],["scrivi"]],
+    NEWLINE: [["newline"],["accapo"]],
+    WAIT: [["wait"],["aspetta"]],
+    MS: [["ms"]],
+    GET: [["get"],["chiedi"]],
+    SAYING: [["saying"],["dicendo"]],
+    SET: [["set"],["imposta"]],
+    COLOR: [["color"],["colore"]],
+    CLEAR: [["clear"],["cancella"]],
+    GRAPHICS: [["graphics"],["grafica"]],
+    SCREEN: [["screen"],["schermo"]],
+    REDRAW: [["redraw"],["ridisegna"]],
+    CIRCLE: [["circle"],["cerchio"]],
+    RADIUS: [["radius"],["raggio"]],
+    CIRCUMFERENCE: [["circumference"],["circonferenza"]],
+    THICKNESS: [["thickness"],["spessore"]],
+    RECTANGLE: [["rectangle"],["rettangolo"]],
+    LINE: [["line"],["linea"]],
+    TRIANGLE: [["triangle"],["triangolo"]],
+    WITH: [["with"],["con"]],
+    VERTICES: [["vertices"],["vertici"]],
+    ARC: [["arc"],["arco"]],
+    GRAFFITI: [["graffiti"]],
+    SIZE: [["size"],["grandezza"]],
+    DRAW: [["draw"],["disegna"]],
+    ROTATE: [["rotate"],["ruota"]],
+    DEG: [["deg"],["gradi"]],
+    PLACE: [["place"],["posiziona"]],
+    IT: [["it"]],
+    AT: [["at"],["in"]],
+    SCALE: [["scale"],["scala"]],
+    BY: [["by"],["di"]],
+    LOAD: [["load"],["carica"]],
+    PAINT: [["paint"],["dipingi"]],
+    BACKGROUND: [["background"],["sfondo"]],
+    AS: [["as"],["come"]],
+    AS_BACKGROUND: [["as","background"],["come","sfondo"]],
+    ALIAS: [["alias"]],
+    INOUT: [["inout"]],
+    KEY: [["key"],["tasto"]],
+    IS: [["is"],["viene"],["vale"],["uguale"]],
+    EQUALS: [["equals"],["uguale"]],
+    PRESSED: [["pressed"],["premuto"]],
+    TICK: [["tick"]],
+    TOCK: [["tock"]],
+    IMPORT: [["import"],["importa"]],
+    LABEL: [["label"],["etichetta"]],
+    SCIENTIFIC: [["scientific"],["scientifica"]]
+  };
+
+  const EXEC_STOP = { type: "ExecutionStop" };
+  function isLetterStart(ch) { return /[A-Za-z_àèéìòùÀÈÉÌÒÙ]/.test(ch); }
+  function isLetterPart(ch) { return /[A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]/.test(ch); }
+
+  class Lexer {
+    constructor(src) {
+      this.src = src.replace(/\r\n/g,"\n");
+      this.i = 0;
+      this.line = 0;
+      this.col = 0;
+    }
+    eof() { return this.i >= this.src.length; }
+    peekChar() { return this.src[this.i]; }
+    nextChar() {
+      const ch = this.src[this.i++];
+      if (ch === "\n") { this.line++; this.col=0; } else this.col++;
+      return ch;
+    }
+    makeToken(type, value, line, col) { return { type, value, line, col }; }
+
+    readWhile(pred) {
+      let s="";
+      while (!this.eof() && pred(this.peekChar())) s += this.nextChar();
+      return s;
+    }
+
+    skipComment() {
+      while (!this.eof() && this.peekChar() !== "\n") this.nextChar();
+    }
+
+    readString() {
+      const line=this.line, col=this.col;
+      let s=""; this.nextChar(); // opening "
+      let esc=false;
+      while (!this.eof()) {
+        const ch=this.nextChar();
+        if (esc) { s += ch; esc=false; continue; }
+        if (ch==="\\") { s += ch; esc=true; continue; }
+        if (ch==="\"") break;
+        s += ch;
+      }
+      return this.makeToken("STRING", "\""+s+"\"", line, col);
+    }
+
+    readNumber() {
+      const line=this.line, col=this.col;
+      const rest = this.src.slice(this.i);
+      const m = rest.match(/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+      if (!m) return null;
+      const lit = m[0];
+      for (let k=0;k<lit.length;k++) this.nextChar();
+      return this.makeToken("NUMBER", lit, line, col);
+    }
+
+    readIdent() {
+      const line=this.line, col=this.col;
+      let s="";
+      s += this.nextChar();
+      s += this.readWhile(isLetterPart);
+      return this.makeToken("IDENT", s, line, col);
+    }
+
+  nextToken() {
+        while (!this.eof()) {
+          const ch = this.peekChar();
+          // Supporto per "Line Continuation" con backslash (\)
+          // Salta eventuali spazi dopo il \
+          if (ch === "\\") {
+            let tempI = this.i + 1;
+            // 1. Avanza finché trova spazi, tabulazioni o CR
+            while (tempI < this.src.length && " \t\r".includes(this.src[tempI])) {
+              tempI++;
+            }
+            // 2. Se dopo gli spazi c'è un invio (\n), è una continuazione valida
+            if (tempI < this.src.length && this.src[tempI] === "\n") {
+              this.i = tempI + 1; // Salta tutto il blocco (\ + spazi + \n)
+              this.line++;        // Aggiorna il contatore delle righe
+              this.col = 0;
+              continue;           // Ricomincia il ciclo (unisce visivamente le righe)
+            }
+          }
+          // whitespace
+          if (ch === " " || ch === "\t") { this.nextChar(); continue; }
+
+          // newline
+          if (ch === "\n") { 
+            const t = this.makeToken("NEWLINE", "\n", this.line, this.col); 
+            this.nextChar(); 
+            return t; 
+          }
+
+          // comment
+          if (ch === "#") { this.skipComment(); continue; }
+
+          // string
+          if (ch === "\"") return this.readString();
+
+          // punctuation
+          if ("(),;[]".includes(ch)) {
+            const line = this.line, col = this.col;
+            this.nextChar();
+            const map = { "(": "LPAREN", ")": "RPAREN", ",": "COMMA", ";": "SEMI", "[": "LBRACK", "]": "RBRACK" };
+            return this.makeToken(map[ch], ch, line, col);
+          }
+
+          // operators
+          if ("+-*/%^<>=!".includes(ch)) {
+            const line = this.line, col = this.col;
+            const rest = this.src.slice(this.i);
+            const m = rest.match(/^(===|!==|==|!=|<=|>=|<|>|\+|-|\*|\/|%|\^|=)/);
+            const op = m ? m[0] : ch;
+            for (let k = 0; k < op.length; k++) this.nextChar();
+            return this.makeToken("OP", op, line, col);
+          }
+
+          // number
+          if (/\d|\./.test(ch)) {
+            const t = this.readNumber();
+            if (t) return t;
+          }
+
+          // identifier/keyword
+          if (isLetterStart(ch)) return this.readIdent();
+
+          // unknown char: skip and error later
+          const line = this.line, col = this.col;
+          this.nextChar();
+          return this.makeToken("UNKNOWN", ch, line, col);
+        }
+        return { type: "EOF", value: "", line: this.line, col: this.col };
+      }
+
+
+    lexAll() {
+      const out=[];
+      let t;
+      do { t=this.nextToken(); out.push(t); } while (t.type!=="EOF");
+      return out;
+    }
+  }
+
+  function lowerTok(t){ return (t && typeof t.value==="string") ? t.value.toLowerCase() : ""; }
+
+  class Parser {
+    constructor(tokens) { this.tokens=tokens; this.pos=0; }
+    peek(n=0){ return this.tokens[this.pos+n] || this.tokens[this.tokens.length-1]; }
+    eof(){ return this.peek().type==="EOF"; }
+    consume(){ return this.tokens[this.pos++]; }
+    matchType(type){ if (this.peek().type===type) return this.consume(); return null; }
+
+    isWord(tok, word) { return tok && tok.type==="IDENT" && tok.value.toLowerCase()===word; }
+
+    // Match any of the provided phrase variants.
+    matchPhrase(variants) {
+      // variants: array of arrays of words, e.g. [["as","long","as"],["fintanto"]]
+      for (const seq of variants) {
+        let ok=true;
+        for (let k=0;k<seq.length;k++) {
+          const t=this.peek(k);
+          if (!(t && t.type==="IDENT" && t.value.toLowerCase()===seq[k])) { ok=false; break; }
+        }
+        if (ok) {
+          const startTok=this.peek();
+          for (let k=0;k<seq.length;k++) this.consume();
+          return startTok;
+        }
+      }
+      return null;
+    }
+
+    // Convenience for KW entries
+    matchKW(name){ return this.matchPhrase(KW[name]); }
+    expectKW(name, lineForErr){
+      const t=this.matchKW(name);
+      if (!t) this.throwParse(`Expected keyword '${name}'.`, (lineForErr ?? this.peek().line));
+      return t;
+    }
+
+    skipSeparators() {
+      while (true) {
+        if (this.matchType("NEWLINE")) continue;
+        if (this.matchType("SEMI")) continue;
+        break;
+      }
+    }
+
+    throwParse(msg, line) { throw { type:"ParseError", message: msg, line: line }; }
+
+    parseProgram() {
+      const stmts=[];
+      this.skipSeparators();
+      while (!this.eof()) {
+        stmts.push(this.parseStatement());
+        this.skipSeparators();
+      }
+      return { type:"Program", stmts };
+    }
+
+    parseBlock() {
+      const lp=this.matchType("LPAREN");
+      if (!lp) this.throwParse(uiStrings[lang].expectedParenAfterKeyword, this.peek().line);
+      const stmts=[];
+      this.skipSeparators();
+      while (!this.eof() && this.peek().type!=="RPAREN") {
+        stmts.push(this.parseStatement());
+        this.skipSeparators();
+      }
+      if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, lp.line);
+      return { type:"Block", stmts, line: lp.line };
+    }
+
+    parseIdentifier() {
+      const t=this.matchType("IDENT");
+      if (!t) this.throwParse("Expected identifier.", this.peek().line);
+      return t;
+    }
+
+    // Expression parsing (Pratt)
+    isStopToken(stopSet, tok) {
+      if (!tok) return true;
+      if (tok.type==="EOF" || tok.type==="NEWLINE" || tok.type==="SEMI" || tok.type==="RPAREN" || tok.type==="COMMA" || tok.type==="RBRACK") return true;
+      if (stopSet && tok.type==="IDENT" && stopSet.has(tok.value.toLowerCase())) return true;
+      return false;
+    }
+
+    getOpPrecedence(tok) {
+      if (!tok) return 0;
+      if (tok.type==="OP") {
+        const op=tok.value;
+        if (op==="^") return 7;
+        if (op==="*" || op==="/" || op==="%") return 6;
+        if (op==="+" || op==="-") return 5;
+        if (op==="=="||op==="==="||op==="!="||op==="!=="||op==="<"||op===">"||op==="<="||op===">=") return 4;
+        if (op==="=") return 4;
+        return 0;
+      }
+      if (tok.type==="IDENT") {
+        const w=tok.value.toLowerCase();
+        if (w==="alias") return 1;
+        if (w==="or" || w==="o") return 1;
+        if (w==="and" || w==="e" || w==="ed") return 2;
+        if (w==="mod") return 6;
+        if (w==="is" || w==="equals" || w==="vale" || w==="uguale") return 4;
+        if (w==="diverso" || w==="different") return 4;
+        if (w==="of" || w==="di") return 8;
+      }
+      return 0;
+    }
+
+    parseExpression(precedence=0, stopSet=null) {
+      let left = this.parsePrefix(stopSet);
+      while (!this.eof()) {
+        const tok=this.peek();
+        if (this.isStopToken(stopSet, tok)) break;
+
+        // special: x of POINT / y of POINT
+        const w = (tok.type==="IDENT") ? tok.value.toLowerCase() : "";
+        if ((w==="of" || w==="di") && left.type==="Var" && (left.nameLower==="x" || left.nameLower==="y")) {
+          // consume 'of/di' and parse right
+          this.consume();
+          const obj = this.parseExpression(7, stopSet);
+          left = { type:"PointProp", prop:left.nameLower, object: obj, line:left.line };
+          continue;
+        }
+
+        const opPrec=this.getOpPrecedence(tok);
+        if (opPrec<=0 || precedence>=opPrec) break;
+        left = this.parseInfix(left, opPrec, stopSet);
+      }
+      return left;
+    }
+
+    parsePrefix(stopSet) {
+      const tok=this.peek();
+      if (this.isStopToken(stopSet, tok)) this.throwParse("Expected expression.", tok.line);
+
+      // unary minus
+      if (tok.type==="OP" && tok.value==="-" ) {
+        this.consume();
+        const right=this.parseExpression(7, stopSet);
+        return { type:"Unary", op:"-", right, line: tok.line };
+      }
+
+      // unary not
+      if (tok.type==="IDENT" && ["not","non"].includes(tok.value.toLowerCase())) {
+        this.consume();
+        const right=this.parseExpression(6, stopSet);
+        return { type:"Unary", op:"not", right, line: tok.line };
+      }
+
+      // literals
+      if (tok.type==="NUMBER") {
+        this.consume();
+        return { type:"Literal", value: parseFloat(tok.value), line: tok.line };
+      }
+      if (tok.type==="STRING") {
+        this.consume();
+        let v;
+        try { v=JSON.parse(tok.value); } catch { v=tok.value.slice(1,-1); }
+        return { type:"Literal", value: v, line: tok.line };
+      }
+
+      // parentheses: grouping or tuple
+      if (tok.type==="LPAREN") {
+        const lp=this.consume();
+        if (this.matchType("RPAREN")) return { type:"Literal", value: [], line: lp.line };
+        const first=this.parseExpression(0, stopSet);
+        if (this.matchType("COMMA")) {
+          const items=[first];
+          while (true) {
+            items.push(this.parseExpression(0, stopSet));
+            if (!this.matchType("COMMA")) break;
+          }
+          if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, lp.line);
+          return { type:"Tuple", items, line: lp.line };
+        } else {
+          if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, lp.line);
+          return first;
+        }
+      }
+
+      // list(...) special
+      if (this.matchKW("LIST")) {
+        const lp=this.matchType("LPAREN");
+        if (!lp) this.throwParse(uiStrings[lang].expectedParenAfterKeyword, this.peek().line);
+        if (this.matchType("RPAREN")) return { type:"Literal", value: [], line: lp.line };
+        const items=[];
+        while (true) {
+          items.push(this.parseExpression(0, stopSet));
+          if (!this.matchType("COMMA")) break;
+        }
+        if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, lp.line);
+        return { type:"Tuple", items, line: lp.line };
+      }
+
+      // dimension of X
+      if (this.matchKW("DIMENSION")) {
+        this.expectKW("OF", tok.line);
+        const expr=this.parseExpression(7, stopSet);
+        return { type:"Dimension", expr, line: tok.line };
+      }
+
+      // item N of LIST
+      if (this.matchKW("ITEM")) {
+        const idx=this.parseExpression(0, new Set(["of","di"])); // stop at of/di
+        this.expectKW("OF", tok.line);
+        const list=this.parseExpression(7, stopSet);
+        return { type:"ItemOf", list, index: idx, line: tok.line };
+      }
+
+      // key <expr> is pressed
+      if (this.matchKW("KEY")) {
+        const keyExpr=this.parseExpression(0, new Set(["is","viene","pressed","premuto","vale","uguale"]));
+        // optional: 'is/viene/vale/uguale'
+        this.matchPhrase([["is"],["viene"],["vale"],["uguale"]]);
+        if (!this.matchPhrase([["pressed"],["premuto"]])) this.throwParse("Expected 'pressed'.", tok.line);
+        return { type:"KeyPressed", keyExpr, line: tok.line };
+      }
+
+      // identifier or function call
+      if (tok.type==="IDENT") {
+        const id=this.consume();
+        const name=id.value;
+        const nameLower=name.toLowerCase();
+
+        // keywordish literals
+        const litMap = {
+          "true": true, "vero": true,
+          "false": false, "falso": false,
+          "pi": Math.PI, "π": Math.PI,
+          "infinity": Infinity, "infinito": Infinity,
+          "nan": NaN, "null": null
+        };
+        if (nameLower in litMap) return { type:"Literal", value: litMap[nameLower], line: id.line };
+
+        // function call?
+        if (this.peek().type==="LPAREN") {
+          this.consume();
+          const args=[];
+          if (this.peek().type!=="RPAREN") {
+            while (true) {
+              args.push(this.parseExpression(0, stopSet));
+              if (!this.matchType("COMMA")) break;
+            }
+          }
+          if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, id.line);
+          return { type:"Call", name, args, line: id.line };
+        }
+
+        return { type:"Var", name, nameLower, line: id.line };
+      }
+
+      this.throwParse(`Unexpected token '${tok.value}'.`, tok.line);
+    }
+
+    parseInfix(left, opPrec, stopSet) {
+      const tok=this.peek();
+      if (tok.type==="OP") {
+        const op=this.consume().value;
+        const right=this.parseExpression(opPrec, stopSet);
+        return { type:"Binary", op, left, right, line: left.line };
+      }
+
+      if (tok.type==="IDENT") {
+        const w=tok.value.toLowerCase();
+
+        if (w==="alias") {
+          this.consume();
+          // Parsifica la parte destra
+          const right=this.parseExpression(opPrec, stopSet);
+          // Crea un nodo binario con operatore 'alias'
+          return { type:"Binary", op:"alias", left, right, line:left.line };
+        }
+
+        // and/or/mod/is/equals
+        if (w==="and"||w==="e"||w==="ed") {
+          this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"and", left, right, line:left.line };
+        }
+        if (w==="or"||w==="o") {
+          this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"or", left, right, line:left.line };
+        }
+        if (w==="mod") {
+          this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"%", left, right, line:left.line };
+        }
+        if (w==="is"||w==="equals"||w==="vale"||w==="uguale") {
+          // handle Italian phrase "uguale a" (consume optional "a")
+          this.consume();
+          if (this.peek().type==="IDENT" && this.peek().value.toLowerCase()==="a") this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"===", left, right, line:left.line };
+        }
+
+        if (w==="diverso" || w==="different") {
+          this.consume(); // Consuma la parola 'diverso'
+          
+          // Controlla se la prossima parola è 'da' (o 'from') e consumala se presente
+          const nextTok = this.peek();
+          if (nextTok.type === "IDENT") {
+             const nw = nextTok.value.toLowerCase();
+             if (nw === "da" || nw === "from") {
+                 this.consume();
+             }
+          }
+
+          // Parsifica l'espressione a destra
+          const right = this.parseExpression(opPrec, stopSet);
+          
+          // Restituisce un nodo Binario con operatore !=
+          return { type:"Binary", op:"!=", left, right, line:left.line };
+        }
+      
+      }
+
+      this.throwParse("Invalid infix operator.", tok.line);
+    }
+
+    // --- Statement parsing ---
+    parseStatement() {
+      this.skipSeparators();
+      const t=this.peek();
+      if (t.type==="EOF") this.throwParse("Unexpected end of input.", t.line);
+
+      // global
+      if (this.matchKW("GLOBAL")) {
+        const names=[];
+        while (true) {
+          const id=this.parseIdentifier();
+          names.push(id.value);
+          if (!this.matchType("COMMA")) break;
+        }
+        return { type:"GlobalDecl", names, line: t.line };
+      }
+
+      // define function/procedure
+      if (this.matchKW("DEFINE")) {
+        const kindTok = this.matchKW("FUNCTION") || this.matchKW("PROCEDURE");
+        if (!kindTok) this.throwParse("Expected 'function' or 'procedure'.", t.line);
+        const kind = (kindTok.value.toLowerCase()==="function" || kindTok.value.toLowerCase()==="funzione") ? "function" : "procedure";
+        const nameTok=this.parseIdentifier();
+
+        const lp=this.matchType("LPAREN");
+        if (!lp) this.throwParse(uiStrings[lang].expectedParenAfterKeyword, t.line);
+        const params=[];
+        if (this.peek().type!=="RPAREN") {
+          while (true) {
+            let inout=false;
+            if (this.matchKW("INOUT")) inout=true;
+            const p=this.parseIdentifier();
+            params.push({ name: p.value, inout });
+            if (!this.matchType("COMMA")) break;
+          }
+        }
+        if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, t.line);
+        const body=this.parseBlock();
+        return { type:"Define", kind, name:nameTok.value, params, body, line: t.line };
+      }
+
+      // return
+      if (this.matchKW("RETURN")) {
+        // optional expr until end-of-statement
+        const expr = (!this.isStopToken(null, this.peek()) && this.peek().type!=="NEWLINE" && this.peek().type!=="SEMI" && this.peek().type!=="RPAREN")
+          ? this.parseExpression(0, null)
+          : null;
+        return { type:"Return", expr, line: t.line };
+      }
+
+      // stop
+      if (this.matchKW("STOP")) return { type:"Stop", line: t.line };
+
+      // clear graphics / clear screen
+      if (this.matchKW("CLEAR")) {
+        if (this.matchKW("GRAPHICS")) return { type:"ClearGraphics", line: t.line };
+        if (this.matchKW("SCREEN")) return { type:"ClearScreen", line: t.line };
+        this.throwParse("Expected 'graphics' or 'screen'.", t.line);
+      }
+
+      // tick / redraw
+      if (this.matchKW("TICK")) return { type:"Tick", line: t.line };
+      if (this.matchKW("REDRAW")) return { type:"Redraw", line: t.line };
+
+      // wait <expr> ms
+      if (this.matchKW("WAIT")) {
+        const duration=this.parseExpression(0, new Set(["ms"]));
+        this.expectKW("MS", t.line);
+        return { type:"Wait", duration, line: t.line };
+      }
+
+      // digits/decimali
+      if (this.peek().type==="IDENT" && ["digits","decimali"].includes(lowerTok(this.peek()))) {
+        this.consume();
+        const prec=this.parseExpression(0, null);
+        return { type:"Digits", prec, line: t.line };
+      }
+
+      // scientifica(N)
+      if (this.matchKW("SCIENTIFIC")) {
+        // Legge un'espressione (es. 1000, 10^5, o una variabile)
+        const valExpr = this.parseExpression(0, null);
+        return { type: "ScientificThreshold", valExpr, line: t.line };
+      }
+
+      // newline/accapo statement
+      if (this.matchKW("NEWLINE")) return { type:"Newline", line: t.line };
+
+      // output/scrivi
+      if (this.matchKW("OUTPUT")) {
+        const expr=this.parseExpression(0, null);
+        return { type:"Output", expr, line: t.line };
+      }
+
+      // get/chiedi VAR saying/dicendo <expr>
+      if (this.matchKW("GET")) {
+        const varTok=this.parseIdentifier();
+        this.expectKW("SAYING", t.line);
+        const promptExpr=this.parseExpression(0, null);
+        return { type:"Get", varName: varTok.value, promptExpr, line: t.line };
+      }
+
+      // set/imposta ...
+      if (this.matchKW("SET")) {
+        // set color ...
+        if (this.matchKW("COLOR")) {
+          const colorExpr=this.parseExpression(0, null);
+          return { type:"SetColor", colorExpr, line: t.line };
+        }
+        // set x|y of <expr> to <expr>
+        const propTok=this.parseIdentifier();
+        const prop=propTok.value.toLowerCase();
+        if (!(prop==="x"||prop==="y")) this.throwParse("Expected 'x' or 'y'.", propTok.line);
+        this.expectKW("OF", t.line);
+        const targetExpr=this.parseExpression(0, new Set(["to","a"]));
+        this.expectKW("TO", t.line);
+        const valueExpr=this.parseExpression(0, null);
+        return { type:"SetPointProp", prop, targetExpr, valueExpr, line: t.line };
+      }
+
+      // paint background
+      if (this.matchKW("PAINT")) {
+        this.expectKW("BACKGROUND", t.line);
+        return { type:"PaintBackground", line: t.line };
+      }
+
+      // load <expr> scale <expr> as background
+      if (this.matchKW("LOAD")) {
+        const filenameExpr=this.parseExpression(0, new Set(["scale","scala"]));
+        this.expectKW("SCALE", t.line);
+        const scaleExpr=this.parseExpression(0, new Set(["as","come"]));
+        this.expectKW("AS", t.line);
+        this.expectKW("BACKGROUND", t.line);
+        return { type:"LoadBackground", filenameExpr, scaleExpr, line: t.line };
+      }
+
+      // circle radius R at POS
+      if (this.matchKW("CIRCLE")) {
+        this.expectKW("RADIUS", t.line);
+        const r=this.parseExpression(0, new Set(["at","in"]));
+        this.expectKW("AT", t.line);
+        const pos=this.parseExpression(0, null);
+        return { type:"Circle", r, pos, line: t.line };
+      }
+
+      // circumference radius R thickness T at POS
+      if (this.matchKW("CIRCUMFERENCE")) {
+        this.expectKW("RADIUS", t.line);
+        const r=this.parseExpression(0, new Set(["thickness","spessore"]));
+        this.expectKW("THICKNESS", t.line);
+        const th=this.parseExpression(0, new Set(["at","in"]));
+        this.expectKW("AT", t.line);
+        const pos=this.parseExpression(0, null);
+        return { type:"Circumference", r, th, pos, line: t.line };
+      }
+
+      // rectangle from P1 to P2
+      if (this.matchKW("RECTANGLE")) {
+        const fromTok=this.matchPhrase([["from"],["da"]]);
+        if (!fromTok) this.throwParse("Expected 'from/da'.", t.line);
+        const p1=this.parseExpression(0, new Set(["to","a"]));
+        this.expectKW("TO", t.line);
+        const p2=this.parseExpression(0, null);
+        return { type:"Rectangle", p1, p2, line: t.line };
+      }
+
+      // line thickness T from P1 to P2
+      if (this.matchKW("LINE")) {
+        this.expectKW("THICKNESS", t.line);
+        const th=this.parseExpression(0, new Set(["from","da"]));
+        const fromTok=this.matchPhrase([["from"],["da"]]);
+        if (!fromTok) this.throwParse("Expected 'from/da'.", t.line);
+        const p1=this.parseExpression(0, new Set(["to","a"]));
+        this.expectKW("TO", t.line);
+        const p2=this.parseExpression(0, null);
+        return { type:"Line", th, p1, p2, line: t.line };
+      }
+
+      // triangle with vertices P1, P2, P3
+      if (this.matchKW("TRIANGLE")) {
+        this.expectKW("WITH", t.line);
+        this.expectKW("VERTICES", t.line);
+        // Legge il primo vertice
+        const p1 = this.parseExpression(0, null);
+        // Si aspetta una virgola
+        if (!this.matchType("COMMA")) this.throwParse("Attesa ',' tra i vertici.", t.line);
+        // Legge il secondo vertice
+        const p2 = this.parseExpression(0, null);
+        // Si aspetta una virgola
+        if (!this.matchType("COMMA")) this.throwParse("Attesa ',' tra i vertici.", t.line);
+        // Legge il terzo vertice
+        const p3 = this.parseExpression(0, null);
+        
+        return { type:"Triangle", p1, p2, p3, line: t.line };
+      }
+
+      // arc radius R thickness T from P1 to P2
+      if (this.matchKW("ARC")) {
+        this.expectKW("RADIUS", t.line);
+        const r=this.parseExpression(0, new Set(["thickness","spessore"]));
+        this.expectKW("THICKNESS", t.line);
+        const th=this.parseExpression(0, new Set(["from","da"]));
+        const fromTok=this.matchPhrase([["from"],["da"]]);
+        if (!fromTok) this.throwParse("Expected 'from/da'.", t.line);
+        const p1=this.parseExpression(0, new Set(["to","a"]));
+        this.expectKW("TO", t.line);
+        const p2=this.parseExpression(0, null);
+        return { type:"Arc", r, th, p1, p2, line: t.line };
+      }
+
+      // graffiti size N at POS CONTENT
+      if (this.matchKW("GRAFFITI")) {
+        this.expectKW("SIZE", t.line);
+        const sizeExpr=this.parseExpression(0, new Set(["at","in"]));
+        this.expectKW("AT", t.line);
+        const posExpr=this.parseExpression(0, null);
+
+        let contentExpr=null;
+        if (!(this.peek().type==="NEWLINE" || this.peek().type==="SEMI" || this.peek().type==="RPAREN" || this.peek().type==="EOF")) {
+          contentExpr=this.parseExpression(0, null);
+        } else {
+          contentExpr={ type:"Literal", value:"", line:t.line };
+        }
+        return { type:"Graffiti", sizeExpr, posExpr, contentExpr, line: t.line };
+      }
+
+      // label (...) as NAME
+      if (this.matchKW("LABEL")) {
+        const body=this.parseBlock();
+        this.expectKW("AS", t.line);
+        const nameTok=this.parseIdentifier();
+        return { type:"Label", name:nameTok.value, body, line: t.line };
+      }
+
+      // import <expr> as NAME
+      if (this.matchKW("IMPORT")) {
+        const fileExpr=this.parseExpression(0, new Set(["as","come"]));
+        this.expectKW("AS", t.line);
+        const nameTok=this.parseIdentifier();
+        return { type:"Import", name:nameTok.value, fileExpr, line: t.line };
+      }
+
+      // draw NAME at POS
+      if (this.matchKW("DRAW")) {
+        const nameTok=this.parseIdentifier();
+        this.expectKW("AT", t.line);
+        const posExpr=this.parseExpression(0, null);
+        return { type:"Draw", name:nameTok.value, posExpr, line: t.line };
+      }
+
+      // rotate NAME of ANGLE deg and place it at POS
+      if (this.matchKW("ROTATE")) {
+        const nameTok=this.parseIdentifier();
+        // "of/di"
+        this.matchPhrase([["of"],["di"]]) || this.throwParse("Expected 'of/di'.", t.line);
+        const angleExpr=this.parseExpression(0, new Set(["deg","gradi"]));
+        this.expectKW("DEG", t.line);
+        this.expectKW("AND", t.line);
+        this.expectKW("PLACE", t.line);
+        // optional "it"
+        this.matchPhrase([["it"]]);
+        this.expectKW("AT", t.line);
+        const posExpr=this.parseExpression(0, null);
+        return { type:"RotatePlace", name:nameTok.value, angleExpr, posExpr, line: t.line };
+      }
+
+      // scale NAME by FACTOR
+      if (this.matchKW("SCALE")) {
+        const nameTok=this.parseIdentifier();
+        this.matchPhrase([["by"],["di"]]) || this.throwParse("Expected 'by/di'.", t.line);
+        const factorExpr=this.parseExpression(0, null);
+        return { type:"Scale", name:nameTok.value, factorExpr, line: t.line };
+      }
+
+      // alias statement: <A> alias <B>
+      if (t.type==="IDENT" && this.peek(1).type==="IDENT" && this.peek(1).value.toLowerCase()==="alias") {
+        const a=this.consume(); 
+        this.consume(); // alias
+        const targetExpr = this.parseExpression(0, null);
+        
+        // Se è una variabile semplice, mantengo la compatibilità con targetName
+        if (targetExpr.type === "Var") {
+             return { type:"Alias", aliasName:a.value, targetName:targetExpr.name, line: a.line };
+        }
+        
+        // Altrimenti salvo tutta l'espressione
+        return { type:"Alias", aliasName:a.value, targetExpr: targetExpr, line: a.line };
+      }
+
+      // put statement:
+      if (this.matchKW("PUT")) {
+        const rhs=this.parseExpression(0, new Set(["in"]));
+        this.expectKW("IN", t.line);
+        
+        if (this.matchKW("ITEM")) {
+          const idx=this.parseExpression(0, new Set(["of","di"]));
+          this.expectKW("OF", t.line);
+          const listExpr=this.parseExpression(0, null);
+          return { type:"PutItem", rhs, idx, listExpr, line: t.line };
+        } else {
+
+          let varName = null;
+          let aliasExpr = null;
+
+          if (this.peek().type === "LPAREN") {
+             const expr = this.parseExpression(0, null); 
+             if (expr.type === "Binary" && expr.op === "alias") {
+                 aliasExpr = expr;
+                 varName = expr.left.name; // Il nome su cui scrivere è quello a sinistra (B)
+             } else {
+                 this.throwParse("Dopo 'in' atteso nome variabile o espressione (alias).", t.line);
+             }
+          } else {
+             const varTok = this.parseIdentifier();
+             varName = varTok.value;
+          }
+          
+          return { type:"PutVar", rhs, varName, aliasExpr, line: t.line };
+        }
+      }
+
+      // add <expr> to/a LISTVAR
+      if (this.matchKW("ADD")) {
+        const valueExpr=this.parseExpression(0, new Set(["to","a"]));
+        this.expectKW("TO", t.line);
+        const listTok=this.parseIdentifier();
+        return { type:"Add", valueExpr, listName:listTok.value, line: t.line };
+      }
+
+      // remove ...
+      if (this.matchKW("REMOVE")) {
+        // remove first/last item from LIST
+        if (this.matchKW("FIRST")) {
+          this.expectKW("ITEM", t.line);
+          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          const listTok=this.parseIdentifier();
+          return { type:"RemoveFirst", listName:listTok.value, line: t.line };
+        }
+        if (this.matchKW("LAST")) {
+          this.expectKW("ITEM", t.line);
+          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          const listTok=this.parseIdentifier();
+          return { type:"RemoveLast", listName:listTok.value, line: t.line };
+        }
+        // remove item <idx> from LIST  (English)  / rimuovi elemento <idx> da LISTA (IT)
+        if (this.matchKW("ITEM")) {
+          const idx=this.parseExpression(0, new Set(["from","da"]));
+          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          const listTok=this.parseIdentifier();
+          return { type:"RemoveAt", idx, listName:listTok.value, line: t.line };
+        }
+        this.throwParse("Malformed remove statement.", t.line);
+      }
+
+      // insert <val> at/in item <idx> of/di LIST
+      if (this.matchKW("INSERT")) {
+        const valueExpr=this.parseExpression(0, new Set(["at","in","a"]));
+        // accept "at" (EN) or "in" (IT)
+        if (!this.matchPhrase([["at"],["in"]])) this.throwParse("Expected 'at/in'.", t.line);
+        this.expectKW("ITEM", t.line);
+        const idx=this.parseExpression(0, new Set(["of","di"]));
+        this.expectKW("OF", t.line);
+        const listTok=this.parseIdentifier();
+        return { type:"Insert", valueExpr, idx, listName:listTok.value, line: t.line };
+      }
+
+      // control: if
+      if (this.matchKW("IF")) {
+        const cond=this.parseExpression(0, new Set(["then","allora"]));
+        this.expectKW("THEN", t.line);
+        const thenBlock=this.parseBlock();
+
+        const elseIfs=[];
+        let elseBlock=null;
+
+        while (true) {
+          // otherwise if
+          // salta righe vuote prima di cercare altrimenti:
+          this.skipSeparators();
+          const savePos=this.pos;
+          if (this.matchKW("OTHERWISE")) {
+            if (this.matchKW("IF")) {
+              const c=this.parseExpression(0, new Set(["then","allora"]));
+              this.expectKW("THEN", t.line);
+              const b=this.parseBlock();
+              elseIfs.push({ cond:c, block:b });
+              continue;
+            } else {
+              // otherwise (...)
+              // rollback to allow "otherwise" followed directly by block
+              const b=this.parseBlock();
+              elseBlock=b;
+              break;
+            }
+          } else {
+            this.pos=savePos;
+          }
+          break;
+        }
+
+        return { type:"If", cond, thenBlock, elseIfs, elseBlock, line: t.line };
+      }
+
+      // while: as long as (...) you do (...)  / fintanto (...) esegui (...)
+      {
+        const save=this.pos;
+        const tokWhile=this.matchKW("AS_LONG_AS");
+        if (tokWhile) {
+          const cond=this.parseExpression(0, new Set(["you","esegui"]));
+          this.expectKW("YOU_DO", tokWhile.line);
+          const block=this.parseBlock();
+          return { type:"While", cond, block, line: tokWhile.line };
+        }
+        this.pos=save;
+      }
+
+      // for each: for each x in LIST you do (...)  / per ogni x in LIST esegui (...)
+      {
+        const save=this.pos;
+        const tokFE=this.matchKW("FOR_EACH");
+        if (tokFE) {
+          const varTok=this.parseIdentifier();
+          this.expectKW("IN", tokFE.line);
+          const listExpr=this.parseExpression(0, new Set(["you","esegui"]));
+          this.expectKW("YOU_DO", tokFE.line);
+          const block=this.parseBlock();
+          return { type:"ForEach", varName: varTok.value, listExpr, block, line: tokFE.line };
+        }
+        this.pos=save;
+      }
+
+      // for range:
+      // English: index I goes from A to B and you do (...)
+      // Italian: indice I va da A a B ed esegui (...)
+      {
+        const save=this.pos;
+        const tokVar=this.matchKW("VARIABLE");
+        if (tokVar) {
+          const varTok=this.parseIdentifier();
+          const tokGF=this.matchKW("GOES_FROM");
+          if (!tokGF) this.throwParse("Expected 'goes from' / 'va da'.", tokVar.line);
+          const startExpr=this.parseExpression(0, new Set(["to","a"]));
+          this.expectKW("TO", tokVar.line);
+          const endExpr=this.parseExpression(0, new Set(["and","e","ed","you","esegui"]));
+          // accept 'and' (EN) or 'e/ed' (IT), then 'you do'/esegui
+          this.expectKW("AND", tokVar.line);
+          this.expectKW("YOU_DO", tokVar.line);
+          const block=this.parseBlock();
+          return { type:"ForRange", varName: varTok.value, startExpr, endExpr, block, line: tokVar.line };
+        }
+        this.pos=save;
+      }
+
+      // procedure call or unknown command: IDENT ...
+      if (t.type==="IDENT") {
+        const nameTok=this.consume();
+        // call forms:
+        // name with (args)
+        // name(args)
+        // name
+        let args=[];
+        if (this.matchKW("WITH")) {
+          if (!this.matchType("LPAREN")) this.throwParse(uiStrings[lang].invalidProcCallArgs, nameTok.line);
+          if (this.peek().type!=="RPAREN") {
+            while (true) { args.push(this.parseExpression(0,null)); if (!this.matchType("COMMA")) break; }
+          }
+          if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, nameTok.line);
+        } else if (this.peek().type==="LPAREN") {
+          this.consume();
+          if (this.peek().type!=="RPAREN") {
+            while (true) { args.push(this.parseExpression(0,null)); if (!this.matchType("COMMA")) break; }
+          }
+          if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, nameTok.line);
+        } else {
+          args=[];
+        }
+        return { type:"ProcCall", name: nameTok.value, args, line: nameTok.line };
+      }
+
+      this.throwParse(`Unknown statement starting with '${t.value}'.`, t.line);
+    }
+  }
+
+  // --- Scope chain + aliasing ---
+  function isDeclaredGlobal(scopeChain, name) {
+    const upper=name.toUpperCase();
+    for (let i=scopeChain.length-1;i>=0;i--) {
+      if (scopeChain[i].__globalVars && scopeChain[i].__globalVars.has(upper)) return true;
+    }
+    return false;
+  }
+
+  function resolveVariable(scopeChain, name) {
+    const upper=name.toUpperCase();
+    if (isDeclaredGlobal(scopeChain, name)) {
+      if (upper in scopeChain[0]) {
+        const entry=scopeChain[0][upper];
+        if (entry && entry.__isAlias) return entry;
+        return { scope: scopeChain[0], name: upper, value: entry };
+      }
+      return null;
+    }
+    for (let i=scopeChain.length-1;i>=0;i--) {
+      if (upper in scopeChain[i]) {
+        const entry=scopeChain[i][upper];
+        if (entry && entry.__isAlias) return entry;
+        return { scope: scopeChain[i], name: upper, value: entry };
+      }
+    }
+    return null;
+  }
+
+  function lookupVariable(scopeChain, name) {
+    const res=resolveVariable(scopeChain, name);
+    if (!res) return undefined;
+    if (res.__isAlias) return lookupVariable([res.targetScope], res.targetName);
+    // Se la variabile contiene il flag __isHardRef, restituisce l'oggetto puntato
+    if (res.value && res.value.__isHardRef) {
+        return res.value.value; 
+    }
+    return res.value;
+  }
+
+  function assignVariable(scopeChain, name, value) {
+    const upper=name.toUpperCase();
+    const res=resolveVariable(scopeChain, name);
+
+    if (res && res.__isAlias) {
+      assignVariable([res.targetScope], res.targetName, deepCopyValue(value));
+      return;
+    }
+
+    if (res) { res.scope[res.name] = deepCopyValue(value); return; }
+
+    // New binding
+    const upperName = upper;
+    if (isDeclaredGlobal(scopeChain, name)) {
+      // Create/update in global scope
+      scopeChain[0][upperName] = deepCopyValue(value);
+      return;
+    }
+
+    // Shadowing warning (local hides global)
+    if ((upperName in scopeChain[0]) && scopeChain.length > 1) {
+      env.__shadowWarnings ||= new Set();
+      if (!env.__shadowWarnings.has(upperName)) {
+        env.__shadowWarnings.add(upperName);
+        appendLine(uiStrings[lang].warningShadowing(name), false);
+      }
+    }
+
+    // Create in current local scope
+    scopeChain[scopeChain.length - 1][upperName] = deepCopyValue(value);
+  }
+
+  function ensureNumber(v, key, line) {
+    if (typeof v !== "number" || !Number.isFinite(v)) fail(key, null, line);
+    return v;
+  }
+  function toInt(v) { return (typeof v === "number" && Number.isFinite(v)) ? Math.trunc(v) : NaN; }
+  function truthy(v) {
+    if (typeof v === "boolean") return v;
+    if (typeof v === "number") return v !== 0 && !Number.isNaN(v);
+    if (v === null || v === undefined) return false;
+    if (typeof v === "string") return v.length > 0;
+    if (Array.isArray(v)) return v.length > 0;
+    return true;
+  }
+
+  function coordFromValue(v, line, exprText = "") {
+    if (isPoint(v)) return { x: v.x, y: v.y };
+    if (Array.isArray(v) && v.length === 2) {
+      const x = v[0], y = v[1];
+      if (typeof x !== "number" || typeof y !== "number") fail("coordNotNumber", null, line);
+      return { x, y };
+    }
+    fail("invalidCoordinate", exprText || String(exprText || ""), line);
+  }
+
+  function colorFromTuple(v, line) {
+    if (!Array.isArray(v) || v.length !== 3) fail("invalidColor", null, line);
+    const r = v[0], g = v[1], b = v[2];
+    if (![r,g,b].every(n => typeof n === "number" && Number.isFinite(n))) fail("invalidColor", null, line);
+    if (![r,g,b].every(n => n >= 0 && n <= 100)) fail("invalidColor", null, line);
+    const rr = Math.round(r * 2.55);
+    const gg = Math.round(g * 2.55);
+    const bb = Math.round(b * 2.55);
+    return `rgb(${rr}, ${gg}, ${bb})`;
+  }
+
+  function downloadText(filename, text) {
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2500);
+  }
+
+  function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+  async function loadImageFromUrl(url, line) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("image-load"));
+      img.src = url;
+    }).catch(() => {
+      fail("imageLoadError", url, line);
+    });
+  }
+
+  // --- Runtime env ---
+  const env = {
+    precision: null,
+    currentColor: "rgb(0, 0, 0)",
+    gfxObjects: [],
+    labels: Object.create(null),   // NAME -> {objects, scale, rotation}
+    imports: Object.create(null),  // NAME -> {img, scale, rotation, width, height}
+    backgroundColor: null,
+    backgroundImage: null,         // {img, scale}
+    tickTime: null,
+    functions: Object.create(null), // NAME -> def
+    procedures: Object.create(null),
+    callDepth: 0
+  };
+
+  const MAX_CALL_DEPTH = 200;
+  const MAX_LOOP_ITERS = 1e6;
+
+  // --- Builtins ---
+  function builtin_point(args, line) {
+    if (args.length !== 2) return { __type: "point", x: 0, y: 0, __id: Math.random() };
+    const x = args[0], y = args[1];
+    if (typeof x !== "number" || typeof y !== "number") fail("pointArgsNotNumeric", null, line);
+    return { __type: "point", x, y, __id: Math.random() };
+  }
+
+  function builtin_random(args) {
+    if (args.length === 0) return Math.random();
+    if (args.length === 1) {
+      const a = args[0];
+      if (typeof a !== "number") return Math.random();
+      return Math.random() * a;
+    }
+    const a = args[0], b = args[1];
+    if (typeof a !== "number" || typeof b !== "number") return Math.random();
+    return a + Math.random() * (b - a);
+  }
+
+
+    // 1. Funzione 'tipo(x)' / 'type(x)'
+    // Restituisce sempre stringhe in Inglese
+  function builtin_type(args) {
+    const v = args[0];
+    
+    if (v === null) return "null";
+    
+    if (typeof v === "number") {
+        if (Number.isNaN(v)) return "nan"; // Utile per debug
+        return "number";
+    }
+    
+    if (typeof v === "string") return "string";
+    if (typeof v === "boolean") return "boolean";
+    if (Array.isArray(v)) return "list";
+    
+    // Controllo specifico per l'oggetto Punto
+    if (typeof v === "object" && v.__type === "point") return "point";
+    
+    return "unknown";
+    }
+
+    // 2. Funzione 'numerico(x)' / 'numeric(x)'
+    function builtin_is_numeric(args) {
+    const v = args[0];
+    // Restituisce vero solo se è un numero AND (non è infinito OR NaN)
+    return typeof v === "number" && Number.isFinite(v);
+  }
+
+  function builtin_indexof(args) {
+    const arr = args[0];
+    const val = args[1];
+    if (!Array.isArray(arr)) return 0;
+    const idx = arr.findIndex(x => Object.is(x, val));
+    return (idx >= 0) ? (idx + 1) : 0; // 1-based; 0 = not found
+  }
+
+  function builtin_split(args) {
+    const s = String(args[0] ?? "");
+    const sep = (args.length >= 2) ? String(args[1]) : " ";
+    return s.split(sep);
+  }
+
+  function builtin_valmin(args) {
+    const list = args[0];
+    if (!Array.isArray(list)) return NaN;
+    let minVal = Infinity;
+    let found = false;
+    for (let i = 0; i < list.length; i++) {
+      const v = list[i];
+      // Considera solo numeri validi
+      if (typeof v === "number" && Number.isFinite(v)) {
+        if (v < minVal) {
+          minVal = v;
+          found = true;
+        }
+      }
+    }
+    return found ? minVal : NaN;
+  }
+
+  function builtin_valmax(args) {
+    const list = args[0];
+    if (!Array.isArray(list)) return NaN;
+    let maxVal = -Infinity;
+    let found = false;
+    for (let i = 0; i < list.length; i++) {
+      const v = list[i];
+      if (typeof v === "number" && Number.isFinite(v)) {
+        if (v > maxVal) {
+          maxVal = v;
+          found = true;
+        }
+      }
+    }
+    return found ? maxVal : NaN;
+  }
+
+  function builtin_argmin(args) {
+    const list = args[0];
+    if (!Array.isArray(list)) return 0;
+    let minVal = Infinity;
+    let minIdx = 0; // 0 significa "non trovato"
+    for (let i = 0; i < list.length; i++) {
+      const v = list[i];
+      if (typeof v === "number" && Number.isFinite(v)) {
+        if (v < minVal) {
+          minVal = v;
+          minIdx = i + 1; // Matita usa indici base-1
+        }
+      }
+    }
+    return minIdx;
+  }
+
+  function builtin_argmax(args) {
+    const list = args[0];
+    if (!Array.isArray(list)) return 0;
+    let maxVal = -Infinity;
+    let maxIdx = 0;
+    for (let i = 0; i < list.length; i++) {
+      const v = list[i];
+      if (typeof v === "number" && Number.isFinite(v)) {
+        if (v > maxVal) {
+          maxVal = v;
+          maxIdx = i + 1; // Matita usa indici base-1
+        }
+      }
+    }
+    return maxIdx;
+  }
+
+  function builtin_dice(args, line) {
+    // Se non viene passato un argomento, o se l'argomento non è valido, restituisce 1
+    const n = args[0];
+    if (typeof n !== "number" || !Number.isFinite(n) || n < 1) {
+      return 1;
+    }
+    // Logica: Math.floor(random * n) genera da 0 a n-1. Aggiungendo 1 otteniamo da 1 a n.
+    return Math.floor(Math.random() * Math.floor(n)) + 1;
+  }
+
+
+  function builtin_decomposition(args) {
+    const val = args[0];
+    // Rimuove eventuali virgolette extra se presenti nella stringa tipo
+    const rawType = String(args[1] || "").toLowerCase().replace(/"/g, '');
+
+    // Caso 1: Scomposizione matematica (mantissa, esponente)
+    // Se non è specificato tipo o se è un numero puro senza tipo stringa
+    if (typeof val === "number" && (rawType === "" || rawType === "undefined")) {
+        if (!Number.isFinite(val) || val === 0) return [0, 0];
+        const e = Math.floor(Math.log10(Math.abs(val)));
+        const m = val / Math.pow(10, e);
+        return [m, e];
+    }
+
+    // Caso 2: Scomposizione Stringhe/Liste
+    const str = String(val);
+    
+    if (rawType === "cifre" || rawType === "digits") {
+        return str.split('').map(x => isNaN(Number(x)) ? x : Number(x));
+    }
+    if (rawType === "parole" || rawType === "words") {
+        return str.trim().split(/\s+/);
+    }
+    // Default: caratteri
+    return str.split('');
+  }
+
+  function builtin_composition(args) {
+    const val = args[0];
+    const rawType = String(args[1] || "").toLowerCase().replace(/"/g, '');
+
+    // Caso 1: Composizione matematica (mantissa, esponente)
+    if (!Array.isArray(val) && args.length === 2 && typeof val === 'number') {
+        const e = args[1];
+        if (typeof e !== "number") return NaN;
+        return val * Math.pow(10, Math.trunc(e));
+    }
+
+    // Caso 2: Composizione Lista -> Stringa/Numero
+    if (Array.isArray(val)) {
+        if (rawType === "numero" || rawType === "number") {
+            const n = Number(val.join(''));
+            return isNaN(n) ? 0 : n;
+        }
+        // Default: testo
+        return val.join('');
+    }
+    
+    return String(val);
+  }
+
+  function builtin_cast(args) {
+    const v = args[0];
+    // Rimuove eventuali virgolette o spazi (es. "numero" -> numero)
+    const t = String(args[1] ?? "string").toLowerCase().replace(/['"]/g, "").trim();
+
+    // --- CONVERSIONE A NUMERO ---
+    if (t === "number" || t === "numero") {
+      if (typeof v === "number") return v;
+      // Sostituisce la virgola con il punto per supportare input come "3,14"
+      const s = String(v).replace(",", ".");
+      const n = Number(s);
+      // Se la conversione fallisce, provo parseFloat (utile per stringhe come "10px")
+      // Se fallisce ancora, do 0 invece di NaN per evitare crash
+      if (Number.isNaN(n)) {
+         const f = parseFloat(s);
+         return Number.isNaN(f) ? 0 : f;
+      }
+      return n;
+    }
+
+    // --- CONVERSIONE A BOOLEAN ---
+    if (t === "bool" || t === "boolean" || t === "vero" || t === "falso") {
+      const s = String(v).toLowerCase();
+      if (s === "vero" || s === "true") return true;
+      if (s === "falso" || s === "false" || s === "0") return false;
+      return Boolean(v);
+    }
+
+    // --- DEFAULT: CONVERSIONE A TESTO ---
+    return String(v);
+  }
+
+  function builtin_unicode(args) {
+    const val = args[0];
+    
+    if (typeof val === "number" && Number.isFinite(val)) {
+      return String.fromCodePoint(Math.trunc(val));
+    }
+    
+    if (typeof val === "string" && val.length > 0) {
+      return val.codePointAt(0);
+    }
+    
+    return "";
+  }
+
+  function builtin_tock(args, line) {
+    if (env.tickTime === null) fail("tockWithoutTick", null, line);
+    return performance.now() - env.tickTime;
+  }
+
+  const BUILTINS = Object.create(null);
+  function regBuiltin(names, fn) { names.forEach(n => { BUILTINS[n] = fn; }); }
+
+  regBuiltin(["abs"], (a)=>Math.abs(a[0] ?? 0));
+  regBuiltin(["sin"], (a)=>Math.sin(a[0] ?? 0));
+  regBuiltin(["cos"], (a)=>Math.cos(a[0] ?? 0));
+  regBuiltin(["trunc","tronca"], (a)=>Math.trunc(a[0] ?? 0));
+  regBuiltin(["round","arrotonda"], (a)=>Math.round(a[0] ?? 0));
+  regBuiltin(["ceil"], (a)=>Math.ceil(a[0] ?? 0));
+  regBuiltin(["squareroot","radice"], (a)=>Math.sqrt(a[0] ?? 0));
+  regBuiltin(["min","minimo"], (a)=>Math.min(...a.map(x => (typeof x==="number"?x:NaN))));
+  regBuiltin(["max","massimo"], (a)=>Math.max(...a.map(x => (typeof x==="number"?x:NaN))));
+  regBuiltin(["random","casuale"], (a)=>builtin_random(a));
+  regBuiltin(["dice", "dado"], (a, line) => builtin_dice(a, line));
+  regBuiltin(["point","punto"], (a,line)=>builtin_point(a,line));
+  regBuiltin(["indexof","indicedi"], (a)=>builtin_indexof(a));
+  regBuiltin(["valmin"], (a) => builtin_valmin(a));
+  regBuiltin(["valmax"], (a) => builtin_valmax(a));
+  regBuiltin(["argmin"], (a) => builtin_argmin(a));
+  regBuiltin(["argmax"], (a) => builtin_argmax(a));
+  regBuiltin(["split"], (a)=>builtin_split(a));
+  regBuiltin(["decomposition","scomposizione","scomponi"], (a)=>builtin_decomposition(a));
+  regBuiltin(["composition","composizione"], (a)=>builtin_composition(a));
+  regBuiltin(["type", "tipo"], (a) => builtin_type(a));
+  regBuiltin(["numeric", "numerico", "is_number", "è_numero"], (a) => builtin_is_numeric(a));
+  regBuiltin(["cast"], (a)=>builtin_cast(a));
+  regBuiltin(["unicode"], (a)=>builtin_unicode(a));
+  regBuiltin(["tock"], (a,line)=>builtin_tock(a,line));
+
+  // --- Expression evaluator ---
+  async function evalExpr(node, scopeChain) {
+    switch (node.type) {
+      case "Literal": return node.value;
+
+      case "Var": {
+        // Se il nome della "variabile" è tock, restituisco il tempo trascorso da tick
+        // invece di cercare una variabile nello scope.
+        if (node.nameLower === "tock") {
+          return builtin_tock([], node.line);
+        }
+
+        const v = lookupVariable(scopeChain, node.name);
+        if (v === undefined) fail("variableNotFound", node.name, node.line);
+        return v;
+      }
+
+      case "Tuple": {
+        const arr = [];
+        for (const it of node.items) arr.push(await evalExpr(it, scopeChain));
+        arr.__id = Math.random();
+        return arr;
+      }
+
+      case "Unary": {
+        const r = await evalExpr(node.right, scopeChain);
+        if (node.op === "-") return -(typeof r === "number" ? r : Number(r));
+        if (node.op === "not") return !truthy(r);
+        return r;
+      }
+
+      case "Binary": {
+        
+        if (node.op === "alias") {
+          if (node.left.type !== "Var") fail("genericFail", {msg:"A sinistra di 'alias' serve un nome variabile."}, node.line);
+          if (node.right.type !== "Var" && node.right.type !== "ItemOf") {
+            fail("genericFail", {msg:"A destra di 'alias' serve una variabile o un elemento di lista."}, node.line);
+          }
+
+          const aliasName = node.left.name.toUpperCase();
+          const targetName = node.right.name.toUpperCase();
+
+          const targetRes = resolveVariable(scopeChain, targetName);
+          if (!targetRes) fail("variableNotFound", node.right.name, node.line);
+
+          let finalScope, finalName;
+          if (targetRes.__isAlias) {
+            finalScope = targetRes.targetScope;
+            finalName = targetRes.targetName;
+          } else {
+            finalScope = targetRes.scope;
+            finalName = targetRes.name;
+          }
+
+          const currentScope = scopeChain[scopeChain.length - 1];
+          currentScope[aliasName] = { __isAlias: true, targetScope: finalScope, targetName: finalName };
+
+          return lookupVariable(scopeChain, targetName);
+        }        
+        if (node.op === "and") {
+          const l = await evalExpr(node.left, scopeChain);
+          if (!truthy(l)) return false;
+          const r = await evalExpr(node.right, scopeChain);
+          return truthy(r);
+        }
+        if (node.op === "or") {
+          const l = await evalExpr(node.left, scopeChain);
+          if (truthy(l)) return true;
+          const r = await evalExpr(node.right, scopeChain);
+          return truthy(r);
+        }
+
+        const l = await evalExpr(node.left, scopeChain);
+        const r = await evalExpr(node.right, scopeChain);
+
+        switch (node.op) {
+
+          case "+": {
+            if (typeof l === "string" || typeof r === "string") {
+              // Usa formatForOutput per rispettare env.precision e formattare oggetti/liste
+              return formatForOutput(l, env.precision) + formatForOutput(r, env.precision);
+            }
+            return Number(l) + Number(r);
+          }
+
+          case "-": return Number(l) - Number(r);
+          case "*": return Number(l) * Number(r);
+          case "/": return Number(l) / Number(r);
+          case "%": return Number(l) % Number(r);
+          case "^": return Math.pow(Number(l), Number(r));
+          case "==":
+          case "=":
+          case "===": return Object.is(l, r) || (l === r);
+          case "!=":
+          case "!==": return !(Object.is(l, r) || (l === r));
+          case "<": return Number(l) < Number(r);
+          case "<=": return Number(l) <= Number(r);
+          case ">": return Number(l) > Number(r);
+          case ">=": return Number(l) >= Number(r);
+          default: return NaN;
+        }
+      }
+
+      case "Call": {
+        const nameLower = node.name.toLowerCase();
+        const args = [];
+        for (const a of node.args) args.push(await evalExpr(a, scopeChain));
+
+        if (BUILTINS[nameLower]) return BUILTINS[nameLower](args, node.line);
+
+        const def = env.functions[node.name.toUpperCase()];
+        if (!def) fail("unknownFunction", node.name, node.line);
+        
+        // Aggiungo 'node.args' come terzo parametro
+        return await callUserRoutine(def, args, node.args, scopeChain, true, node.line);
+      }
+
+      case "PointProp": {
+        const obj = await evalExpr(node.object, scopeChain);
+        if (!isPoint(obj)) fail("pointPropOnlyXY", null, node.line);
+        return node.prop === "x" ? obj.x : obj.y;
+      }
+
+      case "Dimension": {
+        const v = await evalExpr(node.expr, scopeChain);
+        if (!Array.isArray(v)) fail("dimensionNeedsList", null, node.line);
+        return v.length;
+      }
+
+      case "ItemOf": {
+        const list = await evalExpr(node.list, scopeChain);
+        if (!Array.isArray(list)) fail("listOnlyOp", "<expr>", node.line);
+        const idxV = await evalExpr(node.index, scopeChain);
+        const idx = toInt(idxV);
+        if (!Number.isFinite(idx)) fail("invalidIndex", { idx: idxV, name: "<list>" }, node.line);
+        const pos = idx - 1; // 1-based
+        if (pos < 0 || pos >= list.length) fail("invalidIndex", { idx, name: "<list>" }, node.line);
+        return deepCopyValue(list[pos]);
+      }
+
+      case "KeyPressed": {
+        const k = await evalExpr(node.keyExpr, scopeChain);
+        const kk = String(k).toUpperCase();
+        return !!keyState[kk];
+      }
+
+      default:
+        throw new Error("Unknown expr node: " + node.type);
+    }
+  }
+
+  // --- Statement executor ---
+  async function execBlock(block, scopeChain) {
+    for (const st of block.stmts) {
+      const r = await execStatement(st, scopeChain);
+      if (r && (r.__return || r === EXEC_STOP)) return r;
+    }
+    return null;
+  }
+
+  function defineRoutine(node) {
+    const nameUpper = node.name.toUpperCase();
+    const def = {
+      kind: node.kind,
+      name: node.name,
+      params: node.params,
+      body: node.body,
+      line: node.line
+    };
+    if (node.kind === "function") {
+      if (env.functions[nameUpper] || env.procedures[nameUpper]) fail("functionExists", node.name, node.line);
+      env.functions[nameUpper] = def;
+    } else {
+      if (env.procedures[nameUpper] || env.functions[nameUpper]) fail("functionExists", node.name, node.line);
+      env.procedures[nameUpper] = def;
+    }
+  }
+
+  function ensureListByName(scopeChain, listName, line) {
+    const v = lookupVariable(scopeChain, listName);
+    if (!Array.isArray(v)) fail("listOnlyOp", listName, line);
+    return v;
+  }
+
+  function getVarRef(scopeChain, varName, line) {
+    const res = resolveVariable(scopeChain, varName);
+    if (!res) fail("variableNotFound", varName, line);
+    if (res.__isAlias) return { scope: res.targetScope, name: res.targetName };
+    return { scope: res.scope, name: res.name };
+  }
+
+  async function resolveMutableList(node, scopeChain) {
+      // CASO 1: Variabile Semplice (es. "Stime")
+      if (node.type === "Var") {
+          const v = lookupVariable(scopeChain, node.name);
+          // Se è un alias diretto a un'altra lista, lookupVariable lo risolve già
+          if (!Array.isArray(v)) throw new Error(`'${node.name}' non è una lista.`);
+          return v; // Ritorna l'array originale
+      }
+
+      // CASO 2: Elemento di Lista (es. "elemento P di Registro")
+      if (node.type === "ItemOf") {
+          // 1. Ottieni ricorsivamente la lista genitore (per riferimento)
+          const parentList = await resolveMutableList(node.list, scopeChain);
+          
+          // 2. Calcola l'indice
+          const idxV = await evalExpr(node.index, scopeChain);
+          const idx = toInt(idxV);
+          const pos = idx - 1; // indici 1-based
+
+          // 3. Controlli di sicurezza
+          if (!Number.isFinite(idx)) throw new Error(`Indice non valido: ${idxV}`);
+          if (pos < 0 || pos >= parentList.length) throw new Error(`Indice fuori dai limiti: ${idx}`);
+          
+          // 4. Ottieni l'elemento target
+          const target = parentList[pos];
+          
+          // 5. Check che sia una lista (per poterci fare alias o aggiungere elementi)
+          if (!Array.isArray(target)) throw new Error(`L'elemento all'indice ${idx} non è una lista.`);
+          return target; // Ritorna il riferimento all'array interno
+        }
+
+        throw new Error("Destinazione non valida per alias o modifica.");
+  }
+
+  async function execStatement(st, scopeChain) {
+    switch (st.type) {
+      case "GlobalDecl": {
+        const cur = scopeChain[scopeChain.length - 1];
+        cur.__globalVars ||= new Set();
+        st.names.forEach(n => cur.__globalVars.add(n.toUpperCase()));
+        return null;
+      }
+
+      case "Define":
+        defineRoutine(st);
+        return null;
+
+      case "Return": {
+        const value = st.expr ? await evalExpr(st.expr, scopeChain) : null;
+        return { __return: true, value: deepCopyValue(value) };
+      }
+
+      case "Stop": return EXEC_STOP;
+
+      case "ClearScreen":
+        clearScreen();
+        return null;
+
+      case "ClearGraphics":
+        env.gfxObjects = [];
+        return null;
+
+      case "Digits": {
+        const v = await evalExpr(st.prec, scopeChain);
+        const n = toInt(v);
+        env.precision = (Number.isFinite(n) && n >= 0) ? n : null;
+        return null;
+      }
+
+      case "ScientificThreshold": {
+        const v = await evalExpr(st.valExpr, scopeChain);
+        if (typeof v !== "number" || !Number.isFinite(v) || v < 0) {
+             fail("genericFail", { msg: "Il valore per 'scientifica' deve essere un numero positivo." }, st.line);
+        }
+        env.sciThreshold = v;
+        return null;
+      }
+
+      case "Newline":
+        outputArea.appendChild(document.createTextNode("\n"));
+        return null;
+
+      case "Output": {
+        const v = await evalExpr(st.expr, scopeChain);
+        appendText(v, env.precision); 
+        return null;
+      }
+
+      case "Wait": {
+        const v = await evalExpr(st.duration, scopeChain);
+        if (typeof v !== "number" || !Number.isFinite(v) || v < 0) fail("invalidWait", null, st.line);
+        await sleep(v);
+        return null;
+      }
+
+      case "Tick":
+        env.tickTime = performance.now();
+        return null;
+
+      case "Redraw":
+        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
+        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+        return null;
+
+      case "Get": {
+        const p = await evalExpr(st.promptExpr, scopeChain);
+        if (typeof p !== "string") fail("getPromptNotText", null, st.line);
+        
+        const ans = window.prompt(p) ?? "";
+        const trimmed = ans.trim();
+        const num = Number(trimmed);
+        
+        // Se la stringa non è vuota e il risultato è un numero valido, uso il numero.
+        // Altrimenti mantengo la stringa (utile se si chiede il nome utente, ecc.)
+        const finalVal = (trimmed !== "" && !isNaN(num)) ? num : ans;
+        
+        assignVariable(scopeChain, st.varName, finalVal);
+        return null;
+      }
+      case "SetColor": {
+        const v = await evalExpr(st.colorExpr, scopeChain);
+        // Uso la funzione helper già presente per validare (r,g,b) tra 0 e 100
+        env.currentColor = colorFromTuple(v, st.line);
+        return null;
+      }
+      case "SetPointProp": {
+        const target = await evalExpr(st.targetExpr, scopeChain);
+        if (!isPoint(target)) fail("pointOnlySet", null, st.line);
+        const val = await evalExpr(st.valueExpr, scopeChain);
+        if (typeof val !== "number" || !Number.isFinite(val)) fail("coordNotNumber", null, st.line);
+        if (st.prop === "x") target.x = val; else target.y = val;
+        return null;
+      }
+
+      case "PaintBackground":
+        env.backgroundImage = null;
+        env.backgroundColor = env.currentColor;
+        return null;
+
+      case "LoadBackground": {
+        const f = await evalExpr(st.filenameExpr, scopeChain);
+        if (typeof f !== "string") fail("backgroundFilenameNotText", null, st.line);
+        const sc = await evalExpr(st.scaleExpr, scopeChain);
+        if (typeof sc !== "number" || !Number.isFinite(sc) || sc <= 0) fail("backgroundScaleNotNumber", null, st.line);
+        const img = await loadImageFromUrl(f, st.line);
+        env.backgroundColor = null;
+        env.backgroundImage = { img, scale: sc };
+        return null;
+      }
+
+      // --- Lists ---
+      case "PutVar": {
+        if (st.aliasExpr) {
+           await evalExpr(st.aliasExpr, scopeChain);
+        }
+        
+        const v = await evalExpr(st.rhs, scopeChain);
+        
+        assignVariable(scopeChain, st.varName, v);
+        return null;
+      }
+
+    case "PutItem": {
+        // 1. Calcola l'indice
+        const idxV = await evalExpr(st.idx, scopeChain);
+        const idx = toInt(idxV);
+        const pos = idx - 1; // 1-based
+
+        // 2. Calcola il valore da inserire
+        const v = await evalExpr(st.rhs, scopeChain);
+
+        try {
+            // 3. Risolvi la lista target (Supporta Alias e Liste annidate)
+            // Nota: st.listExpr è già un nodo espressione, lo passiamo direttamente
+            const lst = await resolveMutableList(st.listExpr, scopeChain);
+
+            // 4. Controlli di sicurezza
+            if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) {
+                throw new Error(`Indice non valido o fuori dai limiti: ${idx}`);
+            }
+
+            // 5. Modifica diretta
+            lst[pos] = deepCopyValue(v);
+
+        } catch (e) {
+            fail("genericFail", { msg: e.message }, st.line);
+        }
+        return null;
+      }
+
+      case "Add": {
+        const v = await evalExpr(st.valueExpr, scopeChain);
+        
+        // Dobbiamo capire se st.listName è un nome o se dobbiamo gestire espressioni.
+        try {
+            let lst;
+            
+            // Se nel parser "Add" ha solo listName (codice originale):
+            // Creiamo un nodo Var per usare la funzione helper
+            const mockNode = { type: "Var", name: st.listName };
+            
+            // Risolviamo (gestisce sia liste normali che alias hard)
+            lst = await resolveMutableList(mockNode, scopeChain);
+            
+            // Modifica diretta
+            lst.push(deepCopyValue(v));
+            
+        } catch (e) {
+             fail("genericFail", { msg: e.message }, st.line);
+        }
+        return null;
+      }
+
+    case "Insert": {
+        const v = await evalExpr(st.valueExpr, scopeChain);
+        const idxV = await evalExpr(st.idx, scopeChain);
+        const idx = toInt(idxV);
+        const pos = idx - 1;
+
+        try {
+            // Creiamo il "finto nodo" perché il parser qui ci dà solo il nome stringa
+            const mockNode = { type: "Var", name: st.listName };
+            
+            // Risolviamo il riferimento
+            const lst = await resolveMutableList(mockNode, scopeChain);
+
+            if (!Number.isFinite(idx) || pos < 0 || pos > lst.length) {
+                 throw new Error(`Indice non valido per inserimento: ${idx}`);
+            }
+
+            // Modifica diretta (splice)
+            lst.splice(pos, 0, deepCopyValue(v));
+
+        } catch (e) {
+            fail("genericFail", { msg: e.message }, st.line);
+        }
+        return null;
+      }
+
+    case "RemoveFirst": {
+        try {
+            const mockNode = { type: "Var", name: st.listName };
+            const lst = await resolveMutableList(mockNode, scopeChain);
+
+            if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
+            
+            lst.shift(); // Rimuove il primo elemento dall'originale
+
+        } catch (e) {
+            // Se l'errore non è quello standard, lo rilanciamo
+            if (e.message !== "Execution stopped.") 
+                fail("genericFail", { msg: e.message }, st.line);
+        }
+        return null;
+      }
+
+    case "RemoveLast": {
+        try {
+            const mockNode = { type: "Var", name: st.listName };
+            const lst = await resolveMutableList(mockNode, scopeChain);
+
+            if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
+            
+            lst.pop(); // Rimuove l'ultimo elemento dall'originale
+
+        } catch (e) {
+            if (e.message !== "Execution stopped.") 
+                fail("genericFail", { msg: e.message }, st.line);
+        }
+        return null;
+      }
+
+    case "RemoveAt": {
+        const idxV = await evalExpr(st.idx, scopeChain);
+        const idx = toInt(idxV);
+        const pos = idx - 1;
+
+        try {
+            const mockNode = { type: "Var", name: st.listName };
+            const lst = await resolveMutableList(mockNode, scopeChain);
+
+            if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) {
+                throw new Error(`Indice non valido: ${idx}`);
+            }
+
+            lst.splice(pos, 1); // Rimuove elemento specifico
+
+        } catch (e) {
+            fail("genericFail", { msg: e.message }, st.line);
+        }
+        return null;
+      }
+
+      // --- Control flow ---
+      case "If": {
+        const c = await evalExpr(st.cond, scopeChain);
+        if (truthy(c)) return await execBlock(st.thenBlock, scopeChain);
+        for (const ei of st.elseIfs) {
+          const cc = await evalExpr(ei.cond, scopeChain);
+          if (truthy(cc)) return await execBlock(ei.block, scopeChain);
+        }
+        if (st.elseBlock) return await execBlock(st.elseBlock, scopeChain);
+        return null;
+      }
+
+      case "While": {
+        let iters = 0;
+        while (true) {
+          const c = await evalExpr(st.cond, scopeChain);
+          if (!truthy(c)) break;
+          const r = await execBlock(st.block, scopeChain);
+          if (r && (r.__return || r === EXEC_STOP)) return r;
+          iters++;
+          if (iters > MAX_LOOP_ITERS) fail("infiniteLoop", null, st.line);
+        }
+        return null;
+      }
+
+      case "ForEach": {
+        const list = await evalExpr(st.listExpr, scopeChain);
+        if (!Array.isArray(list)) fail("loopNotList", "<expr>", st.line);
+
+        const loopScope = Object.create(null);
+        loopScope.__globalVars = new Set();
+        const chain = scopeChain.concat([loopScope]);
+
+        let iters = 0;
+        for (const item of list) {
+          assignVariable(chain, st.varName, deepCopyValue(item));
+          const r = await execBlock(st.block, chain);
+          if (r && (r.__return || r === EXEC_STOP)) return r;
+          iters++;
+          if (iters > MAX_LOOP_ITERS) fail("infiniteLoop", null, st.line);
+        }
+        return null;
+      }
+
+      case "ForRange": {
+        const startV = await evalExpr(st.startExpr, scopeChain);
+        const endV   = await evalExpr(st.endExpr, scopeChain);
+        const a = toInt(startV);
+        const b = toInt(endV);
+
+        if (!Number.isFinite(a) || !Number.isFinite(b)) fail("shapeParamsNotNumeric", "for", st.line);
+
+        const step = (a <= b) ? 1 : -1;
+
+        const loopScope = Object.create(null);
+        loopScope.__globalVars = new Set();
+        const chain = scopeChain.concat([loopScope]);
+
+        let iters = 0;
+        for (let i = a; (step > 0) ? (i <= b) : (i >= b); i += step) {
+          assignVariable(chain, st.varName, i);
+          const r = await execBlock(st.block, chain);
+          if (r && (r.__return || r === EXEC_STOP)) return r;
+          iters++;
+          if (iters > MAX_LOOP_ITERS) fail("infiniteLoop", null, st.line);
+        }
+        return null;
+      }
+
+      // --- Graphics primitives ---
+      case "Circle": {
+        const r = await evalExpr(st.r, scopeChain);
+        if (typeof r !== "number" || !Number.isFinite(r)) fail("shapeParamsNotNumeric", "circle", st.line);
+        const pos = await evalExpr(st.pos, scopeChain);
+        const { x, y } = coordFromValue(pos, st.line, "");
+        env.gfxObjects.push({ type: "circle", x, y, r, color: env.currentColor });
+        return null;
+      }
+
+      case "Circumference": {
+        const r = await evalExpr(st.r, scopeChain);
+        const th = await evalExpr(st.th, scopeChain);
+        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v))) fail("shapeParamsNotNumeric", "circumference", st.line);
+        const pos = await evalExpr(st.pos, scopeChain);
+        const { x, y } = coordFromValue(pos, st.line, "");
+        env.gfxObjects.push({ type: "circumference", x, y, r, t: th, color: env.currentColor });
+        return null;
+      }
+
+      case "Rectangle": {
+        const p1v = await evalExpr(st.p1, scopeChain);
+        const p2v = await evalExpr(st.p2, scopeChain);
+        const p1 = coordFromValue(p1v, st.line, "");
+        const p2 = coordFromValue(p2v, st.line, "");
+        const x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
+        env.gfxObjects.push({
+          type: "rectangle",
+          v1: { x: x1, y: y1 },
+          v2: { x: x2, y: y1 },
+          v3: { x: x2, y: y2 },
+          v4: { x: x1, y: y2 },
+          color: env.currentColor
+        });
+        return null;
+      }
+
+      case "Line": {
+        const th = await evalExpr(st.th, scopeChain);
+        if (typeof th !== "number" || !Number.isFinite(th)) fail("shapeParamsNotNumeric", "line", st.line);
+        const p1v = await evalExpr(st.p1, scopeChain);
+        const p2v = await evalExpr(st.p2, scopeChain);
+        const p1 = coordFromValue(p1v, st.line, "");
+        const p2 = coordFromValue(p2v, st.line, "");
+        env.gfxObjects.push({
+          type: "line",
+          x1: p1.x, y1: p1.y,
+          x2: p2.x, y2: p2.y,
+          t: th,
+          color: env.currentColor
+        });
+        return null;
+      }
+
+      case "Triangle": {
+        // Valuta le tre espressioni separate
+        const v1 = await evalExpr(st.p1, scopeChain);
+        const v2 = await evalExpr(st.p2, scopeChain);
+        const v3 = await evalExpr(st.p3, scopeChain);
+
+        // Converte i risultati in coordinate
+        const p1 = coordFromValue(v1, st.line, "vertice 1");
+        const p2 = coordFromValue(v2, st.line, "vertice 2");
+        const p3 = coordFromValue(v3, st.line, "vertice 3");
+
+        env.gfxObjects.push({ type: "triangle", v1: p1, v2: p2, v3: p3, color: env.currentColor });
+        return null;
+      }
+
+      case "Arc": {
+        const r = await evalExpr(st.r, scopeChain);
+        const th = await evalExpr(st.th, scopeChain);
+        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v) && v > 0)) fail("arcRadiusThicknessPositive", null, st.line);
+        const p1v = await evalExpr(st.p1, scopeChain);
+        const p2v = await evalExpr(st.p2, scopeChain);
+        const p1 = coordFromValue(p1v, st.line, "");
+        const p2 = coordFromValue(p2v, st.line, "");
+        env.gfxObjects.push({ type:"arc", r, t: th, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, color: env.currentColor });
+        return null;
+      }
+
+      case "Graffiti": {
+        const size = await evalExpr(st.sizeExpr, scopeChain);
+        if (typeof size !== "number" || !Number.isFinite(size) || size <= 0) fail("graffitiSizeNotNumber", null, st.line);
+        const posV = await evalExpr(st.posExpr, scopeChain);
+        const { x, y } = coordFromValue(posV, st.line, "");
+        const content = await evalExpr(st.contentExpr, scopeChain);
+        if (typeof content !== "string") fail("graffitiContentNotString", null, st.line);
+
+        // approximate text bounds
+        const w = Math.max(10, size * 0.62 * content.length);
+        const h = Math.max(10, size * 1.2);
+
+        env.gfxObjects.push({
+          type: "text",
+          x: x - w/2, y: y - h/2,
+          width: w, height: h,
+          rotation: 0,
+          size,
+          content,
+          color: env.currentColor
+        });
+        return null;
+      }
+
+      // --- Label & import/draw ---
+      case "Label": {
+        const nameU = st.name.toUpperCase();
+        if (env.labels[nameU] || env.imports[nameU]) fail("labelExists", st.name, st.line);
+
+        const localObjects = [];
+        const savedObjects = env.gfxObjects;
+        env.gfxObjects = localObjects;
+
+        // Execute label body in its own local scope (can use globals)
+        const labelScope = Object.create(null);
+        labelScope.__globalVars = new Set();
+        const chain = scopeChain.concat([labelScope]);
+
+        const r = await execBlock(st.body, chain);
+
+        env.gfxObjects = savedObjects;
+        if (r === EXEC_STOP) return EXEC_STOP;
+        if (r && r.__return) return r;
+
+        env.labels[nameU] = { objects: localObjects.map(deepCopyValue), scale: 1, rotation: 0 };
+        return null;
+      }
+
+      case "Import": {
+        const nameU = st.name.toUpperCase();
+        if (env.labels[nameU] || env.imports[nameU]) fail("labelExists", st.name, st.line);
+
+        const f = await evalExpr(st.fileExpr, scopeChain);
+        if (typeof f !== "string") fail("backgroundFilenameNotText", null, st.line);
+        const img = await loadImageFromUrl(f, st.line);
+        env.imports[nameU] = {
+          img,
+          scale: 1,
+          rotation: 0,
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        };
+        return null;
+      }
+
+      case "Scale": {
+        const nameU = st.name.toUpperCase();
+        const factor = await evalExpr(st.factorExpr, scopeChain);
+        if (typeof factor !== "number" || !Number.isFinite(factor) || factor <= 0) fail("scaleNotNumber", null, st.line);
+
+        if (env.labels[nameU]) env.labels[nameU].scale *= factor;
+        else if (env.imports[nameU]) env.imports[nameU].scale *= factor;
+        else fail("labelNotFound", st.name, st.line);
+        return null;
+      }
+
+      case "Draw": {
+        const nameU = st.name.toUpperCase();
+        const posV = await evalExpr(st.posExpr, scopeChain);
+        const pos = coordFromValue(posV, st.line, "");
+
+        const defL = env.labels[nameU];
+        const defI = env.imports[nameU];
+
+        if (!defL && !defI) fail("labelNotFound", st.name, st.line);
+
+        if (defI) {
+          const w = defI.width * defI.scale;
+          const h = defI.height * defI.scale;
+          env.gfxObjects.push({
+            type: "image",
+            img: defI.img,
+            x: pos.x - w/2,
+            y: pos.y - h/2,
+            width: w,
+            height: h,
+            rotation: defI.rotation
+          });
+          return null;
+        }
+
+        // label
+        const c = Math.cos(defL.rotation), s = Math.sin(defL.rotation);
+        const sc = defL.scale;
+
+        const transformPoint = (x,y) => ({
+          x: pos.x + (x*sc*c - y*sc*s),
+          y: pos.y + (x*sc*s + y*sc*c)
+        });
+
+        for (const o of defL.objects) {
+          const obj = deepCopyValue(o);
+          if (obj.type === "circle" || obj.type === "circumference") {
+            const p = transformPoint(obj.x, obj.y);
+            obj.x = p.x; obj.y = p.y;
+            obj.r *= sc;
+            if (obj.t) obj.t *= sc;
+          } else if (obj.type === "line") {
+            const p1 = transformPoint(obj.x1, obj.y1);
+            const p2 = transformPoint(obj.x2, obj.y2);
+            obj.x1 = p1.x; obj.y1 = p1.y;
+            obj.x2 = p2.x; obj.y2 = p2.y;
+            obj.t *= sc;
+          } else if (obj.type === "rectangle") {
+            obj.v1 = transformPoint(obj.v1.x, obj.v1.y);
+            obj.v2 = transformPoint(obj.v2.x, obj.v2.y);
+            obj.v3 = transformPoint(obj.v3.x, obj.v3.y);
+            obj.v4 = transformPoint(obj.v4.x, obj.v4.y);
+          } else if (obj.type === "triangle") {
+            obj.v1 = transformPoint(obj.v1.x, obj.v1.y);
+            obj.v2 = transformPoint(obj.v2.x, obj.v2.y);
+            obj.v3 = transformPoint(obj.v3.x, obj.v3.y);
+          } else if (obj.type === "arc") {
+            const p1 = transformPoint(obj.x1, obj.y1);
+            const p2 = transformPoint(obj.x2, obj.y2);
+            obj.x1=p1.x; obj.y1=p1.y;
+            obj.x2=p2.x; obj.y2=p2.y;
+            obj.r *= sc;
+            obj.t *= sc;
+          } else if (obj.type === "text") {
+            const centerX = obj.x + obj.width/2;
+            const centerY = obj.y + obj.height/2;
+            const pc = transformPoint(centerX, centerY);
+            obj.size *= sc;
+            obj.width *= sc;
+            obj.height *= sc;
+            obj.x = pc.x - obj.width/2;
+            obj.y = pc.y - obj.height/2;
+            obj.rotation = (obj.rotation || 0) + defL.rotation;
+          }
+          env.gfxObjects.push(obj);
+        }
+        return null;
+      }
+
+      case "RotatePlace": {
+        const nameU = st.name.toUpperCase();
+        const angle = await evalExpr(st.angleExpr, scopeChain);
+        if (typeof angle !== "number" || !Number.isFinite(angle)) fail("rotationNotNumber", null, st.line);
+        const posV = await evalExpr(st.posExpr, scopeChain);
+        const pos = coordFromValue(posV, st.line, "");
+
+        const rad = angle * Math.PI / 180;
+
+        if (env.imports[nameU]) {
+          const def = env.imports[nameU];
+          const w = def.width * def.scale;
+          const h = def.height * def.scale;
+          env.gfxObjects.push({
+            type: "image",
+            img: def.img,
+            x: pos.x - w/2,
+            y: pos.y - h/2,
+            width: w,
+            height: h,
+            rotation: rad
+          });
+          return null;
+        }
+
+        if (env.labels[nameU]) {
+          const def = env.labels[nameU];
+          const prevRot = def.rotation;
+          def.rotation = rad;
+          const drawStmt = { type:"Draw", name: st.name, posExpr: st.posExpr, line: st.line };
+          const r = await execStatement(drawStmt, scopeChain);
+          def.rotation = prevRot;
+          return r;
+        }
+
+        fail("labelNotFound", st.name, st.line);
+      }
+
+      // --- Alias ---
+      case "Alias": {
+        const aU = st.aliasName.toUpperCase();
+        
+        // CASO 1: Alias su Variabile Semplice
+        if (st.targetName) { 
+           const target = resolveVariable(scopeChain, st.targetName);
+           if (!target) fail("variableNotFound", st.targetName, st.line);
+
+           let targetScope, targetName;
+           if (target.__isAlias) { targetScope = target.targetScope; targetName = target.targetName; }
+           else { targetScope = target.scope; targetName = target.name; }
+
+           scopeChain[scopeChain.length - 1][aU] = { __isAlias: true, targetScope, targetName };
+           return null;
+        }
+
+        // --- CASO 2: Alias su Espressione (Elemento di Lista) ---
+        
+        try {
+            // Ottieni il "Puntatore" alla lista reale usando la nuova helper
+            const refToList = await resolveMutableList(st.targetExpr, scopeChain);
+            
+            // Salviamo nello scope corrente un "Riferimento diretto" (Hard Reference)
+            const currentScope = scopeChain[scopeChain.length - 1];
+            
+            // Usiamo un oggetto speciale riconoscibile da lookupVariable
+            currentScope[aU] = { 
+                __isHardRef: true, 
+                value: refToList   // Riferimento JS originale
+            };
+            
+        } catch (e) {
+            fail("genericFail", {msg: "Impossibile creare alias: " + e.message}, st.line);
+        }
+        return null;
+      }
+
+      // --- Procedure calls ---
+      case "ProcCall": {
+        const nameLower = st.name.toLowerCase();
+
+        if (nameLower === "tock" && st.args.length === 0) {
+          const v = builtin_tock([], st.line);
+          appendLine(v, false, env.precision);
+          return null;
+        }
+
+        if (BUILTINS[nameLower]) {
+          const args = [];
+          for (const a of st.args) args.push(await evalExpr(a, scopeChain));
+          BUILTINS[nameLower](args, st.line);
+          return null;
+        }
+
+        const def = env.procedures[st.name.toUpperCase()];
+        if (!def) fail("unknownCommand", st.name, st.line);
+
+        const args = [];
+        for (const a of st.args) args.push(await evalExpr(a, scopeChain));
+        
+        return await callUserRoutine(def, args, st.args, scopeChain, false, st.line);
+      }
+
+      default:
+        throw new Error("Unknown statement: " + st.type);
+    }
+  }
+
+  async function callUserRoutine(def, argValues, argNodes, callerScopeChain, wantReturn, callLine) {
+    if (env.callDepth >= MAX_CALL_DEPTH) fail("recursionLimit", null, callLine);
+    env.callDepth++;
+
+    try {
+      const localScope = Object.create(null);
+      localScope.__globalVars = new Set();
+      const scopeChain = [callerScopeChain[0], localScope]; 
+
+      const expected = def.params.length;
+      const got = argValues.length;
+      if (got !== expected) {
+        if (def.kind === "procedure") fail("procArgCount", { name: def.name, expected, got }, callLine);
+        else fail("funcArgCount", { name: def.name, expected, got }, callLine);
+      }
+
+      for (let i = 0; i < expected; i++) {
+        const p = def.params[i];
+        const pNameU = p.name.toUpperCase();
+
+        // LOGICA INOUT
+        if (p.inout) {
+          // Controllo se l'argomento passato è una variabile (nodo tipo "Var")
+          const argNode = argNodes[i];
+          if (argNode && argNode.type === "Var") {
+            // Risolvo la variabile nel contesto del chiamante
+            const res = resolveVariable(callerScopeChain, argNode.name);
+            
+            // Se esiste, creo un ALIAS locale invece di copiare il valore
+            if (res) {
+              let targetScope, targetName;
+              if (res.__isAlias) { 
+                 // Se stiamo passando una catea di alas (alias a un altro alias)
+                 targetScope = res.targetScope;
+                 targetName = res.targetName;
+              } else {
+                 targetScope = res.scope;
+                 targetName = res.name;
+              }
+              // Collegamento:
+              localScope[pNameU] = { __isAlias: true, targetScope, targetName };
+              continue; // Ora al prossimo parametro, finito qui
+            }
+          }
+          // Se inout è richiesto ma passiamo un numero (es. proc(5)) o variabile inesistente,
+          // ricadiamo nel comportamento di default (copia per valore).
+        }
+
+        // Comportamento standard (passaggio per valore / deep copy)
+        localScope[pNameU] = deepCopyValue(argValues[i]);
+      }
+
+      const r = await execBlock(def.body, scopeChain);
+
+      if (r === EXEC_STOP) return EXEC_STOP;
+
+      if (wantReturn) {
+        if (r && r.__return) return deepCopyValue(r.value);
+        fail("funcNoReturn", def.name, def.line);
+      } else {
+        return null;
+      }
+    } finally {
+      env.callDepth--;
+    }
+  }
+
+  // --- Run pipeline ---
+  async function runProgram() {
+    if (isRunning) return;
+    isRunning = true;
+    runButton.disabled = true;
+
+    try {
+      clearScreen();
+      env.gfxObjects = [];
+      env.labels = Object.create(null);
+      env.imports = Object.create(null);
+      env.functions = Object.create(null);
+      env.procedures = Object.create(null);
+      env.callDepth = 0;
+      env.backgroundColor = null;
+      env.backgroundImage = null;
+      env.currentColor = "rgb(0, 0, 0)";
+      env.precision = null;
+      env.sciThreshold = 1000000; // Di default switcho a scientific notation sopra tale valore
+      env.tickTime = null;
+      env.__shadowWarnings = new Set();
+
+      const src = codeInput.value ?? "";
+
+      // Lex + parse
+      let ast;
+      try {
+        const lexer = new Lexer(src);
+        const tokens = lexer.lexAll();
+        const parser = new Parser(tokens);
+        ast = parser.parseProgram();
+      } catch (e) {
+        if (e && e.type === "ParseError") {
+          appendLine(`${uiStrings[lang].errorPrefix} ${e.line + 1}: ${e.message}`, true);
+          return;
+        }
+        appendLine(`${uiStrings[lang].executionStopped} ${String(e?.message ?? e)}`, true);
+        return;
+      }
+
+      // Execute
+      const globalScope = Object.create(null);
+      globalScope.__globalVars = new Set();
+      const scopeChain = [globalScope];
+
+      try {
+        for (const st of ast.stmts) {
+          const r = await execStatement(st, scopeChain);
+          if (r === EXEC_STOP) break;
+          if (r && r.__return) break;
+        }
+      } catch (e) {
+        if (e === EXEC_STOP) {
+          appendLine(uiStrings[lang].programStopped, false);
+        } else if (e && e.message === "Execution stopped.") {
+          // already reported by fail()
+        } else {
+          appendLine(`${uiStrings[lang].executionStopped} ${String(e?.message ?? e)}`, true);
+        }
+      }
+
+      // Final redraw (if canvas visible)
+      if (!canvasWindow.classList.contains("hidden")) {
+        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+      }
+
+    } finally {
+      isRunning = false;
+      runButton.disabled = false;
+    }
+  }
+
+  // --- UI wiring ---
+  function updateLineNumber() {
+    const pos = codeInput.selectionStart || 0;
+    const before = codeInput.value.slice(0, pos);
+    const line = before.split("\n").length;
+    lineIndicator.textContent = `${uiStrings[lang].lineIndicatorPrefix.toLowerCase()}: ${line}`;
+  }
+
+  codeInput.addEventListener("keydown", (ev) => {
+    if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") {
+      ev.preventDefault();
+      runProgram();
+      return;
+    }
+    handleEditorKeydown(ev);
+  });
+
+  codeInput.addEventListener("input", () => {
+    updateLineNumber();
+    updateHighlighting();
+    scheduleSuggestions();
+  });
+
+  codeInput.addEventListener("scroll", () => syncHighlightScroll());
+  codeInput.addEventListener("click", () => { updateLineNumber(); scheduleSuggestions(); });
+  codeInput.addEventListener("keyup", () => { updateLineNumber(); scheduleSuggestions(); });
+  codeInput.addEventListener("blur", () => setTimeout(hideSuggestions, 120));
+
+  runButton.addEventListener("click", runProgram);
+
+  helpButton.addEventListener("click", () => {
+    // Apre il file help_it.html in una nuova scheda/finestra del browser
+    window.open("help_it.html", "_blank");
+  });
+
+  toggleCanvasButton.addEventListener("click", () => {
+    if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
+    else hideCanvasWindow();
+  });
+  closeCanvasButton.addEventListener("click", hideCanvasWindow);
+
+  savePngButton.addEventListener("click", () => {
+    try {
+      const url = gfxCanvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "matita.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch {
+      appendLine(isLanguageIT ? "Impossibile salvare PNG (canvas tainted o errore)." : "Cannot save PNG.", true);
+    }
+  });
+
+  // Drag window
+  (function enableCanvasDrag() {
+    let dragging = false;
+    let startX = 0, startY = 0;
+    let startLeft = 0, startTop = 0;
+
+    canvasWindowHeader.addEventListener("pointerdown", (e) => {
+      if (e.target && e.target.tagName === "BUTTON") return;
+      dragging = true;
+      canvasWindowHeader.setPointerCapture(e.pointerId);
+
+      const rect = canvasWindow.getBoundingClientRect();
+      // switch from right/bottom to left/top once
+      canvasWindow.style.right = "auto";
+      canvasWindow.style.bottom = "auto";
+      canvasWindow.style.left = rect.left + "px";
+      canvasWindow.style.top = rect.top + "px";
+
+      startX = e.clientX;
+      startY = e.clientY;
+      startLeft = rect.left;
+      startTop = rect.top;
+      e.preventDefault();
+    });
+
+    canvasWindowHeader.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      canvasWindow.style.left = (startLeft + dx) + "px";
+      canvasWindow.style.top = (startTop + dy) + "px";
+    });
+
+    canvasWindowHeader.addEventListener("pointerup", (e) => {
+      dragging = false;
+      try { canvasWindowHeader.releasePointerCapture(e.pointerId); } catch {}
+    });
+  })();
+
+  // Resize : notify redraw need
+  const ro = new ResizeObserver(() => {
+    if (!canvasWindow.classList.contains("hidden")) drawReadyScreen(uiStrings[lang].canvasResized);
+  });
+  ro.observe(canvasWindowBody);
+
+  window.addEventListener("resize", () => {
+    if (!canvasWindow.classList.contains("hidden")) drawReadyScreen(uiStrings[lang].canvasResized);
+  });
+
+  // Open/Save code
+  openButton.addEventListener("click", () => {
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.accept = ".txt,.mt,.matita,.mtt,.mex,.tex,.js,.html,text/plain";
+    inp.addEventListener("change", () => {
+      const f = inp.files && inp.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        codeInput.value = String(reader.result || "");
+        updateLineNumber();
+        updateHighlighting(true);
+        scheduleSuggestions();
+      };
+      reader.readAsText(f, "utf-8");
+    });
+    inp.click();
+  });
+
+  saveButton.addEventListener("click", () => {
+    downloadText(uiStrings[lang].saveFilename, codeInput.value ?? "");
+  });
+
+  getMatitalkButton.addEventListener("click", () => {
+    const full = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    downloadText(uiStrings[lang].downloadFilename, full);
+  });
+
+  // Split panes
+  try {
+    Split(["#editor-pane", "#output-pane"], { sizes: [60, 40], minSize: [320, 280], gutterSize: 8 });
+  } catch {}
+
+
+  codeInput.value = `cancella schermo
+
+chiedi Nome dicendo "Come ti chiami?"
+metti "Ciao, " + Nome + ". Facciamo qualcosa insieme! " in Messaggio
+scrivi Messaggio # output su console
+
+# Scriviamo il nome su cavas N volte:
+metti 10 in N # numero di ripetizioni
+metti 30 in H # dimensione testo
+
+indice I va da 1 a N ed esegui (
+    imposta colore (50, 10*I, 100-10*I) # colori come % di R,G,B
+    graffiti grandezza H in punto(0, H*I) Nome # scrive Nome su canvas
+)`;
+
+  // Initial paint
+  updateLineNumber();
+  updateHighlighting(true);
+  hideSuggestions();
+  drawReadyScreen(uiStrings[lang].canvasReady);
+}
+
+// bootstrap
+document.addEventListener("DOMContentLoaded", initMatita);
+
+</script>
+</body>
+</html>

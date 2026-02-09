@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esempi di Programmi in Matita</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+<style>
+        :root { 
+            --PrimaryBlue: #007BFF; 
+            --PrimaryYellow: #FFC107; 
+            --White: #fff; 
+            --DarkText: #212529; 
+            /* Palette Interprete Matita v0.3.1 */
+            --CodeBackground: #1e293b; 
+            --CodeText: #f8fafc;
+            --PaperW: 900px; 
+        }
+
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            background: #fff; 
+            color: var(--DarkText); 
+            font-family: 'Poppins', sans-serif; 
+            line-height: 1.7; 
+            scroll-behavior: smooth; 
+        }
+        
+        /* Layout Generale */
+        header { 
+            position: sticky; 
+            top: 0; 
+            background: white; 
+            border-bottom: 1px solid #e5e7eb; 
+            z-index: 10; 
+            margin-bottom: 2em; 
+        }
+        header .bar { 
+            max-width: var(--PaperW); 
+            margin: 0 auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 10px 16px; 
+        }
+        header .left { font-weight: 700; color: var(--PrimaryBlue); }
+        
+        main { max-width: var(--PaperW); margin: 0 auto; padding: 16px; }
+        
+        h1 { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; color: var(--PrimaryBlue); }
+        h2 { font-size: 1.8rem; margin-top: 0; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; }
+        p { margin-bottom: 1.5em; }
+
+        /* Indice */
+        .toc { 
+            background: #f8f9fa; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 40px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            scroll-margin-top: 100px; 
+        }
+        .toc h3 { margin-top: 0; }
+        .toc ul { list-style-type: none; padding-left: 0; }
+        .toc li { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .toc a { text-decoration: none; color: var(--PrimaryBlue); font-weight: 700; display: block; width: 100%; }
+        .toc a:hover { color: #0056b3; }
+
+        /* Sezioni Programma */
+        .program-section { margin-bottom: 60px; padding-top: 20px; scroll-margin-top: 80px; }
+        
+        /* Link di navigazione */
+        .nav-link { 
+            display: inline-block; 
+            margin: 10px 0; 
+            font-size: 0.9rem; 
+            color: #6c757d; 
+            text-decoration: none; 
+            border: 1px solid #dee2e6; 
+            padding: 2px 10px; 
+            border-radius: 20px; 
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-link:hover { background-color: #e9ecef; color: var(--PrimaryBlue); }
+
+        /* Contenitore Codice */
+        .code-wrapper {
+            background-color: var(--CodeBackground);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #475569; /* Bordo sottile */
+        }
+
+        .code-toolbar {
+            background-color: #0f172a; /* Header ancora più scuro */
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .code-lang { color: #94a3b8; font-size: 0.85rem; font-family: 'Roboto Mono', monospace; }
+
+        .copy-btn {
+            background-color: var(--PrimaryBlue);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover { background-color: #0056b3; }
+        .copy-btn:active { transform: translateY(1px); }
+
+        pre { margin: 0; padding: 20px; overflow-x: auto; }
+        
+        /* Regola per CODE nel testo normale (sfondo chiaro) */
+        code { 
+            font-family: 'Roboto Mono', monospace; 
+            color: #0369a1; /* Blu scuro leggibile su bianco */
+            background-color: #f1f5f9; /* Slate chiarissimo */
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em; 
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Regola per CODE dentro PRE (sfondo scuro - resetta stili inline) */
+        pre code { 
+            color: var(--CodeText); 
+            background-color: transparent; 
+            padding: 0;
+            border: none;
+            font-size: 0.9rem; 
+            line-height: 1.5; 
+        }
+
+        /* Syntax Highlighting MATCHING INTERPRETER THEME */
+        .kw { color: #38bdf8; font-weight: 600; }             /* Keyword (Azzurro) */
+        .str { color: #fbbf24; }                              /* String (Giallo) */
+        .num { color: #a78bfa; }                              /* Number (Viola) */
+        .com { color: rgba(148, 163, 184, 0.85); font-style: italic; } /* Comment (Grigio) */
+
+    </style>
+</head>
+<body>
+
+<header id="top">
+    <div class="bar">
+        <div class="left">Matita v0.3.1</div>
+    </div>
+</header>
+
+<main>
+    <h1>Programmi di Esempio</h1>
+    <p>Raccolta di programmi scritti in Matita.</p>
+
+    <nav class="toc" id="indice">
+        <h3>Indice dei Programmi</h3>
+        <ul>
+            <li><a href="#prog1">1. Tabellina</a></li>
+            <li><a href="#prog2">2. Emoji Unicode</a></li>
+            <li><a href="#prog3">3. Codice Morse</a></li>
+            <li><a href="#prog4">4. Cifrario di Cesare</a></li>
+            <li><a href="#prog5">5. Velocità di Caduta</a></li>
+            <li><a href="#prog6">6. (Gioco) Tempo di Reazione</a></li>
+            <li><a href="#prog7">7. Faccina (Smiley)</a></li>
+            <li><a href="#prog8">8. (Gioco) Pensa un Numero</a></li>
+            <li><a href="#prog9">9. Albero Frattale</a></li>
+            <li><a href="#prog10">10. (Gioco) Raccogli e Sfuggi</a></li>
+            <li><a href="#prog11">11. Fiocco di Neve di Koch</a></li>
+            <li><a href="#prog12">12. Curve Polari</a></li>
+            <li><a href="#prog13">13. Operazioni su vettori</a></li>
+            <li><a href="#prog14">14. (Gioco) Space Invaders</a></li>
+            <li><a href="#prog15">15. Frattale di Mandelbrot</a></li>
+            <li><a href="#prog16">16. Stima di Pi Greco (Monte Carlo)</a></li>
+        </ul>
+    </nav>
+
+    <section id="prog1" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>1. Tabellina</h2>
+        <p>Chiede un numero all'utente e calcola la sua tabellina dal 1 al 12.<br>
+        Utilizza un ciclo numerico per iterare il calcolo e concatena stringhe e numeri.<br>
+        Mostra il risultato formattato direttamente nella console testuale.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code1', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code1"><span class="kw">chiedi</span> Numero <span class="kw">dicendo</span> <span class="str">"Inserisci un numero per la sua tabellina:"</span>
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"Ecco la tabellina del "</span> + Numero + <span class="str">":"</span>; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"-------------------------"</span>; <span class="kw">accapo</span>
+
+<span class="kw">variabile</span> I <span class="kw">va da</span> <span class="num">1</span> <span class="kw">a</span> <span class="num">12</span> <span class="kw">ed esegui</span> (
+    <span class="kw">metti</span> Numero * I <span class="kw">in</span> Risultato
+    <span class="kw">scrivi</span> Numero + <span class="str">" x "</span> + I + <span class="str">" = "</span> + Risultato; <span class="kw">accapo</span>
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog2" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>2. Emoji Unicode</h2>
+        <p>Stampa una tabella di caratteri Emoji utilizzando i codici standard Unicode.<br>
+        Itera attraverso un intervallo di numeri interi convertendoli in simboli grafici.<br>
+        Dimostra l'uso della funzione <code>unicode()</code> per trasformare codici numerici in testo.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code2', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code2"><span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"--- Tabella Emoji UNICODE ---"</span>; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Simbolo   |   Codice"</span>
+<span class="kw">scrivi</span> <span class="str">"------------------"</span>; <span class="kw">accapo</span>
+
+<span class="kw">metti</span> <span class="num">128512</span> <span class="kw">in</span> Inizio <span class="com"># da dove iniziamo a scorrere il codice UNICODE</span>
+<span class="kw">metti</span> <span class="num">128591</span> <span class="kw">in</span> Fine <span class="com"># dove ci fermiamo</span>
+
+<span class="kw">variabile</span> N <span class="kw">va da</span> Inizio <span class="kw">a</span> Fine <span class="kw">ed esegui</span> (
+    <span class="kw">metti unicode</span>(N) <span class="kw">in</span> Faccina
+    <span class="kw">scrivi</span> <span class="str">"   "</span> + Faccina + <span class="str">"       |   "</span> + N; <span class="kw">accapo</span>
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog3" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>3. Codice Morse</h2>
+        <p>Traduce una frase inserita dall'utente in codice Morse.<br>
+        Scompone il testo in caratteri e usa l'aritmetica Unicode per trovare l'indice nella lista dei codici.<br>
+        Gestisce la traduzione lettera per lettera, convertendo gli spazi in pause visive.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code3', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code3"><span class="com"># 'a', 'b', 'c', ecc. in codice Morse:</span>
+<span class="kw">metti</span> (<span class="str">".-"</span>, <span class="str">"-..."</span>, <span class="str">"-.-."</span>, <span class="str">"-.."</span>, <span class="str">"."</span>, <span class="str">"..-."</span>, <span class="str">"--."</span>, <span class="str">"...."</span>, \
+<span class="str">".."</span>, <span class="str">".---"</span>, <span class="str">"-.-"</span>, <span class="str">".-.."</span>, <span class="str">"--"</span>, <span class="str">"-."</span>, <span class="str">"---"</span>, <span class="str">".--."</span>, <span class="str">"--.-"</span>, \
+<span class="str">".-."</span>, <span class="str">"..."</span>, <span class="str">"-"</span>, <span class="str">"..-"</span>, <span class="str">"...-"</span>, <span class="str">".--"</span>, <span class="str">"-..-"</span>, <span class="str">"-.--"</span>, <span class="str">"--.."</span>) \
+<span class="kw">in</span> alfabetoMorse
+
+<span class="kw">chiedi</span> testo <span class="kw">dicendo</span> <span class="str">"Scrivi in minuscolo il testo da tradurre:"</span>
+<span class="kw">metti scomponi</span>(testo) <span class="kw">in</span> listaCaratteri
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"Testo: "</span> + testo; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Morse: "</span>
+
+<span class="kw">metti Unicode</span>(<span class="str">"a"</span>) <span class="kw">in</span> IndiceA
+
+<span class="kw">per ogni</span> lettera <span class="kw">in</span> listaCaratteri <span class="kw">esegui</span> (
+    <span class="kw">metti Unicode</span>(lettera) - IndiceA + <span class="num">1</span> <span class="kw">in</span> j
+    <span class="kw">se</span> (j>= <span class="num">1</span> <span class="kw">e</span> j<= <span class="num">26</span>) <span class="kw">allora</span> (
+        <span class="kw">metti elemento</span> j <span class="kw">di</span> alfabetoMorse <span class="kw">in</span> codice
+        <span class="kw">scrivi</span> codice + <span class="str">" "</span>
+    ) <span class="kw">altrimenti</span> (
+        <span class="kw">se</span> (lettera == <span class="str">" "</span>) <span class="kw">allora</span> (
+            <span class="kw">scrivi</span> <span class="str">"   "</span> 
+        ) <span class="kw">altrimenti</span> (
+            <span class="kw">scrivi</span> <span class="str">"?"</span>
+        )
+    )
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog4" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>4. Cifrario di Cesare</h2>
+        <p>Implementa un antico algoritmo di crittografia a sostituzione semplice.<br>
+        Sposta ogni lettera del testo di un numero fisso di posizioni determinato dalla chiave.<br>
+        Utilizza l'operatore modulo (<code>mod</code>) per gestire il "giro" dell'alfabeto dalla Z alla A.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code4', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code4"><span class="kw">chiedi</span> testo <span class="kw">dicendo</span> <span class="str">"Scrivi il testo da cifrare (in minuscolo):"</span>
+<span class="kw">chiedi</span> chiave <span class="kw">dicendo</span> <span class="str">"Inserisci la chiave (numero intero):"</span>
+
+<span class="kw">metti scomponi</span>(testo) <span class="kw">in</span> listaCaratteri
+<span class="kw">metti Unicode</span>(<span class="str">"a"</span>) <span class="kw">in</span> baseA
+
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"Testo Originale: "</span> + testo; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Testo Cifrato:    "</span>
+
+<span class="kw">per ogni</span> lettera <span class="kw">in</span> listaCaratteri <span class="kw">esegui</span> (
+    <span class="kw">metti Unicode</span>(lettera) <span class="kw">in</span> codice
+    <span class="kw">se</span> (codice >= baseA <span class="kw">e</span> codice <= baseA + <span class="num">25</span>) <span class="kw">allora</span> (
+        <span class="kw">metti</span> codice - baseA <span class="kw">in</span> indice0
+        <span class="kw">metti</span> indice0 + chiave <span class="kw">in</span> indiceSpostato
+        <span class="kw">metti</span> indiceSpostato <span class="kw">mod</span> <span class="num">26</span> <span class="kw">in</span> indiceNuovo
+        <span class="kw">metti</span> indiceNuovo + baseA <span class="kw">in</span> codiceCifrato
+        <span class="kw">scrivi Unicode</span>(codiceCifrato)
+    ) <span class="kw">altrimenti</span> (<span class="com"># Lasciamo uguale se non è una lettera (spazio, punto, ecc.):</span>
+        <span class="kw">scrivi</span> lettera
+    )
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog5" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>5. Velocità di Caduta</h2>
+        <p>Calcola la velocità di impatto di un oggetto in caduta libera sulla Terra da un'altezza H.<br>
+        Utilizza la notazione scientifica (es. <code>5.9e24</code>) per gestire le grandi costanti fisiche.<br>
+        Confronta il risultato ottenuto con la velocità del suono (Mach) e la velocità di fuga.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code5', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code5"><span class="kw">cancella schermo</span>
+<span class="kw">metti</span> <span class="num">5.9722e24</span> <span class="kw">in</span> MassaTerra <span class="com"># kg</span>
+<span class="kw">metti</span> <span class="num">6371e3</span> <span class="kw">in</span> RaggioTerra <span class="com"># m</span>
+<span class="kw">metti</span> <span class="num">6.6743e-11</span> <span class="kw">in</span> G <span class="com"># Costante di Cavendish</span>
+
+<span class="kw">chiedi</span> H <span class="kw">dicendo</span> <span class="str">"Altezza di caduta (m)? "</span>
+
+<span class="kw">metti radice</span>(<span class="num">2</span>*MassaTerra*G*(<span class="num">1</span>/RaggioTerra - <span class="num">1</span>/(RaggioTerra+H))) <span class="kw">in</span> v
+<span class="kw">decimali</span> <span class="num">3</span>
+<span class="kw">scrivi</span> <span class="str">"Altezza di caduta: "</span> + H; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Velocità di caduta: "</span>; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"    "</span> + v + <span class="str">" m/s"</span>; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"    "</span> + v*<span class="num">3.6</span> + <span class="str">" km/h"</span>; <span class="kw">accapo</span>; <span class="kw">accapo</span>
+
+<span class="kw">metti</span> <span class="num">343</span> <span class="kw">in</span> c <span class="com"># velocità del suono, altezza mare 15 gradi C</span>
+<span class="kw">scrivi</span> <span class="str">"Mach: "</span> + v/c; <span class="kw">accapo</span>
+
+<span class="kw">metti radice</span>(<span class="num">2</span>*G*MassaTerra/RaggioTerra) <span class="kw">in</span> VelFuga
+
+<span class="kw">scrivi</span> <span class="str">"Rispetto alla velocità di fuga: "</span> + v/VelFuga*<span class="num">100</span> + <span class="str">"%"</span>; <span class="kw">accapo</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog6" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>6. Tempo di Reazione</h2>
+        <p>Misura i riflessi dell'utente calcolando il tempo tra un segnale visivo e la pressione di un tasto.<br>
+        Utilizza i comandi <code>tick</code> e <code>tock</code> per il cronometraggio preciso in millisecondi.<br>
+        Sfrutta un'attesa casuale per rendere il test imprevedibile ed evitare anticipazioni.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code6', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code6"><span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">" Misuriamo il tuo tempo di reazione ..."</span>; <span class="kw">accapo</span>
+<span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Quando compare la scritta 'VIA!', premi la BARRA SPAZIATRICE."</span>
+<span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Premi SPAZIO per iniziare..."</span>
+
+<span class="com"># Aspetta che l'utente prema spazio per avviare il gioco</span>
+<span class="kw">fintanto</span> (<span class="kw">non</span> (<span class="kw">tasto</span> <span class="str">"SPACE"</span> <span class="kw">viene premuto</span>)) <span class="kw">esegui</span> (
+    <span class="kw">aspetta</span> <span class="num">10</span> <span class="kw">ms</span>
+)
+
+<span class="com"># Aspetta che l'utente rilasci il tasto per evitare false partenze</span>
+<span class="kw">fintanto</span> (<span class="kw">tasto</span> <span class="str">"SPACE"</span> <span class="kw">viene premuto</span>) <span class="kw">esegui</span> (
+    <span class="kw">aspetta</span> <span class="num">10</span> <span class="kw">ms</span>
+)
+
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"Pronti..."</span>; <span class="kw">accapo</span>
+
+<span class="com"># Calcola un tempo casuale tra 2s e 5s</span>
+<span class="kw">metti casuale</span>(<span class="num">2000</span>, <span class="num">5000</span>) <span class="kw">in</span> AttesaRandom
+<span class="kw">aspetta</span> AttesaRandom <span class="kw">ms</span>
+
+
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"VIA!"</span>
+<span class="kw">tick</span> <span class="com"># Parte il cronometro</span>
+
+<span class="com"># Ciclo di attesa: gira finché la barra NON viene premuta</span>
+<span class="kw">fintanto</span> (<span class="kw">non</span> (<span class="kw">tasto</span> <span class="str">"SPACE"</span> <span class="kw">viene premuto</span>)) <span class="kw">esegui</span> (
+    <span class="kw">aspetta</span> <span class="num">1</span> <span class="kw">ms</span>
+)
+
+<span class="com"># Appena il ciclo si rompe (tasto premuto), leggiamo il tempo con tock</span>
+<span class="kw">metti tock in</span> TempoReazione
+
+<span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Tempo di reazione: "</span> + TempoReazione + <span class="str">" ms."</span>; <span class="kw">accapo</span>
+
+<span class="kw">accapo</span>
+<span class="kw">se</span> (TempoReazione < <span class="num">250</span>) <span class="kw">allora</span> (
+    <span class="kw">scrivi</span> <span class="str">"Complimenti, riflessi fulminei!"</span>
+) <span class="kw">altrimenti</span> (
+    <span class="kw">scrivi</span> <span class="str">"Puoi fare di meglio..."</span>
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog7" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>7. Faccina (Smiley)</h2>
+        <p>Costruzione di un disegno utilizzando primitive geometriche come cerchi e archi.<br>
+        Sovrappone cerchi pieni e circonferenze vuote per creare i dettagli del viso.<br>
+        Utilizza punti specifici per posizionare accuratamente occhi e bocca.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code7', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code7"><span class="com"># --- Faccina ---</span>
+
+<span class="com"># Colori</span>
+<span class="kw">metti</span> (<span class="num">100</span>, <span class="num">90</span>, <span class="num">10</span>) <span class="kw">in</span> Giallo
+<span class="kw">metti</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Nero
+<span class="kw">metti</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="kw">in</span> Bianco
+
+<span class="kw">cancella grafica</span>
+
+<span class="com"># Faccia</span>
+<span class="kw">imposta colore</span> Giallo
+<span class="kw">cerchio raggio</span> <span class="num">120</span> <span class="kw">in punto</span>(<span class="num">0</span>, <span class="num">0</span>)
+
+<span class="com"># Contorno faccia</span>
+<span class="kw">imposta colore</span> Nero
+<span class="kw">circonferenza raggio</span> <span class="num">120</span> <span class="kw">spessore</span> <span class="num">8</span> <span class="kw">in punto</span>(<span class="num">0</span>, <span class="num">0</span>)
+
+<span class="com"># Occhi</span>
+<span class="kw">imposta colore</span> Nero
+<span class="kw">cerchio raggio</span> <span class="num">12</span> <span class="kw">in punto</span>(<span class="num">-40</span>, <span class="num">30</span>)
+<span class="kw">cerchio raggio</span> <span class="num">12</span> <span class="kw">in punto</span>(<span class="num">40</span>, <span class="num">30</span>)
+
+<span class="com"># Punti luce negli occhi</span>
+<span class="kw">imposta colore</span> Bianco
+<span class="kw">cerchio raggio</span> <span class="num">4</span> <span class="kw">in punto</span>(<span class="num">-35</span>, <span class="num">35</span>)
+<span class="kw">cerchio raggio</span> <span class="num">4</span> <span class="kw">in punto</span>(<span class="num">45</span>, <span class="num">35</span>)
+
+<span class="com"># Sorriso</span>
+<span class="kw">imposta colore</span> Nero
+<span class="kw">arco raggio</span> <span class="num">60</span> <span class="kw">spessore</span> <span class="num">8</span> <span class="kw">da</span> (<span class="num">-50</span>, <span class="num">-25</span>) <span class="kw">a</span> (<span class="num">50</span>, <span class="num">-25</span>)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog8" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>8. Pensa un Numero</h2>
+        <p>Un esempio di input/output testuale e logica condizionale complessa.<br>
+        Il computer usa la ricerca binaria per indovinare il numero pensato dall'utente in pochi passi.<br>
+        Gestisce le risposte dell'utente (Maggiore, Minore, Indovinato) per restringere l'intervallo.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code8', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code8"><span class="com"># Il computer indovina il numero (1..100) pensato dall'utente.</span>
+
+<span class="kw">cancella schermo</span>
+<span class="kw">chiedi</span> avvia <span class="kw">dicendo</span> <span class="str">"Pensa ad un numero intero tra 1 e 100.\n \
+Proverò ad indovinarlo il più velocemente possibile. \n \
+Rispondi con: \n \
+G = il tuo numero è più Grande \n \
+P = il tuo numero è più Piccolo \n \
+I = ho Indovinato \n \
+\n \
+X = esci \n \
+Premi INVIO per iniziare..."</span>
+
+<span class="kw">metti</span> <span class="num">1</span> <span class="kw">in</span> Min
+<span class="kw">metti</span> <span class="num">100</span> <span class="kw">in</span> Max
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> Tentativi
+
+<span class="kw">fintanto</span> (<span class="kw">vero</span>) <span class="kw">esegui</span> (
+    <span class="kw">globale</span> Min, Max, Tentativi
+
+    <span class="kw">metti tronca</span>((Min + Max) / <span class="num">2</span>) <span class="kw">in</span> Proposta
+    <span class="kw">metti</span> Tentativi + <span class="num">1</span> <span class="kw">in</span> Tentativi
+
+    <span class="kw">chiedi</span> Risposta <span class="kw">dicendo</span> (<span class="str">"Proposta: "</span> + Proposta + <span class="str">". Il numero che hai pensato è più Grande (premi G), più Piccolo (premi P) oppure ho Indovinato (premi I)? Premere X per uscire: "</span>)
+
+    <span class="kw">se</span> (Risposta <span class="kw">uguale a</span> <span class="str">"X"</span>) <span class="kw">o</span> (Risposta <span class="kw">uguale a</span> <span class="str">"x"</span>) <span class="kw">allora</span> (
+        <span class="kw">scrivi</span> <span class="str">"Tentativi effettuati: "</span> + Tentativi; <span class="kw">accapo</span>
+        <span class="kw">stop</span>
+    )
+
+    <span class="kw">se</span> (Risposta <span class="kw">uguale a</span> <span class="str">"I"</span>) <span class="kw">o</span> (Risposta <span class="kw">uguale a</span> <span class="str">"i"</span>) <span class="kw">allora</span> (
+        <span class="kw">accapo</span>
+        <span class="kw">scrivi</span> <span class="str">"Indovinato! Il numero era "</span> + Proposta + <span class="str">"."</span>
+        <span class="kw">accapo</span>
+        <span class="kw">scrivi</span> <span class="str">"Tentativi: "</span> + Tentativi; <span class="kw">accapo</span>
+        <span class="kw">stop</span>
+    )
+
+    <span class="kw">se</span> (Risposta <span class="kw">uguale a</span> <span class="str">"G"</span>) <span class="kw">o</span> (Risposta <span class="kw">uguale a</span> <span class="str">"g"</span>) <span class="kw">allora</span> (
+        <span class="kw">metti</span> Proposta + <span class="num">1</span> <span class="kw">in</span> Min
+    ) <span class="kw">altrimenti</span> (
+        <span class="kw">se</span> (Risposta <span class="kw">uguale a</span> <span class="str">"P"</span>) <span class="kw">o</span> (Risposta <span class="kw">uguale a</span> <span class="str">"p"</span>) <span class="kw">allora</span> (
+            <span class="kw">metti</span> Proposta - <span class="num">1</span> <span class="kw">in</span> Max
+        ) <span class="kw">altrimenti</span> (
+            <span class="kw">accapo</span>; <span class="kw">scrivi</span> <span class="str">"Risposta non valida. Usare G, P, I oppure X."</span>
+            <span class="kw">accapo</span>
+        )
+    )
+
+    <span class="kw">se</span> (Min > Max) <span class="kw">allora</span> (
+        <span class="kw">accapo</span>
+        <span class="kw">scrivi</span> <span class="str">"Incoerenza nelle risposte: non esiste un numero compatibile."</span>
+        <span class="kw">accapo</span>
+        <span class="kw">scrivi</span> <span class="str">"Tentativi effettuati: "</span> + Tentativi; <span class="kw">accapo</span>
+        <span class="kw">stop</span>
+    )
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog9" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>9. Albero Frattale</h2>
+        <p>Un esempio di ricorsione per disegnare un albero naturale.<br>
+        Include funzioni matematiche (seno, coseno) per calcolare le ramificazioni.<br>
+        Usa numeri casuali per variare angoli e lunghezze, rendendo ogni albero unico.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code9', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code9"><span class="com"># Albero frattale</span>
+<span class="kw">cancella schermo</span>
+<span class="kw">cancella grafica</span>
+
+<span class="com"># Foglia rettangolare ancorata allo "stelo" in basso</span>
+<span class="kw">definisci procedura</span> disegnaFoglia(centro, angolo_base) (
+    <span class="kw">imposta colore lista</span>(<span class="kw">casuale</span>(<span class="num">30</span>, <span class="num">90</span>), <span class="kw">casuale</span>(<span class="num">80</span>, <span class="num">100</span>), <span class="kw">casuale</span>(<span class="num">10</span>, <span class="num">50</span>))
+    
+    <span class="kw">metti casuale</span>(<span class="num">5</span>, <span class="num">9</span>) <span class="kw">in</span> larghezza
+    <span class="kw">metti casuale</span>(<span class="num">6</span>, <span class="num">12</span>) <span class="kw">in</span> altezza
+    
+    <span class="com"># Rotazione totale in radianti</span>
+    <span class="kw">metti</span> (angolo_base + <span class="kw">casuale</span>(<span class="num">-20</span>, <span class="num">20</span>)) * <span class="kw">pi</span> / <span class="num">180</span> <span class="kw">in</span> angolo_rad
+    <span class="kw">metti cos</span>(angolo_rad) <span class="kw">in</span> c
+    <span class="kw">metti sin</span>(angolo_rad) <span class="kw">in</span> s
+
+    <span class="com"># Rettangolo locale ancorato in basso (stelo sul lato inferiore)</span>
+    <span class="kw">metti</span> -larghezza / <span class="num">2</span> <span class="kw">in</span> x1_loc
+    <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> y1_loc
+    <span class="kw">metti</span> larghezza / <span class="num">2</span> <span class="kw">in</span> x2_loc
+    <span class="kw">metti</span> altezza <span class="kw">in</span> y2_loc
+
+    <span class="com"># Quattro vertici dopo rotazione + traslazione</span>
+    <span class="kw">metti</span> (x1_loc * c - y1_loc * s + <span class="kw">x di</span> centro) <span class="kw">in</span> v1x
+    <span class="kw">metti</span> (x1_loc * s + y1_loc * c + <span class="kw">y di</span> centro) <span class="kw">in</span> v1y
+    <span class="kw">metti</span> (x2_loc * c - y1_loc * s + <span class="kw">x di</span> centro) <span class="kw">in</span> v2x
+    <span class="kw">metti</span> (x2_loc * s + y1_loc * c + <span class="kw">y di</span> centro) <span class="kw">in</span> v2y
+    <span class="kw">metti</span> (x2_loc * c - y2_loc * s + <span class="kw">x di</span> centro) <span class="kw">in</span> v3x
+    <span class="kw">metti</span> (x2_loc * s + y2_loc * c + <span class="kw">y di</span> centro) <span class="kw">in</span> v3y
+    <span class="kw">metti</span> (x1_loc * c - y2_loc * s + <span class="kw">x di</span> centro) <span class="kw">in</span> v4x
+    <span class="kw">metti</span> (x1_loc * s + y2_loc * c + <span class="kw">y di</span> centro) <span class="kw">in</span> v4y
+
+    <span class="kw">triangolo con vertici punto</span>(v1x, v1y), <span class="kw">punto</span>(v2x, v2y), <span class="kw">punto</span>(v3x, v3y)
+    <span class="kw">triangolo con vertici punto</span>(v1x, v1y), <span class="kw">punto</span>(v4x, v4y), <span class="kw">punto</span>(v3x, v3y)
+    
+    <span class="com"># Stelo corto allineato alla foglia</span>
+    <span class="kw">imposta colore lista</span>(<span class="num">50</span>, <span class="num">30</span>, <span class="num">15</span>)
+    <span class="kw">metti</span> (<span class="num">0</span> * c - (<span class="num">-2</span>) * s + <span class="kw">x di</span> centro) <span class="kw">in</span> s2x
+    <span class="kw">metti</span> (<span class="num">0</span> * s + (<span class="num">-2</span>) * c + <span class="kw">y di</span> centro) <span class="kw">in</span> s2y
+    <span class="kw">linea spessore</span> <span class="num">1</span> <span class="kw">da</span> centro <span class="kw">a punto</span>(s2x, s2y)
+)
+
+<span class="com"># Ramo ricorsivo; le foglie nascono alla punta</span>
+<span class="kw">definisci procedura</span> disegnaRamo(inizio, lunghezza, angolo, livello) (
+    <span class="kw">se</span> (livello > <span class="num">0</span>) <span class="kw">allora</span> (
+        <span class="kw">metti</span> (angolo * <span class="kw">pi</span> / <span class="num">180</span>) <span class="kw">in</span> angolo_rad
+        <span class="kw">metti</span> (<span class="kw">x di</span> inizio + lunghezza * <span class="kw">cos</span>(angolo_rad)) <span class="kw">in</span> fine_x
+        <span class="kw">metti</span> (<span class="kw">y di</span> inizio + lunghezza * <span class="kw">sin</span>(angolo_rad)) <span class="kw">in</span> fine_y
+        <span class="kw">metti punto</span>(fine_x, fine_y) <span class="kw">in</span> punto_finale
+
+        <span class="kw">imposta colore lista</span>(<span class="num">40</span>, <span class="num">26</span>, <span class="num">13</span>)
+        <span class="kw">linea spessore massimo</span>(<span class="num">1</span>, livello / <span class="num">2</span>) <span class="kw">da</span> inizio <span class="kw">a</span> punto_finale
+        
+        <span class="kw">metti</span> (<span class="num">0.75</span> + <span class="kw">casuale</span>(<span class="num">-10</span>, <span class="num">5</span>) / <span class="num">100</span>) <span class="kw">in</span> fattore_lunghezza
+        <span class="kw">metti casuale</span>(<span class="num">-15</span>, <span class="num">15</span>) <span class="kw">in</span> var1
+        <span class="kw">metti casuale</span>(<span class="num">-15</span>, <span class="num">15</span>) <span class="kw">in</span> var2
+        
+        disegnaRamo(punto_finale, lunghezza * fattore_lunghezza, angolo - (<span class="num">25</span> + var1), livello - <span class="num">1</span>)
+        disegnaRamo(punto_finale, lunghezza * fattore_lunghezza, angolo + (<span class="num">25</span> + var2), livello - <span class="num">1</span>)
+    )
+    
+    <span class="kw">se</span> (livello == <span class="num">0</span>) <span class="kw">allora</span> (
+        <span class="com"># Punto di foglia spostato in avanti lungo il ramo e leggermente di lato</span>
+        <span class="kw">metti</span> (angolo * <span class="kw">pi</span> / <span class="num">180</span>) <span class="kw">in</span> a
+        <span class="kw">metti cos</span>(a) <span class="kw">in</span> ca
+        <span class="kw">metti sin</span>(a) <span class="kw">in</span> sa
+        <span class="kw">metti casuale</span>(<span class="num">6</span>, <span class="num">12</span>) <span class="kw">in</span> avanti              <span class="com"># offset lungo il ramo</span>
+        <span class="kw">metti casuale</span>(<span class="num">-3</span>, <span class="num">3</span>) <span class="kw">in</span> lato                <span class="com"># offset laterale</span>
+        <span class="com"># perpendicolare al ramo: (-sa, ca)</span>
+        <span class="kw">metti</span> (<span class="kw">x di</span> inizio + avanti * ca + lato * (-sa)) <span class="kw">in</span> fx
+        <span class="kw">metti</span> (<span class="kw">y di</span> inizio + avanti * sa + lato * ca) <span class="kw">in</span> fy
+        <span class="kw">metti punto</span>(fx, fy) <span class="kw">in</span> p_foglia
+        
+        <span class="com"># 2–4 foglie per cima, con piccole variazioni</span>
+        <span class="kw">metti casuale</span>(<span class="num">2</span>, <span class="num">4</span>) <span class="kw">in</span> n
+        <span class="kw">indice</span> i <span class="kw">va da</span> <span class="num">1</span> <span class="kw">a</span> n <span class="kw">ed esegui</span> (
+            <span class="kw">metti</span> angolo + <span class="kw">casuale</span>(<span class="num">-15</span>, <span class="num">15</span>) <span class="kw">in</span> a_loc
+            <span class="com"># micro-scostamento per evitare sovrapposizioni</span>
+            <span class="kw">metti</span> fx + <span class="kw">casuale</span>(<span class="num">-2</span>, <span class="num">2</span>) <span class="kw">in</span> lx
+            <span class="kw">metti</span> fy + <span class="kw">casuale</span>(<span class="num">-2</span>, <span class="num">2</span>) <span class="kw">in</span> ly
+            disegnaFoglia(<span class="kw">punto</span>(lx, ly), a_loc)
+        )
+    )
+)
+
+<span class="com"># Avvio</span>
+<span class="kw">scrivi</span> <span class="str">"Disegno un albero frattale con foglie naturali..."</span>
+<span class="kw">metti punto</span>(<span class="num">0</span>, <span class="num">-220</span>) <span class="kw">in</span> partenza
+disegnaRamo(partenza, <span class="num">90</span>, <span class="num">90</span>, <span class="num">9</span>)
+<span class="kw">scrivi</span> <span class="str">"Fatto! Esegui di nuovo per variare."</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog10" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>10. Gioco: Raccogli e Sfuggi</h2>
+        <p>Un videogioco completo con motore fisico elementare.<br>
+        Controlla il cerchio blu con le frecce per raccogliere il cibo ed evitare i nemici.<br>
+        Implementa vettori, velocità, accelerazione inerziale e rilevamento delle collisioni.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code10', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code10"><span class="com"># Raccogli e Sfuggi</span>
+<span class="com"># Muovi il cerchio blu.</span>
+<span class="com"># Raccogli le particelle di energia (quadrati azzurri).</span>
+<span class="com"># Se un triangolo ti tocca, perdi una vita.</span>
+<span class="com"># Inizi con 3 vite. Premi 'x' per uscire.</span>
+
+<span class="com"># --- Impostazioni Iniziali ---</span>
+
+<span class="com"># Variabili di stato globali</span>
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> X_POS
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> Y_POS
+<span class="kw">metti</span> <span class="num">5</span> <span class="kw">in</span> VELOCITA
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> USCITA 
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> PUNTEGGIO
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> CIBO_X
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> CIBO_Y
+<span class="kw">metti</span> <span class="num">3</span> <span class="kw">in</span> VITE
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> GAME_OVER
+
+<span class="com"># Costanti per le dimensioni</span>
+<span class="kw">metti</span> <span class="num">20</span> <span class="kw">in</span> GIOCATORE_RAGGIO
+<span class="kw">metti</span> <span class="num">18</span> <span class="kw">in</span> TRI_RAGGIO <span class="com"># raggio effettivo più aderente al triangolo disegnato</span>
+<span class="kw">metti</span> <span class="num">15</span> <span class="kw">in</span> CIBO_SIZE
+<span class="kw">metti</span> <span class="num">220</span> <span class="kw">in</span> AREA_GIOCO 
+
+<span class="com"># --- Variabili per la Fisica ---</span>
+<span class="kw">metti</span> <span class="num">10</span> <span class="kw">in</span> TRI_MASSA
+<span class="kw">metti</span> <span class="num">20</span> <span class="kw">in</span> K_MOLLA
+<span class="kw">metti</span> <span class="num">5</span> <span class="kw">in</span> C_SMORZATORE
+<span class="kw">metti</span> <span class="num">50</span> <span class="kw">in</span> L_RIPOSO
+<span class="kw">metti</span> <span class="num">0.030</span> <span class="kw">in</span> DT          <span class="com"># Delta Time (corrisponde a "aspetta 30 ms")</span>
+
+<span class="com"># --- Liste per i Triangoli ---</span>
+<span class="kw">metti lista</span>() <span class="kw">in</span> LISTA_TRI_X
+<span class="kw">metti lista</span>() <span class="kw">in</span> LISTA_TRI_Y
+<span class="kw">metti lista</span>() <span class="kw">in</span> LISTA_TRI_VX
+<span class="kw">metti lista</span>() <span class="kw">in</span> LISTA_TRI_VY
+
+<span class="com"># Imposta il colore di sfondo (bianco)</span>
+<span class="kw">imposta colore</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>)
+<span class="kw">dipingi sfondo</span>
+
+<span class="com"># --- Definizione Procedure ---</span>
+
+<span class="kw">definisci procedura</span> piazza_cibo () (
+    <span class="kw">globale</span> CIBO_X, CIBO_Y, AREA_GIOCO
+    <span class="kw">metti casuale</span>(-AREA_GIOCO, AREA_GIOCO) <span class="kw">in</span> CIBO_X
+    <span class="kw">metti casuale</span>(-AREA_GIOCO, AREA_GIOCO) <span class="kw">in</span> CIBO_Y
+)
+
+<span class="com"># Aggiunge un triangolo non sovrapposto al giocatore</span>
+<span class="kw">definisci procedura</span> aggiungi_triangolo () (
+    <span class="kw">globale</span> LISTA_TRI_X, LISTA_TRI_Y, LISTA_TRI_VX, LISTA_TRI_VY
+    <span class="kw">globale</span> AREA_GIOCO, X_POS, Y_POS
+
+    <span class="kw">metti casuale</span>(-AREA_GIOCO, AREA_GIOCO) <span class="kw">in</span> TX
+    <span class="kw">metti casuale</span>(-AREA_GIOCO, AREA_GIOCO) <span class="kw">in</span> TY
+
+    <span class="kw">metti</span> TX - X_POS <span class="kw">in</span> DX
+    <span class="kw">metti</span> TY - Y_POS <span class="kw">in</span> DY
+    <span class="kw">metti radice</span>((DX*DX) + (DY*DY)) <span class="kw">in</span> D
+
+    <span class="kw">se</span> (D < <span class="num">120</span>) <span class="kw">allora</span> (
+        <span class="kw">se</span> (<span class="kw">abs</span>(DX) > <span class="kw">abs</span>(DY)) <span class="kw">allora</span> (
+            <span class="kw">se</span> (DX >= <span class="num">0</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> AREA_GIOCO <span class="kw">in</span> TX ) <span class="kw">altrimenti</span> ( <span class="kw">metti</span> -AREA_GIOCO <span class="kw">in</span> TX )
+        ) <span class="kw">altrimenti</span> (
+            <span class="kw">se</span> (DY >= <span class="num">0</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> AREA_GIOCO <span class="kw">in</span> TY ) <span class="kw">altrimenti</span> ( <span class="kw">metti</span> -AREA_GIOCO <span class="kw">in</span> TY )
+        )
+    )
+
+    <span class="kw">aggiungi</span> TX <span class="kw">a</span> LISTA_TRI_X
+    <span class="kw">aggiungi</span> TY <span class="kw">a</span> LISTA_TRI_Y
+    <span class="kw">aggiungi</span> <span class="num">0</span> <span class="kw">a</span> LISTA_TRI_VX
+    <span class="kw">aggiungi</span> <span class="num">0</span> <span class="kw">a</span> LISTA_TRI_VY
+
+    <span class="kw">scrivi</span> <span class="str">"Un nuovo triangolo rosso è apparso!"</span>
+    <span class="kw">accapo</span>
+)
+
+<span class="kw">definisci procedura</span> aggiorna_gioco () (
+    <span class="kw">globale</span> X_POS, Y_POS, USCITA, VELOCITA, VITE, GAME_OVER
+    <span class="kw">globale</span> PUNTEGGIO, CIBO_X, CIBO_Y, CIBO_SIZE, GIOCATORE_RAGGIO, TRI_RAGGIO, AREA_GIOCO
+    <span class="kw">globale</span> TRI_MASSA, K_MOLLA, C_SMORZATORE, L_RIPOSO, DT
+    <span class="kw">globale</span> LISTA_TRI_X, LISTA_TRI_Y, LISTA_TRI_VX, LISTA_TRI_VY
+
+    <span class="com"># 1. Movimento Giocatore</span>
+    <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"UP"</span> <span class="kw">viene premuto</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> Y_POS + VELOCITA <span class="kw">in</span> Y_POS )
+    <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"DOWN"</span> <span class="kw">viene premuto</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> Y_POS - VELOCITA <span class="kw">in</span> Y_POS )
+    <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"LEFT"</span> <span class="kw">viene premuto</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> X_POS - VELOCITA <span class="kw">in</span> X_POS )
+    <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"RIGHT"</span> <span class="kw">viene premuto</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> X_POS + VELOCITA <span class="kw">in</span> X_POS )
+    <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"X"</span> <span class="kw">viene premuto</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> <span class="num">1</span> <span class="kw">in</span> USCITA )
+
+    <span class="com"># --- 2. FISICA e COLLISIONI TRIANGOLI ---</span>
+    <span class="kw">metti dimensione di</span> LISTA_TRI_X <span class="kw">in</span> NUM_TRIANGOLI
+
+    <span class="kw">se</span> (NUM_TRIANGOLI > <span class="num">0</span>) <span class="kw">allora</span> (
+        <span class="kw">indice</span> i <span class="kw">va da</span> <span class="num">1</span> <span class="kw">a</span> NUM_TRIANGOLI <span class="kw">ed esegui</span> (
+            <span class="kw">metti elemento</span> i <span class="kw">di</span> LISTA_TRI_X <span class="kw">in</span> T_X
+            <span class="kw">metti elemento</span> i <span class="kw">di</span> LISTA_TRI_Y <span class="kw">in</span> T_Y
+            <span class="kw">metti elemento</span> i <span class="kw">di</span> LISTA_TRI_VX <span class="kw">in</span> T_VX
+            <span class="kw">metti elemento</span> i <span class="kw">di</span> LISTA_TRI_VY <span class="kw">in</span> T_VY
+
+            <span class="kw">metti</span> X_POS - T_X <span class="kw">in</span> VETTORE_X
+            <span class="kw">metti</span> Y_POS - T_Y <span class="kw">in</span> VETTORE_Y
+            <span class="kw">metti radice</span>((VETTORE_X * VETTORE_X) + (VETTORE_Y * VETTORE_Y)) <span class="kw">in</span> DISTANZA
+            <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> ALLUNGAMENTO
+            <span class="kw">se</span> (DISTANZA > <span class="num">0.1</span>) <span class="kw">allora</span> ( <span class="kw">metti</span> DISTANZA - L_RIPOSO <span class="kw">in</span> ALLUNGAMENTO )
+            <span class="kw">metti</span> K_MOLLA * ALLUNGAMENTO <span class="kw">in</span> FORZA_MOLLA_MAG
+
+            <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> DIR_X
+            <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> DIR_Y
+            <span class="kw">se</span> (DISTANZA > <span class="num">0</span>) <span class="kw">allora</span> (
+                <span class="kw">metti</span> VETTORE_X / DISTANZA <span class="kw">in</span> DIR_X
+                <span class="kw">metti</span> VETTORE_Y / DISTANZA <span class="kw">in</span> DIR_Y
+            )
+
+            <span class="kw">metti</span> (FORZA_MOLLA_MAG * DIR_X) - (C_SMORZATORE * T_VX) <span class="kw">in</span> FORZA_TOT_X
+            <span class="kw">metti</span> (FORZA_MOLLA_MAG * DIR_Y) - (C_SMORZATORE * T_VY) <span class="kw">in</span> FORZA_TOT_Y
+            <span class="kw">metti</span> FORZA_TOT_X / TRI_MASSA <span class="kw">in</span> ACCEL_X
+            <span class="kw">metti</span> FORZA_TOT_Y / TRI_MASSA <span class="kw">in</span> ACCEL_Y
+            <span class="kw">metti</span> T_VX + (ACCEL_X * DT) <span class="kw">in</span> T_VX_NEW
+            <span class="kw">metti</span> T_VY + (ACCEL_Y * DT) <span class="kw">in</span> T_VY_NEW
+            <span class="kw">metti</span> T_X + (T_VX_NEW * DT) <span class="kw">in</span> T_X_NEW
+            <span class="kw">metti</span> T_Y + (T_VY_NEW * DT) <span class="kw">in</span> T_Y_NEW
+
+            <span class="kw">metti</span> T_X_NEW <span class="kw">in elemento</span> i <span class="kw">di</span> LISTA_TRI_X
+            <span class="kw">metti</span> T_Y_NEW <span class="kw">in elemento</span> i <span class="kw">di</span> LISTA_TRI_Y
+            <span class="kw">metti</span> T_VX_NEW <span class="kw">in elemento</span> i <span class="kw">di</span> LISTA_TRI_VX
+            <span class="kw">metti</span> T_VY_NEW <span class="kw">in elemento</span> i <span class="kw">di</span> LISTA_TRI_VY
+
+            <span class="com"># --- Collisione Giocatore-Triangolo ---</span>
+            <span class="kw">metti</span> T_X_NEW - X_POS <span class="kw">in</span> DIST_TX
+            <span class="kw">metti</span> T_Y_NEW - Y_POS <span class="kw">in</span> DIST_TY
+            <span class="kw">metti</span> (DIST_TX * DIST_TX) + (DIST_TY * DIST_TY) <span class="kw">in</span> DIST_T_Q
+            <span class="kw">metti</span> GIOCATORE_RAGGIO + TRI_RAGGIO <span class="kw">in</span> R_TOT_T
+            <span class="kw">metti</span> R_TOT_T * R_TOT_T <span class="kw">in</span> R_TOT_T_Q
+
+            <span class="kw">se</span> (DIST_T_Q < R_TOT_T_Q) <span class="kw">allora</span> (
+                <span class="kw">metti</span> VITE - <span class="num">1</span> <span class="kw">in</span> VITE
+                <span class="kw">se</span> (VITE <= <span class="num">0</span>) <span class="kw">allora</span> (
+                    <span class="kw">metti</span> <span class="num">1</span> <span class="kw">in</span> GAME_OVER
+                ) <span class="kw">altrimenti</span> (
+                    <span class="kw">scrivi</span> <span class="str">"VITA PERSA! Vite rimaste: "</span>
+                    <span class="kw">scrivi</span> VITE
+                    <span class="kw">accapo</span>
+                    <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> X_POS
+                    <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> Y_POS
+                    <span class="kw">indice</span> j <span class="kw">va da</span> <span class="num">1</span> <span class="kw">a</span> NUM_TRIANGOLI <span class="kw">ed esegui</span> (
+                        <span class="kw">metti casuale</span>(-AREA_GIOCO, AREA_GIOCO) <span class="kw">in elemento</span> j <span class="kw">di</span> LISTA_TRI_X
+                        <span class="kw">metti casuale</span>(-AREA_GIOCO, AREA_GIOCO) <span class="kw">in elemento</span> j <span class="kw">di</span> LISTA_TRI_Y
+                        <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in elemento</span> j <span class="kw">di</span> LISTA_TRI_VX
+                        <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in elemento</span> j <span class="kw">di</span> LISTA_TRI_VY
+                    )
+                    <span class="kw">aspetta</span> <span class="num">500</span> <span class="kw">ms</span>
+                )
+            )
+        )
+    )
+
+    <span class="com"># --- 3. Logica di Collisione Cibo ---</span>
+    <span class="kw">metti</span> X_POS - CIBO_X <span class="kw">in</span> DIST_X
+    <span class="kw">metti</span> Y_POS - CIBO_Y <span class="kw">in</span> DIST_Y
+    <span class="kw">metti</span> (DIST_X * DIST_X) + (DIST_Y * DIST_Y) <span class="kw">in</span> DIST_QUADRATA
+    <span class="kw">metti</span> GIOCATORE_RAGGIO + (CIBO_SIZE / <span class="num">2</span>) <span class="kw">in</span> RAGGIO_TOTALE
+    <span class="kw">metti</span> RAGGIO_TOTALE * RAGGIO_TOTALE <span class="kw">in</span> RAGGIO_TOTALE_Q
+
+    <span class="kw">se</span> (DIST_QUADRATA < RAGGIO_TOTALE_Q) <span class="kw">allora</span> (
+        <span class="kw">metti</span> PUNTEGGIO + <span class="num">1</span> <span class="kw">in</span> PUNTEGGIO
+        <span class="kw">scrivi</span> <span class="str">"Punteggio: "</span>
+        <span class="kw">scrivi</span> PUNTEGGIO
+        <span class="kw">accapo</span>
+        piazza_cibo()
+        aggiungi_triangolo()
+    )
+
+    <span class="com"># --- 4. Aggiorna la grafica ---</span>
+    <span class="kw">metti dimensione di</span> LISTA_TRI_X <span class="kw">in</span> NUM_TRIANGOLI
+    <span class="kw">cancella grafica</span>
+    <span class="kw">imposta colore</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>)
+    <span class="kw">dipingi sfondo</span>
+
+    <span class="com"># Disegna il Giocatore (Blu) per primo</span>
+    <span class="kw">imposta colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">100</span>)
+    <span class="kw">cerchio raggio</span> GIOCATORE_RAGGIO <span class="kw">in punto</span>(X_POS, Y_POS)
+
+    <span class="com"># Disegna Cibo (Azzurro)</span>
+    <span class="kw">imposta colore</span> (<span class="num">50</span>, <span class="num">80</span>, <span class="num">100</span>)
+    <span class="kw">metti</span> CIBO_X - (CIBO_SIZE / <span class="num">2</span>) <span class="kw">in</span> CIBO_X1
+    <span class="kw">metti</span> CIBO_Y - (CIBO_SIZE / <span class="num">2</span>) <span class="kw">in</span> CIBO_Y1
+    <span class="kw">metti</span> CIBO_X + (CIBO_SIZE / <span class="num">2</span>) <span class="kw">in</span> CIBO_X2
+    <span class="kw">metti</span> CIBO_Y + (CIBO_SIZE / <span class="num">2</span>) <span class="kw">in</span> CIBO_Y2
+    <span class="kw">rettangolo da punto</span>(CIBO_X1, CIBO_Y1) <span class="kw">a punto</span>(CIBO_X2, CIBO_Y2)
+
+    <span class="com"># Disegna Triangoli e Molle sopra al giocatore</span>
+    <span class="kw">se</span> (NUM_TRIANGOLI > <span class="num">0</span>) <span class="kw">allora</span> (
+        <span class="kw">indice</span> i <span class="kw">va da</span> <span class="num">1</span> <span class="kw">a</span> NUM_TRIANGOLI <span class="kw">ed esegui</span> (
+            <span class="kw">metti elemento</span> i <span class="kw">di</span> LISTA_TRI_X <span class="kw">in</span> T_X
+            <span class="kw">metti elemento</span> i <span class="kw">di</span> LISTA_TRI_Y <span class="kw">in</span> T_Y
+
+            <span class="kw">imposta colore</span> (<span class="num">50</span>, <span class="num">50</span>, <span class="num">50</span>)
+            <span class="kw">linea spessore</span> <span class="num">2</span> <span class="kw">da punto</span>(X_POS, Y_POS) <span class="kw">a punto</span>(T_X, T_Y)
+
+            <span class="kw">imposta colore</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
+            <span class="kw">triangolo con vertici punto</span>(T_X, T_Y + <span class="num">15</span>), <span class="kw">punto</span>(T_X - <span class="num">10</span>, T_Y - <span class="num">10</span>), <span class="kw">punto</span>(T_X + <span class="num">10</span>, T_Y - <span class="num">10</span>)
+        )
+    )
+
+    <span class="com"># HUD</span>
+    <span class="kw">imposta colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+    <span class="kw">graffiti grandezza</span> <span class="num">16</span> <span class="kw">in punto</span>(-AREA_GIOCO - <span class="num">20</span>, AREA_GIOCO + <span class="num">20</span>) <span class="str">"Punteggio: "</span> + PUNTEGGIO
+    <span class="kw">graffiti grandezza</span> <span class="num">16</span> <span class="kw">in punto</span>(-AREA_GIOCO - <span class="num">20</span>, AREA_GIOCO) <span class="str">"Vite: "</span> + VITE
+
+    <span class="kw">ridisegna</span>
+)
+
+<span class="com"># --- Loop di Gioco Principale ---</span>
+piazza_cibo()
+
+<span class="kw">fintanto</span> (USCITA <span class="kw">vale</span> <span class="num">0</span> <span class="kw">e</span> GAME_OVER <span class="kw">vale</span> <span class="num">0</span>) <span class="kw">esegui</span> (
+    aggiorna_gioco()
+    <span class="kw">aspetta</span> <span class="num">30</span> <span class="kw">ms</span> 
+)
+
+<span class="com"># --- Schermata Finale ---</span>
+<span class="kw">se</span> (GAME_OVER <span class="kw">vale</span> <span class="num">1</span>) <span class="kw">allora</span> (
+    <span class="kw">cancella grafica</span>
+    <span class="kw">imposta colore</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>)
+    <span class="kw">dipingi sfondo</span>
+    <span class="kw">imposta colore</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
+    <span class="kw">graffiti grandezza</span> <span class="num">40</span> <span class="kw">in punto</span>(<span class="num">0</span>, <span class="num">50</span>) <span class="str">"GAME OVER"</span>
+    <span class="kw">imposta colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+    <span class="kw">graffiti grandezza</span> <span class="num">20</span> <span class="kw">in punto</span>(<span class="num">0</span>, <span class="num">-10</span>) <span class="str">"Punteggio Finale: "</span> + PUNTEGGIO
+    <span class="kw">ridisegna</span>
+) <span class="kw">altrimenti</span> (
+    <span class="kw">scrivi</span> <span class="str">"Gioco terminato! Punteggio finale: "</span>
+    <span class="kw">scrivi</span> PUNTEGGIO
+    <span class="kw">accapo</span>
+)
+<span class="kw">stop</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog11" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>11. Fiocco di Neve di Koch</h2>
+        <p>Il fiocco di neve di Koch è una delle più celebri curve frattali.<br>
+        Questo programma lo disegna usando la ricorsione: ogni linea retta viene divisa in quattro segmenti.<br>
+        La profondità della ricorsione determina il livello di dettaglio del frattale finale.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code11', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code11"><span class="com"># Programma per disegnare il frattale "Fiocco di Neve" di Koch</span>
+<span class="com">#</span>
+<span class="com"># Definiamo il livello di dettaglio del frattale.</span>
+<span class="com"># Un valore di 4 o 5 è un buon inizio.</span>
+<span class="com"># Valori più alti (6+) possono essere molto lenti.</span>
+<span class="kw">metti</span> <span class="num">6</span> <span class="kw">in</span> livelloMassimo
+
+<span class="com"># Impostiamo lo spessore della linea e il colore</span>
+<span class="kw">metti</span> <span class="num">1</span> <span class="kw">in</span> spessoreLinea
+<span class="kw">imposta colore</span> (<span class="num">0</span>, <span class="num">40</span>, <span class="num">80</span>) <span class="com"># Un blu scuro</span>
+
+<span class="com"># Calcoliamo le costanti per la rotazione di 60 gradi (PI/3 radianti)</span>
+<span class="com"># L'interprete usa Math.sin/cos, che richiedono radianti.</span>
+<span class="kw">metti</span> <span class="kw">PI</span> / <span class="num">3</span> <span class="kw">in</span> PGRECOTERZI
+<span class="kw">metti cos</span>(PGRECOTERZI) <span class="kw">in</span> cos60
+<span class="kw">metti</span> -<span class="kw">sin</span>(PGRECOTERZI) <span class="kw">in</span> sin60
+
+<span class="com">#</span>
+<span class="com"># Questa è la procedura ricorsiva che disegna una curva di Koch</span>
+<span class="com"># tra due punti (x1, y1) e (x2, y2).</span>
+<span class="com">#</span>
+<span class="kw">definisci procedura</span> disegnaKoch(livello, x1, y1, x2, y2) (
+    
+    <span class="com"># Caso Base: Se il livello è 0, disegna una linea retta.</span>
+    <span class="kw">se</span> (livello == <span class="num">0</span>) <span class="kw">allora</span> (
+        <span class="kw">linea spessore</span> spessoreLinea <span class="kw">da</span> (x1, y1) <span class="kw">a</span> (x2, y2)
+    )
+    
+    <span class="com"># Caso Ricorsivo: Calcola i 4 segmenti e ripeti.</span>
+    <span class="kw">altrimenti</span> (
+        <span class="com"># 1. Calcola il vettore dal punto 1 al punto 2</span>
+        <span class="kw">metti</span> x2 - x1 <span class="kw">in</span> dx
+        <span class="kw">metti</span> y2 - y1 <span class="kw">in</span> dy
+        
+        <span class="com"># 2. Trova i punti A e B, che dividono la linea in 3 parti</span>
+        <span class="kw">metti</span> x1 + dx / <span class="num">3</span> <span class="kw">in</span> ax
+        <span class="kw">metti</span> y1 + dy / <span class="num">3</span> <span class="kw">in</span> ay
+        
+        <span class="kw">metti</span> x1 + dx * <span class="num">2</span> / <span class="num">3</span> <span class="kw">in</span> bx
+        <span class="kw">metti</span> y1 + dy * <span class="num">2</span> / <span class="num">3</span> <span class="kw">in</span> by
+        
+        <span class="com"># 3. Calcola il punto C (la "punta") ruotando il segmento A->B</span>
+        <span class="com">#    di 60 gradi attorno al punto A.</span>
+        <span class="kw">metti</span> (dx / <span class="num">3</span>) * cos60 - (dy / <span class="num">3</span>) * sin60 <span class="kw">in</span> cx_rel
+        <span class="kw">metti</span> (dx / <span class="num">3</span>) * sin60 + (dy / <span class="num">3</span>) * cos60 <span class="kw">in</span> cy_rel
+        
+        <span class="kw">metti</span> ax + cx_rel <span class="kw">in</span> cx
+        <span class="kw">metti</span> ay + cy_rel <span class="kw">in</span> cy
+        
+        <span class="com"># 4. Chiama la procedura 4 volte per i nuovi segmenti</span>
+        disegnaKoch(livello - <span class="num">1</span>, x1, y1, ax, ay)  <span class="com"># P1 -> A</span>
+        disegnaKoch(livello - <span class="num">1</span>, ax, ay, cx, cy)  <span class="com"># A -> C</span>
+        disegnaKoch(livello - <span class="num">1</span>, cx, cy, bx, by)  <span class="com"># C -> B</span>
+        disegnaKoch(livello - <span class="num">1</span>, bx, by, x2, y2)  <span class="com"># B -> P2</span>
+    )
+)
+
+<span class="com"># --- PROGRAMMA PRINCIPALE ---</span>
+
+<span class="com"># Definiamo i 3 vertici di un grande triangolo equilatero</span>
+<span class="com"># centrato nell'origine (0, 0).</span>
+<span class="kw">metti</span> <span class="num">1000</span> <span class="kw">in</span> raggio
+
+<span class="com"># Punto 1 (in alto)</span>
+<span class="kw">metti</span> raggio * <span class="kw">cos</span>(<span class="kw">PI</span> / <span class="num">2</span>) <span class="kw">in</span> p1x
+<span class="kw">metti</span> raggio * <span class="kw">sin</span>(<span class="kw">PI</span> / <span class="num">2</span>) <span class="kw">in</span> p1y
+
+<span class="com"># Punto 2 (in basso a sinistra)</span>
+<span class="kw">metti</span> raggio * <span class="kw">cos</span>(<span class="num">7</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p2x
+<span class="kw">metti</span> raggio * <span class="kw">sin</span>(<span class="num">7</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p2y
+
+<span class="com"># Punto 3 (in basso a destra)</span>
+<span class="kw">metti</span> raggio * <span class="kw">cos</span>(<span class="num">11</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p3x
+<span class="kw">metti</span> raggio * <span class="kw">sin</span>(<span class="num">11</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p3y
+
+<span class="com"># Disegniamo il fiocco di neve chiamando la procedura</span>
+<span class="com"># per ognuno dei 3 lati del triangolo.</span>
+disegnaKoch(livelloMassimo, p1x, p1y, p2x, p2y)
+disegnaKoch(livelloMassimo, p2x, p2y, p3x, p3y)
+disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog12" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>12. Curve Polari</h2>
+        <p>Generazione di figure geometriche complesse utilizzando coordinate polari.<br>
+        Converte raggio e angolo in coordinate cartesiane (x, y) per il disegno.<br>
+        Usa cicli matematici per variare il colore e la forma durante il tracciamento.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code12', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code12"><span class="kw">metti</span> <span class="num">300</span> <span class="kw">in</span> R0
+<span class="kw">metti</span> <span class="num">5000</span> <span class="kw">in</span> passi
+<span class="kw">metti</span> <span class="num">2</span>*<span class="kw">PI</span>/passi <span class="kw">in</span> inc
+<span class="kw">metti</span> <span class="num">3</span> <span class="kw">in</span> R
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> angolo
+
+<span class="kw">indice</span> I <span class="kw">va da</span> <span class="num">0</span> <span class="kw">a</span> passi-<span class="num">1</span> <span class="kw">ed esegui</span> (
+   <span class="kw">metti</span> angolo+inc <span class="kw">in</span> angolo
+   <span class="kw">metti</span> R0*<span class="kw">cos</span>(angolo)*<span class="kw">sin</span>(<span class="num">13</span>*angolo) <span class="kw">in</span> R1
+   <span class="kw">imposta colore</span> (<span class="kw">arrotonda</span>(I/passi)*<span class="num">100</span>, (<span class="num">1</span>-<span class="kw">arrotonda</span>(I/passi))*<span class="num">100</span>, <span class="num">90</span>)
+
+   <span class="kw">cerchio raggio</span> R <span class="kw">in</span> (R1*<span class="kw">cos</span>(angolo), R1*<span class="kw">sin</span>(angolo))
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog13" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>13. Operazioni su vettori</h2>
+        <p>Una calcolatrice vettoriale che definisce funzioni personalizzate per l'algebra lineare.<br>
+        Implementa il calcolo del prodotto scalare e del prodotto vettoriale tra due vettori 3D.<br>
+        Richiede l'input dell'utente per le coordinate e mostra i risultati a schermo.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code13', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code13"><span class="kw">cancella schermo</span>
+
+<span class="com"># --- 1. Funzioni Matematiche ---</span>
+
+<span class="kw">definisci funzione</span> Scalare(v1, v2) (
+  <span class="kw">metti elemento</span> <span class="num">1</span> <span class="kw">di</span> v1 <span class="kw">in</span> x1
+  <span class="kw">metti elemento</span> <span class="num">2</span> <span class="kw">di</span> v1 <span class="kw">in</span> y1
+  <span class="kw">metti elemento</span> <span class="num">3</span> <span class="kw">di</span> v1 <span class="kw">in</span> z1
+  
+  <span class="kw">metti elemento</span> <span class="num">1</span> <span class="kw">di</span> v2 <span class="kw">in</span> x2
+  <span class="kw">metti elemento</span> <span class="num">2</span> <span class="kw">di</span> v2 <span class="kw">in</span> y2
+  <span class="kw">metti elemento</span> <span class="num">3</span> <span class="kw">di</span> v2 <span class="kw">in</span> z2
+
+  <span class="kw">restituisci</span> (x1 * x2) + (y1 * y2) + (z1 * z2)
+)
+
+<span class="kw">definisci funzione</span> Vettoriale(v1, v2) (
+  <span class="kw">metti elemento</span> <span class="num">1</span> <span class="kw">di</span> v1 <span class="kw">in</span> x1
+  <span class="kw">metti elemento</span> <span class="num">2</span> <span class="kw">di</span> v1 <span class="kw">in</span> y1
+  <span class="kw">metti elemento</span> <span class="num">3</span> <span class="kw">di</span> v1 <span class="kw">in</span> z1
+  
+  <span class="kw">metti elemento</span> <span class="num">1</span> <span class="kw">di</span> v2 <span class="kw">in</span> x2
+  <span class="kw">metti elemento</span> <span class="num">2</span> <span class="kw">di</span> v2 <span class="kw">in</span> y2
+  <span class="kw">metti elemento</span> <span class="num">3</span> <span class="kw">di</span> v2 <span class="kw">in</span> z2
+
+  <span class="kw">metti</span> (y1 * z2) - (z1 * y2) <span class="kw">in</span> i
+  <span class="kw">metti</span> (z1 * x2) - (x1 * z2) <span class="kw">in</span> j
+  <span class="kw">metti</span> (x1 * y2) - (y1 * x2) <span class="kw">in</span> k
+
+  <span class="kw">restituisci lista</span>(i, j, k)
+)
+
+<span class="com"># --- 2. Funzione di Input ---</span>
+<span class="kw">definisci funzione</span> ChiediVettore(Nome) (
+  <span class="kw">scrivi</span> <span class="str">"--- Inserimento dati per "</span> + Nome + <span class="str">" ---"</span>
+  <span class="kw">chiedi</span> x <span class="kw">dicendo</span> Nome + <span class="str">" -> coordinata X:"</span>
+  <span class="kw">chiedi</span> y <span class="kw">dicendo</span> Nome + <span class="str">" -> coordinata Y:"</span>
+  <span class="kw">chiedi</span> z <span class="kw">dicendo</span> Nome + <span class="str">" -> coordinata Z:"</span>
+  
+  <span class="com"># Restituisce la lista che descrive il vettore</span>
+  <span class="kw">restituisci lista</span>(x, y, z)
+)
+
+<span class="com"># --- 3. Programma Principale ---</span>
+
+<span class="kw">scrivi</span> <span class="str">"CALCOLATRICE VETTORIALE"</span>; <span class="kw">accapo</span>
+
+<span class="kw">metti</span> ChiediVettore(<span class="str">"Vettore A"</span>) <span class="kw">in</span> A
+<span class="kw">metti</span> ChiediVettore(<span class="str">"Vettore B"</span>) <span class="kw">in</span> B
+
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"Vettore A: "</span> + A; <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Vettore B: "</span> + B; <span class="kw">accapo</span>
+
+<span class="kw">scrivi</span> <span class="str">"Prodotto Scalare: "</span> + Scalare(A, B); <span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Prodotto Vettoriale: "</span> + Vettoriale(A, B)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog14" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>14. Space Invaders (Italiano)</h2>
+        <p>Una versione completa del classico gioco arcade, interamente localizzata in italiano.<br>
+        Gestisce sprite multipli, movimento nemico a sciame e input del giocatore.<br>
+        Include logica per proiettili, scudi distruttibili e punteggio.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code14', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code14"><span class="com"># ------------------------------------------------------------------</span>
+<span class="com"># ------------------------------------------------------------------</span>
+<span class="com"># MATITA: SPACE INVADERS</span>
+<span class="com"># ------------------------------------------------------------------</span>
+
+<span class="com"># --- COLORI ---</span>
+<span class="kw">metti</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Nero
+<span class="kw">metti</span> (<span class="num">20</span>, <span class="num">100</span>, <span class="num">30</span>) <span class="kw">in</span> Verde
+<span class="kw">metti</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="kw">in</span> Bianco
+<span class="kw">metti</span> (<span class="num">100</span>, <span class="num">20</span>, <span class="num">20</span>) <span class="kw">in</span> Rosso
+<span class="kw">metti</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">20</span>) <span class="kw">in</span> Giallo
+
+<span class="com"># --- SPRITE ---</span>
+<span class="kw">etichetta</span> (
+  <span class="kw">imposta colore</span> Verde
+  <span class="kw">rettangolo da</span> (<span class="num">-20</span>, <span class="num">-10</span>) <span class="kw">a</span> (<span class="num">20</span>, <span class="num">-6</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">-15</span>, <span class="num">-6</span>) <span class="kw">a</span> (<span class="num">15</span>, <span class="num">0</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">-5</span>, <span class="num">0</span>) <span class="kw">a</span> (<span class="num">5</span>, <span class="num">8</span>)
+) <span class="kw">come</span> NaveGiocatore
+
+<span class="kw">etichetta</span> (
+  <span class="kw">imposta colore</span> Bianco
+  <span class="kw">rettangolo da</span> (<span class="num">-12</span>, <span class="num">-8</span>) <span class="kw">a</span> (<span class="num">12</span>, <span class="num">8</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">-8</span>, <span class="num">8</span>) <span class="kw">a</span> (<span class="num">-4</span>, <span class="num">12</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">4</span>, <span class="num">8</span>) <span class="kw">a</span> (<span class="num">8</span>, <span class="num">12</span>)
+  <span class="kw">imposta colore</span> Nero
+  <span class="kw">rettangolo da</span> (<span class="num">-6</span>, <span class="num">-2</span>) <span class="kw">a</span> (<span class="num">-2</span>, <span class="num">2</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">2</span>, <span class="num">-2</span>) <span class="kw">a</span> (<span class="num">6</span>, <span class="num">2</span>)
+) <span class="kw">come</span> Alieno1
+
+<span class="kw">etichetta</span> (
+  <span class="kw">imposta colore</span> Bianco
+  <span class="kw">rettangolo da</span> (<span class="num">-12</span>, <span class="num">-8</span>) <span class="kw">a</span> (<span class="num">12</span>, <span class="num">8</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">-12</span>, <span class="num">4</span>) <span class="kw">a</span> (<span class="num">-8</span>, <span class="num">8</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">8</span>, <span class="num">4</span>) <span class="kw">a</span> (<span class="num">12</span>, <span class="num">8</span>)
+  <span class="kw">imposta colore</span> Nero
+  <span class="kw">rettangolo da</span> (<span class="num">-6</span>, <span class="num">-2</span>) <span class="kw">a</span> (<span class="num">-2</span>, <span class="num">2</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">2</span>, <span class="num">-2</span>) <span class="kw">a</span> (<span class="num">6</span>, <span class="num">2</span>)
+) <span class="kw">come</span> Alieno2
+
+<span class="kw">etichetta</span> (
+  <span class="kw">imposta colore</span> Giallo
+  <span class="kw">rettangolo da</span> (<span class="num">-10</span>, <span class="num">-2</span>) <span class="kw">a</span> (<span class="num">10</span>, <span class="num">2</span>)
+  <span class="kw">rettangolo da</span> (<span class="num">-2</span>, <span class="num">-10</span>) <span class="kw">a</span> (<span class="num">2</span>, <span class="num">10</span>)
+  <span class="kw">imposta colore</span> Bianco
+  <span class="kw">rettangolo da</span> (<span class="num">-6</span>, <span class="num">-6</span>) <span class="kw">a</span> (<span class="num">6</span>, <span class="num">6</span>)
+) <span class="kw">come</span> Esplosione
+
+<span class="com"># --- CONFIGURAZIONE ---</span>
+<span class="kw">metti</span> <span class="num">300</span> <span class="kw">in</span> LarghezzaSchermo
+<span class="kw">metti</span> <span class="num">240</span> <span class="kw">in</span> LivelloGiocatoreY
+<span class="kw">metti</span> <span class="num">-220</span> <span class="kw">in</span> GiocatoreY
+<span class="kw">metti</span> <span class="num">6</span> <span class="kw">in</span> VelocitaGiocatore
+<span class="kw">metti</span> <span class="num">9</span> <span class="kw">in</span> VelocitaProiettile
+<span class="kw">metti</span> <span class="num">4</span> <span class="kw">in</span> VelocitaBomba
+<span class="kw">metti</span> <span class="num">12</span> <span class="kw">in</span> LarghezzaAlieno
+<span class="kw">metti</span> <span class="num">8</span> <span class="kw">in</span> AltezzaAlieno
+<span class="kw">metti</span> <span class="num">5</span> <span class="kw">in</span> DimBloccoScudo
+<span class="kw">metti</span> <span class="num">8</span> <span class="kw">in</span> DurataEsplosione
+
+<span class="com"># --- STATO INIZIALE ---</span>
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> Punteggio
+<span class="kw">metti</span> <span class="num">3</span> <span class="kw">in</span> Vite
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> GiocatoreX
+<span class="kw">metti falso in</span> ProiettileAttivo
+<span class="kw">metti punto</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Proiettile
+<span class="kw">metti lista</span>() <span class="kw">in</span> Alieni
+<span class="kw">metti</span> <span class="num">-180</span> <span class="kw">in</span> StormoX
+<span class="kw">metti</span> <span class="num">150</span> <span class="kw">in</span> StormoY
+<span class="kw">metti</span> <span class="num">1</span> <span class="kw">in</span> DirezioneStormo
+<span class="kw">metti</span> <span class="num">3</span> <span class="kw">in</span> PassoStormoX
+<span class="kw">metti</span> <span class="num">-40</span> <span class="kw">in</span> PassoStormoY
+<span class="kw">metti</span> <span class="num">10</span> <span class="kw">in</span> RitardoStormo
+<span class="kw">metti</span> RitardoStormo <span class="kw">in</span> RitardoAttuale
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> TimerStormo
+<span class="kw">metti</span> <span class="num">1</span> <span class="kw">in</span> FrameAnimazione
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> TimerAnimazione
+<span class="kw">metti lista</span>() <span class="kw">in</span> Bombe
+<span class="kw">metti</span> <span class="num">96</span> <span class="kw">in</span> ProbabilitaBomba
+<span class="kw">metti lista</span>() <span class="kw">in</span> Esplosioni
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> TimerFlashRosso
+
+<span class="com"># Generazione Alieni</span>
+<span class="kw">indice</span> riga <span class="kw">va da</span> <span class="num">0</span> <span class="kw">a</span> <span class="num">4</span> <span class="kw">ed esegui</span> (
+  <span class="kw">indice</span> col <span class="kw">va da</span> <span class="num">0</span> <span class="kw">a</span> <span class="num">10</span> <span class="kw">ed esegui</span> (
+    <span class="kw">aggiungi punto</span>(col * <span class="num">40</span>, riga * <span class="num">-35</span>) <span class="kw">a</span> Alieni
+  )
+)
+<span class="kw">metti dimensione di</span> Alieni <span class="kw">in</span> TotaleAlieni
+
+<span class="com"># --- GENERAZIONE SCUDI ---</span>
+<span class="kw">metti lista</span>() <span class="kw">in</span> BlocchiScudo
+<span class="kw">metti</span> <span class="num">-170</span> <span class="kw">in</span> ScudoY
+<span class="kw">metti lista</span>(<span class="num">-210</span>, <span class="num">-70</span>, <span class="num">70</span>, <span class="num">210</span>) <span class="kw">in</span> PosizioniScudi
+
+<span class="kw">per ogni</span> CentroX <span class="kw">in</span> PosizioniScudi <span class="kw">esegui</span> (
+  <span class="kw">indice</span> riga <span class="kw">va da</span> <span class="num">0</span> <span class="kw">a</span> <span class="num">4</span> <span class="kw">ed esegui</span> (
+    <span class="kw">indice</span> col <span class="kw">va da</span> <span class="num">-5</span> <span class="kw">a</span> <span class="num">5</span> <span class="kw">ed esegui</span> (
+      <span class="kw">se non</span> (riga < <span class="num">2</span> <span class="kw">e</span> col > <span class="num">-3</span> <span class="kw">e</span> col < <span class="num">3</span>) <span class="kw">allora</span> (
+        <span class="kw">aggiungi punto</span>(CentroX + col * DimBloccoScudo, ScudoY + riga * DimBloccoScudo) <span class="kw">a</span> BlocchiScudo
+      )
+    )
+  )
+)
+
+<span class="kw">metti</span> DimBloccoScudo / <span class="num">2</span> <span class="kw">in</span> MezzoBlocco
+
+<span class="com"># Costanti calcolate</span>
+<span class="kw">metti</span> -LarghezzaSchermo <span class="kw">in</span> SchermoSinistra
+<span class="kw">metti</span> LarghezzaSchermo <span class="kw">in</span> SchermoDestra
+<span class="kw">metti</span> GiocatoreY - <span class="num">10</span> <span class="kw">in</span> HitBoxGiocatoreBasso
+<span class="kw">metti</span> GiocatoreY + <span class="num">10</span> <span class="kw">in</span> HitBoxGiocatoreAlto
+<span class="kw">metti</span> ScudoY + <span class="num">25</span> <span class="kw">in</span> TopBarriereY
+
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"Matita Space Invaders"</span>
+
+<span class="com"># --- CICLO DI GIOCO ---</span>
+<span class="kw">fintanto</span> Vite > <span class="num">0</span> <span class="kw">e dimensione di</span> Alieni > <span class="num">0</span> <span class="kw">esegui</span> (
+  <span class="kw">globale</span> GiocatoreX, ProiettileAttivo, Proiettile, TimerStormo, StormoX, StormoY
+  <span class="kw">globale</span> RitardoAttuale, TimerAnimazione, FrameAnimazione, Vite, Punteggio
+  <span class="kw">globale</span> Alieni, Bombe, BlocchiScudo, Esplosioni, DirezioneStormo, TimerFlashRosso
+
+  <span class="com"># 1. GRAFICA E SFONDO</span>
+  <span class="kw">cancella grafica</span>
+  
+  <span class="com"># Gestione Flash Rosso</span>
+  <span class="kw">se</span> TimerFlashRosso > <span class="num">0</span> <span class="kw">allora</span> (
+    <span class="kw">imposta colore</span> Rosso
+    <span class="kw">dipingi sfondo</span>
+    <span class="kw">metti</span> TimerFlashRosso - <span class="num">1</span> <span class="kw">in</span> TimerFlashRosso
+  ) <span class="kw">altrimenti</span> (
+    <span class="kw">imposta colore</span> Nero
+    <span class="kw">dipingi sfondo</span>
+  )
+
+  <span class="com"># Fix zoom (Rettangolo nero di base)</span>
+  <span class="kw">imposta colore</span> Nero
+  <span class="kw">rettangolo da</span> (<span class="num">-320</span>, <span class="num">-260</span>) <span class="kw">a</span> (<span class="num">320</span>, <span class="num">260</span>)
+
+  <span class="com"># Console Output</span>
+  <span class="kw">cancella schermo</span>
+  <span class="kw">scrivi</span> <span class="str">"PUNTEGGIO: "</span>
+  <span class="kw">scrivi</span> Punteggio
+  <span class="kw">scrivi</span> <span class="str">"    VITE: "</span>
+  <span class="kw">scrivi</span> Vite
+
+  <span class="kw">metti dimensione di</span> Alieni <span class="kw">in</span> NumAlieni
+
+  <span class="com"># 2. CONTROLLI</span>
+  <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"LEFT"</span> <span class="kw">premuto</span>) <span class="kw">e</span> GiocatoreX > SchermoSinistra <span class="kw">allora</span> (
+    <span class="kw">metti</span> GiocatoreX - VelocitaGiocatore <span class="kw">in</span> GiocatoreX
+  )
+  <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"RIGHT"</span> <span class="kw">premuto</span>) <span class="kw">e</span> GiocatoreX < SchermoDestra <span class="kw">allora</span> (
+    <span class="kw">metti</span> GiocatoreX + VelocitaGiocatore <span class="kw">in</span> GiocatoreX
+  )
+  <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"SPACE"</span> <span class="kw">premuto</span>) <span class="kw">e</span> ProiettileAttivo <span class="kw">vale falso allora</span> (
+    <span class="kw">metti vero in</span> ProiettileAttivo
+    <span class="kw">metti punto</span>(GiocatoreX, GiocatoreY + <span class="num">20</span>) <span class="kw">in</span> Proiettile
+  )
+  <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"X"</span> <span class="kw">premuto</span>) <span class="kw">allora</span> ( <span class="kw">stop</span> )
+
+  <span class="com"># 3. LOGICA ALIENI</span>
+  <span class="kw">metti</span> TimerStormo + <span class="num">1</span> <span class="kw">in</span> TimerStormo
+  <span class="kw">se</span> TimerStormo >= RitardoAttuale <span class="kw">allora</span> (
+    <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> TimerStormo
+    <span class="kw">metti</span> StormoX + (PassoStormoX * DirezioneStormo) <span class="kw">in</span> StormoX
+    <span class="kw">metti</span> TimerAnimazione + <span class="num">1</span> <span class="kw">in</span> TimerAnimazione
+    <span class="kw">se</span> TimerAnimazione > <span class="num">1</span> <span class="kw">allora</span> (
+      <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> TimerAnimazione
+      <span class="kw">se</span> FrameAnimazione <span class="kw">uguale</span> <span class="num">1</span> <span class="kw">allora</span> ( <span class="kw">metti</span> <span class="num">2</span> <span class="kw">in</span> FrameAnimazione ) <span class="kw">altrimenti</span> ( <span class="kw">metti</span> <span class="num">1</span> <span class="kw">in</span> FrameAnimazione )
+    )
+    
+    <span class="kw">metti falso in</span> MuroColpito
+    <span class="kw">per ogni</span> alieno <span class="kw">in</span> Alieni <span class="kw">esegui</span> (
+      <span class="kw">metti</span> StormoX + <span class="kw">x di</span> alieno <span class="kw">in</span> AX
+      <span class="kw">se</span> (AX > SchermoDestra <span class="kw">e</span> DirezioneStormo <span class="kw">uguale</span> <span class="num">1</span>) <span class="kw">o</span> (AX < SchermoSinistra <span class="kw">e</span> DirezioneStormo <span class="kw">uguale</span> <span class="num">-1</span>) <span class="kw">allora</span> (
+        <span class="kw">metti vero in</span> MuroColpito
+      )
+    )
+    <span class="kw">se</span> MuroColpito <span class="kw">vale vero allora</span> (
+      <span class="kw">metti</span> DirezioneStormo * <span class="num">-1</span> <span class="kw">in</span> DirezioneStormo
+      <span class="kw">metti</span> StormoY + PassoStormoY <span class="kw">in</span> StormoY
+    )
+  )
+
+  <span class="kw">se casuale</span>(<span class="num">1</span>, <span class="num">100</span>) > ProbabilitaBomba <span class="kw">e</span> NumAlieni > <span class="num">0</span> <span class="kw">allora</span> (
+    <span class="kw">metti elemento casuale</span>(<span class="num">1</span>, NumAlieni) <span class="kw">di</span> Alieni <span class="kw">in</span> AlienoSparante
+    <span class="kw">aggiungi punto</span>(StormoX + <span class="kw">x di</span> AlienoSparante, StormoY + <span class="kw">y di</span> AlienoSparante) <span class="kw">a</span> Bombe
+  )
+
+  <span class="com"># 4. COLLISIONI</span>
+  
+  <span class="com"># A. Proiettile AMICO vs SCUDI</span>
+  <span class="kw">se</span> ProiettileAttivo <span class="kw">vale vero allora</span> (
+    <span class="kw">metti lista</span>() <span class="kw">in</span> BlocchiSopravvissuti
+    <span class="kw">per ogni</span> blocco <span class="kw">in</span> BlocchiScudo <span class="kw">esegui</span> (
+      <span class="kw">metti vero in</span> TieniBlocco
+      <span class="kw">metti x di</span> blocco <span class="kw">in</span> SX
+      <span class="kw">metti y di</span> blocco <span class="kw">in</span> SY
+      <span class="kw">metti x di</span> Proiettile <span class="kw">in</span> BX
+      <span class="kw">se abs</span>(BX - SX) < MezzoBlocco <span class="kw">e</span> (<span class="kw">y di</span> Proiettile <= SY + MezzoBlocco) <span class="kw">e</span> (<span class="kw">y di</span> Proiettile + VelocitaProiettile >= SY - MezzoBlocco) <span class="kw">allora</span> (
+        <span class="kw">metti falso in</span> TieniBlocco
+        <span class="kw">metti falso in</span> ProiettileAttivo
+      )
+      <span class="kw">se</span> TieniBlocco <span class="kw">vale vero allora</span> ( <span class="kw">aggiungi</span> blocco <span class="kw">a</span> BlocchiSopravvissuti )
+    )
+    <span class="kw">metti</span> BlocchiSopravvissuti <span class="kw">in</span> BlocchiScudo
+  )
+
+  <span class="com"># B. Proiettile AMICO vs ALIENI</span>
+  <span class="kw">se</span> ProiettileAttivo <span class="kw">vale vero allora</span> (
+    <span class="kw">metti y di</span> Proiettile + VelocitaProiettile <span class="kw">in</span> ProiettileNextY
+    <span class="kw">metti x di</span> Proiettile <span class="kw">in</span> BX
+    <span class="kw">metti lista</span>() <span class="kw">in</span> AlieniSopravvissuti
+    <span class="kw">per ogni</span> alieno <span class="kw">in</span> Alieni <span class="kw">esegui</span> (
+      <span class="kw">metti vero in</span> TieniAlieno
+      <span class="kw">metti</span> StormoX + <span class="kw">x di</span> alieno <span class="kw">in</span> AX
+      <span class="kw">metti</span> StormoY + <span class="kw">y di</span> alieno <span class="kw">in</span> AY
+      <span class="kw">se abs</span>(BX - AX) < LarghezzaAlieno <span class="kw">e y di</span> Proiettile <= AY + AltezzaAlieno <span class="kw">e</span> ProiettileNextY >= AY - AltezzaAlieno <span class="kw">allora</span> (
+        <span class="kw">metti falso in</span> ProiettileAttivo
+        <span class="kw">metti falso in</span> TieniAlieno
+        <span class="kw">metti</span> Punteggio + <span class="num">10</span> <span class="kw">in</span> Punteggio
+        <span class="kw">metti</span> RitardoStormo * (<span class="kw">dimensione di</span> Alieni / TotaleAlieni) <span class="kw">in</span> RitardoAttuale
+        <span class="kw">aggiungi</span> (<span class="kw">punto</span>(AX, AY), DurataEsplosione) <span class="kw">a</span> Esplosioni
+      )
+      <span class="kw">se</span> TieniAlieno <span class="kw">vale vero allora</span> ( <span class="kw">aggiungi</span> alieno <span class="kw">a</span> AlieniSopravvissuti )
+    )
+    <span class="kw">metti</span> AlieniSopravvissuti <span class="kw">in</span> Alieni
+  )
+
+  <span class="com"># C. Bombe NEMICHE vs GIOCATORE e SCUDI</span>
+  <span class="kw">metti lista</span>() <span class="kw">in</span> BombeSopravvissute
+  <span class="kw">per ogni</span> bomba <span class="kw">in</span> Bombe <span class="kw">esegui</span> (
+    <span class="kw">metti vero in</span> BombaAttiva
+    <span class="kw">metti x di</span> bomba <span class="kw">in</span> BX
+    <span class="kw">metti y di</span> bomba <span class="kw">in</span> BY
+    <span class="kw">metti</span> BY - VelocitaBomba <span class="kw">in</span> BombaNextY
+
+    <span class="com"># Colpisce Giocatore?</span>
+    <span class="kw">se abs</span>(BX - GiocatoreX) < <span class="num">20</span> <span class="kw">e</span> BY >= HitBoxGiocatoreBasso <span class="kw">e</span> BombaNextY <= HitBoxGiocatoreAlto <span class="kw">allora</span> (
+      <span class="kw">metti</span> Vite - <span class="num">1</span> <span class="kw">in</span> Vite
+      <span class="kw">metti falso in</span> BombaAttiva
+      <span class="kw">metti</span> <span class="num">25</span> <span class="kw">in</span> TimerFlashRosso
+      <span class="kw">aggiungi</span> (<span class="kw">punto</span>(GiocatoreX, GiocatoreY), DurataEsplosione) <span class="kw">a</span> Esplosioni
+    )
+
+    <span class="com"># Colpisce Scudi?</span>
+    <span class="kw">se</span> BombaAttiva <span class="kw">vale vero allora</span> (
+      <span class="kw">metti lista</span>() <span class="kw">in</span> BlocchiSopravvissuti
+      <span class="kw">per ogni</span> blocco <span class="kw">in</span> BlocchiScudo <span class="kw">esegui</span> (
+        <span class="kw">metti vero in</span> TieniBlocco
+        <span class="kw">metti x di</span> blocco <span class="kw">in</span> SX
+        <span class="kw">metti y di</span> blocco <span class="kw">in</span> SY
+        <span class="com"># Collisione Scudo</span>
+        <span class="kw">se abs</span>(BX - SX) < MezzoBlocco <span class="kw">e</span> BY >= (SY - MezzoBlocco) <span class="kw">e</span> BombaNextY <= (SY + MezzoBlocco) <span class="kw">allora</span> (
+          <span class="kw">metti falso in</span> TieniBlocco
+          <span class="kw">metti falso in</span> BombaAttiva
+          <span class="kw">aggiungi</span> (<span class="kw">punto</span>(SX, SY), <span class="num">2</span>) <span class="kw">a</span> Esplosioni
+        )
+        <span class="kw">se</span> TieniBlocco <span class="kw">vale vero allora</span> ( <span class="kw">aggiungi</span> blocco <span class="kw">a</span> BlocchiSopravvissuti )
+      )
+      <span class="kw">metti</span> BlocchiSopravvissuti <span class="kw">in</span> BlocchiScudo
+    )
+    
+    <span class="kw">se</span> BombaAttiva <span class="kw">vale vero allora</span> ( <span class="kw">aggiungi</span> bomba <span class="kw">a</span> BombeSopravvissute )
+  )
+  <span class="kw">metti</span> BombeSopravvissute <span class="kw">in</span> Bombe
+
+  <span class="com"># D. Controllo INVASIONE</span>
+  <span class="kw">per ogni</span> alieno <span class="kw">in</span> Alieni <span class="kw">esegui</span> (
+    <span class="kw">metti</span> StormoY + <span class="kw">y di</span> alieno <span class="kw">in</span> PosYAlieno
+    <span class="kw">se</span> (PosYAlieno - <span class="num">10</span>) < TopBarriereY <span class="kw">allora</span> ( <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> Vite )
+  )
+
+  <span class="com"># 5. FISICA</span>
+  <span class="kw">se</span> ProiettileAttivo <span class="kw">vale vero allora</span> (
+    <span class="kw">imposta y di</span> Proiettile <span class="kw">a</span> (<span class="kw">y di</span> Proiettile + VelocitaProiettile)
+    <span class="kw">se y di</span> Proiettile > LivelloGiocatoreY <span class="kw">allora</span> ( <span class="kw">metti falso in</span> ProiettileAttivo )
+  )
+
+  <span class="kw">metti lista</span>() <span class="kw">in</span> BombeAttive
+  <span class="kw">per ogni</span> bomba <span class="kw">in</span> Bombe <span class="kw">esegui</span> (
+    <span class="kw">imposta y di</span> bomba <span class="kw">a</span> (<span class="kw">y di</span> bomba - VelocitaBomba)
+    <span class="kw">se y di</span> bomba > -LivelloGiocatoreY <span class="kw">allora</span> ( <span class="kw">aggiungi</span> bomba <span class="kw">a</span> BombeAttive )
+  )
+  <span class="kw">metti</span> BombeAttive <span class="kw">in</span> Bombe
+  
+  <span class="kw">metti lista</span>() <span class="kw">in</span> EsplosioniAttive
+  <span class="kw">per ogni</span> exp <span class="kw">in</span> Esplosioni <span class="kw">esegui</span> (
+    <span class="kw">metti elemento</span> <span class="num">1</span> <span class="kw">di</span> exp <span class="kw">in</span> PosExp
+    <span class="kw">metti elemento</span> <span class="num">2</span> <span class="kw">di</span> exp <span class="kw">in</span> TimerExp
+    <span class="kw">metti</span> TimerExp - <span class="num">1</span> <span class="kw">in</span> TimerExp
+    <span class="kw">se</span> TimerExp > <span class="num">0</span> <span class="kw">allora</span> ( <span class="kw">aggiungi</span> (PosExp, TimerExp) <span class="kw">a</span> EsplosioniAttive )
+  )
+  <span class="kw">metti</span> EsplosioniAttive <span class="kw">in</span> Esplosioni
+
+  <span class="com"># 6. DISEGNO</span>
+  <span class="kw">se</span> FrameAnimazione <span class="kw">uguale</span> <span class="num">1</span> <span class="kw">allora</span> (
+    <span class="kw">per ogni</span> alieno <span class="kw">in</span> Alieni <span class="kw">esegui</span> ( <span class="kw">disegna</span> Alieno1 <span class="kw">in punto</span>(StormoX + <span class="kw">x di</span> alieno, StormoY + <span class="kw">y di</span> alieno) )
+  ) <span class="kw">altrimenti</span> (
+    <span class="kw">per ogni</span> alieno <span class="kw">in</span> Alieni <span class="kw">esegui</span> ( <span class="kw">disegna</span> Alieno2 <span class="kw">in punto</span>(StormoX + <span class="kw">x di</span> alieno, StormoY + <span class="kw">y di</span> alieno) )
+  )
+  
+  <span class="kw">per ogni</span> exp <span class="kw">in</span> Esplosioni <span class="kw">esegui</span> ( <span class="kw">disegna</span> Esplosione <span class="kw">in</span> (<span class="kw">elemento</span> <span class="num">1</span> <span class="kw">di</span> exp) )
+
+  <span class="kw">disegna</span> NaveGiocatore <span class="kw">in punto</span>(GiocatoreX, GiocatoreY)
+  
+  <span class="kw">imposta colore</span> Verde
+  <span class="kw">per ogni</span> blocco <span class="kw">in</span> BlocchiScudo <span class="kw">esegui</span> (
+    <span class="kw">metti x di</span> blocco - MezzoBlocco <span class="kw">in</span> x1
+    <span class="kw">metti y di</span> blocco - MezzoBlocco <span class="kw">in</span> y1
+    <span class="kw">metti x di</span> blocco + MezzoBlocco <span class="kw">in</span> x2
+    <span class="kw">metti y di</span> blocco + MezzoBlocco <span class="kw">in</span> y2
+    <span class="kw">rettangolo da</span> (x1, y1) <span class="kw">a</span> (x2, y2)
+  )
+
+  <span class="kw">se</span> ProiettileAttivo <span class="kw">vale vero allora</span> (
+    <span class="kw">imposta colore</span> Bianco
+    <span class="kw">rettangolo da</span> (<span class="kw">x di</span> Proiettile - <span class="num">2</span>, <span class="kw">y di</span> Proiettile - <span class="num">8</span>) <span class="kw">a</span> (<span class="kw">x di</span> Proiettile + <span class="num">2</span>, <span class="kw">y di</span> Proiettile + <span class="num">8</span>)
+  )
+
+  <span class="kw">imposta colore</span> Rosso
+  <span class="kw">per ogni</span> bomba <span class="kw">in</span> Bombe <span class="kw">esegui</span> (
+    <span class="kw">rettangolo da</span> (<span class="kw">x di</span> bomba - <span class="num">2</span>, <span class="kw">y di</span> bomba - <span class="num">6</span>) <span class="kw">a</span> (<span class="kw">x di</span> bomba + <span class="num">2</span>, <span class="kw">y di</span> bomba + <span class="num">6</span>)
+  )
+
+  <span class="com"># --- HUD VISIBILE (Disegnato per ultimo) ---</span>
+  <span class="kw">imposta colore</span> Bianco
+  <span class="kw">graffiti grandezza</span> <span class="num">12</span> <span class="kw">in</span> (<span class="num">-290</span>, <span class="num">230</span>) <span class="str">"VITE: "</span> + Vite
+  <span class="kw">graffiti grandezza</span> <span class="num">12</span> <span class="kw">in</span> (<span class="num">-290</span>, <span class="num">210</span>) <span class="str">"PUNTI: "</span> + Punteggio
+
+  <span class="kw">aspetta</span> <span class="num">8</span> <span class="kw">ms</span>
+  <span class="kw">ridisegna</span>
+)
+
+<span class="com"># --- SCHERMATA FINE GIOCO ---</span>
+<span class="kw">cancella grafica</span>
+<span class="kw">imposta colore</span> Nero
+<span class="kw">dipingi sfondo</span>
+
+<span class="kw">imposta colore</span> Rosso
+<span class="kw">graffiti grandezza</span> <span class="num">50</span> <span class="kw">in</span> (<span class="num">-130</span>, <span class="num">20</span>) <span class="str">"GAME OVER"</span>
+
+<span class="kw">imposta colore</span> Bianco
+<span class="kw">graffiti grandezza</span> <span class="num">25</span> <span class="kw">in</span> (<span class="num">-90</span>, <span class="num">-40</span>) <span class="str">"PUNTI: "</span> + Punteggio
+
+<span class="kw">cancella schermo</span>
+<span class="kw">scrivi</span> <span class="str">"PARTITA TERMINATA"</span>
+<span class="kw">scrivi</span> <span class="str">"Punteggio Finale: "</span>
+<span class="kw">scrivi</span> Punteggio</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog15" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>15. Frattale di Mandelbrot</h2>
+        <p>Rendering progressivo dell'insieme di Mandelbrot, un famoso frattale matematico.<br>
+        Utilizza un algoritmo di "fuga" su numeri complessi mappati sulla griglia di pixel.<br>
+        Il programma permette di esplorare diverse aree del frattale scommentando le coordinate nella sezione di configurazione.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code15', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code15"><span class="kw">cancella grafica</span>
+<span class="kw">cancella schermo</span>
+
+<span class="com"># ==========================================</span>
+<span class="com">#     SELEZIONE DELLA DESTINAZIONE</span>
+<span class="com"># ==========================================</span>
+<span class="com"># Istruzioni: Scommenta (togli #) SOLO il blocco</span>
+<span class="com"># della zona che vuoi visitare. Commenta gli altri.</span>
+
+<span class="com"># --- 1. VISTA STANDARD (L'intero insieme) ---</span>
+ <span class="kw">metti</span> <span class="num">-0.75</span> <span class="kw">in</span> CENTRO_X
+ <span class="kw">metti</span> <span class="num">0.0</span>   <span class="kw">in</span> CENTRO_Y
+ <span class="kw">metti</span> <span class="num">140</span>   <span class="kw">in</span> ZOOM
+ <span class="kw">metti</span> <span class="num">80</span>    <span class="kw">in</span> MAX_ITERAZIONI
+
+<span class="com"># --- 2. VALLE DEI CAVALLUCCI (Seahorse Valley) ---</span>
+<span class="com"># metti -0.748 in CENTRO_X</span>
+<span class="com"># metti 0.1    in CENTRO_Y</span>
+<span class="com"># metti 3000   in ZOOM</span>
+<span class="com"># metti 300    in MAX_ITERAZIONI</span>
+
+<span class="com"># --- 3. IL SATELLITE (Mini Mandelbrot) ---</span>
+<span class="com"># metti -1.7685 in CENTRO_X</span>
+<span class="com"># metti 0.0005  in CENTRO_Y</span>
+<span class="com"># metti 1000    in ZOOM</span>
+<span class="com"># metti 200     in MAX_ITERAZIONI</span>
+
+<span class="com"># --- 4. VALLE DEGLI ELEFANTI ---</span>
+<span class="com"># metti 0.275 in CENTRO_X</span>
+<span class="com"># metti 0.006 in CENTRO_Y</span>
+<span class="com"># metti 2500  in ZOOM</span>
+<span class="com"># metti 200   in MAX_ITERAZIONI</span>
+
+<span class="com"># --- 5. SPIRALE PROFONDA (Deep Zoom) ---</span>
+<span class="com"># metti -0.743643 in CENTRO_X</span>
+<span class="com"># metti 0.131825  in CENTRO_Y</span>
+<span class="com"># metti 40000     in ZOOM</span>
+<span class="com"># metti 1200      in MAX_ITERAZIONI</span>
+
+<span class="com"># ==========================================</span>
+<span class="com">#           FINE CONFIGURAZIONE</span>
+<span class="com"># ==========================================</span>
+
+<span class="com"># --- Dimensioni Finestra (Alta Risoluzione) ---</span>
+<span class="com"># Multipli di 32 per evitare blocchi residui</span>
+<span class="kw">metti</span> <span class="num">416</span> <span class="kw">in</span> SEMI_LARGHEZZA
+<span class="kw">metti</span> <span class="num">320</span> <span class="kw">in</span> SEMI_ALTEZZA
+
+<span class="com"># Calcolo bordi di rendering</span>
+<span class="kw">metti</span> -SEMI_LARGHEZZA <span class="kw">in</span> X_START
+<span class="kw">metti</span>  SEMI_LARGHEZZA <span class="kw">in</span> X_END
+<span class="kw">metti</span> -SEMI_ALTEZZA   <span class="kw">in</span> Y_START
+<span class="kw">metti</span>  SEMI_ALTEZZA   <span class="kw">in</span> Y_END
+
+<span class="com"># --- Logica Rendering Progressivo ---</span>
+<span class="kw">metti</span> <span class="num">32</span> <span class="kw">in</span> PASSO_CORRENTE
+<span class="kw">metti</span> <span class="num">1</span>  <span class="kw">in</span> PASSO_MINIMO
+<span class="kw">metti</span> <span class="num">0</span>  <span class="kw">in</span> MARGINE
+
+<span class="kw">scrivi</span> <span class="str">"Rendering centrato in ("</span> + CENTRO_X + <span class="str">", "</span> + CENTRO_Y + <span class="str">")"</span>
+<span class="kw">accapo</span>
+
+<span class="kw">fintanto</span> (PASSO_CORRENTE >= PASSO_MINIMO) <span class="kw">esegui</span> (
+    
+    <span class="kw">scrivi</span> <span class="str">"Rifinitura dettaglio (Passo: "</span> + PASSO_CORRENTE + <span class="str">")..."</span>
+    <span class="com"># Non andiamo accapo per pulizia console</span>
+
+    <span class="com"># --- CICLO RIGHE (Y) ---</span>
+    <span class="kw">metti</span> Y_START <span class="kw">in</span> Py
+    
+    <span class="kw">fintanto</span> (Py < (Y_END + MARGINE)) <span class="kw">esegui</span> (
+        
+        <span class="com"># --- CICLO COLONNE (X) ---</span>
+        <span class="kw">metti</span> X_START <span class="kw">in</span> Px
+        
+        <span class="kw">fintanto</span> (Px < (X_END + MARGINE)) <span class="kw">esegui</span> (
+            
+            <span class="com"># 1. Mappatura Coordinate</span>
+            <span class="kw">metti</span> (Px / ZOOM) + CENTRO_X <span class="kw">in</span> cx
+            <span class="kw">metti</span> (Py / ZOOM) + CENTRO_Y <span class="kw">in</span> cy
+            
+            <span class="com"># 2. Inizializzazione Mandelbrot</span>
+            <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> zx
+            <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> zy
+            <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> iter
+            <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> raggioQ
+            
+            <span class="com"># 3. Ciclo di Fuga</span>
+            <span class="kw">fintanto</span> ((raggioQ < <span class="num">4</span>) <span class="kw">e</span> (iter < MAX_ITERAZIONI)) <span class="kw">esegui</span> (
+                <span class="kw">metti</span> (zx * zx) - (zy * zy) + cx <span class="kw">in</span> tempX
+                <span class="kw">metti</span> (<span class="num">2</span> * zx * zy) + cy <span class="kw">in</span> zy
+                <span class="kw">metti</span> tempX <span class="kw">in</span> zx
+                <span class="kw">metti</span> (zx * zx) + (zy * zy) <span class="kw">in</span> raggioQ
+                <span class="kw">metti</span> iter + <span class="num">1</span> <span class="kw">in</span> iter
+            )
+
+            <span class="com"># 4. Colorazione (CORRETTA 0-100)</span>
+            <span class="kw">se</span> (iter == MAX_ITERAZIONI) <span class="kw">allora</span> (
+                <span class="kw">imposta colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+            ) <span class="kw">altrimenti</span> (
+                <span class="com"># Palette sinusoidale adattata per Matita (0-100)</span>
+                <span class="com"># 50 è il centro, 50 l'ampiezza. Risultato max 100.</span>
+                <span class="kw">metti</span> <span class="num">0.1</span> <span class="kw">in</span> freq 
+                <span class="kw">metti</span> <span class="num">50</span> + <span class="num">50</span> * <span class="kw">sin</span>(freq * iter + <span class="num">0.0</span>) <span class="kw">in</span> R
+                <span class="kw">metti</span> <span class="num">50</span> + <span class="num">50</span> * <span class="kw">sin</span>(freq * iter + <span class="num">2.0</span>) <span class="kw">in</span> G
+                <span class="kw">metti</span> <span class="num">50</span> + <span class="num">50</span> * <span class="kw">sin</span>(freq * iter + <span class="num">4.0</span>) <span class="kw">in</span> B
+                <span class="kw">imposta colore</span> (R, G, B)
+            )
+
+            <span class="com"># 5. Disegno Pixel</span>
+            <span class="kw">rettangolo da</span> (Px, Py) <span class="kw">a</span> (Px + PASSO_CORRENTE + <span class="num">1</span>, Py + PASSO_CORRENTE + <span class="num">1</span>)
+
+            <span class="com"># Avanza Colonna</span>
+            <span class="kw">metti</span> Px + PASSO_CORRENTE <span class="kw">in</span> Px
+        )
+        
+        <span class="com"># Aggiornamento schermo</span>
+        <span class="kw">ridisegna</span>
+        <span class="kw">aspetta</span> <span class="num">0</span> <span class="kw">ms</span> 
+        
+        <span class="com"># Avanza Riga</span>
+        <span class="kw">metti</span> Py + PASSO_CORRENTE <span class="kw">in</span> Py
+    )
+
+    <span class="com"># Aumenta risoluzione</span>
+    <span class="kw">metti</span> PASSO_CORRENTE / <span class="num">2</span> <span class="kw">in</span> PASSO_CORRENTE
+)
+
+<span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Immagine completata!"</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog16" class="program-section">
+        <a href="#indice" class="nav-link">↑ Torna all'indice</a>
+        <h2>16. Stima di Pi Greco (Monte Carlo)</h2>
+        <p>Una dimostrazione del metodo Monte Carlo per stimare il valore di Pi Greco.<br>
+        Genera punti casuali in un quadrato e conta quanti cadono all'interno del cerchio inscritto.<br>
+        Il rapporto tra i punti interni e quelli totali approssima l'area del cerchio, e quindi Pi.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code16', this)">Copia Codice</button>
+            </div>
+            <pre><code id="code16"><span class="kw">cancella schermo</span>
+
+<span class="kw">definisci funzione</span> modulo(P) (
+    <span class="kw">restituisci radice</span>((<span class="kw">x di</span> P)^<span class="num">2</span>+(<span class="kw">y di</span> P)^<span class="num">2</span>)
+)
+
+<span class="kw">metti</span> <span class="num">10000</span> <span class="kw">in</span> NumeroPunti
+<span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> inCerchio
+<span class="kw">metti</span> (<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>) <span class="kw">in</span> nero
+<span class="kw">metti</span> (<span class="num">0</span>,<span class="num">0</span>,<span class="num">100</span>) <span class="kw">in</span> blu
+<span class="kw">metti</span> (<span class="num">100</span>,<span class="num">0</span>,<span class="num">0</span>) <span class="kw">in</span> rosso
+
+<span class="kw">metti</span> <span class="num">2.5e-3</span> <span class="kw">in</span> Spessore
+<span class="kw">imposta colore</span> nero
+<span class="kw">linea spessore</span> Spessore <span class="kw">da</span> (<span class="num">-0.5</span>, <span class="num">-0.5</span>) <span class="kw">a</span> (<span class="num">-0.5</span>, <span class="num">0.5</span>)
+<span class="kw">linea spessore</span> Spessore <span class="kw">da</span> (<span class="num">-0.5</span>, <span class="num">0.5</span>) <span class="kw">a</span> (<span class="num">0.5</span>, <span class="num">0.5</span>)
+<span class="kw">linea spessore</span> Spessore <span class="kw">da</span> (<span class="num">0.5</span>, <span class="num">0.5</span>) <span class="kw">a</span> (<span class="num">0.5</span>, <span class="num">-0.5</span>)
+<span class="kw">linea spessore</span> Spessore <span class="kw">da</span> (<span class="num">0.5</span>, <span class="num">-0.5</span>) <span class="kw">a</span> (<span class="num">-0.5</span>, <span class="num">-0.5</span>)
+
+<span class="kw">indice</span> I <span class="kw">va da</span> <span class="num">1</span> <span class="kw">a</span> NumeroPunti <span class="kw">ed esegui</span> (
+    <span class="kw">metti casuale</span>() - <span class="num">0.5</span> <span class="kw">in</span> x
+    <span class="kw">metti casuale</span>() - <span class="num">0.5</span> <span class="kw">in</span> y
+    <span class="kw">metti punto</span>(x, y) <span class="kw">in</span> P
+
+    <span class="kw">se</span> modulo(P) < <span class="num">0.5</span> <span class="kw">allora</span> (
+       <span class="kw">imposta colore</span> rosso
+       <span class="kw">cerchio raggio</span> Spessore <span class="kw">in</span> (<span class="kw">x di</span> P, <span class="kw">y di</span> P)
+       <span class="kw">metti</span> inCerchio + <span class="num">1</span> <span class="kw">in</span> inCerchio
+       
+    ) <span class="kw">altrimenti</span> (
+        <span class="kw">imposta colore</span> blu
+        <span class="kw">cerchio raggio</span> Spessore <span class="kw">in</span> (<span class="kw">x di</span> P, <span class="kw">y di</span> P)
+      )
+) 
+
+<span class="kw">scrivi</span> <span class="str">"Punti: "</span> + NumeroPunti + <span class="str">" di cui dentro: "</span> + inCerchio
+<span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="str">"Stima di Pi Greco: "</span> + (inCerchio / NumeroPunti) * <span class="num">4</span></code></pre>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    function copyToClipboard(elementId, btnElement) {
+        // Trova il blocco di codice
+        const codeElement = document.getElementById(elementId);
+        
+        // CORREZIONE: Usiamo textContent invece di innerText.
+        // textContent estrae solo il testo puro, ignorando completamente
+        // i tag HTML interni (come <span class="kw">) usati per i colori.
+        const textToCopy = codeElement.textContent;
+
+        // Usa l'API Clipboard
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Feedback visivo
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "Copiato!";
+            btnElement.style.backgroundColor = "#28a745"; // Verde successo
+
+            // Ripristina il pulsante dopo 2 secondi
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.style.backgroundColor = ""; // Torna al colore originale (CSS)
+            }, 2000);
+        }).catch(err => {
+            console.error('Errore durante la copia: ', err);
+            btnElement.innerText = "Errore";
+            btnElement.style.backgroundColor = "#dc3545";
+        });
+    }
+</script>
+
+</body>
+</html>
