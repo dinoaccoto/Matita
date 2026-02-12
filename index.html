@@ -327,6 +327,7 @@
         <button id="getMatitalkButton" aria-label="Scarica Matita IDE">Scarica Matita</button>
 
         <div class="header-right-group">
+          <button id="fullscreenButton" aria-label="Schermo Intero">Full Screen</button>
           <button id="helpButton" aria-label="Apri Aiuto">Aiuto</button>
         </div>
       </div>
@@ -366,6 +367,8 @@ function initMatita() {
   const uiStrings = {
     it: {
       title: "Matita", run: "Esegui", open: "Apri", save: "Salva", graphics: "Grafica", savePng: "Salva PNG",
+      fullscreen: "Schermo Intero", 
+      exitFullscreen: "Esci Schermo Intero",
       download: "Download", help: "Aiuto", lineIndicatorPrefix: "Riga",
       placeholder: "Scrivi il tuo codice qui...", canvasReady: "Premi 'Esegui' per disegnare.",
       canvasResized: "Ridimensionato. Riesegui per ridisegnare.",
@@ -424,6 +427,8 @@ function initMatita() {
     },
     en: {
       title: "Matita", run: "Run", open: "Open", save: "Save", graphics: "Graphics", savePng: "Save PNG",
+      fullscreen: "Full Screen",
+      exitFullscreen: "Exit Full Screen",
       download: "Download", help: "Help", lineIndicatorPrefix: "Line",
       placeholder: "Write your code here...", canvasReady: "Run code to draw.",
       canvasResized: "Resized. Re-run to redraw.",
@@ -499,6 +504,7 @@ function initMatita() {
   const lineIndicator = document.getElementById("lineIndicator");
   const openButton = document.getElementById("openButton");
   const saveButton = document.getElementById("saveButton");
+  const fullscreenButton = document.getElementById("fullscreenButton");
 
   let isRunning = false;
   const keyState = {};
@@ -518,6 +524,7 @@ function initMatita() {
   helpButton.textContent = uiStrings[lang].help;
   toggleCanvasButton.textContent = uiStrings[lang].graphics;
   savePngButton.textContent = uiStrings[lang].savePng;
+  fullscreenButton.textContent = uiStrings[lang].fullscreen;
   codeInput.setAttribute("placeholder", uiStrings[lang].placeholder);
 
   const CONSOLE_PROMPT = ":) ";
@@ -4364,7 +4371,29 @@ function initMatita() {
   window.addEventListener("resize", () => {
     if (!canvasWindow.classList.contains("hidden")) drawReadyScreen(uiStrings[lang].canvasResized);
   });
+  // --- Full Screen Logic ---
+  function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
 
+  fullscreenButton.addEventListener("click", toggleFullScreen);
+
+  // Listen for fullscreen change events (e.g. user presses ESC) to update the button text
+  document.addEventListener("fullscreenchange", () => {
+    if (document.fullscreenElement) {
+      fullscreenButton.textContent = uiStrings[lang].exitFullscreen;
+    } else {
+      fullscreenButton.textContent = uiStrings[lang].fullscreen;
+    }
+  });
   // Open/Save code
   openButton.addEventListener("click", () => {
     const inp = document.createElement("input");
