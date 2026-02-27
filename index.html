@@ -134,6 +134,19 @@
       text-decoration: underline;
     }
 
+    #snapButton, #orthoButton, #orthoAngleButton {
+      font-size: 1.1rem;
+      padding: 2px 8px;
+    }
+
+
+
+    #snapButton.active, #orthoButton.active, #orthoAngleButton.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
     .editor-container { flex-grow: 1; position: relative; }
 
     .output-pane { background: var(--console-bg); }
@@ -210,6 +223,7 @@
       height: 100%;
       background-color: #fff;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      cursor: crosshair; /* cursore a crocetta su canvas */
     }
 
     ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -346,12 +360,21 @@
 
   <div id="canvasWindow" class="canvas-window" role="dialog" aria-label="Area grafica">
     <div id="canvasWindowHeader" class="canvas-window-header">
-      <div class="canvas-window-title">canvas</div>
-      <div class="canvas-window-actions">
-        <button id="savePngButton" aria-label="Salva PNG">Salva PNG</button>
-        <button id="closeCanvasButton" aria-label="Chiudi grafica">✕</button>
+        <div id="canvasWindowTitle" class="canvas-window-title">canvas</div>
+          <div class="canvas-window-actions">
+            <button id="snapButton" title="Attiva/Disattiva Snap ai punti (Calamita)" aria-label="Snap">🧲</button>
+            <button id="orthoButton" title="Vincola a direzioni ortogonali (Ortho)" aria-label="Ortho">⟂</button>
+            
+            <div style="display:flex; align-items:center; gap: 4px; border-left: 1px solid var(--border-color); padding-left: 6px; margin-left: 2px; border-right: 1px solid var(--border-color); padding-right: 6px; margin-right: 2px;">
+              <button id="orthoAngleButton" title="Ruota l'asse ortogonale (Alpha)" aria-label="Alpha">α</button>
+              <input type="number" id="orthoAngleInput" value="45" title="Gradi di rotazione" style="width: 44px; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 2px; font-family: 'Roboto Mono', monospace; font-size: 0.8rem; text-align: center; outline: none;" />
+            </div>
+
+            <button id="fullscreenCanvasButton" title="Adatta alla finestra" aria-label="Adatta alla finestra">⛶</button>
+            <button id="savePngButton" aria-label="Salva PNG">Salva PNG</button>
+            <button id="closeCanvasButton" aria-label="Chiudi grafica">✕</button>
+          </div>
       </div>
-    </div>
     <div id="canvasWindowBody" class="canvas-window-body">
       <canvas id="stage" aria-label="Output Grafico"></canvas>
     </div>
@@ -498,7 +521,36 @@ function initMatita() {
   const toggleCanvasButton = document.getElementById("toggleCanvasButton");
   const closeCanvasButton = document.getElementById("closeCanvasButton");
   const savePngButton = document.getElementById("savePngButton");
+
+  const snapButton = document.getElementById("snapButton");
+
+  const orthoButton = document.getElementById("orthoButton");
+  const orthoAngleButton = document.getElementById("orthoAngleButton");
+  const orthoAngleInput = document.getElementById("orthoAngleInput"); 
+  const canvasWindowTitle = document.getElementById("canvasWindowTitle");
+
+  const fullscreenCanvasButton = document.getElementById("fullscreenCanvasButton");
+  let isSnapEnabled = false;
+
+  let snapPointsCache = null;
+
+  let isOrthoEnabled = false;
+  let isOrthoAngleEnabled = false;
+  let orthoBasePoint = null;
+  let activeOrthoPoint = null;
+
+  let currentHoverPos = null;
+
   let gfxCtx = gfxCanvas.getContext("2d", { alpha: true });
+
+  function addGraphicObject(obj) {
+    env.gfxObjects.push(obj);
+    snapPointsCache = null; // Invalida la cache automaticamente
+  }
+
+  // Disabilita il menu contestuale del browser (click destro) sul canvas
+  gfxCanvas.addEventListener("contextmenu", e => e.preventDefault());
+
   let gfxDpr = window.devicePixelRatio || 1;
   const getMatitalkButton = document.getElementById("getMatitalkButton");
   const lineIndicator = document.getElementById("lineIndicator");
@@ -507,7 +559,109 @@ function initMatita() {
   const fullscreenButton = document.getElementById("fullscreenButton");
 
   let isRunning = false;
-  const keyState = {};
+
+  let camera = { tx: 0, ty: 0, scale: 1 }; // Telecamera assoluta
+
+  let currentTransform = { tx: 0, ty: 0, scale: 1 };
+  let dragDistance = 0; // Serve per distinguere un click vero da un trascinamento (Pan)
+
+
+  // +++ Gestione Snap (Calamita)  e ortho +++
+  let activeSnapPoint = null; // Traccia il punto agganciato
+
+  // Helper per ripristinare il titolo della finestra
+  function resetCanvasTitle() {
+    canvasWindowTitle.textContent = "canvas";
+  }
+
+  snapButton.addEventListener("click", () => {
+    isSnapEnabled = !isSnapEnabled;
+    if (isSnapEnabled) {
+      snapButton.classList.add("active");
+      gfxCanvas.style.cursor = "crosshair";
+    } else {
+      snapButton.classList.remove("active");
+      if (!isOrthoEnabled) gfxCanvas.style.cursor = "default";
+      activeSnapPoint = null;
+      if (!isRunning) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    }
+  });
+
+  orthoButton.addEventListener("click", () => {
+    isOrthoEnabled = !isOrthoEnabled;
+    if (isOrthoEnabled) {
+      orthoButton.classList.add("active");
+      gfxCanvas.style.cursor = "crosshair";
+      if (!isRunning) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+
+
+    } else {
+      orthoButton.classList.remove("active");
+      if (!isSnapEnabled) gfxCanvas.style.cursor = "default";
+      orthoBasePoint = null;
+      activeOrthoPoint = null;
+      if (!isRunning) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    }
+  });
+
+// Listener per input testuale
+  orthoAngleInput.addEventListener("input", () => {
+    if (isOrthoAngleEnabled && isOrthoEnabled && !isRunning) {
+      redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    }
+  });
+
+  // Listener per l'attivazione del bottone alpha
+  orthoAngleButton.addEventListener("click", () => {
+    isOrthoAngleEnabled = !isOrthoAngleEnabled;
+    if (isOrthoAngleEnabled) {
+      orthoAngleButton.classList.add("active");
+    } else {
+      orthoAngleButton.classList.remove("active");
+    }
+    // Ridisegna subito se si cambia asse stando fermi col mouse
+    if (!isRunning && isOrthoEnabled) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+  });
+
+  function getSnapPoints() {
+    if (snapPointsCache !== null) return snapPointsCache; // usa cache, se esiste
+
+    const pts = [];
+    for (const obj of env.gfxObjects) {
+      if (!obj || obj.type === "background") continue;
+
+      if (obj.type === "circle" || obj.type === "circumference") {
+        pts.push({ x: obj.x, y: obj.y }); // Centro
+      } else if (obj.type === "rectangle") {
+        pts.push(obj.v1, obj.v2, obj.v3, obj.v4); // Vertici
+        pts.push({ x: (obj.v1.x + obj.v3.x)/2, y: (obj.v1.y + obj.v3.y)/2 }); // Centro esatto
+      } else if (obj.type === "triangle") {
+        pts.push(obj.v1, obj.v2, obj.v3); // Vertici
+      } else if (obj.type === "line") {
+        pts.push({ x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 }); // Estremi
+        pts.push({ x: (obj.x1 + obj.x2)/2, y: (obj.y1 + obj.y2)/2 }); // Punto medio
+      } else if (obj.type === "arc") {
+        pts.push({ x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 }); // Estremi
+        // Calcolo del centro dell'arco (stessa logica del disegno)
+        const dx = obj.x2 - obj.x1, dy = obj.y2 - obj.y1;
+        const d2 = dx*dx + dy*dy;
+        if (d2 > 0 && obj.r >= Math.sqrt(d2)/2) {
+          const d = Math.sqrt(d2);
+          const h = Math.sqrt(obj.r*obj.r - d2/4);
+          const mx = (obj.x1 + obj.x2)/2, my = (obj.y1 + obj.y2)/2;
+          const cx = mx + h*(-dy/d), cy = my + h*(dx/d);
+          pts.push({ x: cx, y: cy }); // Centro
+        }
+      } else if (obj.type === "text" || obj.type === "image") {
+        pts.push({ x: obj.x + obj.width/2, y: obj.y + obj.height/2 }); // Centro
+      }
+    }
+    snapPointsCache = pts; // Salva la cache
+    return pts;
+  }
+
+
+
 
   function showCanvasWindow() {
     canvasWindow.classList.remove("hidden");
@@ -1287,7 +1441,7 @@ function initMatita() {
     return;
   }
 
-  // Se il box non è visibile, non fare nulla
+  // Se il box non è visibile, non faccio nulla
   if (suggestionBox.style.display !== "block") return;
 
   // ESC chiude sempre
@@ -1416,6 +1570,7 @@ function initMatita() {
   }
 
   // --- Keyboard state ---
+  const keyState = {}; // oggetto che memorizza tasti premuti
   function normalizeKey(e) {
     if (e.key === " ") return "SPACE";
     const map = {
@@ -1426,10 +1581,36 @@ function initMatita() {
     if (e.key.length === 1) return e.key.toUpperCase();
     return map[e.key] || e.key.toUpperCase();
   }
+
+
   function onKeydown(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") return;
+
+    // Rottura Ortho- Snap con  ESC ---
+    if (e.key === "Escape") {
+      let needsRedraw = false;
+      
+      if (isOrthoEnabled && orthoBasePoint) {
+        orthoBasePoint = null;
+        activeOrthoPoint = null;
+        resetCanvasTitle();
+        needsRedraw = true;
+      }
+      
+      if (isSnapEnabled && activeSnapPoint) {
+        activeSnapPoint = null;
+        needsRedraw = true;
+      }
+      
+      if (needsRedraw && !isRunning) {
+        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+      }
+    }
+
     keyState[normalizeKey(e)] = true;
   }
+
+
   function onKeyup(e) { keyState[normalizeKey(e)] = false; }
   window.addEventListener("keydown", onKeydown, { passive: true });
   window.addEventListener("keyup", onKeyup, { passive: true });
@@ -1594,36 +1775,45 @@ function initMatita() {
     return { minX, minY, maxX, maxY };
   }
 
-  function applyFitTransform(objects) {
+  function computeFitCamera(objects) {
     const bounds = calculateBoundingBox(objects);
     const dpr = gfxDpr || (window.devicePixelRatio || 1);
     const rect = gfxCanvas.getBoundingClientRect();
     const cssW = rect.width, cssH = rect.height;
 
-    if (!isFinite(bounds.minX) || !isFinite(bounds.maxX) || cssW<=0 || cssH<=0) {
-      gfxCtx.setTransform(dpr,0,0,-dpr, gfxCanvas.width/2, gfxCanvas.height/2);
+    if (!isFinite(bounds.minX) || !isFinite(bounds.maxX) || cssW <= 0 || cssH <= 0) {
+      camera.scale = dpr;
+      camera.tx = gfxCanvas.width / 2;
+      camera.ty = gfxCanvas.height / 2;
       return;
     }
 
     const contentWidth = bounds.maxX - bounds.minX;
     const contentHeight = bounds.maxY - bounds.minY;
     let scaleCss;
-    if (contentWidth===0 && contentHeight===0) scaleCss = 50;
+    if (contentWidth === 0 && contentHeight === 0) scaleCss = 50;
     else {
       const scaleX = cssW / (contentWidth || 1e-9);
       const scaleY = cssH / (contentHeight || 1e-9);
       scaleCss = Math.min(scaleX, scaleY) * 0.95;
     }
 
-    const scale = scaleCss * dpr;
-    const cx = (bounds.minX + bounds.maxX)/2;
-    const cy = (bounds.minY + bounds.maxY)/2;
-    const tx = (gfxCanvas.width/2) - cx*scale;
-    const ty = (gfxCanvas.height/2) + cy*scale;
-    gfxCtx.setTransform(scale,0,0,-scale, tx, ty);
+    camera.scale = scaleCss * dpr;
+    const cx = (bounds.minX + bounds.maxX) / 2;
+    const cy = (bounds.minY + bounds.maxY) / 2;
+
+    camera.tx = (gfxCanvas.width / 2) - cx * camera.scale;
+    camera.ty = (gfxCanvas.height / 2) + cy * camera.scale;
   }
 
-  function drawObject(obj) {
+  function applyCamera() {
+    gfxCtx.setTransform(camera.scale, 0, 0, -camera.scale, camera.tx, camera.ty);
+    currentTransform.tx = camera.tx;
+    currentTransform.ty = camera.ty;
+    currentTransform.scale = camera.scale;
+  }
+
+  function drawObject(obj) {
     if (!obj || !obj.type) return;
     gfxCtx.save();
     switch (obj.type) {
@@ -1665,7 +1855,7 @@ function initMatita() {
       }
       case "line": {
         gfxCtx.strokeStyle = obj.color;
-        gfxCtx.lineWidth = obj.t;
+        gfxCtx.lineWidth =obj.t;
         gfxCtx.beginPath();
         gfxCtx.moveTo(obj.x1,obj.y1);
         gfxCtx.lineTo(obj.x2,obj.y2);
@@ -1719,6 +1909,7 @@ function initMatita() {
     gfxCtx.restore();
   }
 
+
   function paintBackground(objects, context) {
     gfxCtx.save();
     gfxCtx.setTransform(1,0,0,1,0,0);
@@ -1743,13 +1934,123 @@ function initMatita() {
   }
 
   function redrawAll(objects, context) {
+    // --- GESTIONE VISIBILITÀ CURSORE ---
+    // Se stiamo tracciando una linea Ortho, nascondiamo il puntatore reale del sistema
+    if (isOrthoEnabled && orthoBasePoint) {
+      gfxCanvas.style.cursor = "none";
+    } else if (isOrthoEnabled || isSnapEnabled) {
+      gfxCanvas.style.cursor = "crosshair";
+    } else {
+      gfxCanvas.style.cursor = "default";
+    }
+
     setupCanvas();
     clearCanvasScreenSpace();
     paintBackground(objects, context);
-    applyFitTransform(objects);
+    applyCamera();
+
     const shapes = objects.filter(o=>o.type!=="background");
     for (const obj of shapes) drawObject(obj);
+
+    // +++ Disegno il mirino di Snap (se attivo e rilevato) +++
+    if (isSnapEnabled && typeof activeSnapPoint !== 'undefined' && activeSnapPoint) {
+      gfxCtx.save();
+      // Mantiene la dimensione dell'indicatore costante indipendentemente dallo zoom
+      const screenRadius = 6; 
+      const radius = screenRadius / currentTransform.scale;
+      const lineWidth = 2 / currentTransform.scale;
+
+      // Disegno un cerchio
+      gfxCtx.beginPath();
+      gfxCtx.arc(activeSnapPoint.x, activeSnapPoint.y, radius, 0, 2 * Math.PI);
+      gfxCtx.strokeStyle = "#f87171"; // Rosso acceso per massima visibilità
+      gfxCtx.lineWidth = lineWidth;
+      gfxCtx.stroke();
+      
+      // Disegno una croce sul cerchio
+      const crossSize = (screenRadius + 4) / currentTransform.scale;
+      gfxCtx.beginPath();
+      gfxCtx.moveTo(activeSnapPoint.x - crossSize, activeSnapPoint.y);
+      gfxCtx.lineTo(activeSnapPoint.x + crossSize, activeSnapPoint.y);
+      gfxCtx.moveTo(activeSnapPoint.x, activeSnapPoint.y - crossSize);
+      gfxCtx.lineTo(activeSnapPoint.x, activeSnapPoint.y + crossSize);
+      gfxCtx.stroke();
+      
+      gfxCtx.restore();
+    }
+
+    // +++ Disegno guide Ortho +++
+    if (isOrthoEnabled) {
+      gfxCtx.save();
+      const radius = 4 / currentTransform.scale;
+      const lineWidth = 1.5 / currentTransform.scale;
+      const dash = 6 / currentTransform.scale;
+      const inf = 10000 / currentTransform.scale; 
+
+      let rad = 0;
+      if (isOrthoAngleEnabled) {
+        let deg = parseFloat(orthoAngleInput.value) || 0;
+        rad = deg * Math.PI / 180;
+      }
+      const cosA = Math.cos(rad);
+      const sinA = Math.sin(rad);
+
+      // Uso il punto base se fissato, altrimenti la posizione corrente del mouse
+      let crossCenter = orthoBasePoint || currentHoverPos;
+
+      // Disegno i binari (linee tratteggiate infinite)
+      if (crossCenter) {
+        gfxCtx.beginPath();
+        // Asse principale
+        gfxCtx.moveTo(crossCenter.x - inf * cosA, crossCenter.y - inf * sinA);
+        gfxCtx.lineTo(crossCenter.x + inf * cosA, crossCenter.y + inf * sinA);
+        // Asse trasversale
+        gfxCtx.moveTo(crossCenter.x + inf * sinA, crossCenter.y - inf * cosA);
+        gfxCtx.lineTo(crossCenter.x - inf * sinA, crossCenter.y + inf * cosA);
+
+        gfxCtx.strokeStyle = "rgba(56, 189, 248, 0.25)"; 
+        gfxCtx.lineWidth = 1 / currentTransform.scale;
+        gfxCtx.setLineDash([dash, dash]);
+        gfxCtx.stroke();
+      }
+
+      // Se ho un punto base, disegno le geometrie di puntamento attive
+      if (orthoBasePoint) {
+        // Cerchio base
+        gfxCtx.setLineDash([]);
+        gfxCtx.beginPath();
+        gfxCtx.arc(orthoBasePoint.x, orthoBasePoint.y, radius, 0, 2 * Math.PI);
+        gfxCtx.fillStyle = "#38bdf8";
+        gfxCtx.fill();
+
+        // Segmento attivo al cursore vincolato
+        let drawTarget = activeOrthoPoint; // Ora usiamo sempre e solo il target Ortho
+
+        if (drawTarget) {
+          gfxCtx.beginPath();
+          gfxCtx.moveTo(orthoBasePoint.x, orthoBasePoint.y);
+          gfxCtx.lineTo(drawTarget.x, drawTarget.y);
+          gfxCtx.strokeStyle = "#38bdf8"; 
+          gfxCtx.lineWidth = lineWidth;
+          gfxCtx.setLineDash([dash, dash]);
+          gfxCtx.stroke();
+          
+          // Disegna sempre la croce azzurra sul punto finale individuato
+          const crossSize = 10 / currentTransform.scale;
+          gfxCtx.setLineDash([]);
+          gfxCtx.beginPath();
+          gfxCtx.moveTo(drawTarget.x - crossSize, drawTarget.y);
+          gfxCtx.lineTo(drawTarget.x + crossSize, drawTarget.y);
+          gfxCtx.moveTo(drawTarget.x, drawTarget.y - crossSize);
+          gfxCtx.lineTo(drawTarget.x, drawTarget.y + crossSize);
+          gfxCtx.strokeStyle = "#0ea5e9"; 
+          gfxCtx.lineWidth = 1.5 / currentTransform.scale;
+          gfxCtx.stroke();
+        }
+      }
+    gfxCtx.restore();
   }
+}
 
   function setupCanvas() {
     gfxDpr = window.devicePixelRatio || 1;
@@ -1773,6 +2074,7 @@ function initMatita() {
     gfxCtx.fillStyle="#ffffff";
     gfxCtx.fillRect(0,0,width,height);
     gfxCtx.fillStyle="#888";
+
     gfxCtx.font=`${16*dpr}px monospace`;
     gfxCtx.textAlign="center";
     gfxCtx.textBaseline="middle";
@@ -1781,6 +2083,7 @@ function initMatita() {
     gfxCtx.fillText(message, width/2, height/2 + 12*dpr);
     gfxCtx.restore();
   }
+
 
   // === UNIFIED AST PARSER (statements + expressions) ===
 
@@ -1863,6 +2166,7 @@ function initMatita() {
     SCIENTIFIC: [["scientific"],["scientifica"]]
   };
 
+
   const EXEC_STOP = { type: "ExecutionStop" };
   function isLetterStart(ch) { return /[A-Za-z_àèéìòùÀÈÉÌÒÙ]/.test(ch); }
   function isLetterPart(ch) { return /[A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]/.test(ch); }
@@ -1928,15 +2232,17 @@ function initMatita() {
   nextToken() {
         while (!this.eof()) {
           const ch = this.peekChar();
-          // Supporto per "Line Continuation" con backslash (\)
-          // Salta eventuali spazi dopo il \
-          if (ch === "\\") {
+          // Fornisco supporto per "Line Continuation" con backslash (\)
+          // Salto eventuali spazi dopo il \
+ 
+          if (ch === "\\") { 
             let tempI = this.i + 1;
-            // 1. Avanza finché trova spazi, tabulazioni o CR
+            // 1. Avanzo finché trovo spazi, tabulazioni o CR:
             while (tempI < this.src.length && " \t\r".includes(this.src[tempI])) {
               tempI++;
             }
-            // 2. Se dopo gli spazi c'è un invio (\n), è una continuazione valida
+            // 2. Se dopo gli spazi c'è un invio (\n), si tratta di una continuazione valida
+
             if (tempI < this.src.length && this.src[tempI] === "\n") {
               this.i = tempI + 1; // Salta tutto il blocco (\ + spazi + \n)
               this.line++;        // Aggiorna il contatore delle righe
@@ -1944,18 +2250,19 @@ function initMatita() {
               continue;           // Ricomincia il ciclo (unisce visivamente le righe)
             }
           }
+          
           // whitespace
           if (ch === " " || ch === "\t") { this.nextChar(); continue; }
 
           // newline
+          
           if (ch === "\n") { 
             const t = this.makeToken("NEWLINE", "\n", this.line, this.col); 
             this.nextChar(); 
             return t; 
           }
 
-          // comment
-          if (ch === "#") { this.skipComment(); continue; }
+          if (ch === "#") { this.skipComment(); continue; } // comment
 
           // string
           if (ch === "\"") return this.readString();
@@ -2850,6 +3157,10 @@ function initMatita() {
 
   function assignVariable(scopeChain, name, value) {
     const upper=name.toUpperCase();
+
+    env.varOriginalNames = env.varOriginalNames || {};
+    env.varOriginalNames[upper] = name;
+
     const res=resolveVariable(scopeChain, name);
 
     if (res && res.__isAlias) {
@@ -3484,6 +3795,7 @@ function initMatita() {
 
       case "ClearGraphics":
         env.gfxObjects = [];
+        snapPointsCache = null;
         return null;
 
       case "Digits": {
@@ -3792,7 +4104,7 @@ function initMatita() {
         if (typeof r !== "number" || !Number.isFinite(r)) fail("shapeParamsNotNumeric", "circle", st.line);
         const pos = await evalExpr(st.pos, scopeChain);
         const { x, y } = coordFromValue(pos, st.line, "");
-        env.gfxObjects.push({ type: "circle", x, y, r, color: env.currentColor });
+        addGraphicObject({ type: "circle", x, y, r, color: env.currentColor });
         return null;
       }
 
@@ -3802,7 +4114,7 @@ function initMatita() {
         if (![r,th].every(v => typeof v==="number" && Number.isFinite(v))) fail("shapeParamsNotNumeric", "circumference", st.line);
         const pos = await evalExpr(st.pos, scopeChain);
         const { x, y } = coordFromValue(pos, st.line, "");
-        env.gfxObjects.push({ type: "circumference", x, y, r, t: th, color: env.currentColor });
+        addGraphicObject({ type: "circumference", x, y, r, t: th, color: env.currentColor });
         return null;
       }
 
@@ -3812,7 +4124,7 @@ function initMatita() {
         const p1 = coordFromValue(p1v, st.line, "");
         const p2 = coordFromValue(p2v, st.line, "");
         const x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
-        env.gfxObjects.push({
+        addGraphicObject({
           type: "rectangle",
           v1: { x: x1, y: y1 },
           v2: { x: x2, y: y1 },
@@ -3830,7 +4142,7 @@ function initMatita() {
         const p2v = await evalExpr(st.p2, scopeChain);
         const p1 = coordFromValue(p1v, st.line, "");
         const p2 = coordFromValue(p2v, st.line, "");
-        env.gfxObjects.push({
+        addGraphicObject({
           type: "line",
           x1: p1.x, y1: p1.y,
           x2: p2.x, y2: p2.y,
@@ -3851,7 +4163,7 @@ function initMatita() {
         const p2 = coordFromValue(v2, st.line, "vertice 2");
         const p3 = coordFromValue(v3, st.line, "vertice 3");
 
-        env.gfxObjects.push({ type: "triangle", v1: p1, v2: p2, v3: p3, color: env.currentColor });
+        addGraphicObject({ type: "triangle", v1: p1, v2: p2, v3: p3, color: env.currentColor });
         return null;
       }
 
@@ -3863,7 +4175,7 @@ function initMatita() {
         const p2v = await evalExpr(st.p2, scopeChain);
         const p1 = coordFromValue(p1v, st.line, "");
         const p2 = coordFromValue(p2v, st.line, "");
-        env.gfxObjects.push({ type:"arc", r, t: th, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, color: env.currentColor });
+        addGraphicObject({ type:"arc", r, t: th, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, color: env.currentColor });
         return null;
       }
 
@@ -3940,6 +4252,7 @@ function initMatita() {
         if (env.labels[nameU]) env.labels[nameU].scale *= factor;
         else if (env.imports[nameU]) env.imports[nameU].scale *= factor;
         else fail("labelNotFound", st.name, st.line);
+        snapPointsCache = null;
         return null;
       }
 
@@ -4054,6 +4367,7 @@ function initMatita() {
           const drawStmt = { type:"Draw", name: st.name, posExpr: st.posExpr, line: st.line };
           const r = await execStatement(drawStmt, scopeChain);
           def.rotation = prevRot;
+          snapPointsCache = null;
           return r;
         }
 
@@ -4205,6 +4519,7 @@ function initMatita() {
     try {
       clearScreen();
       env.gfxObjects = [];
+      snapPointsCache = null; // annullo cache quando gli oggetti cambiano
       env.labels = Object.create(null);
       env.imports = Object.create(null);
       env.functions = Object.create(null);
@@ -4217,6 +4532,10 @@ function initMatita() {
       env.sciThreshold = 1000000; // Di default switcho a scientific notation sopra tale valore
       env.tickTime = null;
       env.__shadowWarnings = new Set();
+
+      env.varOriginalNames = {};
+
+      camera = { tx: 0, ty: 0, scale: 1 }; // Reset telecamera
 
       const src = codeInput.value ?? "";
 
@@ -4241,6 +4560,8 @@ function initMatita() {
       globalScope.__globalVars = new Set();
       const scopeChain = [globalScope];
 
+      env.lastGlobalScope = globalScope;
+
       try {
         for (const st of ast.stmts) {
           const r = await execStatement(st, scopeChain);
@@ -4258,6 +4579,8 @@ function initMatita() {
       }
 
       // Final redraw (if canvas visible)
+      computeFitCamera(env.gfxObjects);
+
       if (!canvasWindow.classList.contains("hidden")) {
         redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
       }
@@ -4268,13 +4591,316 @@ function initMatita() {
     }
   }
 
-  // --- UI wiring ---
+
+// ===== Gestione Pan, Zoom e Long-Press =====
+
+  let isDraggingCanvas = false;
+  let lastPanX = 0;
+  let lastPanY = 0;
+
+
+  // +++ Variabili per il Long Press (400ms) +++
+  let longPressTimer = null;
+  let isLongPressFired = false;
+  let pointerDownEvent = null;
+
+  // Helper per calcolare la coordinata finale
+  function getEventCoordinate(e) {
+    if (isOrthoEnabled && activeOrthoPoint) return activeOrthoPoint;
+    if (isSnapEnabled && activeSnapPoint) return activeSnapPoint;
+
+    const rect = gfxCanvas.getBoundingClientRect();
+    const canvasX = (e.clientX - rect.left) * gfxDpr;
+    const canvasY = (e.clientY - rect.top) * gfxDpr;
+
+    return {
+      x: (canvasX - currentTransform.tx) / currentTransform.scale,
+      y: (currentTransform.ty - canvasY) / currentTransform.scale
+    };
+  }
+
+// Click per iniziare la tracciatura Ortho, click per terminarla
+  function handleShortClick(e) {
+    if (isRunning) return;
+
+    if (isOrthoEnabled) {
+      if (!orthoBasePoint) {
+        // Primo click: inizia la linea. Usa lo snap se è rilevato
+        if (isSnapEnabled && activeSnapPoint) {
+          orthoBasePoint = { x: activeSnapPoint.x, y: activeSnapPoint.y };
+        } else {
+          const pt = getEventCoordinate(e);
+          orthoBasePoint = { x: Math.round(pt.x * 100) / 100, y: Math.round(pt.y * 100) / 100 };
+        }
+      } else {
+        // Secondo click: sgancia l'Ortho (fissa la linea)
+        orthoBasePoint = null;
+        activeOrthoPoint = null;
+        resetCanvasTitle();
+      }
+      redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    }
+  }
+
+
+  // Incolla le coordinate nell'editor dopo pressione prolungata (400ms): 
+  function handleLongPress(e) {
+    if (isRunning) return;
+
+    const pt = getEventCoordinate(e);
+    let finalX = Math.round(pt.x * 100) / 100;
+    let finalY = Math.round(pt.y * 100) / 100;
+
+    let coordText = `(${finalX}, ${finalY})`;
+
+    if (isSnapEnabled && activeSnapPoint && env.lastGlobalScope) {
+      const TOLERANCE = 0.001; // Tolleranza per arrotondamenti
+      
+      for (const key in env.lastGlobalScope) {
+        if (key === "__globalVars") continue;
+        const val = env.lastGlobalScope[key];
+        let match = false;
+        
+        // Controlla se è una variabile di tipo "punto"
+        if (val && val.__type === "point") {
+          if (Math.abs(val.x - pt.x) < TOLERANCE && Math.abs(val.y - pt.y) < TOLERANCE) {
+            match = true;
+          }
+        } 
+        //  Controlla se è una lista di coordinate [x, y]
+        else if (Array.isArray(val) && val.length === 2 && typeof val[0] === "number") {
+          if (Math.abs(val[0] - pt.x) < TOLERANCE && Math.abs(val[1] - pt.y) < TOLERANCE) {
+            match = true;
+          }
+        }
+
+        // Se trova una corrispondenza, usa il nome invece delle coordinate
+        if (match) {
+          coordText = env.varOriginalNames[key] || key;
+          break;
+        }
+      }
+    }
+
+    const startPos = codeInput.selectionStart ?? 0;
+    const endPos = codeInput.selectionEnd ?? startPos;
+    const text = codeInput.value;
+
+    codeInput.value = text.slice(0, startPos) + coordText + text.slice(endPos);
+    const newPos = startPos + coordText.length;
+    codeInput.setSelectionRange(newPos, newPos);
+    codeInput.focus();
+
+    updateHighlighting(true);
+    updateLineNumber();
+    scheduleSuggestions();
+
+    const prevBg = canvasWindowBody.style.backgroundColor;
+    canvasWindowBody.style.backgroundColor = "rgba(56,189,248,0.2)";
+    setTimeout(() => { canvasWindowBody.style.backgroundColor = prevBg; }, 120);
+  }
+
+gfxCanvas.addEventListener("pointerdown", (e) => {
+    if (isRunning) return; 
+    dragDistance = 0; 
+
+    if (e.button === 2 || e.button === 1 || (e.button === 0 && e.shiftKey)) {
+      isDraggingCanvas = true;
+      lastPanX = e.clientX;
+      lastPanY = e.clientY;
+      gfxCanvas.setPointerCapture(e.pointerId);
+    } else if (e.button === 0 && !e.shiftKey) {
+      // Potenziale Long Press (tasto sinistro normale)
+      isLongPressFired = false;
+      pointerDownEvent = e;
+      longPressTimer = setTimeout(() => {
+        isLongPressFired = true;
+        handleLongPress(pointerDownEvent);
+      }, 400); // Trigger a 400ms
+    }
+  });
+
+gfxCanvas.addEventListener("pointermove", (e) => {
+    if (isRunning) return;
+
+    // Se stiamo tenendo premuto per il long-press ma si muove troppo il mouse, lo annulliamo
+    if (longPressTimer && e.buttons === 1 && !e.shiftKey && pointerDownEvent) {
+      const dx = e.clientX - pointerDownEvent.clientX;
+      const dy = e.clientY - pointerDownEvent.clientY;
+      if (Math.abs(dx) + Math.abs(dy) > 5) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    }
+
+    // DRAGGING (Pan diretto sulla telecamera)
+    if (isDraggingCanvas) {
+      const dx = e.clientX - lastPanX;
+      const dy = e.clientY - lastPanY;
+      dragDistance += Math.abs(dx) + Math.abs(dy);
+
+      lastPanX = e.clientX;
+      lastPanY = e.clientY;
+
+      const buttons = e.buttons;
+      if ((buttons & 1) || (buttons & 4)) {
+        camera.tx += dx * gfxDpr;
+        camera.ty += dy * gfxDpr;
+        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+      }
+      return;
+    }
+
+    // --- Calcolo Posizione Base ---
+    let needsRedraw = false;
+    const rect = gfxCanvas.getBoundingClientRect();
+    const worldX = ((e.clientX - rect.left) * gfxDpr - currentTransform.tx) / currentTransform.scale;
+    const worldY = (currentTransform.ty - (e.clientY - rect.top) * gfxDpr) / currentTransform.scale;
+
+    currentHoverPos = { x: worldX, y: worldY };
+
+    // --- Calcolo Snap ---
+    const prevSnap = activeSnapPoint;
+    if (isSnapEnabled) {
+      let minDist = Infinity, bestPt = null;
+      for (const pt of getSnapPoints()) {
+        const dist = Math.sqrt((pt.x - worldX)**2 + (pt.y - worldY)**2);
+        if (dist < minDist) { minDist = dist; bestPt = pt; }
+      }
+      activeSnapPoint = (bestPt && minDist <= 50 / currentTransform.scale) ? bestPt : null;
+    } else activeSnapPoint = null;
+    if (prevSnap !== activeSnapPoint) needsRedraw = true;
+
+// --- Calcolo Ortho ---
+    const prevOrtho = activeOrthoPoint;
+    if (isOrthoEnabled && orthoBasePoint) {
+      
+      // Proietta lo snap sull'asse Ortho, se attivo
+      let targetX = (isSnapEnabled && activeSnapPoint) ? activeSnapPoint.x : worldX;
+      let targetY = (isSnapEnabled && activeSnapPoint) ? activeSnapPoint.y : worldY;
+
+      if (isOrthoAngleEnabled) {
+        let deg = parseFloat(orthoAngleInput.value) || 0;
+        let rad = deg * Math.PI / 180;
+        let cosA = Math.cos(rad);
+        let sinA = Math.sin(rad);
+
+        let dx = targetX - orthoBasePoint.x;
+        let dy = targetY - orthoBasePoint.y;
+
+        let dx_unrot = dx * cosA + dy * sinA;
+        let dy_unrot = -dx * sinA + dy * cosA;
+
+        if (Math.abs(dx_unrot) > Math.abs(dy_unrot)) {
+          dy_unrot = 0;
+        } else {
+          dx_unrot = 0;
+        }
+
+        let dx_final = dx_unrot * cosA - dy_unrot * sinA;
+        let dy_final = dx_unrot * sinA + dy_unrot * cosA;
+
+        activeOrthoPoint = {
+          x: orthoBasePoint.x + dx_final,
+          y: orthoBasePoint.y + dy_final
+        };
+      } else {
+        if (Math.abs(targetX - orthoBasePoint.x) > Math.abs(targetY - orthoBasePoint.y)) {
+          activeOrthoPoint = { x: targetX, y: orthoBasePoint.y };
+        } else {
+          activeOrthoPoint = { x: orthoBasePoint.x, y: targetY };
+        }
+      }
+    } else {
+      activeOrthoPoint = null;
+    }
+
+    let orthoChanged = (!prevOrtho && activeOrthoPoint) || (prevOrtho && !activeOrthoPoint) || 
+                       (prevOrtho && activeOrthoPoint && (prevOrtho.x !== activeOrthoPoint.x || prevOrtho.y !== activeOrthoPoint.y));
+    
+    // FORZA IL REDRAW se stiamo muovendo il mirino libero di Ortho prima di fissare il punto
+    if (isOrthoEnabled && !orthoBasePoint) {
+      needsRedraw = true;
+    } else if (orthoChanged) {
+      needsRedraw = true;
+    }
+
+    // --- Calcolo Distanza per il titolo ---
+    let targetForDist = activeOrthoPoint || ((isSnapEnabled && activeSnapPoint) ? activeSnapPoint : null);
+    if (targetForDist && orthoBasePoint) {
+      let distX = targetForDist.x - orthoBasePoint.x;
+      let distY = targetForDist.y - orthoBasePoint.y;
+      let dist = Math.sqrt(distX * distX + distY * distY); 
+      canvasWindowTitle.textContent = `dist: ${dist.toFixed(2)}`;
+    } else {
+      canvasWindowTitle.textContent = `x: ${worldX.toFixed(2)} | y: ${worldY.toFixed(2)}`;
+    }
+
+    if (needsRedraw && !isRunning) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+  });
+
+
+  gfxCanvas.addEventListener("pointerup", (e) => {
+    isDraggingCanvas = false;
+    try { gfxCanvas.releasePointerCapture(e.pointerId); } catch {}
+
+    // Rilasciando il mouse si annulla sempre il potenziale Long Press non ancora scattato
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+
+    currentHoverPos = null;
+
+    // Rilevamento click solo se il long press NON è già avvenuto
+
+    if (!isLongPressFired && dragDistance <= 5 && e.button === 0 && !e.shiftKey) {
+        handleShortClick(e);
+    }
+  });
+
+  gfxCanvas.addEventListener("pointerleave", () => {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+    let changed = false;
+    if (activeSnapPoint) { activeSnapPoint = null; changed = true; }
+    if (activeOrthoPoint) { activeOrthoPoint = null; changed = true; }
+    resetCanvasTitle();
+    if (changed && !isRunning) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+  });
+// =====================================================
+
+// --- UI wiring ---
   function updateLineNumber() {
     const pos = codeInput.selectionStart || 0;
     const before = codeInput.value.slice(0, pos);
     const line = before.split("\n").length;
     lineIndicator.textContent = `${uiStrings[lang].lineIndicatorPrefix.toLowerCase()}: ${line}`;
   }
+
+  // Zoom IN-out centrato su puntatore del mouse
+  gfxCanvas.addEventListener("wheel", (e) => {
+    if (isRunning) return;
+    e.preventDefault(); 
+
+    const rect = gfxCanvas.getBoundingClientRect();
+    const screenX = (e.clientX - rect.left) * gfxDpr;
+    const screenY = (e.clientY - rect.top) * gfxDpr;
+
+    // Coordinate World sotto il mouse PRIMA dello zoom
+    const worldX = (screenX - camera.tx) / camera.scale;
+    const worldY = (camera.ty - screenY) / camera.scale;
+
+    // Zoom alla telecamera
+    const zoomSpeed = 0.002;
+    camera.scale *= Math.exp(-e.deltaY * zoomSpeed);
+    camera.scale = Math.max(0.01, Math.min(camera.scale, 10000));
+
+    // aggiusta la traslazione per mantenere worldX e worldY fermi sotto il cursore
+    camera.tx = screenX - (worldX * camera.scale);
+    camera.ty = screenY + (worldY * camera.scale);
+
+    redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+  }, { passive: false });
+
 
   codeInput.addEventListener("keydown", (ev) => {
     if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") {
@@ -4292,6 +4918,9 @@ function initMatita() {
   });
 
   codeInput.addEventListener("scroll", () => syncHighlightScroll());
+
+
+
   codeInput.addEventListener("click", () => { updateLineNumber(); scheduleSuggestions(); });
   codeInput.addEventListener("keyup", () => { updateLineNumber(); scheduleSuggestions(); });
   codeInput.addEventListener("blur", () => setTimeout(hideSuggestions, 120));
@@ -4307,7 +4936,24 @@ function initMatita() {
     if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
     else hideCanvasWindow();
   });
-  closeCanvasButton.addEventListener("click", hideCanvasWindow);
+  
+  closeCanvasButton.addEventListener("click", () => {
+    hideCanvasWindow();
+    
+    // Reset degli strumenti interattivi quando si chiude la grafica
+    isSnapEnabled = false;
+    snapButton.classList.remove("active");
+    activeSnapPoint = null;
+    
+    isOrthoEnabled = false;
+    orthoButton.classList.remove("active");
+    orthoBasePoint = null;
+    activeOrthoPoint = null;
+    resetCanvasTitle();
+    
+    // Ripristina il cursore di default
+    gfxCanvas.style.cursor = "default";
+  });
 
   savePngButton.addEventListener("click", () => {
     try {
@@ -4330,7 +4976,7 @@ function initMatita() {
     let startLeft = 0, startTop = 0;
 
     canvasWindowHeader.addEventListener("pointerdown", (e) => {
-      if (e.target && e.target.tagName === "BUTTON") return;
+      if (e.target && (e.target.tagName === "BUTTON" || e.target.tagName === "INPUT")) return;
       dragging = true;
       canvasWindowHeader.setPointerCapture(e.pointerId);
 
@@ -4349,11 +4995,31 @@ function initMatita() {
     });
 
     canvasWindowHeader.addEventListener("pointermove", (e) => {
+
       if (!dragging) return;
+      
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
-      canvasWindow.style.left = (startLeft + dx) + "px";
-      canvasWindow.style.top = (startTop + dy) + "px";
+      
+      let newLeft = startLeft + dx;
+      let newTop = startTop + dy;
+
+      const cw = canvasWindow.offsetWidth;
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+
+      // Keep the window horizontally inside the screen
+      // (If the window is wider than the screen, it allows it to slide left/right just enough to see everything)
+      const minLeft = Math.min(0, winW - cw);
+      const maxLeft = Math.max(0, winW - cw);
+      newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
+
+      // Keep the header vertically inside the screen (header is 44px tall)
+      const maxTop = Math.max(0, winH - 44);
+      newTop = Math.max(0, Math.min(newTop, maxTop));
+
+      canvasWindow.style.left = newLeft + "px";
+      canvasWindow.style.top = newTop + "px";
     });
 
     canvasWindowHeader.addEventListener("pointerup", (e) => {
@@ -4362,15 +5028,49 @@ function initMatita() {
     });
   })();
 
-  // Resize : notify redraw need
-  const ro = new ResizeObserver(() => {
-    if (!canvasWindow.classList.contains("hidden")) drawReadyScreen(uiStrings[lang].canvasResized);
-  });
+  // Resize: Ridisegna in automatico se ci sono oggetti, altrimenti mostra messaggio
+  function handleCanvasResize() {
+    if (canvasWindow.classList.contains("hidden")) return;
+    
+    // Se c'è un disegno in memoria, fa il redraw e lo adatta al nuovo schermo intero
+    if (env.gfxObjects && env.gfxObjects.length > 0) {
+      redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    } else if (!isRunning) {
+      drawReadyScreen(uiStrings[lang].canvasResized);
+    }
+  }
+
+  const ro = new ResizeObserver(handleCanvasResize);
   ro.observe(canvasWindowBody);
 
   window.addEventListener("resize", () => {
-    if (!canvasWindow.classList.contains("hidden")) drawReadyScreen(uiStrings[lang].canvasResized);
+    handleCanvasResize();
+    
+    // Se la finestra grafica è visibile ed è stata mossa, assicuriamoci che non finisca fuori schermo 
+    // se l'utente rimpicciolisce il browser
+    if (!canvasWindow.classList.contains("hidden") && canvasWindow.style.left && canvasWindow.style.left !== "auto") {
+      const cw = canvasWindow.offsetWidth;
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+      
+      let currentLeft = parseFloat(canvasWindow.style.left);
+      let currentTop = parseFloat(canvasWindow.style.top);
+
+      if (!isNaN(currentLeft) && !isNaN(currentTop)) {
+        const minLeft = Math.min(0, winW - cw);
+        const maxLeft = Math.max(0, winW - cw);
+        currentLeft = Math.max(minLeft, Math.min(currentLeft, maxLeft));
+
+        const maxTop = Math.max(0, winH - 44);
+        currentTop = Math.max(0, Math.min(currentTop, maxTop));
+
+        canvasWindow.style.left = currentLeft + "px";
+        canvasWindow.style.top = currentTop + "px";
+      }
+    }
   });
+
+
   // --- Full Screen Logic ---
   function toggleFullScreen() {
     if (!document.fullscreenElement) {
@@ -4383,6 +5083,14 @@ function initMatita() {
       }
     }
   }
+
+  // Adatta grafica alla finestra attiva (i.e. Reset Pan & Zoom):
+  fullscreenCanvasButton.addEventListener("click", () => {
+    if (env.gfxObjects && env.gfxObjects.length > 0) {
+      computeFitCamera(env.gfxObjects);
+      redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    }
+  });
 
   fullscreenButton.addEventListener("click", toggleFullScreen);
 

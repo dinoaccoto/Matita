@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Matita v0.3.1 - Guida</title>
+    <title>Matita v0.4.0 - Guida</title>
     <meta name="author" content="Dino Accoto" />
-    <meta name="description" content="Una guida completa per programmare con Matita v0.3.1." />
+    <meta name="description" content="Una guida completa per programmare con Matita v0.4.0." />
     <meta name="subject" content="Guida operativa alla programmazione con Matita (sintassi italiana)" />
     <meta name="keywords" content="programmazione, grafica, Matita, cicli, variabili, interattività, liste, alias, inout, null, procedure, funzioni, scope, globale, etichette, dimensione, accapo, scrivi, cast, unicode" />
     <style>
@@ -165,7 +165,7 @@
 <body>
 <header>
     <div class="bar">
-        <div class="left">Matita v0.3.1</div>
+        <div class="left">Matita v0.4.0</div>
         <div class="right">Guida per l'Utente</div>
     </div>
 </header>
@@ -214,6 +214,7 @@
                     <li><a href="#labels">Etichette grafiche</a></li>
                     <li><a href="#transformations">Trasformazioni</a></li>
                     <li><a href="#images">Immagini</a></li>
+                    <li><a href="#canvas-interaction">Interagire col canvas</a></li>
                     <li><a href="#project">Esercizio guidato</a></li>
                 </ol>
             </li>
@@ -1206,6 +1207,31 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
     </section>
 
     <div class="pagebreak"></div>
+    <section id="canvas-interaction">
+        <h2>Interagire col canvas</h2>
+        <p>Oltre a renderizzare la grafica generata dal codice, l'area grafica di Matita (il <em>canvas</em>) offre strumenti interattivi per ispezionare lo spazio di disegno e individuare i punti.</p>
+        
+        <h3>Pan e Zoom</h3>
+        <p>È possibile navigare all'interno dell'area grafica senza alterare le coordinate originali degli oggetti:</p>
+        <ul>
+            <li><strong>Pan (Trascinamento)</strong>: Tenendo premuto il <strong>tasto destro</strong> del mouse (oppure il tasto centrale, o <code>Shift</code> + tasto sinistro) e muovendo il cursore, è possibile traslare la vista in qualsiasi direzione.</li>
+            <li><strong>Zoom</strong>: Utilizzando la <strong>rotellina del mouse</strong>, si ingrandisce o si rimpicciolisce la vista. L'ingrandimento è centrato sul cursore, ovvero punta verso le coordinate in cui si trova il mouse in quel momento.</li>
+        </ul>
+
+        <h3>Vincoli Ortogonali (Ortho) e Calamita (Snap)</h3>
+
+        <p>I pulsanti posti sulla barra superiore della finestra del canvas permettono di attivare strumenti di precisione geometrica:</p>
+        <ul>
+            <li><strong>Calamita (Snap)</strong>: Se attiva, il cursore viene attratto e agganciato ai punti notevoli degli oggetti già disegnati (centri di circonferenze, vertici di rettangoli, punti medi di linee, ecc.).</li>
+            <li><strong>Ortho</strong>: Attivando questo strumento è possibile tracciare linee a supporto dell'allineamento. Con un <strong>singolo click</strong> sul canvas si fissa un punto di base. Da quel momento, muovendo il mouse, verrà proiettato un mirino vincolato a muoversi solo in direzioni ortogonali (in orizzontale o in verticale). Se si attiva e si imposta un angolo <strong>&alpha;</strong>, l'asse ortogonale risulterà ruotato di tale angolo in senso antiorario. Un <strong>secondo click</strong> rilascia il punto di base.</li>
+        </ul>
+
+        <h3>Trasferimento di Coordinate</h3>
+        <p>Per velocizzare la stesura del codice e il posizionamento degli oggetti, Matita consente di prelevare i dati posizionali direttamente dall'area grafica e inserirli nell'editor testuale.</p>
+        <p>Effettuando un <strong>click prolungato</strong> con il tasto sinistro su un punto del canvas, le coordinate di quel punto (ad esempio, <code>(15.2, 30.5)</code>) verranno digitate automaticamente nell'Editor di codice, in corrispondenza del cursore testuale. Se questa operazione viene eseguita mentre la Calamita è in funzione ed è agganciata a un punto le cui coordinate sono salvata in una variabile globale, nell'Editor verrà incollato direttamente il nome di tale variabile anziché i valori numerici, preservando la coerenza del codice.</p>
+    </section>
+
+    <div class="pagebreak"></div>
     <section id="project">
         <h2>Esercizio guidato: faccina interattiva</h2>
         <p>Il seguente codice integra definizione di etichette, input utente e ciclo di rendering per creare un oggetto controllabile.</p>
@@ -1378,7 +1404,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
 </main>
 
 <footer>
-    <span class="chip">Matita v0.3.1</span>
+    <span class="chip">Matita v0.4.0</span>
     <span class="chip">Guida (Informatica)</span>
 </footer>
 
