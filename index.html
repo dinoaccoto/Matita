@@ -693,7 +693,7 @@ function initMatita() {
     "if","then","otherwise","as","as long as","you do","for each","index","goes","from","to","and",
     "put","in","add","remove","insert","first","last","item","of","dimension","list",
     "output","newline","wait","ms","get","saying",
-    "set","color","clear","screen","graphics","redraw",
+    "set","color","clear","screen","graphics","redraw","frame",
     "circle","radius","circumference","thickness","rectangle","line","triangle","arc","graffiti","draw",
     "rotate","deg","place","it","at","scale","by","load","paint","background","as background",
     "true","false","and","or","not","is","equals", "different", "mod","pi","infinity","nan",
@@ -707,7 +707,7 @@ function initMatita() {
     "se","allora","altrimenti","come","fintanto","esegui","per ogni","variabile","indice","va","da","a","e",
     "metti","in","aggiungi","rimuovi","inserisci","primo","ultimo","elemento","di","dimensione","lista",
     "scrivi","accapo","aspetta","ms","chiedi","dicendo",
-    "imposta","colore","cancella","schermo","grafica","ridisegna",
+    "imposta","colore","cancella","schermo","grafica","ridisegna", "inquadra",
     "cerchio","raggio","circonferenza","spessore","rettangolo","linea","triangolo","arco","graffiti","disegna",
     "ruota","gradi","posiziona","scala","carica","dipingi","sfondo","come sfondo",
     "vero","falso","e","o","non","uguale a","vale","uguale","diverso", "mod","pi","infinito","nan",
@@ -823,6 +823,8 @@ function initMatita() {
         { label: "accapo", insert: "accapo\n", detail: "Nuova riga" },
         { label: "imposta colore (r,g,b)", insert: "imposta colore (ROSSO, VERDE, BLU)\n", detail: "Colore (0..100)" },
         { label: "cancella grafica", insert: "cancella grafica\n", detail: "Svuota lista oggetti grafici" },
+
+        { label: "inquadra grafica", insert: "inquadra grafica\n", detail: "Adatta la telecamera per mostrare tutto" },
         { label: "cancella schermo", insert: "cancella schermo\n", detail: "Pulisce la console" },
         { label: "ridisegna", insert: "ridisegna\n", detail: "Ridisegna l'area grafica" },
         { label: "cerchio raggio R in (x,y)", insert: "cerchio raggio RAGGIO in (X, Y)\n", detail: "Cerchio pieno" },
@@ -884,6 +886,7 @@ function initMatita() {
     // Graphics - Setup
     { label: "set color (r,g,b)", insert: "set color (RED, GREEN, BLUE)\n", detail: "Color (0..100)" },
     { label: "clear graphics", insert: "clear graphics\n", detail: "Clear objects" },
+    { label: "frame graphics", insert: "frame graphics\n", detail: "Fit camera to show all objects" },
     { label: "clear screen", insert: "clear screen\n", detail: "Clear console" },
     { label: "redraw", insert: "redraw\n", detail: "Refresh graphics" },
     
@@ -2126,6 +2129,7 @@ function initMatita() {
     COLOR: [["color"],["colore"]],
     CLEAR: [["clear"],["cancella"]],
     GRAPHICS: [["graphics"],["grafica"]],
+    FRAME: [["frame"],["inquadra"]],
     SCREEN: [["screen"],["schermo"]],
     REDRAW: [["redraw"],["ridisegna"]],
     CIRCLE: [["circle"],["cerchio"]],
@@ -2750,6 +2754,12 @@ function initMatita() {
         this.expectKW("TO", t.line);
         const valueExpr=this.parseExpression(0, null);
         return { type:"SetPointProp", prop, targetExpr, valueExpr, line: t.line };
+      }
+
+      // inquadra grafica / frame graphics
+      if (this.matchKW("FRAME")) {
+        this.expectKW("GRAPHICS", t.line);
+        return { type:"FrameGraphics", line: t.line };
       }
 
       // paint background
@@ -3796,6 +3806,14 @@ function initMatita() {
       case "ClearGraphics":
         env.gfxObjects = [];
         snapPointsCache = null;
+        return null;
+
+      case "FrameGraphics":
+        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
+        if (env.gfxObjects && env.gfxObjects.length > 0) {
+          computeFitCamera(env.gfxObjects);
+          redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+        }
         return null;
 
       case "Digits": {

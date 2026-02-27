@@ -209,6 +209,7 @@
                     <li><a href="#shapes">Disegnare Forme di Base</a></li>
                     <li><a href="#graffiti">Graffiti</a></li>
                     <li><a href="#redraw">Ridisegnare una scena</a></li>
+                    <li><a href="#frame">Inquadrare la grafica</a></li>
                     <li><a href="#animations">Creare Animazioni</a></li>
                     <li><a href="#input">Input da tastiera</a></li>
                     <li><a href="#labels">Etichette grafiche</a></li>
@@ -1074,6 +1075,17 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <p>Il comando <code>ridisegna</code> forza l'aggiornamento dell'area grafica (canvas). Questo comando è essenziale per visualizzare i cambiamenti avvenuti nella scena memorizzata in memoria.</p>
     </section>
 
+    <section id="frame">
+        <h2>Inquadrare la grafica (Auto-framing)</h2>
+        <p>Il comando <code>inquadra grafica</code> regola automaticamente la telecamera (pan e zoom) in modo che tutti gli oggetti attualmente presenti nell'area grafica (canvas) siano visibili e centrati nella finestra.</p>
+        <p>Questo comando è utile per fare in modo che la scena si adatti dinamicamente allo schermo. Esegue implicitamente anche un ridisegno, per cui il suo uso rende non necessario usare <code>ridisegna</code>.</p>
+        <pre><code><span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
+<span class="com"># Disegna un cerchio molto grande, lontano dall'origine</span>
+<span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">500</span> <span class="kw">in</span> (<span class="num">2000</span>, <span class="num">2000</span>)
+<span class="com"># Adatta la vista per mostrarlo tutto</span>
+<span class="kw">inquadra grafica</span></code></pre>
+    </section>
+
     <div class="pagebreak"></div>
     <section id="animations">
         <h2>Creare Animazioni</h2>
@@ -1351,6 +1363,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>imposta colore (R, G, B)</code></td><td>Imposta il colore corrente (0-100).</td></tr>
             <tr><td><code>cancella grafica</code> / <code>dipingi sfondo</code></td><td>Pulisce canvas / Colora sfondo.</td></tr>
             <tr><td><code>ridisegna</code></td><td>Forza aggiornamento grafico.</td></tr>
+            <tr><td><code>inquadra grafica</code></td><td>Adatta la telecamera per mostrare tutti gli oggetti.</td></tr>
             <tr><td><code>cerchio raggio R in (X,Y)</code></td><td>Disegna cerchio pieno.</td></tr>
             <tr><td><code>circonferenza raggio R spessore S in (X,Y)</code></td><td>Disegna contorno cerchio.</td></tr>
             <tr><td><code>rettangolo da (X1,Y1) a (X2,Y2)</code></td><td>Disegna rettangolo pieno.</td></tr>
