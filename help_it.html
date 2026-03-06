@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Matita v0.4.0 - Guida</title>
+    <title>Matita v0.4.1 - Guida</title>
     <meta name="author" content="Dino Accoto" />
-    <meta name="description" content="Una guida completa per programmare con Matita v0.4.0." />
+    <meta name="description" content="Una guida completa per programmare con Matita v0.4.1." />
     <meta name="subject" content="Guida operativa alla programmazione con Matita (sintassi italiana)" />
     <meta name="keywords" content="programmazione, grafica, Matita, cicli, variabili, interattività, liste, alias, inout, null, procedure, funzioni, scope, globale, etichette, dimensione, accapo, scrivi, cast, unicode" />
     <style>
@@ -165,7 +165,7 @@
 <body>
 <header>
     <div class="bar">
-        <div class="left">Matita v0.4.0</div>
+        <div class="left">Matita v0.4.1</div>
         <div class="right">Guida per l'Utente</div>
     </div>
 </header>
@@ -245,6 +245,7 @@
         <ul>
             <li><strong>Apri / Salva</strong>: Consentono di aprire e salvare i programmi Matita come file di testo con estensione <code>.txt</code>.</li>
             <li><strong>Scarica Matita</strong>: Permette di salvare l'intero ambiente di sviluppo come un singolo file HTML sul proprio computer. Ciò consente di lavorare in locale, senza la necessità di continuare ad usare una connessione internet. Inoltre, vedremo che usando una copia locale diventa possibile lavorare con immagini salvate sul proprio dispositivo.</li>
+            <li><strong>Cambio Lingua (IT/EN)</strong>: Cambia la lingua dell'interfaccia. Traduce automaticamente l'intero codice sorgente scritto nell'editor dall'italiano all'inglese o viceversa, preservando i commenti e le stringhe di testo.</li>
             <li><strong>Aiuto</strong>: Apre la documentazione tecnica in una nuova finestra.</li>
             <li><strong>Esegui</strong>: Il pulsante principale. Invia al computer l'ordine di interpretare ed eseguire le istruzioni.</li>
         </ul>
@@ -393,16 +394,21 @@
         <h3>Costanti e funzioni matematiche</h3>
         <p>Matita include diverse costanti e funzioni matematiche pronte all'uso. Una lista completa delle funzioni predefinite è disponibile nell'Appendice A.</p>
         <ul>
-            <li><strong>Costanti</strong>: <code>pi</code> (o π), <code>infinito</code>, <code>nan</code> (Not a Number)</li>
-            <li><strong>Funzioni trigonometriche e calcolo</strong>: <code>abs(x)</code>, <code>sin(x)</code>, <code>cos(x)</code>, <code>radice(x)</code>, ecc.</li>
-            <li><strong>Funzioni di arrotondamento</strong>:
-                <ul>
-                    <li><code>arrotonda(x)</code>: Arrotonda all'intero più vicino.</li>
-                    <li><code>tronca(x)</code>: Rimuove la parte decimale senza arrotondare (troncamento verso lo zero).</li>
-                    <li><code>ceil(x)</code>: Arrotonda al numero intero superiore (verso l'alto).</li>
-                </ul>
-            </li>
-        </ul>
+            <li><strong>Costanti</strong>: <code>pi</code> (o π), <code>infinito</code>, <code>nan</code> (Not a Number)</li>
+            <li><strong>Funzioni trigonometriche e calcolo</strong>: <code>assoluto(x)</code>, <code>seno(x)</code>, <code>coseno(x)</code>, <code>radice(x)</code>, ecc.</li>
+            <li><strong>Funzioni di arrotondamento</strong>:
+                <ul>
+                    <li><code>arrotonda(x)</code>: Arrotonda all'intero più vicino.</li>
+                    <li><code>tronca(x)</code>: Rimuove la parte decimale senza arrotondare (troncamento verso lo zero).</li>
+                    <li><code>intero_superiore(x)</code>: Arrotonda al numero intero superiore (verso l'alto).</li>
+                </ul>
+            </li>
+        </ul>
+
+        <p>Esempio di arrotondamento:</p>
+        <pre><code><span class="kw">scrivi</span> <span class="kw">tronca</span>(<span class="num">3.9</span>) <span class="com"># Output: 3</span>
+<span class="kw">accapo</span>
+<span class="kw">scrivi</span> <span class="kw">intero_superiore</span>(<span class="num">3.1</span>)   <span class="com"># Output: 4</span></code></pre>
 
         <p>Esempio di arrotondamento:</p>
         <pre><code><span class="kw">scrivi</span> <span class="kw">tronca</span>(<span class="num">3.9</span>) <span class="com"># Output: 3</span>
@@ -707,10 +713,10 @@
 <span class="kw">scrivi</span> ListaCaratteri
 <span class="com"># Output: :) (C, i, a, o)</span></code></pre>
 
-        <h3>Dividere per separatore: <code>split</code></h3>
-        <p>A differenza di <code>scomponi</code>, che separa ogni singolo carattere, il comando <code>split(testo, separatore)</code> divide una stringa in base a un carattere specifico (come lo spazio o la virgola).</p>
-        <pre><code><span class="kw">metti</span> <span class="str">"rosso,verde,blu"</span> <span class="kw">in</span> CSV
-<span class="kw">metti</span> <span class="kw">split</span>(CSV, <span class="str">","</span>) <span class="kw">in</span> Colori
+        <h3>Dividere per separatore: <code>dividi</code></h3>
+        <p>A differenza di <code>scomponi</code>, che separa ogni singolo carattere, il comando <code>dividi(testo, separatore)</code> divide una stringa in base a un carattere specifico (come lo spazio o la virgola).</p>
+        <pre><code><span class="kw">metti</span> <span class="str">"rosso,verde,blu"</span> <span class="kw">in</span> CSV
+<span class="kw">metti</span> <span class="kw">dividi</span>(CSV, <span class="str">","</span>) <span class="kw">in</span> Colori
 <span class="kw">scrivi</span> Colori
 <span class="com"># Output: :) (rosso, verde, blu)</span></code></pre>
 
@@ -745,7 +751,7 @@
         <p>In Matita, le variabili possono cambiare tipo dinamicamente. È possibile verificare la natura di un dato tramite le seguenti funzioni:</p>
         <ul>
             <li><code>tipo(x)</code>: Restituisce una stringa che descrive il tipo del dato (es. "number", "string", "list", "point", "boolean").</li>
-            <li><code>numerico(x)</code>: Restituisce <code>vero</code> se l'argomento è un numero valido e finito, <code>falso</code> altrimenti.</li>
+            <li><code>numerico(x)</code> (o l'equivalente <code>è_numero(x)</code>): Restituisce <code>vero</code> se l'argomento è un numero valido e finito, <code>falso</code> altrimenti.</li>
         </ul>
         <pre><code><span class="kw">metti</span> <span class="num">42</span> <span class="kw">in</span> X
 <span class="kw">scrivi</span> <span class="kw">tipo</span>(X)        <span class="com"># Output: number</span>
@@ -1003,6 +1009,9 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <pre><code><span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">linea</span> <span class="kw">spessore</span> <span class="num">2</span> <span class="kw">da</span> (<span class="num">-200</span>, <span class="num">-75</span>) <span class="kw">a</span> (<span class="num">-200</span>, <span class="num">-160</span>)</code></pre>
 
+        <p><strong>Triangolo</strong>: Sintassi <code>triangolo con vertici P1, P2, P3</code>. Traccia un triangolo pieno collegando i tre punti specificati separati da virgole.</p>
+        <pre><code><span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">0</span>, <span class="num">50</span>, <span class="num">100</span>)
+<span class="kw">triangolo</span> <span class="kw">con</span> <span class="kw">vertici</span> (<span class="num">0</span>, <span class="num">50</span>), (<span class="num">-50</span>, <span class="num">-50</span>), (<span class="num">50</span>, <span class="num">-50</span>)</code></pre>
         <p><strong>Arco</strong>: Sintassi <code>arco raggio R spessore S da P1 a P2</code>. Disegna un arco di cerchio di dato raggio, passante per i due punti dati. Dal momento che esistono al più due circonferenze di dato raggio passanti per due punti assegnati nel piano, il codice disegnerà l'arco che va dal primo al secondo punto ruotando in verso antiorario. Ciò implica che, se si inverte l'ordine dei due punti, si otterrà un arco a concavità invertita.</p>
         <pre><code><span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">arco</span> <span class="kw">raggio</span> <span class="num">240</span> <span class="kw">spessore</span> <span class="num">12</span> <span class="kw">da</span> (<span class="num">-220</span>, <span class="num">-160</span>) <span class="kw">a</span> (<span class="num">220</span>, <span class="num">-160</span>)</code></pre>
@@ -1218,6 +1227,11 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
 <span class="kw">dipingi</span> <span class="kw">sfondo</span></code></pre>
     </section>
 
+    <h3>Importare Codice Esterno (Librerie)</h3>
+        <p>È possibile dividere programmi complessi su più file. Utilizzando il comando <code>importa</code> senza la parola chiave <code>come</code>, Matita leggerà un file di testo contenente codice sorgente (es. procedure o funzioni utili) e lo eseguirà come se fosse stato scritto direttamente nel file principale.</p>
+        <pre><code><span class="kw">importa</span> <span class="str">"mia_libreria.txt"</span>
+        <span class="com"># Ora si possono usare funzioni definite in mia_libreria.txt</span></code></pre>
+
     <div class="pagebreak"></div>
     <section id="canvas-interaction">
         <h2>Interagire col canvas</h2>
@@ -1235,7 +1249,9 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <p>I pulsanti posti sulla barra superiore della finestra del canvas permettono di attivare strumenti di precisione geometrica:</p>
         <ul>
             <li><strong>Calamita (Snap)</strong>: Se attiva, il cursore viene attratto e agganciato ai punti notevoli degli oggetti già disegnati (centri di circonferenze, vertici di rettangoli, punti medi di linee, ecc.).</li>
-            <li><strong>Ortho</strong>: Attivando questo strumento è possibile tracciare linee a supporto dell'allineamento. Con un <strong>singolo click</strong> sul canvas si fissa un punto di base. Da quel momento, muovendo il mouse, verrà proiettato un mirino vincolato a muoversi solo in direzioni ortogonali (in orizzontale o in verticale). Se si attiva e si imposta un angolo <strong>&alpha;</strong>, l'asse ortogonale risulterà ruotato di tale angolo in senso antiorario. Un <strong>secondo click</strong> rilascia il punto di base.</li>
+            <li><strong>Ortho (⟂) e Angolo Alpha (α)</strong>: Attivando lo strumento Ortho è possibile tracciare linee a supporto dell'allineamento. Con un <strong>singolo click</strong> sul canvas si fissa un punto di base; muovendo il mouse, il mirino sarà vincolato a muoversi solo in orizzontale o verticale. Cliccando il pulsante <strong>α</strong> e inserendo un valore numerico nel campo a fianco, è possibile ruotare liberamente gli assi ortogonali di quel numero di gradi. Un <strong>secondo click</strong> rilascia il punto di base.</li>
+            <li><strong>Salva PNG</strong>: Scarica il contenuto del canvas come immagine <code>.png</code>.</li>
+            <li><strong>Adatta alla Finestra (⛶)</strong>: Regola lo zoom e la posizione della telecamera per inquadrare tutti gli oggetti all'interno della finestra grafica.</li>
         </ul>
 
         <h3>Trasferimento di Coordinate</h3>
@@ -1340,9 +1356,9 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>casuale(MAX)</code></td><td>Restituisce un numero decimale tra 0 e MAX.</td></tr>
             <tr><td><code>casuale(MIN, MAX)</code></td><td>Restituisce un numero decimale tra MIN e MAX.</td></tr>
             <tr><td><code>dado(N)</code></td><td>Restituisce un numero <strong>intero</strong> tra 1 e N.</td></tr>
-            <tr><td><code>arrotonda(X)</code> / <code>tronca(X)</code></td><td>Arrotonda o tronca X all'intero.</td></tr>
-            <tr><td><code>radice(X)</code> / <code>abs(X)</code></td><td>Radice quadrata / Valore assoluto.</td></tr>
-            <tr><td><code>sin(X)</code> / <code>cos(X)</code></td><td>Funzioni trigonometriche (input in radianti).</td></tr>
+            <tr><td><code>arrotonda(X)</code> / <code>tronca(X)</code> / <code>intero_superiore(X)</code></td><td>Arrotondamento all'intero.</td></tr>
+            <tr><td><code>radice(X)</code> / <code>assoluto(X)</code></td><td>Radice quadrata / Valore assoluto.</td></tr>
+            <tr><td><code>seno(X)</code> / <code>coseno(X)</code></td><td>Funzioni trigonometriche (input in radianti).</td></tr>
         </table>
 
         <h3>Logica, Cicli e Input</h3>
@@ -1368,10 +1384,12 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>circonferenza raggio R spessore S in (X,Y)</code></td><td>Disegna contorno cerchio.</td></tr>
             <tr><td><code>rettangolo da (X1,Y1) a (X2,Y2)</code></td><td>Disegna rettangolo pieno.</td></tr>
             <tr><td><code>linea spessore S da (X1,Y1) a (X2,Y2)</code></td><td>Disegna segmento.</td></tr>
+            <tr><td><code>triangolo con vertici P1, P2, P3</code></td><td>Disegna triangolo pieno.</td></tr>
             <tr><td><code>arco raggio R spessore S da P1 a P2</code></td><td>Disegna arco.</td></tr>
             <tr><td><code>graffiti grandezza G in (X,Y) "TESTO"</code></td><td>Scrive testo grafico.</td></tr>
             <tr><td><code>etichetta (...) come NOME</code></td><td>Definisce un oggetto grafico composto.</td></tr>
             <tr><td><code>importa "file.png" come NOME</code></td><td>Carica immagine come etichetta.</td></tr>
+            <tr><td><code>importa "file.txt"</code></td><td>Include ed esegue codice da file esterno.</td></tr>
             <tr><td><code>disegna NOME in (X,Y)</code></td><td>Disegna istanza di etichetta/immagine.</td></tr>
             <tr><td><code>scala NOME di K</code></td><td>Ridimensiona permanentemente l'oggetto.</td></tr>
             <tr><td><code>ruota NOME di G gradi e posiziona in P</code></td><td>Disegna oggetto ruotato.</td></tr>
@@ -1386,7 +1404,8 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>aggiungi X a NOME</code></td><td>Inserisce in coda.</td></tr>
             <tr><td><code>inserisci X in elemento N di NOME</code></td><td>Inserisce in posizione N.</td></tr>
             <tr><td><code>rimuovi elemento N da NOME</code></td><td>Rimuove elemento in posizione N.</td></tr>
-            <tr><td><code>scomponi(VAL)</code> / <code>scomposizione(V, T)</code></td><td>Divide stringhe o numeri in liste.</td></tr>
+            <tr><td><code>scomponi(VAL)</code> / <code>dividi(V, SEP)</code></td><td>Divide stringhe in liste.</td></tr>
+            <tr><td><code>scomposizione(V, T)</code></td><td>Scompone in modo avanzato in base al tipo.</td></tr>
             <tr><td><code>composizione(L, T)</code></td><td>Unisce lista in testo o numero.</td></tr>
             <tr><td><code>cast(VAL)</code> / <code>unicode(X)</code></td><td>Conversione di tipo / Codifica caratteri.</td></tr>
         </table>
@@ -1417,7 +1436,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
 </main>
 
 <footer>
-    <span class="chip">Matita v0.4.0</span>
+    <span class="chip">Matita v0.4.1</span>
     <span class="chip">Guida (Informatica)</span>
 </footer>
 

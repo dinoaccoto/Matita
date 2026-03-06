@@ -59,62 +59,95 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
+/* --- BARRA STRUMENTI SUPERIORE --- */
     .pane-header {
       flex-shrink: 0;
-      padding: 0 12px;
-      height: 48px;
-      border-bottom: 1px solid var(--border-color);
+      height: 48px; /* Altezza fissa per mantenere l'ordine */
+      padding: 0 16px;
       background: var(--bg-pane);
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      overflow-x: auto; /* Layout a scorrimento orizzontale su schermi piccoli */
+      scrollbar-width: none; /* Nasconde la scrollbar su Firefox */
+    }
+    .pane-header::-webkit-scrollbar {
+      display: none; /* Nasconde la scrollbar su Chrome/Edge/Safari */
     }
 
-    .header-left-group, .header-right-group { display: flex; align-items: center; gap: 8px; }
+    .header-left-group, .header-right-group { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+    }
 
+    .header-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 0 4px;
+    }
+
+    /* INDICATORE DI RIGA (Stile "Display incassato") */
     .pane-header-title {
       font-family: 'Roboto Mono', monospace;
       font-weight: 500;
       color: var(--text-secondary);
-      font-size: 0.8rem;
-      margin-right: 8px;
-      background: rgba(255,255,255,0.05);
-      padding: 4px 8px;
+      font-size: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px 10px;
       border-radius: var(--radius-sm);
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
+    /* STILE BASE PULSANTI (Ghost Design) */
     button {
       background: transparent;
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-      font-size: 0.8rem;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      font-size: 0.75rem;
       padding: 6px 12px;
       border-radius: var(--radius-sm);
-      font-weight: 600;
+      font-weight: 500;
       font-family: 'Inter', sans-serif;
       cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      transition: all 0.15s ease;
+      white-space: nowrap;
     }
 
     button:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    button:active {
+      transform: scale(0.95); /* Leggero effetto "pressione" */
+    }
+
+    /* PULSANTI SPECIFICI */
+    #toggleCanvasButton {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     #runButton {
       background: var(--accent-color);
-      color: #0f172a;
-      border-color: var(--accent-color);
+      color: var(--bg-app);
+      font-weight: 700;
+      border: 1px solid var(--accent-color);
+      margin-left: 4px;
     }
+    
     #runButton:hover {
       background: var(--accent-hover);
       border-color: var(--accent-hover);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      color: var(--bg-app);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35); /* Effetto Glow */
     }
+    
     #runButton:disabled {
       background: var(--border-color);
       color: var(--text-secondary);
@@ -123,15 +156,39 @@
       box-shadow: none;
     }
 
+    #stopButton {
+      background: transparent;
+      color: var(--danger-color);
+      border: 1px solid var(--danger-color);
+      margin-left: 4px;
+      font-weight: 700;
+    }
+    
+    #stopButton:hover:not(:disabled) {
+      background: var(--danger-color);
+      color: var(--console-bg);
+      box-shadow: 0 0 12px rgba(248, 113, 113, 0.4);
+    }
+    
+    #stopButton:disabled {
+      background: transparent;
+      color: var(--border-color);
+      border-color: var(--border-color);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* PULSANTE DOWNLOAD SCARICA MATITA */
     #getMatitalkButton {
-      border: none;
       color: var(--text-secondary);
-      font-size: 0.75rem;
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      transition: all 0.2s ease;
     }
     #getMatitalkButton:hover {
-      background: transparent;
       color: var(--accent-color);
-      text-decoration: underline;
+      text-decoration-color: var(--accent-color);
+      background: transparent;
     }
 
     #snapButton, #orthoButton, #orthoAngleButton {
@@ -233,6 +290,25 @@
 
     .editor-layer { position: absolute; inset: 0; }
 
+    #lineGutter {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 44px;
+      background: rgba(0, 0, 0, 0.18);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+      line-height: 22px;
+      padding-right: 8px;
+      text-align: right;
+      white-space: pre;
+      overflow: hidden;
+      pointer-events: none;
+      user-select: none;
+      z-index: 5;
+    }
+
     .editor-shared {
       font-family: 'Roboto Mono', monospace;
       font-variant-ligatures: none;
@@ -240,9 +316,11 @@
       letter-spacing: 0;
       font-size: 14px;
       line-height: 22px;
-      padding: 16px;
+      
+      padding: 16px 16px 16px 56px;
       box-sizing: border-box;
       tab-size: 4;
+
       -moz-tab-size: 4;
       white-space: pre;
       overflow: auto;
@@ -285,6 +363,8 @@
       color: rgba(255,255,255,0.25);
       -webkit-text-fill-color: rgba(255,255,255,0.25);
     }
+
+    .line-error-hl { background: rgba(248, 113, 113, 0.13); display: block; border-left: 2px solid var(--danger-color); margin-left: -2px; }
 
     .tok-comment { color: rgba(148, 163, 184, 0.85); }
     .tok-string  { color: #fbbf24; }
@@ -332,21 +412,27 @@
       <div class="pane-header">
         <div class="header-left-group">
           <span id="lineIndicator" class="pane-header-title">riga: 1</span>
+          <div class="header-divider"></div>
           <button id="openButton" aria-label="Apri File">Apri</button>
           <button id="saveButton" aria-label="Salva File">Salva</button>
+          <div class="header-divider"></div>
           <button id="toggleCanvasButton" aria-label="Mostra/Nascondi Grafica">Grafica</button>
           <button id="runButton" aria-label="Esegui Codice">Esegui</button>
+          <button id="stopButton" aria-label="Ferma Esecuzione" disabled>Stop</button>
+
         </div>
 
-        <button id="getMatitalkButton" aria-label="Scarica Matita IDE">Scarica Matita</button>
-
         <div class="header-right-group">
+          <button id="getMatitalkButton" aria-label="Scarica Matita IDE">Scarica Matita</button>
+          <div class="header-divider"></div>
+          <button id="langToggleButton" aria-label="Cambia Lingua">EN</button>
           <button id="fullscreenButton" aria-label="Schermo Intero">Full Screen</button>
           <button id="helpButton" aria-label="Apri Aiuto">Aiuto</button>
         </div>
       </div>
 
       <div class="editor-container" id="editorContainer">
+        <div id="lineGutter" aria-hidden="true"></div>
         <pre id="highlighting-area" class="editor-shared editor-layer" aria-hidden="true"><code id="highlighting-content" class="editor-content"></code></pre>
         <textarea id="codeInput" class="editor-shared editor-layer" placeholder="Scrivi il tuo codice qui..." aria-label="Editor di codice" spellcheck="false"></textarea>
         <div id="suggestionBox" role="listbox" aria-label="Suggerimenti"></div>
@@ -384,8 +470,19 @@
 "use strict";
 
 function initMatita() {
-  const isLanguageIT = true; // UI language; interpreter accepts BOTH Italian and English keywords.
-  const lang = isLanguageIT ? "it" : "en";
+  let storedLang = localStorage.getItem("matita_lang");
+  let isLanguageIT;
+  
+  if (storedLang !== null) {
+    // Se c'è una preferenza salvata, uso quella:
+    isLanguageIT = storedLang === "it";
+  } else {
+    // Altrimenti, leggo la lingua del browser/dispositivo:
+    let browserLang = navigator.language || navigator.userLanguage || "";
+    isLanguageIT = browserLang.toLowerCase().startsWith("it");
+  }
+  
+  let lang = isLanguageIT ? "it" : "en";
 
   const uiStrings = {
     it: {
@@ -446,8 +543,39 @@ function initMatita() {
       triangleNeedsThreeVertices: (count) => `Il triangolo richiede 3 vertici, ma ne sono stati forniti ${count}.`,
       dimensionNeedsList: "Puoi ottenere la dimensione solo di una lista.",
       tockWithoutTick: "Impossibile usare 'tock': il cronometro non è stato avviato con 'tick'.",
-      programStopped: "Programma fermato."
+      programStopped: "Programma fermato.",
+      expectedKeyword: (name) => `Attesa la parola chiave '${name}'.`,
+      expectedIdent: "Atteso un identificatore (nome variabile/funzione).",
+      expectedExpr: "Attesa un'espressione.",
+      expectedComma: "Attesa ',' tra i vertici.",
+      expectedFrom: "Atteso 'da' (o 'from').",
+      expectedFuncProc: "Atteso 'funzione' o 'procedura'.",
+      expectedXY: "Atteso 'x' o 'y'.",
+      expectedGraphicsScreen: "Atteso 'grafica' o 'schermo'.",
+      expectedAt: "Atteso 'in' (o 'at').",
+      expectedBy: "Atteso 'di' (o 'by').",
+      expectedOf: "Atteso 'di' (o 'of').",
+      expectedGoesFrom: "Atteso 'va da' (o 'goes from').",
+      expectedPressed: "Atteso 'premuto' (o 'pressed').",
+      invalidInfix: "Operatore infisso non valido.",
+      unexpectedEOF: "Fine inattesa del codice.",
+      malformedRemove: "Comando 'rimuovi' (remove) malformato.",
+      expectedVarAfterIn: "Dopo 'in' atteso nome variabile o espressione (alias).",
+      unknownStatement: (val) => `Comando sconosciuto che inizia con '${val}'.`,
+      unexpectedToken: (val) => `Simbolo inatteso '${val}'.`,
+      notAList: (name) => `'${name}' non è una lista.`,
+      invalidIndexVal: (idx) => `Indice non valido: ${idx}`,
+      indexOutOfBounds: (idx) => `Indice fuori dai limiti: ${idx}`,
+      itemNotAList: (idx) => `L'elemento all'indice ${idx} non è una lista.`,
+      invalidAliasDest: "Destinazione non valida per alias o modifica.",
+      aliasLeftVar: "A sinistra di 'alias' serve un nome variabile.",
+      aliasRightVar: "A destra di 'alias' serve una variabile o un elemento di lista.",
+      scientificPositive: "Il valore per 'scientifica' deve essere un numero positivo.",
+      aliasCreateFail: (msg) => `Impossibile creare alias: ${msg}`,  
     },
+
+
+
     en: {
       title: "Matita", run: "Run", open: "Open", save: "Save", graphics: "Graphics", savePng: "Save PNG",
       fullscreen: "Full Screen",
@@ -506,13 +634,42 @@ function initMatita() {
       triangleNeedsThreeVertices: (count) => `Triangle requires 3 vertices, but ${count} were provided.`,
       dimensionNeedsList: "You can only get the dimension of a list.",
       tockWithoutTick: "Cannot use 'tock': stopwatch not started with 'tick'.",
-      programStopped: "Program stopped."
+      programStopped: "Program stopped.",
+      expectedKeyword: (name) => `Expected keyword '${name}'.`,
+      expectedIdent: "Expected an identifier (variable/function name).",
+      expectedExpr: "Expected an expression.",
+      expectedComma: "Expected ',' between vertices.",
+      expectedFrom: "Expected 'from'.",
+      expectedFuncProc: "Expected 'function' or 'procedure'.",
+      expectedXY: "Expected 'x' or 'y'.",
+      expectedGraphicsScreen: "Expected 'graphics' or 'screen'.",
+      expectedAt: "Expected 'at'.",
+      expectedBy: "Expected 'by'.",
+      expectedOf: "Expected 'of'.",
+      expectedGoesFrom: "Expected 'goes from'.",
+      expectedPressed: "Expected 'pressed'.",
+      invalidInfix: "Invalid infix operator.",
+      unexpectedEOF: "Unexpected end of input.",
+      malformedRemove: "Malformed 'remove' statement.",
+      expectedVarAfterIn: "Expected variable name or expression (alias) after 'in'.",
+      unknownStatement: (val) => `Unknown statement starting with '${val}'.`,
+      unexpectedToken: (val) => `Unexpected token '${val}'.`,
+      notAList: (name) => `'${name}' is not a list.`,
+      invalidIndexVal: (idx) => `Invalid index: ${idx}`,
+      indexOutOfBounds: (idx) => `Index out of bounds: ${idx}`,
+      itemNotAList: (idx) => `Item at index ${idx} is not a list.`,
+      invalidAliasDest: "Invalid destination for alias or modification.",
+      aliasLeftVar: "A variable name is required on the left of 'alias'.",
+      aliasRightVar: "A variable or list item is required on the right of 'alias'.",
+      scientificPositive: "The value for 'scientific' must be a positive number.",
+      aliasCreateFail: (msg) => `Cannot create alias: ${msg}`,
     }
   };
 
   const codeInput = document.getElementById("codeInput");
   const outputArea = document.getElementById("outputArea");
   const runButton = document.getElementById("runButton");
+  const stopButton = document.getElementById("stopButton");
   const helpButton = document.getElementById("helpButton");
   const gfxCanvas = document.getElementById("stage");
   const canvasWindow = document.getElementById("canvasWindow");
@@ -543,10 +700,6 @@ function initMatita() {
 
   let gfxCtx = gfxCanvas.getContext("2d", { alpha: true });
 
-  function addGraphicObject(obj) {
-    env.gfxObjects.push(obj);
-    snapPointsCache = null; // Invalida la cache automaticamente
-  }
 
   // Disabilita il menu contestuale del browser (click destro) sul canvas
   gfxCanvas.addEventListener("contextmenu", e => e.preventDefault());
@@ -604,7 +757,7 @@ function initMatita() {
     }
   });
 
-// Listener per input testuale
+  // Listener per input testuale
   orthoAngleInput.addEventListener("input", () => {
     if (isOrthoAngleEnabled && isOrthoEnabled && !isRunning) {
       redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
@@ -623,43 +776,53 @@ function initMatita() {
     if (!isRunning && isOrthoEnabled) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
   });
 
-  function getSnapPoints() {
-    if (snapPointsCache !== null) return snapPointsCache; // usa cache, se esiste
+  function getPointsForObject(obj) {
+    const pts = [];
+    if (!obj || obj.type === "background") return pts;
 
-    const pts = [];
-    for (const obj of env.gfxObjects) {
-      if (!obj || obj.type === "background") continue;
+    if (obj.type === "circle" || obj.type === "circumference") {
+      pts.push({ x: obj.x, y: obj.y });
+    } else if (obj.type === "rectangle") {
+      pts.push(obj.v1, obj.v2, obj.v3, obj.v4);
+      pts.push({ x: (obj.v1.x + obj.v3.x)/2, y: (obj.v1.y + obj.v3.y)/2 });
+    } else if (obj.type === "triangle") {
+      pts.push(obj.v1, obj.v2, obj.v3);
+    } else if (obj.type === "line") {
+      pts.push({ x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 });
+      pts.push({ x: (obj.x1 + obj.x2)/2, y: (obj.y1 + obj.y2)/2 });
+    } else if (obj.type === "arc") {
+      pts.push({ x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 });
+      const dx = obj.x2 - obj.x1, dy = obj.y2 - obj.y1;
+      const d2 = dx*dx + dy*dy;
+      if (d2 > 0 && obj.r >= Math.sqrt(d2)/2) {
+        const d = Math.sqrt(d2);
+        const h = Math.sqrt(obj.r*obj.r - d2/4);
+        const mx = (obj.x1 + obj.x2)/2, my = (obj.y1 + obj.y2)/2;
+        const cx = mx + h*(-dy/d), cy = my + h*(dx/d);
+        pts.push({ x: cx, y: cy });
+      }
+    } else if (obj.type === "text" || obj.type === "image") {
+      pts.push({ x: obj.x + obj.width/2, y: obj.y + obj.height/2 });
+    }
+    return pts;
+  }
 
-      if (obj.type === "circle" || obj.type === "circumference") {
-        pts.push({ x: obj.x, y: obj.y }); // Centro
-      } else if (obj.type === "rectangle") {
-        pts.push(obj.v1, obj.v2, obj.v3, obj.v4); // Vertici
-        pts.push({ x: (obj.v1.x + obj.v3.x)/2, y: (obj.v1.y + obj.v3.y)/2 }); // Centro esatto
-      } else if (obj.type === "triangle") {
-        pts.push(obj.v1, obj.v2, obj.v3); // Vertici
-      } else if (obj.type === "line") {
-        pts.push({ x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 }); // Estremi
-        pts.push({ x: (obj.x1 + obj.x2)/2, y: (obj.y1 + obj.y2)/2 }); // Punto medio
-      } else if (obj.type === "arc") {
-        pts.push({ x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 }); // Estremi
-        // Calcolo del centro dell'arco (stessa logica del disegno)
-        const dx = obj.x2 - obj.x1, dy = obj.y2 - obj.y1;
-        const d2 = dx*dx + dy*dy;
-        if (d2 > 0 && obj.r >= Math.sqrt(d2)/2) {
-          const d = Math.sqrt(d2);
-          const h = Math.sqrt(obj.r*obj.r - d2/4);
-          const mx = (obj.x1 + obj.x2)/2, my = (obj.y1 + obj.y2)/2;
-          const cx = mx + h*(-dy/d), cy = my + h*(dx/d);
-          pts.push({ x: cx, y: cy }); // Centro
-        }
-      } else if (obj.type === "text" || obj.type === "image") {
-        pts.push({ x: obj.x + obj.width/2, y: obj.y + obj.height/2 }); // Centro
-      }
-    }
-    snapPointsCache = pts; // Salva la cache
-    return pts;
-  }
+  function getSnapPoints() {
+    if (snapPointsCache !== null) return snapPointsCache;
+    snapPointsCache = [];
+    for (const obj of env.gfxObjects) {
+      snapPointsCache.push(...getPointsForObject(obj));
+    }
+    return snapPointsCache;
+  }
 
+  function addGraphicObject(obj) {
+    env.gfxObjects.push(obj);
+    // Aggiornamento incrementale della cache invece di distruggerla
+    if (snapPointsCache !== null) {
+      snapPointsCache.push(...getPointsForObject(obj)); 
+    }
+  }
 
 
 
@@ -668,29 +831,155 @@ function initMatita() {
     setupCanvas();
     if (!isRunning) drawReadyScreen(uiStrings[lang].canvasReady);
   }
+  
+  
   function hideCanvasWindow() { canvasWindow.classList.add("hidden"); }
 
-  document.title = uiStrings[lang].title;
-  runButton.textContent = uiStrings[lang].run;
-  openButton.textContent = uiStrings[lang].open;
-  saveButton.textContent = uiStrings[lang].save;
-  getMatitalkButton.textContent = uiStrings[lang].download;
-  helpButton.textContent = uiStrings[lang].help;
-  toggleCanvasButton.textContent = uiStrings[lang].graphics;
-  savePngButton.textContent = uiStrings[lang].savePng;
-  fullscreenButton.textContent = uiStrings[lang].fullscreen;
-  codeInput.setAttribute("placeholder", uiStrings[lang].placeholder);
+  const langToggleButton = document.getElementById("langToggleButton");
+
+  function applyUILanguage() {
+    lang = isLanguageIT ? "it" : "en";
+    document.title = uiStrings[lang].title;
+    
+    // Assegnazione pulita solo testo
+    runButton.textContent = uiStrings[lang].run;
+    openButton.textContent = uiStrings[lang].open;
+    saveButton.textContent = uiStrings[lang].save;
+    toggleCanvasButton.textContent = uiStrings[lang].graphics;
+    
+    getMatitalkButton.textContent = uiStrings[lang].download;
+    helpButton.textContent = uiStrings[lang].help;
+    savePngButton.textContent = uiStrings[lang].savePng;
+    
+    fullscreenButton.textContent = document.fullscreenElement ? uiStrings[lang].exitFullscreen : uiStrings[lang].fullscreen;
+    
+    codeInput.setAttribute("placeholder", uiStrings[lang].placeholder);
+    langToggleButton.textContent = isLanguageIT ? "EN" : "IT";
+    
+    if (typeof updateLineNumber === "function") updateLineNumber();
+  }
+
+
+  const dictEnToIt = {
+    "as long as": "fintanto", "you do": "esegui", "for each": "per ogni", "goes from": "va da", "as background": "come sfondo", "place it": "posiziona",
+    "define": "definisci", "function": "funzione", "procedure": "procedura", "global": "globale", "return": "restituisci", "otherwise": "altrimenti",
+    "index": "indice", "variable": "variabile", "put": "metti", "add": "aggiungi", "remove": "rimuovi", "insert": "inserisci", "first": "primo", "last": "ultimo",
+    "item": "elemento", "dimension": "dimensione", "list": "lista", "output": "scrivi", "newline": "accapo", "wait": "aspetta", "get": "chiedi",
+    "saying": "dicendo", "set": "imposta", "color": "colore", "clear": "cancella", "graphics": "grafica", "frame": "inquadra", "screen": "schermo",
+    "redraw": "ridisegna", "circle": "cerchio", "radius": "raggio", "circumference": "circonferenza", "thickness": "spessore", "rectangle": "rettangolo",
+    "line": "linea", "triangle": "triangolo", "with": "con", "vertices": "vertici", "arc": "arco", "size": "grandezza", "draw": "disegna", "rotate": "ruota",
+    "deg": "gradi", "place": "posiziona", "scale": "scala", "load": "carica", "paint": "dipingi", "background": "sfondo", "key": "tasto", "equals": "uguale",
+    "pressed": "premuto", "import": "importa", "label": "etichetta", "true": "vero", "false": "falso", "squareroot": "radice", "trunc": "tronca", "round": "arrotonda",
+    "min": "minimo", "max": "massimo", "random": "casuale", "point": "punto", "indexof": "indicedi", "decomposition": "scomposizione", "composition": "composizione",
+    "type": "tipo", "numeric": "numerico", "dice": "dado", "scientific": "scientifica",
+    "and": "e", "of": "di", "at": "in", "by": "di", "as": "come", "to": "a", "is": "vale", "if": "se", "then": "allora", "not": "non", "or": "o", "different": "diverso"
+  };
+
+  const dictItToEn = {
+    "fintanto": "as long as", "esegui": "you do", "per ogni": "for each", "va da": "goes from", "come sfondo": "as background",
+    "definisci": "define", "funzione": "function", "procedura": "procedure", "globale": "global", "restituisci": "return", "altrimenti": "otherwise",
+    "indice": "index", "variabile": "variable", "metti": "put", "aggiungi": "add", "rimuovi": "remove", "inserisci": "insert", "primo": "first", "ultimo": "last",
+    "elemento": "item", "dimensione": "dimension", "lista": "list", "scrivi": "output", "accapo": "newline", "aspetta": "wait", "chiedi": "get",
+    "dicendo": "saying", "imposta": "set", "colore": "color", "cancella": "clear", "grafica": "graphics", "inquadra": "frame", "schermo": "screen",
+    "ridisegna": "redraw", "cerchio": "circle", "raggio": "radius", "circonferenza": "circumference", "spessore": "thickness", "rettangolo": "rectangle",
+    "linea": "line", "triangolo": "triangle", "con": "with", "vertici": "vertices", "arco": "arc", "grandezza": "size", "disegna": "draw", "ruota": "rotate",
+    "gradi": "deg", "posiziona": "place", "scala": "scale", "carica": "load", "dipingi": "paint", "sfondo": "background", "tasto": "key", "uguale": "equals",
+    "premuto": "pressed", "importa": "import", "etichetta": "label", "vero": "true", "falso": "false", "radice": "squareroot", "tronca": "trunc", "arrotonda": "round",
+    "minimo": "min", "massimo": "max", "casuale": "random", "punto": "point", "indicedi": "indexof", "scomposizione": "decomposition", "composizione": "composition",
+    "tipo": "type", "numerico": "numeric", "dado": "dice", "scientifica": "scientific", "diverso": "different",
+    "se": "if", "allora": "then", "ed": "and", "e": "and", "di": "of", "in": "in", "come": "as", "a": "to", "vale": "is", "o": "or", "non": "not"
+  };
+
+  function translateEditorCode(toItalian) {
+    const code = codeInput.value;
+    if (!code.trim()) return;
+
+    const dict = toItalian ? dictEnToIt : dictItToEn;
+    // Ordiniamo le chiavi dalla più lunga alla più corta per evitare che parole singole sovrascrivano frasi intere (es. "for each" vs "for")
+    const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
+
+    // Dividiamo il testo isolando le stringhe ("...") e i commenti (#...) in modo da NON tradurli
+    const parts = code.split(/("[^"\\\\]*(?:\\\\.[^"\\\\]*)*"|#.*)/g);
+
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 0) { // Gli indici pari sono il codice reale
+        let text = parts[i];
+        for (const key of keys) {
+          // \\b assicura di tradurre solo parole intere (es. evita che "list" modifichi la variabile "lista_spesa")
+          const regex = new RegExp('\\b' + key + '\\b', 'gi');
+          text = text.replace(regex, (match) => {
+            const translated = dict[key];
+            // Mantiene la lettera maiuscola se l'utente l'ha usata
+            if (match[0] === match[0].toUpperCase()) {
+              return translated.charAt(0).toUpperCase() + translated.slice(1);
+            }
+            return translated;
+          });
+        }
+        parts[i] = text;
+      }
+    }
+
+    // Applichiamo la traduzione
+    codeInput.value = parts.join("");
+    
+    // Aggiorniamo l'evidenziazione e il conteggio righe
+    updateHighlighting(true);
+    if (typeof updateLineNumber === "function") updateLineNumber();
+  }
+
+
+
+  langToggleButton.addEventListener("click", () => {
+    isLanguageIT = !isLanguageIT;
+    localStorage.setItem("matita_lang", isLanguageIT ? "it" : "en");
+    applyUILanguage();
+    updateSuggestionsList();
+    
+    // TRADUZIONE AUTOMATICA DELL'EDITOR
+    translateEditorCode(isLanguageIT);
+  });
 
   const CONSOLE_PROMPT = ":) ";
+
   const editorContainer = document.getElementById("editorContainer");
   const highlightingContent = document.getElementById("highlighting-content");
   const highlightingArea = document.getElementById("highlighting-area");
   const suggestionBox = document.getElementById("suggestionBox");
 
+  const lineGutter = document.getElementById("lineGutter");
+
+  const GUTTER_LINE_HEIGHT = 22; // deve corrispondere a line-height nell'editor-shared
+  const GUTTER_PADDING_TOP = 16; // deve corrispondere a padding-top nell'editor-shared
+
+  function updateLineNumbers() {
+    const scrollTop   = codeInput.scrollTop;
+    const viewHeight  = codeInput.clientHeight;
+    const totalLines  = codeInput.value.split("\n").length;
+
+    // Prima riga parzialmente visibile (indice 0-based)
+    const firstVisible = Math.max(0, Math.floor((scrollTop - GUTTER_PADDING_TOP) / GUTTER_LINE_HEIGHT));
+    // Ultima riga visibile + 2 righe di buffer per evitare buchi durante lo scroll rapido
+    const lastVisible  = Math.min(
+      totalLines - 1,
+      Math.ceil((scrollTop + viewHeight - GUTTER_PADDING_TOP) / GUTTER_LINE_HEIGHT) + 1
+    );
+
+    // Posizione Y in pixel dove deve apparire il numero della prima riga renderizzata
+    const offsetY = GUTTER_PADDING_TOP + firstVisible * GUTTER_LINE_HEIGHT - scrollTop;
+
+    let s = "";
+    for (let i = firstVisible + 1; i <= lastVisible + 1; i++) s += i + "\n";
+
+    lineGutter.textContent = s;
+    lineGutter.style.transform = `translateY(${offsetY}px)`;
+  }
+
+
   const KEYWORDS_EN = [
     "alias", "to", "inout",
     "define","function","procedure","global","return","stop",
-    "if","then","otherwise","as","as long as","you do","for each","index","goes","from","to","and",
+    "if","then","otherwise","as","long","you","do","for","each","index","goes","from","and",
     "put","in","add","remove","insert","first","last","item","of","dimension","list",
     "output","newline","wait","ms","get","saying",
     "set","color","clear","screen","graphics","redraw","frame",
@@ -704,7 +993,7 @@ function initMatita() {
   const KEYWORDS_IT = [
     "alias","a","ed","inout",
     "definisci","funzione","procedura","globale","restituisci","stop",
-    "se","allora","altrimenti","come","fintanto","esegui","per ogni","variabile","indice","va","da","a","e",
+    "se","allora","altrimenti","come","fintanto","esegui","per","ogni","variabile","indice","va","da","e",
     "metti","in","aggiungi","rimuovi","inserisci","primo","ultimo","elemento","di","dimensione","lista",
     "scrivi","accapo","aspetta","ms","chiedi","dicendo",
     "imposta","colore","cancella","schermo","grafica","ridisegna", "inquadra",
@@ -723,6 +1012,10 @@ function initMatita() {
   function escapeHtml(s) {
     return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
+
+  const RE_NUMBER = /^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/;
+  const RE_IDENT = /^[A-Za-z_àèéìòùÀÈÉÌÒÙ][A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]*/;
+  const RE_OP = /^(===|!==|==|!=|<=|>=|<|>|\+|-|\*|\/|%|\^|=|;)/;
 
   function highlightLine(line) {
     let out = "";
@@ -746,10 +1039,11 @@ function initMatita() {
         continue;
       }
 
-      const num = line.slice(i).match(/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+      const num = line.slice(i).match(RE_NUMBER);
       if (num) { out += `<span class="tok-number">${num[0]}</span>`; i += num[0].length; continue; }
 
-      const id = line.slice(i).match(/^[A-Za-z_àèéìòùÀÈÉÌÒÙ][A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]*/);
+      const id = line.slice(i).match(RE_IDENT);
+
       if (id) {
         const raw = id[0];
         const lower = raw.toLowerCase();
@@ -757,7 +1051,7 @@ function initMatita() {
         const isBuiltin = [...BUILTINS_EN, ...BUILTINS_IT].includes(lower);
         let cls;
         if (isBuiltin) cls = "tok-builtin";
-        else if (isKw) cls = (raw === "A") ? "tok-ident" : "tok-keyword";
+        else if (isKw) cls = (raw === "A" || raw === "a") ? "tok-ident" : "tok-keyword";
         else cls = "tok-ident";
         out += `<span class="${cls}">${escapeHtml(raw)}</span>`;
         i += raw.length;
@@ -766,7 +1060,8 @@ function initMatita() {
 
       if ("()[],".includes(ch)) { out += `<span class="tok-punc">${escapeHtml(ch)}</span>`; i++; continue; }
       if ("+-*/%<>=!^;".includes(ch)) {
-        const op = line.slice(i).match(/^(===|!==|==|!=|<=|>=|<|>|\+|-|\*|\/|%|\^|=|;)/);
+        const op = line.slice(i).match(RE_OP);
+        
         const tok = op ? op[0] : ch;
         out += `<span class="tok-op">${escapeHtml(tok)}</span>`;
         i += tok.length;
@@ -780,19 +1075,37 @@ function initMatita() {
   }
 
   let highlightRaf = 0;
+  let lastHighlightedCode = "";
+  let errorLine = -1; // riga in errore (0-based); -1 = nessuna
+
   function syncHighlightScroll() {
     highlightingArea.scrollTop = codeInput.scrollTop;
     highlightingArea.scrollLeft = codeInput.scrollLeft;
+    updateLineNumbers();
   }
-  function updateHighlighting(immediate = false) {
-    const render = () => {
-      highlightRaf = 0;
-      document.body.classList.add("overlay-on");
-      const code = codeInput.value;
-      const safe = code.endsWith("\n") ? (code + " ") : code;
-      highlightingContent.innerHTML = safe.split(/\r?\n/).map(highlightLine).join("\n");
-      syncHighlightScroll();
-    };
+
+  function updateHighlighting(immediate = false) {
+    const render = () => {
+      highlightRaf = 0;
+      const code = codeInput.value;
+      
+      // Evita il ricalcolo se il testo non è cambiato
+      if (code === lastHighlightedCode) {
+        syncHighlightScroll();
+        return;
+      }
+      lastHighlightedCode = code;
+
+      document.body.classList.add("overlay-on");
+      const safe = code.endsWith("\n") ? (code + " ") : code;
+      highlightingContent.innerHTML = safe.split(/\r?\n/).map((line, i) => {
+        const hl = highlightLine(line);
+        return (i === errorLine) ? `<span class="line-error-hl">${hl}</span>` : hl;
+      }).join("\n");
+
+      syncHighlightScroll();
+    };
+
     if (immediate) { if (highlightRaf) cancelAnimationFrame(highlightRaf); render(); return; }
     if (highlightRaf) cancelAnimationFrame(highlightRaf);
     highlightRaf = requestAnimationFrame(render);
@@ -836,6 +1149,7 @@ function initMatita() {
         { label: "graffiti grandezza N in (x,y) \"TESTO\"", insert: "graffiti grandezza GRANDEZZA in (X, Y) \"TESTO\"\n", detail: "Testo in area grafica" },
         { label: "etichetta ( ... ) come NOME", insert: "etichetta (\n    \n) come NOME\n", detail: "Definisce un oggetto grafico" },
         { label: "importa \"file\" come NOME", insert: "importa \"file\" come NOME\n", detail: "Importa immagine come oggetto" },
+        { label: "importa(\"libreria.txt\")", insert: "importa(\"libreria.txt\")\n", detail: "Includi codice da file di testo" },
         { label: "disegna OGGETTO in (x,y)", insert: "disegna OGGETTO in (X, Y)\n", detail: "Disegna oggetto importato/etichettato" },
         { label: "ruota OGGETTO di gradi e posiziona in (x,y)", insert: "ruota OGGETTO di ANGOLO gradi e posiziona in (X, Y)\n", detail: "Trasformazione" },
         { label: "scala OGGETTO di fattore", insert: "scala OGGETTO di FATTORE\n", detail: "Scala" },
@@ -902,6 +1216,7 @@ function initMatita() {
     // Graphics - Objects & Transforms
     { label: "label ( ... ) as NAME", insert: "label (\n    \n) as NAME\n", detail: "Define graphical object" },
     { label: "import \"file\" as NAME", insert: "import \"file\" as NAME\n", detail: "Import image as object" },
+    { label: "import(\"library.txt\")", insert: "import(\"library.txt\")\n", detail: "Include code from text file" },
     { label: "draw OBJECT at (x,y)", insert: "draw OBJECT at (X, Y)\n", detail: "Draw imported/labeled object" },
     { label: "rotate OBJECT of angle deg and place it at (x,y)", insert: "rotate OBJECT of ANGLE deg and place it at (X, Y)\n", detail: "Transform" },
     { label: "scale OBJECT by factor", insert: "scale OBJECT by FACTOR\n", detail: "Scale object" },
@@ -918,19 +1233,26 @@ function initMatita() {
   ];
 }
 
-  const RAW_SUGGESTIONS = buildSuggestions();
   function getSuggestionCmd(s) {
     const src = String(s.insert || s.label || "").trim();
     return (src.split(/\s+/)[0] || "").toLowerCase();
   }
-  const _collator = new Intl.Collator(isLanguageIT ? "it" : "en", { sensitivity: "base", numeric: true });
-  const SUGGESTIONS = RAW_SUGGESTIONS
-    .map(s => Object.assign({}, s, { cmd: getSuggestionCmd(s), labelLower: String(s.label || "").toLowerCase() }))
-    .sort((a,b) => {
-      const c = _collator.compare(a.cmd, b.cmd);
-      if (c !== 0) return c;
-      return _collator.compare(String(a.label||""), String(b.label||""));
-    });
+
+  let RAW_SUGGESTIONS = [];
+  let SUGGESTIONS = [];
+  let _collator;
+
+  function updateSuggestionsList() {
+    RAW_SUGGESTIONS = buildSuggestions();
+    _collator = new Intl.Collator(isLanguageIT ? "it" : "en", { sensitivity: "base", numeric: true });
+    SUGGESTIONS = RAW_SUGGESTIONS
+      .map(s => Object.assign({}, s, { cmd: getSuggestionCmd(s), labelLower: String(s.label || "").toLowerCase() }))
+      .sort((a,b) => {
+        const c = _collator.compare(a.cmd, b.cmd);
+        if (c !== 0) return c;
+        return _collator.compare(String(a.label||""), String(b.label||""));
+      });
+  }
 
   let activeSuggestions = [];
   let selectedSuggestionIndex = 0;
@@ -960,18 +1282,26 @@ function initMatita() {
   caretMirror.style.zIndex = "-1";
   editorContainer.appendChild(caretMirror);
 
+  let _caretStylesReady = false;
   function copyTextAreaStyles() {
+    if (_caretStylesReady) return;
+    _caretStylesReady = true;
     const cs = window.getComputedStyle(codeInput);
-    const props = ["fontFamily","fontSize","fontWeight","fontStyle","letterSpacing","textTransform",
-      "paddingTop","paddingRight","paddingBottom","paddingLeft","borderTopWidth","borderRightWidth","borderBottomWidth","borderLeftWidth",
-      "lineHeight","tabSize","width","height"
-    ];
-    props.forEach(p => { caretMirror.style[p] = cs[p]; });
+    // Proprietà statiche: si leggono una sola volta (non cambiano col resize)
+    ["fontFamily","fontSize","fontWeight","fontStyle","letterSpacing","textTransform",
+     "paddingTop","paddingRight","paddingBottom","paddingLeft",
+     "borderTopWidth","borderRightWidth","borderBottomWidth","borderLeftWidth",
+     "lineHeight","tabSize"
+    ].forEach(p => { caretMirror.style[p] = cs[p]; });
     caretMirror.style.boxSizing = "border-box";
   }
 
   function getCaretCoords() {
     copyTextAreaStyles();
+    // width/height si aggiornano ad ogni chiamata: dipendono dal resize della finestra
+    const _cs = window.getComputedStyle(codeInput);
+    caretMirror.style.width = _cs.width;
+    caretMirror.style.height = _cs.height;
     const value = codeInput.value;
     const pos = codeInput.selectionStart || 0;
     const before = value.substring(0, pos);
@@ -1106,11 +1436,11 @@ function initMatita() {
   const isWordCharLocal = (ch) => /[A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]/.test(ch);
 
   const add = (name, type, score) => {
-    if (!name) return;
-    const lower = String(name).toLowerCase();
+      if (!name) return;
+      const lower = String(name).toLowerCase();
 
-    // evita cose non plausibili
-    if (ALL_KEYWORDS.has(lower)) return;
+      // evita cose non plausibili (ma faccio un'eccezione per "a" / "A" usata come variabile):
+      if (ALL_KEYWORDS.has(lower) && lower !== "a") return;
 
     // evita echi, ossia di suggerire token ancora in scrittura
     if (endsWithToken && lastRealTok.type === "IDENT" && lower === String(lastRealTok.value).toLowerCase()) return;
@@ -1698,13 +2028,20 @@ function initMatita() {
   function fail(key, params, lineNumber) {
     let msg = uiStrings[lang][key] || key;
     if (typeof msg === "function") msg = msg(params);
+    errorLine = lineNumber;
+    lastHighlightedCode = ""; // forza re-render con la riga evidenziata
     appendLine(`${uiStrings[lang].errorPrefix} ${lineNumber + 1}: ${msg}`, true);
+    updateHighlighting(true);
     throw new Error("Execution stopped.");
   }
 
   // --- Deep copy (value semantics) ---
   function deepCopyValue(v) {
-    if (v === null || typeof v !== "object") return v;
+    if (v === null) return v;
+    const _t = typeof v;
+    if (_t === "number" || _t === "string" || _t === "boolean") return v;
+    if (_t !== "object") return v;
+
     if (Array.isArray(v)) {
       const copy = v.map(deepCopyValue);
       copy.__id = Math.random();
@@ -1712,6 +2049,28 @@ function initMatita() {
     }
     if (isPoint(v)) return { __type: "point", x: v.x, y: v.y, __id: Math.random() };
     try { return JSON.parse(JSON.stringify(v)); } catch { return v; }
+  }
+
+  // --- Copy-on-Write (CoW) Helpers ---
+  function markShared(arr) {
+    if (Array.isArray(arr)) {
+      arr.__shared = true;
+      for (let i = 0; i < arr.length; i++) {
+        if (Array.isArray(arr[i])) markShared(arr[i]);
+      }
+    }
+    return arr;
+  }
+
+  function ensureWritable(arr) {
+    if (!Array.isArray(arr)) return arr;
+    if (arr.__shared) {
+      const copy = arr.map(v => Array.isArray(v) ? ensureWritable(v) : (isPoint(v) ? deepCopyValue(v) : v));
+      copy.__shared = false;
+      copy.__id = Math.random();
+      return copy;
+    }
+    return arr;
   }
 
   // --- Canvas grafico ---
@@ -1816,7 +2175,7 @@ function initMatita() {
     currentTransform.scale = camera.scale;
   }
 
-  function drawObject(obj) {
+  function drawObject(obj) {
     if (!obj || !obj.type) return;
     gfxCtx.save();
     switch (obj.type) {
@@ -2055,15 +2414,26 @@ function initMatita() {
   }
 }
 
+  let lastCanvasW = 0, lastCanvasH = 0;
   function setupCanvas() {
     gfxDpr = window.devicePixelRatio || 1;
-    const dpr=gfxDpr;
-    const rect=gfxCanvas.getBoundingClientRect();
-    if (rect.width<=0 || rect.height<=0) return;
-    gfxCanvas.width=Math.floor(rect.width*dpr);
-    gfxCanvas.height=Math.floor(rect.height*dpr);
-    gfxCtx=gfxCanvas.getContext("2d",{alpha:true});
-    gfxCtx.setTransform(dpr,0,0,-dpr, gfxCanvas.width/2, gfxCanvas.height/2);
+    const dpr = gfxDpr;
+    const rect = gfxCanvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+    
+    const newW = Math.floor(rect.width * dpr);
+    const newH = Math.floor(rect.height * dpr);
+    
+    // Evita di resettare il canvas se le dimensioni non sono cambiate
+    if (newW === lastCanvasW && newH === lastCanvasH) return;
+    
+    gfxCanvas.width = newW;
+    gfxCanvas.height = newH;
+    lastCanvasW = newW;
+    lastCanvasH = newH;
+    
+    gfxCtx = gfxCanvas.getContext("2d", { alpha: true });
+    gfxCtx.setTransform(dpr, 0, 0, -dpr, gfxCanvas.width / 2, gfxCanvas.height / 2);
   }
 
   function drawReadyScreen(message) {
@@ -2348,7 +2718,7 @@ function initMatita() {
     matchKW(name){ return this.matchPhrase(KW[name]); }
     expectKW(name, lineForErr){
       const t=this.matchKW(name);
-      if (!t) this.throwParse(`Expected keyword '${name}'.`, (lineForErr ?? this.peek().line));
+      if (!t) this.throwParse(uiStrings[lang].expectedKeyword(name), (lineForErr ?? this.peek().line));
       return t;
     }
 
@@ -2387,7 +2757,7 @@ function initMatita() {
 
     parseIdentifier() {
       const t=this.matchType("IDENT");
-      if (!t) this.throwParse("Expected identifier.", this.peek().line);
+      if (!t) this.throwParse(uiStrings[lang].expectedIdent, this.peek().line);
       return t;
     }
 
@@ -2448,7 +2818,7 @@ function initMatita() {
 
     parsePrefix(stopSet) {
       const tok=this.peek();
-      if (this.isStopToken(stopSet, tok)) this.throwParse("Expected expression.", tok.line);
+      if (this.isStopToken(stopSet, tok)) this.throwParse(uiStrings[lang].expectedExpr, tok.line);
 
       // unary minus
       if (tok.type==="OP" && tok.value==="-" ) {
@@ -2529,7 +2899,7 @@ function initMatita() {
         const keyExpr=this.parseExpression(0, new Set(["is","viene","pressed","premuto","vale","uguale"]));
         // optional: 'is/viene/vale/uguale'
         this.matchPhrase([["is"],["viene"],["vale"],["uguale"]]);
-        if (!this.matchPhrase([["pressed"],["premuto"]])) this.throwParse("Expected 'pressed'.", tok.line);
+        if (!this.matchPhrase([["pressed"],["premuto"]])) this.throwParse(uiStrings[lang].expectedPressed, tok.line);
         return { type:"KeyPressed", keyExpr, line: tok.line };
       }
 
@@ -2563,10 +2933,10 @@ function initMatita() {
           return { type:"Call", name, args, line: id.line };
         }
 
-        return { type:"Var", name, nameLower, line: id.line };
+        return { type:"Var", name, nameLower, nameUpper: name.toUpperCase(), line: id.line };
       }
 
-      this.throwParse(`Unexpected token '${tok.value}'.`, tok.line);
+      this.throwParse(uiStrings[lang].unexpectedToken(tok.value), tok.line);
     }
 
     parseInfix(left, opPrec, stopSet) {
@@ -2633,14 +3003,14 @@ function initMatita() {
       
       }
 
-      this.throwParse("Invalid infix operator.", tok.line);
+      this.throwParse(uiStrings[lang].invalidInfix, tok.line);
     }
 
     // --- Statement parsing ---
     parseStatement() {
       this.skipSeparators();
       const t=this.peek();
-      if (t.type==="EOF") this.throwParse("Unexpected end of input.", t.line);
+      if (t.type==="EOF") this.throwParse(uiStrings[lang].unexpectedEOF, t.line);
 
       // global
       if (this.matchKW("GLOBAL")) {
@@ -2656,7 +3026,7 @@ function initMatita() {
       // define function/procedure
       if (this.matchKW("DEFINE")) {
         const kindTok = this.matchKW("FUNCTION") || this.matchKW("PROCEDURE");
-        if (!kindTok) this.throwParse("Expected 'function' or 'procedure'.", t.line);
+        if (!kindTok) this.throwParse(uiStrings[lang].expectedFuncProc, t.line);
         const kind = (kindTok.value.toLowerCase()==="function" || kindTok.value.toLowerCase()==="funzione") ? "function" : "procedure";
         const nameTok=this.parseIdentifier();
 
@@ -2693,7 +3063,7 @@ function initMatita() {
       if (this.matchKW("CLEAR")) {
         if (this.matchKW("GRAPHICS")) return { type:"ClearGraphics", line: t.line };
         if (this.matchKW("SCREEN")) return { type:"ClearScreen", line: t.line };
-        this.throwParse("Expected 'graphics' or 'screen'.", t.line);
+        this.throwParse(uiStrings[lang].expectedGraphicsScreen, t.line);
       }
 
       // tick / redraw
@@ -2731,12 +3101,12 @@ function initMatita() {
       }
 
       // get/chiedi VAR saying/dicendo <expr>
-      if (this.matchKW("GET")) {
-        const varTok=this.parseIdentifier();
-        this.expectKW("SAYING", t.line);
-        const promptExpr=this.parseExpression(0, null);
-        return { type:"Get", varName: varTok.value, promptExpr, line: t.line };
-      }
+      if (this.matchKW("GET")) {
+        const varTok=this.parseIdentifier();
+        this.expectKW("SAYING", t.line);
+        const promptExpr=this.parseExpression(0, null);
+        return { type:"Get", varName: varTok.value, varNameUpper: varTok.value.toUpperCase(), promptExpr, line: t.line };
+      }
 
       // set/imposta ...
       if (this.matchKW("SET")) {
@@ -2748,7 +3118,7 @@ function initMatita() {
         // set x|y of <expr> to <expr>
         const propTok=this.parseIdentifier();
         const prop=propTok.value.toLowerCase();
-        if (!(prop==="x"||prop==="y")) this.throwParse("Expected 'x' or 'y'.", propTok.line);
+        if (!(prop==="x"||prop==="y")) this.throwParse(uiStrings[lang].expectedXY, propTok.line);
         this.expectKW("OF", t.line);
         const targetExpr=this.parseExpression(0, new Set(["to","a"]));
         this.expectKW("TO", t.line);
@@ -2801,7 +3171,7 @@ function initMatita() {
       // rectangle from P1 to P2
       if (this.matchKW("RECTANGLE")) {
         const fromTok=this.matchPhrase([["from"],["da"]]);
-        if (!fromTok) this.throwParse("Expected 'from/da'.", t.line);
+        if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
         const p1=this.parseExpression(0, new Set(["to","a"]));
         this.expectKW("TO", t.line);
         const p2=this.parseExpression(0, null);
@@ -2813,7 +3183,7 @@ function initMatita() {
         this.expectKW("THICKNESS", t.line);
         const th=this.parseExpression(0, new Set(["from","da"]));
         const fromTok=this.matchPhrase([["from"],["da"]]);
-        if (!fromTok) this.throwParse("Expected 'from/da'.", t.line);
+        if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
         const p1=this.parseExpression(0, new Set(["to","a"]));
         this.expectKW("TO", t.line);
         const p2=this.parseExpression(0, null);
@@ -2827,11 +3197,11 @@ function initMatita() {
         // Legge il primo vertice
         const p1 = this.parseExpression(0, null);
         // Si aspetta una virgola
-        if (!this.matchType("COMMA")) this.throwParse("Attesa ',' tra i vertici.", t.line);
+        if (!this.matchType("COMMA")) this.throwParse(uiStrings[lang].expectedComma, t.line);
         // Legge il secondo vertice
         const p2 = this.parseExpression(0, null);
         // Si aspetta una virgola
-        if (!this.matchType("COMMA")) this.throwParse("Attesa ',' tra i vertici.", t.line);
+        if (!this.matchType("COMMA")) this.throwParse(uiStrings[lang].expectedComma, t.line);
         // Legge il terzo vertice
         const p3 = this.parseExpression(0, null);
         
@@ -2845,7 +3215,7 @@ function initMatita() {
         this.expectKW("THICKNESS", t.line);
         const th=this.parseExpression(0, new Set(["from","da"]));
         const fromTok=this.matchPhrase([["from"],["da"]]);
-        if (!fromTok) this.throwParse("Expected 'from/da'.", t.line);
+        if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
         const p1=this.parseExpression(0, new Set(["to","a"]));
         this.expectKW("TO", t.line);
         const p2=this.parseExpression(0, null);
@@ -2876,12 +3246,19 @@ function initMatita() {
         return { type:"Label", name:nameTok.value, body, line: t.line };
       }
 
-      // import <expr> as NAME
+      // import/importa <expr> [as/come NAME]
       if (this.matchKW("IMPORT")) {
-        const fileExpr=this.parseExpression(0, new Set(["as","come"]));
-        this.expectKW("AS", t.line);
-        const nameTok=this.parseIdentifier();
-        return { type:"Import", name:nameTok.value, fileExpr, line: t.line };
+        const fileExpr = this.parseExpression(0, new Set(["as","come"]));
+        
+        // Se c'è "come" / "as", è un'immagine
+        if (this.matchKW("AS")) {
+          const nameTok = this.parseIdentifier();
+          return { type:"Import", name:nameTok.value, fileExpr, line: t.line };
+        } 
+        // Se non c'è, è un'inclusione di file (libreria)
+        else {
+          return { type:"Include", fileExpr, line: t.line };
+        }
       }
 
       // draw NAME at POS
@@ -2896,7 +3273,7 @@ function initMatita() {
       if (this.matchKW("ROTATE")) {
         const nameTok=this.parseIdentifier();
         // "of/di"
-        this.matchPhrase([["of"],["di"]]) || this.throwParse("Expected 'of/di'.", t.line);
+        this.matchPhrase([["of"],["di"]]) || this.throwParse(uiStrings[lang].expectedOf, t.line);
         const angleExpr=this.parseExpression(0, new Set(["deg","gradi"]));
         this.expectKW("DEG", t.line);
         this.expectKW("AND", t.line);
@@ -2911,7 +3288,7 @@ function initMatita() {
       // scale NAME by FACTOR
       if (this.matchKW("SCALE")) {
         const nameTok=this.parseIdentifier();
-        this.matchPhrase([["by"],["di"]]) || this.throwParse("Expected 'by/di'.", t.line);
+        this.matchPhrase([["by"],["di"]]) || this.throwParse(uiStrings[lang].expectedBy, t.line);
         const factorExpr=this.parseExpression(0, null);
         return { type:"Scale", name:nameTok.value, factorExpr, line: t.line };
       }
@@ -2944,69 +3321,73 @@ function initMatita() {
         } else {
 
           let varName = null;
+          let varNameUpper = null; // <-- AGGIUNTA DICHIARAZIONE QUI
           let aliasExpr = null;
 
           if (this.peek().type === "LPAREN") {
-             const expr = this.parseExpression(0, null); 
-             if (expr.type === "Binary" && expr.op === "alias") {
-                 aliasExpr = expr;
-                 varName = expr.left.name; // Il nome su cui scrivere è quello a sinistra (B)
-             } else {
-                 this.throwParse("Dopo 'in' atteso nome variabile o espressione (alias).", t.line);
-             }
+              const expr = this.parseExpression(0, null); 
+              if (expr.type === "Binary" && expr.op === "alias") {
+                  aliasExpr = expr;
+                  varName = expr.left.name; 
+                  varNameUpper = varName.toUpperCase();
+              } else {
+                  this.throwParse(uiStrings[lang].expectedVarAfterIn, t.line);
+              }
+
           } else {
-             const varTok = this.parseIdentifier();
-             varName = varTok.value;
+              const varTok = this.parseIdentifier();
+              
+              varName = varTok.value;
+              varNameUpper = varName.toUpperCase();
           }
           
-          return { type:"PutVar", rhs, varName, aliasExpr, line: t.line };
+          return { type:"PutVar", rhs, varName, varNameUpper, aliasExpr, line: t.line };
         }
       }
 
       // add <expr> to/a LISTVAR
-      if (this.matchKW("ADD")) {
-        const valueExpr=this.parseExpression(0, new Set(["to","a"]));
-        this.expectKW("TO", t.line);
-        const listTok=this.parseIdentifier();
-        return { type:"Add", valueExpr, listName:listTok.value, line: t.line };
-      }
+      if (this.matchKW("ADD")) {
+        const valueExpr=this.parseExpression(0, new Set(["to","a"]));
+        this.expectKW("TO", t.line);
+        const listTok=this.parseIdentifier();
+        return { type:"Add", valueExpr, listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
+      }
 
       // remove ...
-      if (this.matchKW("REMOVE")) {
-        // remove first/last item from LIST
-        if (this.matchKW("FIRST")) {
-          this.expectKW("ITEM", t.line);
-          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
-          const listTok=this.parseIdentifier();
-          return { type:"RemoveFirst", listName:listTok.value, line: t.line };
-        }
-        if (this.matchKW("LAST")) {
-          this.expectKW("ITEM", t.line);
-          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
-          const listTok=this.parseIdentifier();
-          return { type:"RemoveLast", listName:listTok.value, line: t.line };
-        }
-        // remove item <idx> from LIST  (English)  / rimuovi elemento <idx> da LISTA (IT)
-        if (this.matchKW("ITEM")) {
-          const idx=this.parseExpression(0, new Set(["from","da"]));
-          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
-          const listTok=this.parseIdentifier();
-          return { type:"RemoveAt", idx, listName:listTok.value, line: t.line };
-        }
-        this.throwParse("Malformed remove statement.", t.line);
-      }
+      if (this.matchKW("REMOVE")) {
+        // remove first/last item from LIST
+        if (this.matchKW("FIRST")) {
+          this.expectKW("ITEM", t.line);
+          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          const listTok=this.parseIdentifier();
+          return { type:"RemoveFirst", listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
+        }
+        if (this.matchKW("LAST")) {
+          this.expectKW("ITEM", t.line);
+          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          const listTok=this.parseIdentifier();
+          return { type:"RemoveLast", listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
+        }
+        // remove item <idx> from LIST  (English)  / rimuovi elemento <idx> da LISTA (IT)
+        if (this.matchKW("ITEM")) {
+          const idx=this.parseExpression(0, new Set(["from","da"]));
+          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          const listTok=this.parseIdentifier();
+          return { type:"RemoveAt", idx, listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
+        }
+        this.throwParse(uiStrings[lang].malformedRemove, t.line);
+      }
 
       // insert <val> at/in item <idx> of/di LIST
-      if (this.matchKW("INSERT")) {
-        const valueExpr=this.parseExpression(0, new Set(["at","in","a"]));
-        // accept "at" (EN) or "in" (IT)
-        if (!this.matchPhrase([["at"],["in"]])) this.throwParse("Expected 'at/in'.", t.line);
-        this.expectKW("ITEM", t.line);
-        const idx=this.parseExpression(0, new Set(["of","di"]));
-        this.expectKW("OF", t.line);
-        const listTok=this.parseIdentifier();
-        return { type:"Insert", valueExpr, idx, listName:listTok.value, line: t.line };
-      }
+      if (this.matchKW("INSERT")) {
+        const valueExpr=this.parseExpression(0, new Set(["at","in","a"]));
+        if (!this.matchPhrase([["at"],["in"]])) this.throwParse(uiStrings[lang].expectedAt, t.line);
+        this.expectKW("ITEM", t.line);
+        const idx=this.parseExpression(0, new Set(["of","di"]));
+        this.expectKW("OF", t.line);
+        const listTok=this.parseIdentifier();
+        return { type:"Insert", valueExpr, idx, listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
+      }
 
       // control: if
       if (this.matchKW("IF")) {
@@ -3082,7 +3463,7 @@ function initMatita() {
         if (tokVar) {
           const varTok=this.parseIdentifier();
           const tokGF=this.matchKW("GOES_FROM");
-          if (!tokGF) this.throwParse("Expected 'goes from' / 'va da'.", tokVar.line);
+          if (!tokGF) this.throwParse(uiStrings[lang].expectedGoesFrom, tokVar.line);
           const startExpr=this.parseExpression(0, new Set(["to","a"]));
           this.expectKW("TO", tokVar.line);
           const endExpr=this.parseExpression(0, new Set(["and","e","ed","you","esegui"]));
@@ -3121,7 +3502,7 @@ function initMatita() {
         return { type:"ProcCall", name: nameTok.value, args, line: nameTok.line };
       }
 
-      this.throwParse(`Unknown statement starting with '${t.value}'.`, t.line);
+      this.throwParse(uiStrings[lang].unknownStatement(t.value), t.line);
     }
   }
 
@@ -3134,8 +3515,8 @@ function initMatita() {
     return false;
   }
 
-  function resolveVariable(scopeChain, name) {
-    const upper=name.toUpperCase();
+  function resolveVariable(scopeChain, name, precalculatedUpper = null) {
+    const upper = precalculatedUpper || name.toUpperCase(); // Usa il pre-calcolato, se c'è
     if (isDeclaredGlobal(scopeChain, name)) {
       if (upper in scopeChain[0]) {
         const entry=scopeChain[0][upper];
@@ -3154,8 +3535,8 @@ function initMatita() {
     return null;
   }
 
-  function lookupVariable(scopeChain, name) {
-    const res=resolveVariable(scopeChain, name);
+  function lookupVariable(scopeChain, name, precalculatedUpper = null) {
+    const res = resolveVariable(scopeChain, name, precalculatedUpper);
     if (!res) return undefined;
     if (res.__isAlias) return lookupVariable([res.targetScope], res.targetName);
     // Se la variabile contiene il flag __isHardRef, restituisce l'oggetto puntato
@@ -3165,30 +3546,31 @@ function initMatita() {
     return res.value;
   }
 
-  function assignVariable(scopeChain, name, value) {
-    const upper=name.toUpperCase();
-
+  function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
+    const upper = precalculatedUpper || name.toUpperCase();
     env.varOriginalNames = env.varOriginalNames || {};
     env.varOriginalNames[upper] = name;
 
-    const res=resolveVariable(scopeChain, name);
+    const res = resolveVariable(scopeChain, name, upper); 
+
+    // CoW: Marca come condiviso invece di copiare profondamente tutto
+    let storedValue = value;
+    if (Array.isArray(value)) storedValue = markShared(value);
+    else if (isPoint(value)) storedValue = deepCopyValue(value);
 
     if (res && res.__isAlias) {
-      assignVariable([res.targetScope], res.targetName, deepCopyValue(value));
+      assignVariable([res.targetScope], res.targetName, storedValue);
       return;
     }
 
-    if (res) { res.scope[res.name] = deepCopyValue(value); return; }
+    if (res) { res.scope[res.name] = storedValue; return; }
 
-    // New binding
     const upperName = upper;
     if (isDeclaredGlobal(scopeChain, name)) {
-      // Create/update in global scope
-      scopeChain[0][upperName] = deepCopyValue(value);
+      scopeChain[0][upperName] = storedValue;
       return;
     }
 
-    // Shadowing warning (local hides global)
     if ((upperName in scopeChain[0]) && scopeChain.length > 1) {
       env.__shadowWarnings ||= new Set();
       if (!env.__shadowWarnings.has(upperName)) {
@@ -3197,8 +3579,7 @@ function initMatita() {
       }
     }
 
-    // Create in current local scope
-    scopeChain[scopeChain.length - 1][upperName] = deepCopyValue(value);
+    scopeChain[scopeChain.length - 1][upperName] = storedValue;
   }
 
   function ensureNumber(v, key, line) {
@@ -3247,7 +3628,12 @@ function initMatita() {
     setTimeout(() => URL.revokeObjectURL(a.href), 2500);
   }
 
-  function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
+  function sleep(ms) {
+    return new Promise(res => {
+      env.__sleepResolve = res;
+      setTimeout(res, ms);
+    });
+  }
 
   async function loadImageFromUrl(url, line) {
     return new Promise((resolve, reject) => {
@@ -3277,7 +3663,7 @@ function initMatita() {
   };
 
   const MAX_CALL_DEPTH = 200;
-  const MAX_LOOP_ITERS = 1e6;
+  const MAX_LOOP_MS = 15000; // 15 secondi: durata massima accettabile per un loop
 
   // --- Builtins ---
   function builtin_point(args, line) {
@@ -3528,12 +3914,12 @@ function initMatita() {
   const BUILTINS = Object.create(null);
   function regBuiltin(names, fn) { names.forEach(n => { BUILTINS[n] = fn; }); }
 
-  regBuiltin(["abs"], (a)=>Math.abs(a[0] ?? 0));
-  regBuiltin(["sin"], (a)=>Math.sin(a[0] ?? 0));
-  regBuiltin(["cos"], (a)=>Math.cos(a[0] ?? 0));
+  regBuiltin(["abs", "assoluto"], (a)=>Math.abs(a[0] ?? 0));
+  regBuiltin(["sin", "seno"], (a)=>Math.sin(a[0] ?? 0));
+  regBuiltin(["cos", "coseno"], (a)=>Math.cos(a[0] ?? 0));  
   regBuiltin(["trunc","tronca"], (a)=>Math.trunc(a[0] ?? 0));
   regBuiltin(["round","arrotonda"], (a)=>Math.round(a[0] ?? 0));
-  regBuiltin(["ceil"], (a)=>Math.ceil(a[0] ?? 0));
+  regBuiltin(["ceil", "intero_superiore"], (a)=>Math.ceil(a[0] ?? 0));
   regBuiltin(["squareroot","radice"], (a)=>Math.sqrt(a[0] ?? 0));
   regBuiltin(["min","minimo"], (a)=>Math.min(...a.map(x => (typeof x==="number"?x:NaN))));
   regBuiltin(["max","massimo"], (a)=>Math.max(...a.map(x => (typeof x==="number"?x:NaN))));
@@ -3545,7 +3931,7 @@ function initMatita() {
   regBuiltin(["valmax"], (a) => builtin_valmax(a));
   regBuiltin(["argmin"], (a) => builtin_argmin(a));
   regBuiltin(["argmax"], (a) => builtin_argmax(a));
-  regBuiltin(["split"], (a)=>builtin_split(a));
+regBuiltin(["split", "dividi"], (a)=>builtin_split(a));
   regBuiltin(["decomposition","scomposizione","scomponi"], (a)=>builtin_decomposition(a));
   regBuiltin(["composition","composizione"], (a)=>builtin_composition(a));
   regBuiltin(["type", "tipo"], (a) => builtin_type(a));
@@ -3554,6 +3940,9 @@ function initMatita() {
   regBuiltin(["unicode"], (a)=>builtin_unicode(a));
   regBuiltin(["tock"], (a,line)=>builtin_tock(a,line));
 
+
+  
+  
   // --- Expression evaluator ---
   async function evalExpr(node, scopeChain) {
     switch (node.type) {
@@ -3561,12 +3950,11 @@ function initMatita() {
 
       case "Var": {
         // Se il nome della "variabile" è tock, restituisco il tempo trascorso da tick
-        // invece di cercare una variabile nello scope.
         if (node.nameLower === "tock") {
           return builtin_tock([], node.line);
         }
 
-        const v = lookupVariable(scopeChain, node.name);
+        const v = lookupVariable(scopeChain, node.name, node.nameUpper); // Usa nameUpper
         if (v === undefined) fail("variableNotFound", node.name, node.line);
         return v;
       }
@@ -3588,9 +3976,9 @@ function initMatita() {
       case "Binary": {
         
         if (node.op === "alias") {
-          if (node.left.type !== "Var") fail("genericFail", {msg:"A sinistra di 'alias' serve un nome variabile."}, node.line);
+          if (node.left.type !== "Var") fail("aliasLeftVar", null, node.line);
           if (node.right.type !== "Var" && node.right.type !== "ItemOf") {
-            fail("genericFail", {msg:"A destra di 'alias' serve una variabile o un elemento di lista."}, node.line);
+            fail("aliasRightVar", null, node.line);
           }
 
           const aliasName = node.left.name.toUpperCase();
@@ -3630,15 +4018,12 @@ function initMatita() {
         const r = await evalExpr(node.right, scopeChain);
 
         switch (node.op) {
-
           case "+": {
             if (typeof l === "string" || typeof r === "string") {
-              // Usa formatForOutput per rispettare env.precision e formattare oggetti/liste
               return formatForOutput(l, env.precision) + formatForOutput(r, env.precision);
             }
             return Number(l) + Number(r);
           }
-
           case "-": return Number(l) - Number(r);
           case "*": return Number(l) * Number(r);
           case "/": return Number(l) / Number(r);
@@ -3667,7 +4052,6 @@ function initMatita() {
         const def = env.functions[node.name.toUpperCase()];
         if (!def) fail("unknownFunction", node.name, node.line);
         
-        // Aggiungo 'node.args' come terzo parametro
         return await callUserRoutine(def, args, node.args, scopeChain, true, node.line);
       }
 
@@ -3745,41 +4129,47 @@ function initMatita() {
     return { scope: res.scope, name: res.name };
   }
 
-  async function resolveMutableList(node, scopeChain) {
-      // CASO 1: Variabile Semplice (es. "Stime")
+async function resolveMutableList(node, scopeChain) {
       if (node.type === "Var") {
-          const v = lookupVariable(scopeChain, node.name);
-          // Se è un alias diretto a un'altra lista, lookupVariable lo risolve già
-          if (!Array.isArray(v)) throw new Error(`'${node.name}' non è una lista.`);
-          return v; // Ritorna l'array originale
-      }
-
-      // CASO 2: Elemento di Lista (es. "elemento P di Registro")
-      if (node.type === "ItemOf") {
-          // 1. Ottieni ricorsivamente la lista genitore (per riferimento)
-          const parentList = await resolveMutableList(node.list, scopeChain);
+          const res = resolveVariable(scopeChain, node.name);
+          if (!res) throw new Error(uiStrings[lang].variableNotFound(node.name));
           
-          // 2. Calcola l'indice
+          let target = res.__isAlias ? resolveVariable([res.targetScope], res.targetName) : res;
+          let v = target.value;
+          
+          if (!Array.isArray(v)) throw new Error(uiStrings[lang].notAList(node.name));
+          
+          // CoW: Se è condivisa, stacca una copia univoca e aggiorna lo scope PRIMA di mutare
+          if (v.__shared) {
+              v = ensureWritable(v);
+              target.scope[target.name] = v;
+          }
+          return v; 
+      }
+      if (node.type === "ItemOf") {
+          const parentList = await resolveMutableList(node.list, scopeChain);
           const idxV = await evalExpr(node.index, scopeChain);
           const idx = toInt(idxV);
-          const pos = idx - 1; // indici 1-based
+          const pos = idx - 1; 
 
-          // 3. Controlli di sicurezza
-          if (!Number.isFinite(idx)) throw new Error(`Indice non valido: ${idxV}`);
-          if (pos < 0 || pos >= parentList.length) throw new Error(`Indice fuori dai limiti: ${idx}`);
+          if (!Number.isFinite(idx)) throw new Error(uiStrings[lang].invalidIndexVal(idxV));
+          if (pos < 0 || pos >= parentList.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
           
-          // 4. Ottieni l'elemento target
-          const target = parentList[pos];
+          let target = parentList[pos];
+          if (!Array.isArray(target)) throw new Error(uiStrings[lang].itemNotAList(idx));
           
-          // 5. Check che sia una lista (per poterci fare alias o aggiungere elementi)
-          if (!Array.isArray(target)) throw new Error(`L'elemento all'indice ${idx} non è una lista.`);
-          return target; // Ritorna il riferimento all'array interno
+          // CoW per liste annidate
+          if (target.__shared) {
+              target = ensureWritable(target);
+              parentList[pos] = target;
+          }
+          return target;
         }
-
-        throw new Error("Destinazione non valida per alias o modifica.");
+        throw new Error(uiStrings[lang].invalidAliasDest);
   }
 
   async function execStatement(st, scopeChain) {
+    if (env.__forceStop) return EXEC_STOP;
     switch (st.type) {
       case "GlobalDecl": {
         const cur = scopeChain[scopeChain.length - 1];
@@ -3826,7 +4216,7 @@ function initMatita() {
       case "ScientificThreshold": {
         const v = await evalExpr(st.valExpr, scopeChain);
         if (typeof v !== "number" || !Number.isFinite(v) || v < 0) {
-             fail("genericFail", { msg: "Il valore per 'scientifica' deve essere un numero positivo." }, st.line);
+             fail("scientificPositive", null, st.line);
         }
         env.sciThreshold = v;
         return null;
@@ -3866,11 +4256,9 @@ function initMatita() {
         const trimmed = ans.trim();
         const num = Number(trimmed);
         
-        // Se la stringa non è vuota e il risultato è un numero valido, uso il numero.
-        // Altrimenti mantengo la stringa (utile se si chiede il nome utente, ecc.)
         const finalVal = (trimmed !== "" && !isNaN(num)) ? num : ans;
         
-        assignVariable(scopeChain, st.varName, finalVal);
+        assignVariable(scopeChain, st.varName, finalVal, st.varNameUpper);
         return null;
       }
       case "SetColor": {
@@ -3912,7 +4300,7 @@ function initMatita() {
         
         const v = await evalExpr(st.rhs, scopeChain);
         
-        assignVariable(scopeChain, st.varName, v);
+        assignVariable(scopeChain, st.varName, v, st.varNameUpper);
         return null;
       }
 
@@ -3932,7 +4320,7 @@ function initMatita() {
 
             // 4. Controlli di sicurezza
             if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) {
-                throw new Error(`Indice non valido o fuori dai limiti: ${idx}`);
+                throw new Error(uiStrings[lang].indexOutOfBounds(idx));
             }
 
             // 5. Modifica diretta
@@ -3953,7 +4341,7 @@ function initMatita() {
             
             // Se nel parser "Add" ha solo listName (codice originale):
             // Creiamo un nodo Var per usare la funzione helper
-            const mockNode = { type: "Var", name: st.listName };
+            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
             
             // Risolviamo (gestisce sia liste normali che alias hard)
             lst = await resolveMutableList(mockNode, scopeChain);
@@ -3975,13 +4363,13 @@ function initMatita() {
 
         try {
             // Creiamo il "finto nodo" perché il parser qui ci dà solo il nome stringa
-            const mockNode = { type: "Var", name: st.listName };
+            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
             
             // Risolviamo il riferimento
             const lst = await resolveMutableList(mockNode, scopeChain);
 
             if (!Number.isFinite(idx) || pos < 0 || pos > lst.length) {
-                 throw new Error(`Indice non valido per inserimento: ${idx}`);
+                 throw new Error(uiStrings[lang].indexOutOfBounds(idx));
             }
 
             // Modifica diretta (splice)
@@ -3995,7 +4383,7 @@ function initMatita() {
 
     case "RemoveFirst": {
         try {
-            const mockNode = { type: "Var", name: st.listName };
+            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
             const lst = await resolveMutableList(mockNode, scopeChain);
 
             if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
@@ -4012,7 +4400,7 @@ function initMatita() {
 
     case "RemoveLast": {
         try {
-            const mockNode = { type: "Var", name: st.listName };
+            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
             const lst = await resolveMutableList(mockNode, scopeChain);
 
             if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
@@ -4032,11 +4420,11 @@ function initMatita() {
         const pos = idx - 1;
 
         try {
-            const mockNode = { type: "Var", name: st.listName };
+            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
             const lst = await resolveMutableList(mockNode, scopeChain);
 
             if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) {
-                throw new Error(`Indice non valido: ${idx}`);
+                throw new Error(uiStrings[lang].indexOutOfBounds(idx));
             }
 
             lst.splice(pos, 1); // Rimuove elemento specifico
@@ -4060,14 +4448,14 @@ function initMatita() {
       }
 
       case "While": {
-        let iters = 0;
+        const _t0 = performance.now();
+        let _chk = 0;
         while (true) {
           const c = await evalExpr(st.cond, scopeChain);
           if (!truthy(c)) break;
           const r = await execBlock(st.block, scopeChain);
           if (r && (r.__return || r === EXEC_STOP)) return r;
-          iters++;
-          if (iters > MAX_LOOP_ITERS) fail("infiniteLoop", null, st.line);
+          if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
         }
         return null;
       }
@@ -4078,17 +4466,26 @@ function initMatita() {
 
         const loopScope = Object.create(null);
         loopScope.__globalVars = new Set();
-        const chain = scopeChain.concat([loopScope]);
+        
+        scopeChain.push(loopScope); // Push
 
-        let iters = 0;
-        for (const item of list) {
-          assignVariable(chain, st.varName, deepCopyValue(item));
-          const r = await execBlock(st.block, chain);
-          if (r && (r.__return || r === EXEC_STOP)) return r;
-          iters++;
-          if (iters > MAX_LOOP_ITERS) fail("infiniteLoop", null, st.line);
+        const _t0 = performance.now();
+        let _chk = 0;
+        let returnVal = null;
+        try {
+          for (const item of list) {
+            assignVariable(scopeChain, st.varName, deepCopyValue(item));
+            const r = await execBlock(st.block, scopeChain);
+            if (r && (r.__return || r === EXEC_STOP)) {
+                returnVal = r;
+                break;
+            }
+            if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
+          }
+        } finally {
+          scopeChain.pop(); // Pop
         }
-        return null;
+        return returnVal;
       }
 
       case "ForRange": {
@@ -4103,17 +4500,26 @@ function initMatita() {
 
         const loopScope = Object.create(null);
         loopScope.__globalVars = new Set();
-        const chain = scopeChain.concat([loopScope]);
+        
+        scopeChain.push(loopScope); 
 
-        let iters = 0;
-        for (let i = a; (step > 0) ? (i <= b) : (i >= b); i += step) {
-          assignVariable(chain, st.varName, i);
-          const r = await execBlock(st.block, chain);
-          if (r && (r.__return || r === EXEC_STOP)) return r;
-          iters++;
-          if (iters > MAX_LOOP_ITERS) fail("infiniteLoop", null, st.line);
-        }
-        return null;
+          const _t0 = performance.now();
+          let _chk = 0;
+          let returnVal = null;
+          try {
+            for (let i = a; (step > 0) ? (i <= b) : (i >= b); i += step) {
+              assignVariable(scopeChain, st.varName, i);
+              const r = await execBlock(st.block, scopeChain);
+              if (r && (r.__return || r === EXEC_STOP)) {
+                  returnVal = r;
+                  break;
+              }
+              if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
+            }
+          } finally {
+            scopeChain.pop(); // Pulisco scope a fine loop
+          }
+        return returnVal;
       }
 
       // --- Graphics primitives ---
@@ -4242,6 +4648,62 @@ function initMatita() {
         if (r && r.__return) return r;
 
         env.labels[nameU] = { objects: localObjects.map(deepCopyValue), scale: 1, rotation: 0 };
+        return null;
+      }
+
+      case "Include": {
+        const filename = await evalExpr(st.fileExpr, scopeChain);
+        if (typeof filename !== "string") {
+          const msg = isLanguageIT 
+            ? "Il nome del file da importare deve essere un testo." 
+            : "The file name to import must be a text string.";
+          fail("genericFail", { msg: msg }, st.line);
+        }
+
+        // Se il file è già stato importato, salta per evitare loop infiniti
+        if (env.importedFiles.has(filename)) return null; 
+        env.importedFiles.add(filename);
+
+        let code = "";
+        try {
+          // Usa fetch per leggere il file dalla stessa cartella
+          const response = await fetch(filename);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          code = await response.text();
+        } catch (err) {
+          const msg = isLanguageIT 
+            ? `Impossibile leggere il file '${filename}'. Usa un server locale (es. Live Server). Errore: ${err.message}` 
+            : `Cannot read file '${filename}'. Please use a local server (e.g., Live Server). Error: ${err.message}`;
+          fail("genericFail", { msg: msg }, st.line);
+        }
+
+        // Analizza il codice importato
+        let ast;
+        try {
+          const lexer = new Lexer(code);
+          const tokens = lexer.lexAll();
+          const parser = new Parser(tokens);
+          ast = parser.parseProgram();
+        } catch (e) {
+          if (e && e.type === "ParseError") {
+            const msg = isLanguageIT
+              ? `Errore di sintassi in '${filename}' alla riga ${e.line + 1}: ${e.message}`
+              : `Syntax error in '${filename}' on line ${e.line + 1}: ${e.message}`;
+            fail("genericFail", { msg: msg }, st.line);
+          } else {
+            const msg = isLanguageIT
+              ? `Errore di analisi nel file '${filename}'`
+              : `Parsing error in file '${filename}'`;
+            fail("genericFail", { msg: msg }, st.line);
+          }
+        }
+
+        // Esegue il codice della libreria nello STESSO ambiente (scopeChain) del chiamante
+        for (const stmt of ast.stmts) {
+          const r = await execStatement(stmt, scopeChain);
+          if (r === EXEC_STOP) return EXEC_STOP;
+          if (r && r.__return) return r;
+        }
         return null;
       }
 
@@ -4425,7 +4887,7 @@ function initMatita() {
             };
             
         } catch (e) {
-            fail("genericFail", {msg: "Impossibile creare alias: " + e.message}, st.line);
+            fail("genericFail", {msg: uiStrings[lang].aliasCreateFail(e.message)}, st.line);
         }
         return null;
       }
@@ -4528,11 +4990,583 @@ function initMatita() {
     }
   }
 
+  let _cachedSrc = null;
+  let _cachedAst = null;
+
+// ===== PRE-ANALISI: verifica se il programma usa costrutti async =====
+  function astCanWait(node) {
+    if (!node || typeof node !== "object") return false;
+    if (Array.isArray(node)) return node.some(astCanWait);
+    const ASYNC_NODES = new Set(["Wait","Get","LoadBackground","Import","Include"]);
+    if (ASYNC_NODES.has(node.type)) return true;
+    return Object.values(node).some(v => v && typeof v === "object" && astCanWait(v));
+  }
+
+  // ===== EXECUTOR SINCRONO (usato quando il programma non contiene wait/get/import) =====
+
+  function evalExprS(node, scopeChain) {
+    switch (node.type) {
+      case "Literal": return node.value;
+      case "Var": {
+        if (node.nameLower === "tock") return builtin_tock([], node.line);
+        const v = lookupVariable(scopeChain, node.name, node.nameUpper);
+        if (v === undefined) fail("variableNotFound", node.name, node.line);
+        return v;
+      }
+      case "Tuple": {
+        const arr = [];
+        for (const it of node.items) arr.push(evalExprS(it, scopeChain));
+        arr.__id = Math.random();
+        return arr;
+      }
+      case "Unary": {
+        const r = evalExprS(node.right, scopeChain);
+        if (node.op === "-") return -(typeof r === "number" ? r : Number(r));
+        if (node.op === "not") return !truthy(r);
+        return r;
+      }
+      case "Binary": {
+        if (node.op === "alias") {
+          if (node.left.type !== "Var") fail("aliasLeftVar", null, node.line);
+          if (node.right.type !== "Var" && node.right.type !== "ItemOf") fail("aliasRightVar", null, node.line);
+          const aliasName = node.left.name.toUpperCase();
+          const targetName = node.right.name.toUpperCase();
+          const targetRes = resolveVariable(scopeChain, targetName);
+          if (!targetRes) fail("variableNotFound", node.right.name, node.line);
+          let finalScope, finalName;
+          if (targetRes.__isAlias) { finalScope = targetRes.targetScope; finalName = targetRes.targetName; }
+          else { finalScope = targetRes.scope; finalName = targetRes.name; }
+          scopeChain[scopeChain.length - 1][aliasName] = { __isAlias: true, targetScope: finalScope, targetName: finalName };
+          return lookupVariable(scopeChain, targetName);
+        }
+        if (node.op === "and") {
+          const l = evalExprS(node.left, scopeChain);
+          if (!truthy(l)) return false;
+          return truthy(evalExprS(node.right, scopeChain));
+        }
+        if (node.op === "or") {
+          const l = evalExprS(node.left, scopeChain);
+          if (truthy(l)) return true;
+          return truthy(evalExprS(node.right, scopeChain));
+        }
+        const l = evalExprS(node.left, scopeChain);
+        const r = evalExprS(node.right, scopeChain);
+        switch (node.op) {
+          case "+": return (typeof l === "string" || typeof r === "string")
+            ? formatForOutput(l, env.precision) + formatForOutput(r, env.precision)
+            : Number(l) + Number(r);
+          case "-":   return Number(l) - Number(r);
+          case "*":   return Number(l) * Number(r);
+          case "/":   return Number(l) / Number(r);
+          case "%":   return Number(l) % Number(r);
+          case "^":   return Math.pow(Number(l), Number(r));
+          case "==": case "=": case "===": return Object.is(l, r) || (l === r);
+          case "!=": case "!==": return !(Object.is(l, r) || (l === r));
+          case "<":  return Number(l) <  Number(r);
+          case "<=": return Number(l) <= Number(r);
+          case ">":  return Number(l) >  Number(r);
+          case ">=": return Number(l) >= Number(r);
+          default:   return NaN;
+        }
+      }
+      case "Call": {
+        const nameLower = node.name.toLowerCase();
+        const args = [];
+        for (const a of node.args) args.push(evalExprS(a, scopeChain));
+        if (BUILTINS[nameLower]) return BUILTINS[nameLower](args, node.line);
+        const def = env.functions[node.name.toUpperCase()];
+        if (!def) fail("unknownFunction", node.name, node.line);
+        return callUserRoutineS(def, args, node.args, scopeChain, true, node.line);
+      }
+      case "PointProp": {
+        const obj = evalExprS(node.object, scopeChain);
+        if (!isPoint(obj)) fail("pointPropOnlyXY", null, node.line);
+        return node.prop === "x" ? obj.x : obj.y;
+      }
+      case "Dimension": {
+        const v = evalExprS(node.expr, scopeChain);
+        if (!Array.isArray(v)) fail("dimensionNeedsList", null, node.line);
+        return v.length;
+      }
+      case "ItemOf": {
+        const list = evalExprS(node.list, scopeChain);
+        if (!Array.isArray(list)) fail("listOnlyOp", "<expr>", node.line);
+        const idxV = evalExprS(node.index, scopeChain);
+        const idx = toInt(idxV);
+        if (!Number.isFinite(idx)) fail("invalidIndex", { idx: idxV, name: "<list>" }, node.line);
+        const pos = idx - 1;
+        if (pos < 0 || pos >= list.length) fail("invalidIndex", { idx, name: "<list>" }, node.line);
+        return deepCopyValue(list[pos]);
+      }
+      case "KeyPressed": {
+        const k = evalExprS(node.keyExpr, scopeChain);
+        return !!keyState[String(k).toUpperCase()];
+      }
+      default: throw new Error("Unknown expr node: " + node.type);
+    }
+  }
+
+  function resolveMutableListS(node, scopeChain) {
+    if (node.type === "Var") {
+      const res = resolveVariable(scopeChain, node.name);
+      if (!res) throw new Error(uiStrings[lang].variableNotFound(node.name));
+      let target = res.__isAlias ? resolveVariable([res.targetScope], res.targetName) : res;
+      let v = target.value;
+      if (!Array.isArray(v)) throw new Error(uiStrings[lang].notAList(node.name));
+      if (v.__shared) { v = ensureWritable(v); target.scope[target.name] = v; }
+      return v;
+    }
+    if (node.type === "ItemOf") {
+      const parentList = resolveMutableListS(node.list, scopeChain);
+      const idxV = evalExprS(node.index, scopeChain);
+      const idx = toInt(idxV);
+      const pos = idx - 1;
+      if (!Number.isFinite(idx)) throw new Error(uiStrings[lang].invalidIndexVal(idxV));
+      if (pos < 0 || pos >= parentList.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
+      let target = parentList[pos];
+      if (!Array.isArray(target)) throw new Error(uiStrings[lang].itemNotAList(idx));
+      if (target.__shared) { target = ensureWritable(target); parentList[pos] = target; }
+      return target;
+    }
+    throw new Error(uiStrings[lang].invalidAliasDest);
+  }
+
+  function execBlockS(block, scopeChain) {
+    for (const st of block.stmts) {
+      const r = execStatementS(st, scopeChain);
+      if (r && (r.__return || r === EXEC_STOP)) return r;
+    }
+    return null;
+  }
+
+  const _LOOP_MS = 15000;
+
+  function execStatementS(st, scopeChain) {
+    if (env.__forceStop) return EXEC_STOP;
+    switch (st.type) {
+
+      case "GlobalDecl": {
+        const cur = scopeChain[scopeChain.length - 1];
+        cur.__globalVars ||= new Set();
+        st.names.forEach(n => cur.__globalVars.add(n.toUpperCase()));
+        return null;
+      }
+      case "Define":
+        defineRoutine(st);
+        return null;
+      case "Return": {
+        const value = st.expr ? evalExprS(st.expr, scopeChain) : null;
+        return { __return: true, value: deepCopyValue(value) };
+      }
+      case "Stop": return EXEC_STOP;
+      case "ClearScreen": clearScreen(); return null;
+      case "ClearGraphics":
+        env.gfxObjects = [];
+        snapPointsCache = null;
+        return null;
+      case "FrameGraphics":
+        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
+        if (env.gfxObjects && env.gfxObjects.length > 0) {
+          computeFitCamera(env.gfxObjects);
+          redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+        }
+        return null;
+      case "Digits": {
+        const v = evalExprS(st.prec, scopeChain);
+        const n = toInt(v);
+        env.precision = (Number.isFinite(n) && n >= 0) ? n : null;
+        return null;
+      }
+      case "ScientificThreshold": {
+        const v = evalExprS(st.valExpr, scopeChain);
+        if (typeof v !== "number" || !Number.isFinite(v) || v < 0) fail("scientificPositive", null, st.line);
+        env.sciThreshold = v;
+        return null;
+      }
+      case "Newline":
+        outputArea.appendChild(document.createTextNode("\n"));
+        return null;
+      case "Output": {
+        const v = evalExprS(st.expr, scopeChain);
+        appendText(v, env.precision);
+        return null;
+      }
+      case "Tick":
+        env.tickTime = performance.now();
+        return null;
+      case "Redraw":
+        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
+        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+        return null;
+      case "SetColor": {
+        const v = evalExprS(st.colorExpr, scopeChain);
+        env.currentColor = colorFromTuple(v, st.line);
+        return null;
+      }
+      case "SetPointProp": {
+        const target = evalExprS(st.targetExpr, scopeChain);
+        if (!isPoint(target)) fail("pointOnlySet", null, st.line);
+        const val = evalExprS(st.valueExpr, scopeChain);
+        if (typeof val !== "number" || !Number.isFinite(val)) fail("coordNotNumber", null, st.line);
+        if (st.prop === "x") target.x = val; else target.y = val;
+        return null;
+      }
+      case "PaintBackground":
+        env.backgroundImage = null;
+        env.backgroundColor = env.currentColor;
+        return null;
+      case "PutVar": {
+        if (st.aliasExpr) evalExprS(st.aliasExpr, scopeChain);
+        const v = evalExprS(st.rhs, scopeChain);
+        assignVariable(scopeChain, st.varName, v, st.varNameUpper);
+        return null;
+      }
+      case "PutItem": {
+        const idxV = evalExprS(st.idx, scopeChain);
+        const idx = toInt(idxV);
+        const pos = idx - 1;
+        const v = evalExprS(st.rhs, scopeChain);
+        try {
+          const lst = resolveMutableListS(st.listExpr, scopeChain);
+          if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
+          lst[pos] = deepCopyValue(v);
+        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
+        return null;
+      }
+      case "Add": {
+        const v = evalExprS(st.valueExpr, scopeChain);
+        try {
+          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
+          lst.push(deepCopyValue(v));
+        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
+        return null;
+      }
+      case "Insert": {
+        const v = evalExprS(st.valueExpr, scopeChain);
+        const idxV = evalExprS(st.idx, scopeChain);
+        const idx = toInt(idxV);
+        const pos = idx - 1;
+        try {
+          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
+          if (!Number.isFinite(idx) || pos < 0 || pos > lst.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
+          lst.splice(pos, 0, deepCopyValue(v));
+        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
+        return null;
+      }
+      case "RemoveFirst": {
+        try {
+          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
+          if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
+          lst.shift();
+        } catch (e) { if (e.message !== "Execution stopped.") fail("genericFail", { msg: e.message }, st.line); }
+        return null;
+      }
+      case "RemoveLast": {
+        try {
+          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
+          if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
+          lst.pop();
+        } catch (e) { if (e.message !== "Execution stopped.") fail("genericFail", { msg: e.message }, st.line); }
+        return null;
+      }
+      case "RemoveAt": {
+        const idxV = evalExprS(st.idx, scopeChain);
+        const idx = toInt(idxV);
+        const pos = idx - 1;
+        try {
+          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
+          if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
+          lst.splice(pos, 1);
+        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
+        return null;
+      }
+      case "If": {
+        const c = evalExprS(st.cond, scopeChain);
+        if (truthy(c)) return execBlockS(st.thenBlock, scopeChain);
+        for (const ei of st.elseIfs) {
+          if (truthy(evalExprS(ei.cond, scopeChain))) return execBlockS(ei.block, scopeChain);
+        }
+        if (st.elseBlock) return execBlockS(st.elseBlock, scopeChain);
+        return null;
+      }
+      case "While": {
+        const _t0 = performance.now(); let _chk = 0;
+        while (true) {
+          if (!truthy(evalExprS(st.cond, scopeChain))) break;
+          const r = execBlockS(st.block, scopeChain);
+          if (r && (r.__return || r === EXEC_STOP)) return r;
+          if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
+        }
+        return null;
+      }
+      case "ForEach": {
+        const list = evalExprS(st.listExpr, scopeChain);
+        if (!Array.isArray(list)) fail("loopNotList", "<expr>", st.line);
+        const loopScope = Object.create(null);
+        loopScope.__globalVars = new Set();
+        scopeChain.push(loopScope);
+        const _t0 = performance.now(); let _chk = 0; let returnVal = null;
+        try {
+          for (const item of list) {
+            assignVariable(scopeChain, st.varName, deepCopyValue(item));
+            const r = execBlockS(st.block, scopeChain);
+            if (r && (r.__return || r === EXEC_STOP)) { returnVal = r; break; }
+            if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
+          }
+        } finally { scopeChain.pop(); }
+        return returnVal;
+      }
+      case "ForRange": {
+        const a = toInt(evalExprS(st.startExpr, scopeChain));
+        const b = toInt(evalExprS(st.endExpr, scopeChain));
+        if (!Number.isFinite(a) || !Number.isFinite(b)) fail("shapeParamsNotNumeric", "for", st.line);
+        const step = (a <= b) ? 1 : -1;
+        const loopScope = Object.create(null);
+        loopScope.__globalVars = new Set();
+        scopeChain.push(loopScope);
+        const _t0 = performance.now(); let _chk = 0; let returnVal = null;
+        try {
+          for (let i = a; (step > 0) ? (i <= b) : (i >= b); i += step) {
+            assignVariable(scopeChain, st.varName, i);
+            const r = execBlockS(st.block, scopeChain);
+            if (r && (r.__return || r === EXEC_STOP)) { returnVal = r; break; }
+            if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
+          }
+        } finally { scopeChain.pop(); }
+        return returnVal;
+      }
+      case "Circle": {
+        const r = evalExprS(st.r, scopeChain);
+        if (typeof r !== "number" || !Number.isFinite(r)) fail("shapeParamsNotNumeric", "circle", st.line);
+        const { x, y } = coordFromValue(evalExprS(st.pos, scopeChain), st.line, "");
+        addGraphicObject({ type:"circle", x, y, r, color: env.currentColor });
+        return null;
+      }
+      case "Circumference": {
+        const r = evalExprS(st.r, scopeChain);
+        const th = evalExprS(st.th, scopeChain);
+        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v))) fail("shapeParamsNotNumeric", "circumference", st.line);
+        const { x, y } = coordFromValue(evalExprS(st.pos, scopeChain), st.line, "");
+        addGraphicObject({ type:"circumference", x, y, r, t: th, color: env.currentColor });
+        return null;
+      }
+      case "Rectangle": {
+        const p1 = coordFromValue(evalExprS(st.p1, scopeChain), st.line, "");
+        const p2 = coordFromValue(evalExprS(st.p2, scopeChain), st.line, "");
+        addGraphicObject({ type:"rectangle",
+          v1:{x:p1.x,y:p1.y}, v2:{x:p2.x,y:p1.y},
+          v3:{x:p2.x,y:p2.y}, v4:{x:p1.x,y:p2.y},
+          color: env.currentColor });
+        return null;
+      }
+      case "Line": {
+        const th = evalExprS(st.th, scopeChain);
+        if (typeof th !== "number" || !Number.isFinite(th)) fail("shapeParamsNotNumeric", "line", st.line);
+        const p1 = coordFromValue(evalExprS(st.p1, scopeChain), st.line, "");
+        const p2 = coordFromValue(evalExprS(st.p2, scopeChain), st.line, "");
+        addGraphicObject({ type:"line", x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y, t:th, color: env.currentColor });
+        return null;
+      }
+      case "Triangle": {
+        addGraphicObject({ type:"triangle",
+          v1: coordFromValue(evalExprS(st.p1, scopeChain), st.line, ""),
+          v2: coordFromValue(evalExprS(st.p2, scopeChain), st.line, ""),
+          v3: coordFromValue(evalExprS(st.p3, scopeChain), st.line, ""),
+          color: env.currentColor });
+        return null;
+      }
+      case "Arc": {
+        const r = evalExprS(st.r, scopeChain);
+        const th = evalExprS(st.th, scopeChain);
+        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v) && v>0)) fail("arcRadiusThicknessPositive", null, st.line);
+        const p1 = coordFromValue(evalExprS(st.p1, scopeChain), st.line, "");
+        const p2 = coordFromValue(evalExprS(st.p2, scopeChain), st.line, "");
+        addGraphicObject({ type:"arc", r, t:th, x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y, color: env.currentColor });
+        return null;
+      }
+      case "Graffiti": {
+        const size = evalExprS(st.sizeExpr, scopeChain);
+        if (typeof size !== "number" || !Number.isFinite(size) || size <= 0) fail("graffitiSizeNotNumber", null, st.line);
+        const { x, y } = coordFromValue(evalExprS(st.posExpr, scopeChain), st.line, "");
+        const content = evalExprS(st.contentExpr, scopeChain);
+        if (typeof content !== "string") fail("graffitiContentNotString", null, st.line);
+        const w = Math.max(10, size * 0.62 * content.length);
+        const h = Math.max(10, size * 1.2);
+        env.gfxObjects.push({ type:"text", x:x-w/2, y:y-h/2, width:w, height:h, rotation:0, size, content, color:env.currentColor });
+        return null;
+      }
+      case "Label": {
+        const nameU = st.name.toUpperCase();
+        if (env.labels[nameU] || env.imports[nameU]) fail("labelExists", st.name, st.line);
+        const localObjects = [];
+        const savedObjects = env.gfxObjects;
+        env.gfxObjects = localObjects;
+        const labelScope = Object.create(null);
+        labelScope.__globalVars = new Set();
+        const r = execBlockS(st.body, scopeChain.concat([labelScope]));
+        env.gfxObjects = savedObjects;
+        if (r === EXEC_STOP) return EXEC_STOP;
+        if (r && r.__return) return r;
+        env.labels[nameU] = { objects: localObjects.map(deepCopyValue), scale:1, rotation:0 };
+        return null;
+      }
+      case "Scale": {
+        const nameU = st.name.toUpperCase();
+        const factor = evalExprS(st.factorExpr, scopeChain);
+        if (typeof factor !== "number" || !Number.isFinite(factor) || factor <= 0) fail("scaleNotNumber", null, st.line);
+        if (env.labels[nameU]) env.labels[nameU].scale *= factor;
+        else if (env.imports[nameU]) env.imports[nameU].scale *= factor;
+        else fail("labelNotFound", st.name, st.line);
+        snapPointsCache = null;
+        return null;
+      }
+      case "Draw": {
+        const nameU = st.name.toUpperCase();
+        const pos = coordFromValue(evalExprS(st.posExpr, scopeChain), st.line, "");
+        const defL = env.labels[nameU], defI = env.imports[nameU];
+        if (!defL && !defI) fail("labelNotFound", st.name, st.line);
+        if (defI) {
+          const w = defI.width*defI.scale, h = defI.height*defI.scale;
+          env.gfxObjects.push({ type:"image", img:defI.img, x:pos.x-w/2, y:pos.y-h/2, width:w, height:h, rotation:defI.rotation });
+          return null;
+        }
+        const c = Math.cos(defL.rotation), s = Math.sin(defL.rotation), sc = defL.scale;
+        const tp = (x,y) => ({ x: pos.x+(x*sc*c - y*sc*s), y: pos.y+(x*sc*s + y*sc*c) });
+        for (const o of defL.objects) {
+          const obj = deepCopyValue(o);
+          if (obj.type==="circle"||obj.type==="circumference") {
+            const p=tp(obj.x,obj.y); obj.x=p.x; obj.y=p.y; obj.r*=sc; if(obj.t)obj.t*=sc;
+          } else if (obj.type==="line") {
+            const p1=tp(obj.x1,obj.y1),p2=tp(obj.x2,obj.y2); obj.x1=p1.x;obj.y1=p1.y;obj.x2=p2.x;obj.y2=p2.y;obj.t*=sc;
+          } else if (obj.type==="rectangle") {
+            obj.v1=tp(obj.v1.x,obj.v1.y);obj.v2=tp(obj.v2.x,obj.v2.y);obj.v3=tp(obj.v3.x,obj.v3.y);obj.v4=tp(obj.v4.x,obj.v4.y);
+          } else if (obj.type==="triangle") {
+            obj.v1=tp(obj.v1.x,obj.v1.y);obj.v2=tp(obj.v2.x,obj.v2.y);obj.v3=tp(obj.v3.x,obj.v3.y);
+          } else if (obj.type==="arc") {
+            const p1=tp(obj.x1,obj.y1),p2=tp(obj.x2,obj.y2); obj.x1=p1.x;obj.y1=p1.y;obj.x2=p2.x;obj.y2=p2.y;obj.r*=sc;obj.t*=sc;
+          } else if (obj.type==="text") {
+            const cx=obj.x+obj.width/2,cy=obj.y+obj.height/2,pc=tp(cx,cy);
+            obj.size*=sc;obj.width*=sc;obj.height*=sc;obj.x=pc.x-obj.width/2;obj.y=pc.y-obj.height/2;
+            obj.rotation=(obj.rotation||0)+defL.rotation;
+          }
+          env.gfxObjects.push(obj);
+        }
+        return null;
+      }
+      case "RotatePlace": {
+        const nameU = st.name.toUpperCase();
+        const angle = evalExprS(st.angleExpr, scopeChain);
+        if (typeof angle !== "number" || !Number.isFinite(angle)) fail("rotationNotNumber", null, st.line);
+        const pos = coordFromValue(evalExprS(st.posExpr, scopeChain), st.line, "");
+        const rad = angle * Math.PI / 180;
+        if (env.imports[nameU]) {
+          const def = env.imports[nameU];
+          const w=def.width*def.scale, h=def.height*def.scale;
+          env.gfxObjects.push({ type:"image", img:def.img, x:pos.x-w/2, y:pos.y-h/2, width:w, height:h, rotation:rad });
+          return null;
+        }
+        if (env.labels[nameU]) {
+          const def = env.labels[nameU];
+          const prevRot = def.rotation;
+          def.rotation = rad;
+          const r = execStatementS({ type:"Draw", name:st.name, posExpr:st.posExpr, line:st.line }, scopeChain);
+          def.rotation = prevRot;
+          snapPointsCache = null;
+          return r;
+        }
+        fail("labelNotFound", st.name, st.line);
+        break;
+      }
+      case "Alias": {
+        const aU = st.aliasName.toUpperCase();
+        if (st.targetName) {
+          const target = resolveVariable(scopeChain, st.targetName);
+          if (!target) fail("variableNotFound", st.targetName, st.line);
+          let targetScope, targetName;
+          if (target.__isAlias) { targetScope=target.targetScope; targetName=target.targetName; }
+          else { targetScope=target.scope; targetName=target.name; }
+          scopeChain[scopeChain.length-1][aU] = { __isAlias:true, targetScope, targetName };
+          return null;
+        }
+        try {
+          const refToList = resolveMutableListS(st.targetExpr, scopeChain);
+          scopeChain[scopeChain.length-1][aU] = { __isHardRef:true, value:refToList };
+        } catch(e) { fail("genericFail", { msg: uiStrings[lang].aliasCreateFail(e.message) }, st.line); }
+        return null;
+      }
+      case "ProcCall": {
+        const nameLower = st.name.toLowerCase();
+        if (nameLower === "tock" && st.args.length === 0) {
+          appendLine(builtin_tock([], st.line), false, env.precision);
+          return null;
+        }
+        if (BUILTINS[nameLower]) {
+          const args = [];
+          for (const a of st.args) args.push(evalExprS(a, scopeChain));
+          BUILTINS[nameLower](args, st.line);
+          return null;
+        }
+        const def = env.procedures[st.name.toUpperCase()];
+        if (!def) fail("unknownCommand", st.name, st.line);
+        const args = [];
+        for (const a of st.args) args.push(evalExprS(a, scopeChain));
+        return callUserRoutineS(def, args, st.args, scopeChain, false, st.line);
+      }
+      default: throw new Error("Unknown statement: " + st.type);
+    }
+  }
+
+  function callUserRoutineS(def, argValues, argNodes, callerScopeChain, wantReturn, callLine) {
+    if (env.callDepth >= MAX_CALL_DEPTH) fail("recursionLimit", null, callLine);
+    env.callDepth++;
+    try {
+      const localScope = Object.create(null);
+      localScope.__globalVars = new Set();
+      const scopeChain = [callerScopeChain[0], localScope];
+      const expected = def.params.length, got = argValues.length;
+      if (got !== expected) {
+        if (def.kind === "procedure") fail("procArgCount", { name:def.name, expected, got }, callLine);
+        else fail("funcArgCount", { name:def.name, expected, got }, callLine);
+      }
+      for (let i = 0; i < expected; i++) {
+        const p = def.params[i];
+        const pNameU = p.name.toUpperCase();
+        if (p.inout) {
+          const argNode = argNodes[i];
+          if (argNode && argNode.type === "Var") {
+            const res = resolveVariable(callerScopeChain, argNode.name);
+            if (res) {
+              let targetScope, targetName;
+              if (res.__isAlias) { targetScope=res.targetScope; targetName=res.targetName; }
+              else { targetScope=res.scope; targetName=res.name; }
+              localScope[pNameU] = { __isAlias:true, targetScope, targetName };
+              continue;
+            }
+          }
+        }
+        localScope[pNameU] = deepCopyValue(argValues[i]);
+      }
+      const r = execBlockS(def.body, scopeChain);
+      if (r === EXEC_STOP) return EXEC_STOP;
+      if (wantReturn) {
+        if (r && r.__return) return deepCopyValue(r.value);
+        fail("funcNoReturn", def.name, def.line);
+      }
+      return null;
+    } finally { env.callDepth--; }
+  }
+  // ===== FINE EXECUTOR SINCRONO =====
+
+
+
   // --- Run pipeline ---
   async function runProgram() {
     if (isRunning) return;
     isRunning = true;
     runButton.disabled = true;
+
+    stopButton.disabled = false;
+    env.__forceStop = false;
 
     try {
       clearScreen();
@@ -4543,6 +5577,7 @@ function initMatita() {
       env.functions = Object.create(null);
       env.procedures = Object.create(null);
       env.callDepth = 0;
+      env.importedFiles = new Set(); // Tiene traccia dei file già caricati per evitare loop infiniti (A carica B, che carica A...)
       env.backgroundColor = null;
       env.backgroundImage = null;
       env.currentColor = "rgb(0, 0, 0)";
@@ -4555,16 +5590,26 @@ function initMatita() {
 
       camera = { tx: 0, ty: 0, scale: 1 }; // Reset telecamera
 
+      errorLine = -1;
+      lastHighlightedCode = ""; // forza re-render per rimuovere eventuale highlight precedente
+      updateHighlighting(true);
+
       const src = codeInput.value ?? "";
 
-      // Lex + parse
+      // Lex + parse con cache: se il sorgente non è cambiato, riusa l'AST precedente
       let ast;
       try {
-        const lexer = new Lexer(src);
-        const tokens = lexer.lexAll();
-        const parser = new Parser(tokens);
-        ast = parser.parseProgram();
+        if (src !== _cachedSrc) {
+          const lexer = new Lexer(src);
+          const tokens = lexer.lexAll();
+          const parser = new Parser(tokens);
+          _cachedAst = parser.parseProgram();
+          _cachedSrc = src;
+        }
+        ast = _cachedAst;
       } catch (e) {
+        _cachedSrc = null;
+        _cachedAst = null;
         if (e && e.type === "ParseError") {
           appendLine(`${uiStrings[lang].errorPrefix} ${e.line + 1}: ${e.message}`, true);
           return;
@@ -4573,18 +5618,30 @@ function initMatita() {
         return;
       }
 
-      // Execute
+
+      // Execute: sceglie il percorso sincrono (più veloce) se il programma non usa wait/get/import
       const globalScope = Object.create(null);
       globalScope.__globalVars = new Set();
       const scopeChain = [globalScope];
-
       env.lastGlobalScope = globalScope;
 
+      const _useSync = !astCanWait(ast);
+
       try {
-        for (const st of ast.stmts) {
-          const r = await execStatement(st, scopeChain);
-          if (r === EXEC_STOP) break;
-          if (r && r.__return) break;
+        if (_useSync) {
+          // Percorso sincrono: nessun overhead di async/await
+          for (const st of ast.stmts) {
+            const r = execStatementS(st, scopeChain);
+            if (r === EXEC_STOP) break;
+            if (r && r.__return) break;
+          }
+        } else {
+          // Percorso asincrono: necessario per wait/get/import/include
+          for (const st of ast.stmts) {
+            const r = await execStatement(st, scopeChain);
+            if (r === EXEC_STOP) break;
+            if (r && r.__return) break;
+          }
         }
       } catch (e) {
         if (e === EXEC_STOP) {
@@ -4606,6 +5663,8 @@ function initMatita() {
     } finally {
       isRunning = false;
       runButton.disabled = false;
+      stopButton.disabled = true;
+      env.__sleepResolve = null;
     }
   }
 
@@ -4738,8 +5797,20 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
     }
   });
 
-gfxCanvas.addEventListener("pointermove", (e) => {
+  let rafPending = false;
+  let lastMoveEvent = null;
+
+  gfxCanvas.addEventListener("pointermove", (e) => {
     if (isRunning) return;
+    lastMoveEvent = e;
+    
+    // Gate: se stiamo già aspettando il prossimo frame, salta
+    if (rafPending) return;
+    rafPending = true;
+    
+    requestAnimationFrame(() => {
+      rafPending = false;
+      const e = lastMoveEvent;
 
     // Se stiamo tenendo premuto per il long-press ma si muove troppo il mouse, lo annulliamo
     if (longPressTimer && e.buttons === 1 && !e.shiftKey && pointerDownEvent) {
@@ -4855,6 +5926,7 @@ gfxCanvas.addEventListener("pointermove", (e) => {
     }
 
     if (needsRedraw && !isRunning) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    }); // Fine requestAnimationFrame
   });
 
 
@@ -4930,6 +6002,8 @@ gfxCanvas.addEventListener("pointermove", (e) => {
   });
 
   codeInput.addEventListener("input", () => {
+    errorLine = -1;
+    updateLineNumbers();
     updateLineNumber();
     updateHighlighting();
     scheduleSuggestions();
@@ -4945,10 +6019,17 @@ gfxCanvas.addEventListener("pointermove", (e) => {
 
   runButton.addEventListener("click", runProgram);
 
-  helpButton.addEventListener("click", () => {
-    // Apre il file help_it.html in una nuova scheda/finestra del browser
-    window.open("help_it.html", "_blank");
+  stopButton.addEventListener("click", () => {
+    if (isRunning) {
+      env.__forceStop = true;
+      if (env.__sleepResolve) env.__sleepResolve(); // Sblocca immediatamente eventuali "aspetta N ms"
+    }
   });
+
+  helpButton.addEventListener("click", () => {
+    const helpFile = isLanguageIT ? "help_it.html" : "help_en.html";
+    window.open(helpFile, "_blank");
+  });
 
   toggleCanvasButton.addEventListener("click", () => {
     if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
@@ -5062,6 +6143,7 @@ gfxCanvas.addEventListener("pointermove", (e) => {
   ro.observe(canvasWindowBody);
 
   window.addEventListener("resize", () => {
+    _caretStylesReady = false; // forza ricalcolo stili font al prossimo suggerimento
     handleCanvasResize();
     
     // Se la finestra grafica è visibile ed è stata mossa, assicuriamoci che non finisca fuori schermo 
@@ -5154,24 +6236,42 @@ gfxCanvas.addEventListener("pointermove", (e) => {
     Split(["#editor-pane", "#output-pane"], { sizes: [60, 40], minSize: [320, 280], gutterSize: 8 });
   } catch {}
 
+  applyUILanguage();
+  updateSuggestionsList();
 
-  codeInput.value = `cancella schermo
+if (isLanguageIT) {
+    codeInput.value = `cancella schermo
 
 chiedi Nome dicendo "Come ti chiami?"
 metti "Ciao, " + Nome + ". Facciamo qualcosa insieme! " in Messaggio
-scrivi Messaggio # output su console
+scrivi Messaggio
 
-# Scriviamo il nome su cavas N volte:
 metti 10 in N # numero di ripetizioni
 metti 30 in H # dimensione testo
 
 indice I va da 1 a N ed esegui (
-    imposta colore (50, 10*I, 100-10*I) # colori come % di R,G,B
-    graffiti grandezza H in punto(0, H*I) Nome # scrive Nome su canvas
+    imposta colore (50, 10*I, 100-10*I)
+    graffiti grandezza H in punto(0, H*I) Nome
 )`;
+  } else {
+    codeInput.value = `clear screen
+
+get Name saying "What's your name?"
+put "Hello, " + Name + ". Let's do something together! " in Message
+output Message
+
+put 10 in N # number of repetitions
+put 30 in H # text size
+
+index I goes from 1 to N and you do (
+    set color (50, 10*I, 100-10*I)
+    graffiti size H at point(0, H*I) Name
+)`;
+  }
 
   // Initial paint
   updateLineNumber();
+  updateLineNumbers();
   updateHighlighting(true);
   hideSuggestions();
   drawReadyScreen(uiStrings[lang].canvasReady);

@@ -15,7 +15,7 @@
             --PrimaryYellow: #FFC107; 
             --White: #fff; 
             --DarkText: #212529; 
-            /* Palette Interprete Matita v0.4.0 */
+            /* Palette Interprete Matita v0.4.1 */
             --CodeBackground: #1e293b; 
             --CodeText: #f8fafc;
             --PaperW: 900px; 
@@ -161,7 +161,7 @@
 
 <header id="top">
     <div class="bar">
-        <div class="left">Matita v0.4.0</div>
+        <div class="left">Matita v0.4.1</div>
     </div>
 </header>
 
@@ -470,7 +470,9 @@
 
 <span class="com"># Sorriso</span>
 <span class="kw">imposta colore</span> Nero
-<span class="kw">arco raggio</span> <span class="num">60</span> <span class="kw">spessore</span> <span class="num">8</span> <span class="kw">da</span> (<span class="num">-50</span>, <span class="num">-25</span>) <span class="kw">a</span> (<span class="num">50</span>, <span class="num">-25</span>)</code></pre>
+<span class="kw">arco raggio</span> <span class="num">60</span> <span class="kw">spessore</span> <span class="num">8</span> <span class="kw">da</span> (<span class="num">-50</span>, <span class="num">-25</span>) <span class="kw">a</span> (<span class="num">50</span>, <span class="num">-25</span>)
+
+<span class="kw">inquadra grafica</span></code></pre>
         </div>
     </section>
 
@@ -651,8 +653,9 @@ Premi INVIO per iniziare..."</span>
 <span class="kw">scrivi</span> <span class="str">"Disegno un albero frattale con foglie naturali..."</span>
 <span class="kw">metti punto</span>(<span class="num">0</span>, <span class="num">-220</span>) <span class="kw">in</span> partenza
 disegnaRamo(partenza, <span class="num">90</span>, <span class="num">90</span>, <span class="num">9</span>)
-<span class="kw">scrivi</span> <span class="str">"Fatto! Esegui di nuovo per variare."</span></code></pre>
-        </div>
+
+<span class="kw">inquadra grafica</span>
+<span class="kw">scrivi</span> <span class="str">"Fatto! Esegui di nuovo per variare."</span></code></pre>        </div>
     </section>
 
     <hr>
@@ -1004,7 +1007,10 @@ piazza_cibo()
 <span class="com"># per ognuno dei 3 lati del triangolo.</span>
 disegnaKoch(livelloMassimo, p1x, p1y, p2x, p2y)
 disegnaKoch(livelloMassimo, p2x, p2y, p3x, p3y)
-disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)</code></pre>
+disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)
+
+<span class="kw">inquadra grafica</span></code></pre>
+
         </div>
     </section>
 
@@ -1034,7 +1040,8 @@ disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)</code></pre>
    <span class="kw">imposta colore</span> (<span class="kw">arrotonda</span>(I/passi)*<span class="num">100</span>, (<span class="num">1</span>-<span class="kw">arrotonda</span>(I/passi))*<span class="num">100</span>, <span class="num">90</span>)
 
    <span class="kw">cerchio raggio</span> R <span class="kw">in</span> (R1*<span class="kw">cos</span>(angolo), R1*<span class="kw">sin</span>(angolo))
-)</code></pre>
+)
+<span class="kw">inquadra grafica</span></code></pre>
         </div>
     </section>
 
@@ -1547,6 +1554,12 @@ disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)</code></pre>
 <span class="kw">metti</span> -SEMI_ALTEZZA   <span class="kw">in</span> Y_START
 <span class="kw">metti</span>  SEMI_ALTEZZA   <span class="kw">in</span> Y_END
 
+<span class="com"># --- SETUP TELECAMERA ---</span>
+<span class="com"># Fissiamo l'inquadratura sull'area massima prima di iniziare il calcolo</span>
+<span class="kw">rettangolo da</span> (X_START, Y_START) <span class="kw">a</span> (X_END, Y_END)
+<span class="kw">inquadra grafica</span>
+<span class="kw">cancella grafica</span>
+
 <span class="com"># --- Logica Rendering Progressivo ---</span>
 <span class="kw">metti</span> <span class="num">32</span> <span class="kw">in</span> PASSO_CORRENTE
 <span class="kw">metti</span> <span class="num">1</span>  <span class="kw">in</span> PASSO_MINIMO
@@ -1622,7 +1635,8 @@ disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)</code></pre>
 )
 
 <span class="kw">accapo</span>
-<span class="kw">scrivi</span> <span class="str">"Immagine completata!"</span></code></pre>
+<span class="kw">scrivi</span> <span class="str">"Immagine completata!"</span>
+<span class="kw">inquadra grafica</span></code></pre>
         </div>
     </section>
 
@@ -1677,7 +1691,9 @@ disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)</code></pre>
 
 <span class="kw">scrivi</span> <span class="str">"Punti: "</span> + NumeroPunti + <span class="str">" di cui dentro: "</span> + inCerchio
 <span class="kw">accapo</span>
-<span class="kw">scrivi</span> <span class="str">"Stima di Pi Greco: "</span> + (inCerchio / NumeroPunti) * <span class="num">4</span></code></pre>
+<span class="kw">scrivi</span> <span class="str">"Stima di Pi Greco: "</span> + (inCerchio / NumeroPunti) * <span class="num">4</span>
+
+<span class="kw">inquadra grafica</span></code></pre>
         </div>
     </section>
 
