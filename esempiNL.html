@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voorbeeldprogramma's in Matita</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --PrimaryBlue: #007BFF; 
+            --PrimaryYellow: #FFC107; 
+            --White: #fff; 
+            --DarkText: #212529; 
+            /* Palet Matita Interpreter v0.4.1 */
+            --CodeBackground: #1e293b; 
+            --CodeText: #f8fafc;
+            --PaperW: 900px; 
+        }
+
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            background: #fff; 
+            color: var(--DarkText); 
+            font-family: 'Poppins', sans-serif; 
+            line-height: 1.7; 
+            scroll-behavior: smooth; 
+        }
+        
+        /* Algemene Layout */
+        header { 
+            position: sticky; 
+            top: 0; 
+            background: white; 
+            border-bottom: 1px solid #e5e7eb; 
+            z-index: 10; 
+            margin-bottom: 2em; 
+        }
+        header .bar { 
+            max-width: var(--PaperW); 
+            margin: 0 auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 10px 16px; 
+        }
+        header .left { font-weight: 700; color: var(--PrimaryBlue); }
+        
+        main { max-width: var(--PaperW); margin: 0 auto; padding: 16px; }
+        
+        h1 { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; color: var(--PrimaryBlue); }
+        h2 { font-size: 1.8rem; margin-top: 0; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; }
+        p { margin-bottom: 1.5em; }
+
+        /* Inhoudsopgave */
+        .toc { 
+            background: #f8f9fa; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 40px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            scroll-margin-top: 100px; 
+        }
+        .toc h3 { margin-top: 0; }
+        .toc ul { list-style-type: none; padding-left: 0; }
+        .toc li { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .toc a { text-decoration: none; color: var(--PrimaryBlue); font-weight: 700; display: block; width: 100%; }
+        .toc a:hover { color: #0056b3; }
+
+        /* Programmasecties */
+        .program-section { margin-bottom: 60px; padding-top: 20px; scroll-margin-top: 80px; }
+        
+        /* Navigatielink */
+        .nav-link { 
+            display: inline-block; 
+            margin: 10px 0; 
+            font-size: 0.9rem; 
+            color: #6c757d; 
+            text-decoration: none; 
+            border: 1px solid #dee2e6; 
+            padding: 2px 10px; 
+            border-radius: 20px; 
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-link:hover { background-color: #e9ecef; color: var(--PrimaryBlue); }
+
+        /* Code Container */
+        .code-wrapper {
+            background-color: var(--CodeBackground);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #475569; /* Dunne rand */
+        }
+
+        .code-toolbar {
+            background-color: #0f172a; /* Nog donkerdere header */
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .code-lang { color: #94a3b8; font-size: 0.85rem; font-family: 'Roboto Mono', monospace; }
+
+        .copy-btn {
+            background-color: var(--PrimaryBlue);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover { background-color: #0056b3; }
+        .copy-btn:active { transform: translateY(1px); }
+
+        pre { margin: 0; padding: 20px; overflow-x: auto; }
+        
+        /* CODE binnen normale tekst (lichte achtergrond) */
+        code { 
+            font-family: 'Roboto Mono', monospace; 
+            color: #0369a1; /* Donkerblauw leesbaar op wit */
+            background-color: #f1f5f9; /* Zeer licht leisteen */
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em; 
+            border: 1px solid #e2e8f0;
+        }
+
+        /* CODE binnen PRE (donkere achtergrond - reset inline stijlen) */
+        pre code { 
+            color: var(--CodeText); 
+            background-color: transparent; 
+            padding: 0;
+            border: none;
+            font-size: 0.9rem; 
+            line-height: 1.5; 
+        }
+
+        /* Syntax Highlighting MATCHING INTERPRETER THEME */
+        .kw { color: #38bdf8; font-weight: 600; }             /* Keyword (Lichtblauw) */
+        .str { color: #fbbf24; }                              /* String (Geel) */
+        .num { color: #a78bfa; }                              /* Number (Paars) */
+        .com { color: rgba(148, 163, 184, 0.85); font-style: italic; } /* Comment (Grijs) */
+
+    </style>
+</head>
+<body>
+
+<header id="top">
+    <div class="bar">
+        <div class="left">Matita v0.4.1</div>
+    </div>
+</header>
+
+<main>
+    <h1>Voorbeeldprogramma's</h1>
+    <p>Verzameling van programma's geschreven in Matita.</p>
+
+    <nav class="toc" id="indice">
+        <h3>Inhoudsopgave van Programma's</h3>
+        <ul>
+            <li><a href="#prog1">1. Tafel van vermenigvuldiging</a></li>
+            <li><a href="#prog2">2. Unicode Emoji</a></li>
+            <li><a href="#prog3">3. Morsecodering</a></li>
+            <li><a href="#prog4">4. Caesarcijfer</a></li>
+            <li><a href="#prog5">5. Valsnelheid</a></li>
+            <li><a href="#prog6">6. (Spel) Reactietijd</a></li>
+            <li><a href="#prog7">7. Smiley</a></li>
+            <li><a href="#prog8">8. (Spel) Denk aan een getal</a></li>
+            <li><a href="#prog9">9. Fractale Boom</a></li>
+            <li><a href="#prog10">10. (Spel) Verzamel en Ontsnap</a></li>
+            <li><a href="#prog11">11. Koch-sneeuwvlok</a></li>
+            <li><a href="#prog12">12. Polaire Krommen</a></li>
+            <li><a href="#prog13">13. Bewerkingen op vectoren</a></li>
+            <li><a href="#prog14">14. (Spel) Space Invaders</a></li>
+            <li><a href="#prog15">15. Mandelbrot-fractaal</a></li>
+            <li><a href="#prog16">16. Schatting van Pi (Monte Carlo)</a></li>
+        </ul>
+    </nav>
+
+    <section id="prog1" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>1. Tafel van vermenigvuldiging</h2>
+        <p>Vraagt de gebruiker om een getal en berekent de tafel van vermenigvuldiging van 1 tot 12.<br>
+        Maakt gebruik van een numerieke lus om de berekening te herhalen en voegt strings en getallen samen.<br>
+        Toont het geformatteerde resultaat rechtstreeks in de tekstconsole.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code1', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code1"><span class="kw">vraag</span> Getal <span class="kw">met bericht</span> <span class="str">"Voer een getal in voor zijn tafel:"</span>
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Hier is de tafel van "</span> + Getal + <span class="str">":"</span>; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"-------------------------"</span>; <span class="kw">nieuwe regel</span>
+
+<span class="kw">teller</span> I <span class="kw">loopt van</span> <span class="num">1</span> <span class="kw">tot</span> <span class="num">12</span> <span class="kw">en doe</span> (
+    <span class="kw">zet</span> Getal * I <span class="kw">in</span> Resultaat
+    <span class="kw">schrijf</span> Getal + <span class="str">" x "</span> + I + <span class="str">" = "</span> + Resultaat; <span class="kw">nieuwe regel</span>
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog2" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>2. Unicode Emoji</h2>
+        <p>Drukt een tabel met Emoji-karakters af met behulp van standaard Unicode-codes.<br>
+        Het doorloopt een bereik van gehele getallen en zet ze om in grafische symbolen.<br>
+        Demonstreert het gebruik van de functie <code>unicode()</code> om numerieke codes om te zetten in tekst.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code2', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code2"><span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"--- Emoji UNICODE Tabel ---"</span>; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Symbool   |   Code"</span>
+<span class="kw">schrijf</span> <span class="str">"------------------"</span>; <span class="kw">nieuwe regel</span>
+
+<span class="kw">zet</span> <span class="num">128512</span> <span class="kw">in</span> Begin <span class="com"># waar we de UNICODE-code beginnen</span>
+<span class="kw">zet</span> <span class="num">128591</span> <span class="kw">in</span> Einde <span class="com"># waar we stoppen</span>
+
+<span class="kw">teller</span> N <span class="kw">loopt van</span> Begin <span class="kw">tot</span> Einde <span class="kw">en doe</span> (
+    <span class="kw">zet unicode</span>(N) <span class="kw">in</span> Smiley
+    <span class="kw">schrijf</span> <span class="str">"   "</span> + Smiley + <span class="str">"        |   "</span> + N; <span class="kw">nieuwe regel</span>
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog3" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>3. Morsecodering</h2>
+        <p>Vertaalt een door de gebruiker ingevoerde zin naar morsecode.<br>
+        Het splitst de tekst in tekens en gebruikt Unicode-berekeningen om de index in de codelijst te vinden.<br>
+        Verwerkt de vertaling letter voor letter, waarbij spaties worden omgezet in visuele pauzes.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code3', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code3"><span class="com"># 'a', 'b', 'c', enz. in morsecodering:</span>
+<span class="kw">zet</span> (<span class="str">".-"</span>, <span class="str">"-..."</span>, <span class="str">"-.-."</span>, <span class="str">"-.."</span>, <span class="str">"."</span>, <span class="str">"..-."</span>, <span class="str">"--."</span>, <span class="str">"...."</span>, \
+<span class="str">".."</span>, <span class="str">".---"</span>, <span class="str">"-.-"</span>, <span class="str">".-.."</span>, <span class="str">"--"</span>, <span class="str">"-."</span>, <span class="str">"---"</span>, <span class="str">".--."</span>, <span class="str">"--.-"</span>, \
+<span class="str">".-."</span>, <span class="str">"..."</span>, <span class="str">"-"</span>, <span class="str">"..-"</span>, <span class="str">"...-"</span>, <span class="str">".--"</span>, <span class="str">"-..-"</span>, <span class="str">"-.--"</span>, <span class="str">"--.."</span>) \
+<span class="kw">in</span> morseAlfabet
+
+<span class="kw">vraag</span> tekst <span class="kw">met bericht</span> <span class="str">"Schrijf de te vertalen tekst in kleine letters:"</span>
+<span class="kw">zet splits</span>(tekst) <span class="kw">in</span> lijstKarakters
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Tekst: "</span> + tekst; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Morse: "</span>
+
+<span class="kw">zet Unicode</span>(<span class="str">"a"</span>) <span class="kw">in</span> IndexA
+
+<span class="kw">voor elk</span> letter <span class="kw">in</span> lijstKarakters <span class="kw">doe</span> (
+    <span class="kw">zet Unicode</span>(letter) - IndexA + <span class="num">1</span> <span class="kw">in</span> j
+    <span class="kw">indien</span> (j>= <span class="num">1</span> <span class="kw">en</span> j<= <span class="num">26</span>) <span class="kw">dan</span> (
+        <span class="kw">zet element</span> j <span class="kw">van</span> morseAlfabet <span class="kw">in</span> code
+        <span class="kw">schrijf</span> code + <span class="str">" "</span>
+    ) <span class="kw">anders</span> (
+        <span class="kw">indien</span> (letter <span class="kw">gelijk</span> <span class="str">" "</span>) <span class="kw">dan</span> (
+            <span class="kw">schrijf</span> <span class="str">"   "</span> 
+        ) <span class="kw">anders</span> (
+            <span class="kw">schrijf</span> <span class="str">"?"</span>
+        )
+    )
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog4" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>4. Caesarcijfer</h2>
+        <p>Implementeert een oud cryptografisch algoritme met eenvoudige substitutie.<br>
+        Het verschuift elke letter van de tekst een vast aantal posities, bepaald door de sleutel.<br>
+        Maakt gebruik van de modulo operator (<code>modulo</code>) om het "omdraaien" van het alfabet van Z naar A af te handelen.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code4', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code4"><span class="kw">vraag</span> tekst <span class="kw">met bericht</span> <span class="str">"Schrijf de te versleutelen tekst (in kleine letters):"</span>
+<span class="kw">vraag</span> sleutel <span class="kw">met bericht</span> <span class="str">"Voer de sleutel in (geheel getal):"</span>
+
+<span class="kw">zet splits</span>(tekst) <span class="kw">in</span> lijstKarakters
+<span class="kw">zet Unicode</span>(<span class="str">"a"</span>) <span class="kw">in</span> basisA
+
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Originele Tekst: "</span> + tekst; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Gecijferde Tekst:    "</span>
+
+<span class="kw">voor elk</span> letter <span class="kw">in</span> lijstKarakters <span class="kw">doe</span> (
+    <span class="kw">zet Unicode</span>(letter) <span class="kw">in</span> code
+    <span class="kw">indien</span> (code >= basisA <span class="kw">en</span> code <= basisA + <span class="num">25</span>) <span class="kw">dan</span> (
+        <span class="kw">zet</span> code - basisA <span class="kw">in</span> index0
+        <span class="kw">zet</span> index0 + sleutel <span class="kw">in</span> verschovenIndex
+        <span class="kw">zet</span> verschovenIndex <span class="kw">modulo</span> <span class="num">26</span> <span class="kw">in</span> nieuweIndex
+        <span class="kw">zet</span> nieuweIndex + basisA <span class="kw">in</span> gecijferdeCode
+        <span class="kw">schrijf Unicode</span>(gecijferdeCode)
+    ) <span class="kw">anders</span> (<span class="com"># We laten het ongewijzigd als het geen letter is (spatie, punt, enz.):</span>
+        <span class="kw">schrijf</span> letter
+    )
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog5" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>5. Valsnelheid</h2>
+        <p>Berekent de inslagsnelheid van een object in vrije val op aarde vanaf een hoogte H.<br>
+        Maakt gebruik van wetenschappelijke notatie (bijv. <code>5.9e24</code>) om grote fysieke constanten te verwerken.<br>
+        Vergelijkt het verkregen resultaat met de geluidssnelheid (Mach) en de ontsnappingssnelheid.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code5', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code5"><span class="kw">wis scherm</span>
+<span class="kw">zet</span> <span class="num">5.9722e24</span> <span class="kw">in</span> MassaAarde <span class="com"># kg</span>
+<span class="kw">zet</span> <span class="num">6371e3</span> <span class="kw">in</span> StraalAarde <span class="com"># m</span>
+<span class="kw">zet</span> <span class="num">6.6743e-11</span> <span class="kw">in</span> G <span class="com"># Constante van Cavendish</span>
+
+<span class="kw">vraag</span> H <span class="kw">met bericht</span> <span class="str">"Valhoogte (m)? "</span>
+
+<span class="kw">zet wortel</span>(<span class="num">2</span>*MassaAarde*G*(<span class="num">1</span>/StraalAarde - <span class="num">1</span>/(StraalAarde+H))) <span class="kw">in</span> v
+<span class="kw">cijfers</span> <span class="num">3</span>
+<span class="kw">schrijf</span> <span class="str">"Valhoogte: "</span> + H; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Valsnelheid: "</span>; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"    "</span> + v + <span class="str">" m/s"</span>; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"    "</span> + v*<span class="num">3.6</span> + <span class="str">" km/h"</span>; <span class="kw">nieuwe regel</span>; <span class="kw">nieuwe regel</span>
+
+<span class="kw">zet</span> <span class="num">343</span> <span class="kw">in</span> c <span class="com"># geluidssnelheid, zeeniveau 15 graden C</span>
+<span class="kw">schrijf</span> <span class="str">"Mach: "</span> + v/c; <span class="kw">nieuwe regel</span>
+
+<span class="kw">zet wortel</span>(<span class="num">2</span>*G*MassaAarde/StraalAarde) <span class="kw">in</span> Ontsnappingssnelheid
+
+<span class="kw">schrijf</span> <span class="str">"Ten opzichte van ontsnappingssnelheid: "</span> + v/Ontsnappingssnelheid*<span class="num">100</span> + <span class="str">"%"</span>; <span class="kw">nieuwe regel</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog6" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>6. Reactietijd</h2>
+        <p>Meet de reflexen van de gebruiker door de tijd te berekenen tussen een visueel signaal en een toetsaanslag.<br>
+        Maakt gebruik van de commando's <code>tick</code> en <code>tock</code> voor nauwkeurige timing in milliseconden.<br>
+        Maakt gebruik van een willekeurige vertraging om de test onvoorspelbaar te maken en anticipatie te voorkomen.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code6', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code6"><span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">" We meten je reactietijd ..."</span>; <span class="kw">nieuwe regel</span>
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Wanneer het woord 'START!' verschijnt, druk op de SPATIEBALK."</span>
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Druk op SPATIE om te beginnen..."</span>
+
+<span class="com"># Wacht tot de gebruiker op spatie drukt om het spel te starten</span>
+<span class="kw">zolang</span> (<span class="kw">niet</span> (<span class="kw">toets</span> <span class="str">"SPACE"</span> <span class="kw">is ingedrukt</span>)) <span class="kw">doe</span> (
+    <span class="kw">wacht</span> <span class="num">10</span> <span class="kw">ms</span>
+)
+
+<span class="com"># Wacht tot de gebruiker de toets loslaat om valse starts te voorkomen</span>
+<span class="kw">zolang</span> (<span class="kw">toets</span> <span class="str">"SPACE"</span> <span class="kw">is ingedrukt</span>) <span class="kw">doe</span> (
+    <span class="kw">wacht</span> <span class="num">10</span> <span class="kw">ms</span>
+)
+
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Klaar..."</span>; <span class="kw">nieuwe regel</span>
+
+<span class="com"># Bereken een willekeurige tijd tussen 2s en 5s</span>
+<span class="kw">zet willekeurig</span>(<span class="num">2000</span>, <span class="num">5000</span>) <span class="kw">in</span> WillekeurigeWachttijd
+<span class="kw">wacht</span> WillekeurigeWachttijd <span class="kw">ms</span>
+
+
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"START!"</span>
+<span class="kw">tick</span> <span class="com"># Start de stopwatch</span>
+
+<span class="com"># Wachtlus: draait zolang de balk NIET is ingedrukt</span>
+<span class="kw">zolang</span> (<span class="kw">niet</span> (<span class="kw">toets</span> <span class="str">"SPACE"</span> <span class="kw">is ingedrukt</span>)) <span class="kw">doe</span> (
+    <span class="kw">wacht</span> <span class="num">1</span> <span class="kw">ms</span>
+)
+
+<span class="com"># Zodra de lus breekt (toets ingedrukt), lezen we de tijd met tock</span>
+<span class="kw">zet tock in</span> Reactietijd
+
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Reactietijd: "</span> + Reactietijd + <span class="str">" ms."</span>; <span class="kw">nieuwe regel</span>
+
+<span class="kw">nieuwe regel</span>
+<span class="kw">indien</span> (Reactietijd < <span class="num">250</span>) <span class="kw">dan</span> (
+    <span class="kw">schrijf</span> <span class="str">"Gefeliciteerd, bliksemsnelle reflexen!"</span>
+) <span class="kw">anders</span> (
+    <span class="kw">schrijf</span> <span class="str">"Je kunt beter doen..."</span>
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog7" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>7. Smiley</h2>
+        <p>Constructie van een tekening met behulp van geometrische primitieven zoals cirkels en bogen.<br>
+        Overlapt gevulde cirkels en holle omtrekken om de gezichtsdetails te creëren.<br>
+        Maakt gebruik van specifieke punten om ogen en mond nauwkeurig te positioneren.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code7', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code7"><span class="com"># --- Smiley ---</span>
+
+<span class="com"># Kleuren</span>
+<span class="kw">zet</span> (<span class="num">100</span>, <span class="num">90</span>, <span class="num">10</span>) <span class="kw">in</span> Geel
+<span class="kw">zet</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Zwart
+<span class="kw">zet</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="kw">in</span> Wit
+
+<span class="kw">wis grafiek</span>
+
+<span class="com"># Gezicht</span>
+<span class="kw">stel kleur in</span> Geel
+<span class="kw">cirkel straal</span> <span class="num">120</span> <span class="kw">op punt</span>(<span class="num">0</span>, <span class="num">0</span>)
+
+<span class="com"># Omtrek gezicht</span>
+<span class="kw">stel kleur in</span> Zwart
+<span class="kw">omtrek straal</span> <span class="num">120</span> <span class="kw">dikte</span> <span class="num">8</span> <span class="kw">op punt</span>(<span class="num">0</span>, <span class="num">0</span>)
+
+<span class="com"># Ogen</span>
+<span class="kw">stel kleur in</span> Zwart
+<span class="kw">cirkel straal</span> <span class="num">12</span> <span class="kw">op punt</span>(<span class="num">-40</span>, <span class="num">30</span>)
+<span class="kw">cirkel straal</span> <span class="num">12</span> <span class="kw">op punt</span>(<span class="num">40</span>, <span class="num">30</span>)
+
+<span class="com"># Lichtpunten in de ogen</span>
+<span class="kw">stel kleur in</span> Wit
+<span class="kw">cirkel straal</span> <span class="num">4</span> <span class="kw">op punt</span>(<span class="num">-35</span>, <span class="num">35</span>)
+<span class="kw">cirkel straal</span> <span class="num">4</span> <span class="kw">op punt</span>(<span class="num">45</span>, <span class="num">35</span>)
+
+<span class="com"># Glimlach</span>
+<span class="kw">stel kleur in</span> Zwart
+<span class="kw">boog straal</span> <span class="num">60</span> <span class="kw">dikte</span> <span class="num">8</span> <span class="kw">uit</span> (<span class="num">-50</span>, <span class="num">-25</span>) <span class="kw">tot</span> (<span class="num">50</span>, <span class="num">-25</span>)
+
+<span class="kw">kader grafiek</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog8" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>8. Denk aan een getal</h2>
+        <p>Een voorbeeld van tekstuele input/output en complexe voorwaardelijke logica.<br>
+        De computer gebruikt binair zoeken om het getal te raden dat de gebruiker in gedachten heeft in slechts een paar stappen.<br>
+        Verwerkt de antwoorden van de gebruiker (Groter, Kleiner, Juist) om het bereik te verkleinen.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code8', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code8"><span class="com"># De computer raadt het getal (1..100) dat de gebruiker in gedachten heeft.</span>
+
+<span class="kw">wis scherm</span>
+<span class="kw">vraag</span> start <span class="kw">met bericht</span> <span class="str">"Denk aan een geheel getal tussen 1 en 100.
+Ik zal proberen het zo snel mogelijk te raden.
+Antwoord met:
+G = je getal is Groter
+K = je getal is Kleiner
+J = ik heb het Juist
+
+X = afsluiten
+Druk op ENTER om te beginnen..."</span>
+
+<span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> Min
+<span class="kw">zet</span> <span class="num">100</span> <span class="kw">in</span> Max
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Pogingen
+
+<span class="kw">zolang</span> (<span class="kw">waar</span>) <span class="kw">doe</span> (
+    <span class="kw">globaal</span> Min, Max, Pogingen
+
+    <span class="kw">zet afkap</span>((Min + Max) / <span class="num">2</span>) <span class="kw">in</span> Voorstel
+    <span class="kw">zet</span> Pogingen + <span class="num">1</span> <span class="kw">in</span> Pogingen
+
+    <span class="kw">vraag</span> Antwoord <span class="kw">met bericht</span> (<span class="str">"Voorstel: "</span> + Voorstel + <span class="str">". Is het getal dat je in gedachten had Groter (druk op G), Kleiner (druk op K) of heb ik het Juist (druk op J)? Druk op X om af te sluiten: "</span>)
+
+    <span class="kw">indien</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"X"</span>) <span class="kw">of</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"x"</span>) <span class="kw">dan</span> (
+        <span class="kw">schrijf</span> <span class="str">"Gedane pogingen: "</span> + Pogingen; <span class="kw">nieuwe regel</span>
+        <span class="kw">stop</span>
+    )
+
+    <span class="kw">indien</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"J"</span>) <span class="kw">of</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"j"</span>) <span class="kw">dan</span> (
+        <span class="kw">nieuwe regel</span>
+        <span class="kw">schrijf</span> <span class="str">"Geraden! Het getal was "</span> + Voorstel + <span class="str">"."</span>
+        <span class="kw">nieuwe regel</span>
+        <span class="kw">schrijf</span> <span class="str">"Pogingen: "</span> + Pogingen; <span class="kw">nieuwe regel</span>
+        <span class="kw">stop</span>
+    )
+
+    <span class="kw">indien</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"G"</span>) <span class="kw">of</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"g"</span>) <span class="kw">dan</span> (
+        <span class="kw">zet</span> Voorstel + <span class="num">1</span> <span class="kw">in</span> Min
+    ) <span class="kw">anders</span> (
+        <span class="kw">indien</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"K"</span>) <span class="kw">of</span> (Antwoord <span class="kw">gelijk</span> <span class="str">"k"</span>) <span class="kw">dan</span> (
+            <span class="kw">zet</span> Voorstel - <span class="num">1</span> <span class="kw">in</span> Max
+        ) <span class="kw">anders</span> (
+            <span class="kw">nieuwe regel</span>; <span class="kw">schrijf</span> <span class="str">"Ongeldig antwoord. Gebruik G, K, J of X."</span>
+            <span class="kw">nieuwe regel</span>
+        )
+    )
+
+    <span class="kw">indien</span> (Min > Max) <span class="kw">dan</span> (
+        <span class="kw">nieuwe regel</span>
+        <span class="kw">schrijf</span> <span class="str">"Inconsistentie in antwoorden: er is geen compatibel getal."</span>
+        <span class="kw">nieuwe regel</span>
+        <span class="kw">schrijf</span> <span class="str">"Gedane pogingen: "</span> + Pogingen; <span class="kw">nieuwe regel</span>
+        <span class="kw">stop</span>
+    )
+)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog9" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>9. Fractale Boom</h2>
+        
+        <p>Een voorbeeld van recursie om een natuurlijke boom te tekenen.<br>
+        Inclusief wiskundige functies (sinus, cosinus) om de vertakkingen te bereken.<br>
+        Gebruikt willekeurige getallen om hoeken en lengtes te variëren, waardoor elke boom uniek is.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code9', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code9"><span class="com"># Fractale boom</span>
+<span class="kw">wis scherm</span>
+<span class="kw">wis grafiek</span>
+
+<span class="com"># Rechthoekig blad verankerd aan de "stengel" onderaan</span>
+<span class="kw">definieer procedure</span> tekenBlad(centrum, basis_hoek) (
+    <span class="kw">stel kleur in lijst</span>(<span class="kw">willekeurig</span>(<span class="num">30</span>, <span class="num">90</span>), <span class="kw">willekeurig</span>(<span class="num">80</span>, <span class="num">100</span>), <span class="kw">willekeurig</span>(<span class="num">10</span>, <span class="num">50</span>))
+    
+    <span class="kw">zet willekeurig</span>(<span class="num">5</span>, <span class="num">9</span>) <span class="kw">in</span> breedte
+    <span class="kw">zet willekeurig</span>(<span class="num">6</span>, <span class="num">12</span>) <span class="kw">in</span> hoogte
+    
+    <span class="com"># Totale rotatie in radialen</span>
+    <span class="kw">zet</span> (basis_hoek + <span class="kw">willekeurig</span>(<span class="num">-20</span>, <span class="num">20</span>)) * <span class="kw">pi</span> / <span class="num">180</span> <span class="kw">in</span> hoek_rad
+    <span class="kw">zet cos</span>(hoek_rad) <span class="kw">in</span> c
+    <span class="kw">zet sin</span>(hoek_rad) <span class="kw">in</span> s
+
+    <span class="com"># Lokale rechthoek verankerd onderaan</span>
+    <span class="kw">zet</span> -breedte / <span class="num">2</span> <span class="kw">in</span> x1_lok
+    <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> y1_lok
+    <span class="kw">zet</span> breedte / <span class="num">2</span> <span class="kw">in</span> x2_lok
+    <span class="kw">zet</span> hoogte <span class="kw">in</span> y2_lok
+
+    <span class="com"># Vier hoekpunten na rotatie + translatie</span>
+    <span class="kw">zet</span> (x1_lok * c - y1_lok * s + <span class="kw">x van</span> centrum) <span class="kw">in</span> v1x
+    <span class="kw">zet</span> (x1_lok * s + y1_lok * c + <span class="kw">y van</span> centrum) <span class="kw">in</span> v1y
+    <span class="kw">zet</span> (x2_lok * c - y1_lok * s + <span class="kw">x van</span> centrum) <span class="kw">in</span> v2x
+    <span class="kw">zet</span> (x2_lok * s + y1_lok * c + <span class="kw">y van</span> centrum) <span class="kw">in</span> v2y
+    <span class="kw">zet</span> (x2_lok * c - y2_lok * s + <span class="kw">x van</span> centrum) <span class="kw">in</span> v3x
+    <span class="kw">zet</span> (x2_lok * s + y2_lok * c + <span class="kw">y van</span> centrum) <span class="kw">in</span> v3y
+    <span class="kw">zet</span> (x1_lok * c - y2_lok * s + <span class="kw">x van</span> centrum) <span class="kw">in</span> v4x
+    <span class="kw">zet</span> (x1_lok * s + y2_lok * c + <span class="kw">y van</span> centrum) <span class="kw">in</span> v4y
+
+    <span class="kw">driehoek met hoekpunten punt</span>(v1x, v1y), <span class="kw">punt</span>(v2x, v2y), <span class="kw">punt</span>(v3x, v3y)
+    <span class="kw">driehoek met hoekpunten punt</span>(v1x, v1y), <span class="kw">punt</span>(v4x, v4y), <span class="kw">punt</span>(v3x, v3y)
+    
+    <span class="com"># Korte stengel uitgelijnd met het blad</span>
+    <span class="kw">stel kleur in lijst</span>(<span class="num">50</span>, <span class="num">30</span>, <span class="num">15</span>)
+    <span class="kw">zet</span> (<span class="num">0</span> * c - (<span class="num">-2</span>) * s + <span class="kw">x van</span> centrum) <span class="kw">in</span> s2x
+    <span class="kw">zet</span> (<span class="num">0</span> * s + (<span class="num">-2</span>) * c + <span class="kw">y van</span> centrum) <span class="kw">in</span> s2y
+    <span class="kw">lijn dikte</span> <span class="num">1</span> <span class="kw">uit</span> centrum <span class="kw">tot punt</span>(s2x, s2y)
+)
+
+<span class="com"># Recursieve tak; bladeren groeien aan de punt</span>
+<span class="kw">definieer procedure</span> tekenTak(begin, takLengte, hoek, niveau) (
+    <span class="kw">indien</span> (niveau > <span class="num">0</span>) <span class="kw">dan</span> (
+        <span class="kw">zet</span> (hoek * <span class="kw">pi</span> / <span class="num">180</span>) <span class="kw">in</span> hoek_rad
+        <span class="kw">zet</span> (<span class="kw">x van</span> begin + takLengte * <span class="kw">cos</span>(hoek_rad)) <span class="kw">in</span> eind_x
+        <span class="kw">zet</span> (<span class="kw">y van</span> begin + takLengte * <span class="kw">sin</span>(hoek_rad)) <span class="kw">in</span> eind_y
+        <span class="kw">zet punt</span>(eind_x, eind_y) <span class="kw">in</span> eind_punt
+
+        <span class="kw">stel kleur in lijst</span>(<span class="num">40</span>, <span class="num">26</span>, <span class="num">13</span>)
+        <span class="kw">lijn dikte maximum</span>(<span class="num">1</span>, niveau / <span class="num">2</span>) <span class="kw">uit</span> begin <span class="kw">tot</span> eind_punt
+        
+        <span class="kw">zet</span> (<span class="num">0.75</span> + <span class="kw">willekeurig</span>(<span class="num">-10</span>, <span class="num">5</span>) / <span class="num">100</span>) <span class="kw">in</span> lengte_factor
+        <span class="kw">zet willekeurig</span>(<span class="num">-15</span>, <span class="num">15</span>) <span class="kw">in</span> var1
+        <span class="kw">zet willekeurig</span>(<span class="num">-15</span>, <span class="num">15</span>) <span class="kw">in</span> var2
+        
+        tekenTak(eind_punt, takLengte * lengte_factor, hoek - (<span class="num">25</span> + var1), niveau - <span class="num">1</span>)
+        tekenTak(eind_punt, takLengte * lengte_factor, hoek + (<span class="num">25</span> + var2), niveau - <span class="num">1</span>)
+    )
+    
+    <span class="kw">indien</span> (niveau == <span class="num">0</span>) <span class="kw">dan</span> (
+        <span class="com"># Bladpunt naar voren verplaatst langs de tak en iets opzij</span>
+        <span class="kw">zet</span> (hoek * <span class="kw">pi</span> / <span class="num">180</span>) <span class="kw">in</span> a
+        <span class="kw">zet cos</span>(a) <span class="kw">in</span> ca
+        <span class="kw">zet sin</span>(a) <span class="kw">in</span> sa
+        <span class="kw">zet willekeurig</span>(<span class="num">6</span>, <span class="num">12</span>) <span class="kw">in</span> vooruit              <span class="com"># offset langs de tak</span>
+        <span class="kw">zet willekeurig</span>(<span class="num">-3</span>, <span class="num">3</span>) <span class="kw">in</span> zijkant                <span class="com"># zijdelingse offset</span>
+        <span class="com"># loodrecht op de tak: (-sa, ca)</span>
+        <span class="kw">zet</span> (<span class="kw">x van</span> begin + vooruit * ca + zijkant * (-sa)) <span class="kw">in</span> fx
+        <span class="kw">zet</span> (<span class="kw">y van</span> begin + vooruit * sa + zijkant * ca) <span class="kw">in</span> fy
+        <span class="kw">zet punt</span>(fx, fy) <span class="kw">in</span> p_blad
+        
+        <span class="com"># 2-4 bladeren per top, met kleine variaties</span>
+        <span class="kw">zet willekeurig</span>(<span class="num">2</span>, <span class="num">4</span>) <span class="kw">in</span> n
+        <span class="kw">teller</span> i <span class="kw">loopt van</span> <span class="num">1</span> <span class="kw">tot</span> n <span class="kw">en doe</span> (
+            <span class="kw">zet</span> hoek + <span class="kw">willekeurig</span>(<span class="num">-15</span>, <span class="num">15</span>) <span class="kw">in</span> a_lok
+            <span class="com"># micro-verschuiving om overlapping te voorkomen</span>
+            <span class="kw">zet</span> fx + <span class="kw">willekeurig</span>(<span class="num">-2</span>, <span class="num">2</span>) <span class="kw">in</span> lx
+            <span class="kw">zet</span> fy + <span class="kw">willekeurig</span>(<span class="num">-2</span>, <span class="num">2</span>) <span class="kw">in</span> ly
+            tekenBlad(<span class="kw">punt</span>(lx, ly), a_lok)
+        )
+    )
+)
+
+<span class="com"># Start</span>
+<span class="kw">schrijf</span> <span class="str">"Ik teken een fractale boom met natuurlijke bladeren..."</span>
+<span class="kw">zet punt</span>(<span class="num">0</span>, <span class="num">-220</span>) <span class="kw">in</span> startpunt
+tekenTak(startpunt, <span class="num">90</span>, <span class="num">90</span>, <span class="num">9</span>)
+
+<span class="kw">kader grafiek</span>
+<span class="kw">schrijf</span> <span class="str">"Klaar! Voer opnieuw uit voor variatie."</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog10" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>10. Verzamel en Ontsnap</h2>
+        <p>Een complete videogame met een basis physics-engine.<br>
+        Bestuur de blauwe cirkel met de pijltjestoetsen om voedsel te verzamelen en vijanden te ontwijken.<br>
+        Implementeert vectoren, snelheid, traagheidsversnelling en botsingsdetectie.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code10', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code10"><span class="com"># Verzamel en Ontsnap</span>
+<span class="com"># Beweeg de blauwe cirkel.</span>
+<span class="com"># Verzamel de energiedeeltjes (lichtblauwe vierkanten).</span>
+<span class="com"># Als een driehoek je raakt, verlies je een leven.</span>
+<span class="com"># Je begint met 3 levens. Druk op 'x' om af te sluiten.</span>
+
+<span class="com"># --- Begininstellingen ---</span>
+
+<span class="com"># Globale statusvariabelen</span>
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> X_POS
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Y_POS
+<span class="kw">zet</span> <span class="num">5</span> <span class="kw">in</span> SNELHEID
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> AFSLUITEN 
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Score
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> VOEDSEL_X
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> VOEDSEL_Y
+<span class="kw">zet</span> <span class="num">3</span> <span class="kw">in</span> LEVENS
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> GAME_OVER
+
+<span class="com"># Constanten voor afmetingen</span>
+<span class="kw">zet</span> <span class="num">20</span> <span class="kw">in</span> SPELER_STRAAL
+<span class="kw">zet</span> <span class="num">18</span> <span class="kw">in</span> DRIEHOEK_STRAAL <span class="com"># effectieve straal die dichter bij de getekende driehoek ligt</span>
+<span class="kw">zet</span> <span class="num">15</span> <span class="kw">in</span> VOEDSEL_GROOTTE
+<span class="kw">zet</span> <span class="num">220</span> <span class="kw">in</span> SPEELGEBIED 
+
+<span class="com"># --- Fysicavariabelen ---</span>
+<span class="kw">zet</span> <span class="num">10</span> <span class="kw">in</span> DRIEHOEK_MASSA
+<span class="kw">zet</span> <span class="num">20</span> <span class="kw">in</span> K_VEER
+<span class="kw">zet</span> <span class="num">5</span> <span class="kw">in</span> C_DEMPER
+<span class="kw">zet</span> <span class="num">50</span> <span class="kw">in</span> L_RUST
+<span class="kw">zet</span> <span class="num">0.030</span> <span class="kw">in</span> DT          <span class="com"># Delta Time (komt overeen met "wacht 30 ms")</span>
+
+<span class="com"># --- Lijsten voor Driehoeken ---</span>
+<span class="kw">zet lijst</span>() <span class="kw">in</span> LIJST_DRIEHOEK_X
+<span class="kw">zet lijst</span>() <span class="kw">in</span> LIJST_DRIEHOEK_Y
+<span class="kw">zet lijst</span>() <span class="kw">in</span> LIJST_DRIEHOEK_VX
+<span class="kw">zet lijst</span>() <span class="kw">in</span> LIJST_DRIEHOEK_VY
+
+<span class="com"># Stel achtergrondkleur in (wit)</span>
+<span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>)
+<span class="kw">verf achtergrond</span>
+
+<span class="com"># --- Definieer Procedures ---</span>
+
+<span class="kw">definieer procedure</span> plaats_voedsel () (
+    <span class="kw">globaal</span> VOEDSEL_X, VOEDSEL_Y, SPEELGEBIED
+    <span class="kw">zet willekeurig</span>(-SPEELGEBIED, SPEELGEBIED) <span class="kw">in</span> VOEDSEL_X
+    <span class="kw">zet willekeurig</span>(-SPEELGEBIED, SPEELGEBIED) <span class="kw">in</span> VOEDSEL_Y
+)
+
+<span class="com"># Voegt een driehoek toe die de speler niet overlapt</span>
+<span class="kw">definieer procedure</span> voeg_driehoek_toe () (
+    <span class="kw">globaal</span> LIJST_DRIEHOEK_X, LIJST_DRIEHOEK_Y, LIJST_DRIEHOEK_VX, LIJST_DRIEHOEK_VY
+    <span class="kw">globaal</span> SPEELGEBIED, X_POS, Y_POS
+
+    <span class="kw">zet willekeurig</span>(-SPEELGEBIED, SPEELGEBIED) <span class="kw">in</span> TX
+    <span class="kw">zet willekeurig</span>(-SPEELGEBIED, SPEELGEBIED) <span class="kw">in</span> TY
+
+    <span class="kw">zet</span> TX - X_POS <span class="kw">in</span> DX
+    <span class="kw">zet</span> TY - Y_POS <span class="kw">in</span> DY
+    <span class="kw">zet wortel</span>((DX*DX) + (DY*DY)) <span class="kw">in</span> D
+
+    <span class="kw">indien</span> (D < <span class="num">120</span>) <span class="kw">dan</span> (
+        <span class="kw">indien</span> (<span class="kw">abs</span>(DX) > <span class="kw">abs</span>(DY)) <span class="kw">dan</span> (
+            <span class="kw">indien</span> (DX >= <span class="num">0</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> SPEELGEBIED <span class="kw">in</span> TX ) <span class="kw">anders</span> ( <span class="kw">zet</span> -SPEELGEBIED <span class="kw">in</span> TX )
+        ) <span class="kw">anders</span> (
+            <span class="kw">indien</span> (DY >= <span class="num">0</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> SPEELGEBIED <span class="kw">in</span> TY ) <span class="kw">anders</span> ( <span class="kw">zet</span> -SPEELGEBIED <span class="kw">in</span> TY )
+        )
+    )
+
+    <span class="kw">voeg</span> TX <span class="kw">tot</span> LIJST_DRIEHOEK_X
+    <span class="kw">voeg</span> TY <span class="kw">tot</span> LIJST_DRIEHOEK_Y
+    <span class="kw">voeg</span> <span class="num">0</span> <span class="kw">tot</span> LIJST_DRIEHOEK_VX
+    <span class="kw">voeg</span> <span class="num">0</span> <span class="kw">tot</span> LIJST_DRIEHOEK_VY
+
+    <span class="kw">schrijf</span> <span class="str">"Een nieuwe rode driehoek is verschenen!"</span>
+    <span class="kw">nieuwe regel</span>
+)
+
+<span class="kw">definieer procedure</span> update_spel () (
+    <span class="kw">globaal</span> X_POS, Y_POS, AFSLUITEN, SNELHEID, LEVENS, GAME_OVER
+    <span class="kw">globaal</span> Score, VOEDSEL_X, VOEDSEL_Y, VOEDSEL_GROOTTE, SPELER_STRAAL, DRIEHOEK_STRAAL, SPEELGEBIED
+    <span class="kw">globaal</span> DRIEHOEK_MASSA, K_VEER, C_DEMPER, L_RUST, DT
+    <span class="kw">globaal</span> LIJST_DRIEHOEK_X, LIJST_DRIEHOEK_Y, LIJST_DRIEHOEK_VX, LIJST_DRIEHOEK_VY
+
+    <span class="com"># 1. Spelerbeweging</span>
+    <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"UP"</span> <span class="kw">is ingedrukt</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> Y_POS + SNELHEID <span class="kw">in</span> Y_POS )
+    <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"DOWN"</span> <span class="kw">is ingedrukt</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> Y_POS - SNELHEID <span class="kw">in</span> Y_POS )
+    <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"LEFT"</span> <span class="kw">is ingedrukt</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> X_POS - SNELHEID <span class="kw">in</span> X_POS )
+    <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"RIGHT"</span> <span class="kw">is ingedrukt</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> X_POS + SNELHEID <span class="kw">in</span> X_POS )
+    <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"X"</span> <span class="kw">is ingedrukt</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> AFSLUITEN )
+
+    <span class="com"># --- 2. FYSICA en BOTSINGEN DRIEHOEKEN ---</span>
+    <span class="kw">zet lengte van</span> LIJST_DRIEHOEK_X <span class="kw">in</span> NUM_DRIEHOEKEN
+
+    <span class="kw">indien</span> (NUM_DRIEHOEKEN > <span class="num">0</span>) <span class="kw">dan</span> (
+        <span class="kw">teller</span> i <span class="kw">loopt van</span> <span class="num">1</span> <span class="kw">tot</span> NUM_DRIEHOEKEN <span class="kw">en doe</span> (
+            <span class="kw">zet element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_X <span class="kw">in</span> T_X
+            <span class="kw">zet element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_Y <span class="kw">in</span> T_Y
+            <span class="kw">zet element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_VX <span class="kw">in</span> T_VX
+            <span class="kw">zet element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_VY <span class="kw">in</span> T_VY
+
+            <span class="kw">zet</span> X_POS - T_X <span class="kw">in</span> VETTORE_X
+            <span class="kw">zet</span> Y_POS - T_Y <span class="kw">in</span> VETTORE_Y
+            <span class="kw">zet wortel</span>((VETTORE_X * VETTORE_X) + (VETTORE_Y * VETTORE_Y)) <span class="kw">in</span> AFSTAND
+            <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> UITREKKING
+            <span class="kw">indien</span> (AFSTAND > <span class="num">0.1</span>) <span class="kw">dan</span> ( <span class="kw">zet</span> AFSTAND - L_RUST <span class="kw">in</span> UITREKKING )
+            <span class="kw">zet</span> K_VEER * UITREKKING <span class="kw">in</span> VEERKRACHT_MAG
+
+            <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> DIR_X
+            <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> DIR_Y
+            <span class="kw">indien</span> (AFSTAND > <span class="num">0</span>) <span class="kw">dan</span> (
+                <span class="kw">zet</span> VETTORE_X / AFSTAND <span class="kw">in</span> DIR_X
+                <span class="kw">zet</span> VETTORE_Y / AFSTAND <span class="kw">in</span> DIR_Y
+            )
+
+            <span class="kw">zet</span> (VEERKRACHT_MAG * DIR_X) - (C_DEMPER * T_VX) <span class="kw">in</span> TOT_KRACHT_X
+            <span class="kw">zet</span> (VEERKRACHT_MAG * DIR_Y) - (C_DEMPER * T_VY) <span class="kw">in</span> TOT_KRACHT_Y
+            <span class="kw">zet</span> TOT_KRACHT_X / DRIEHOEK_MASSA <span class="kw">in</span> ACCEL_X
+            <span class="kw">zet</span> TOT_KRACHT_Y / DRIEHOEK_MASSA <span class="kw">in</span> ACCEL_Y
+            <span class="kw">zet</span> T_VX + (ACCEL_X * DT) <span class="kw">in</span> T_VX_NEW
+            <span class="kw">zet</span> T_VY + (ACCEL_Y * DT) <span class="kw">in</span> T_VY_NEW
+            <span class="kw">zet</span> T_X + (T_VX_NEW * DT) <span class="kw">in</span> T_X_NEW
+            <span class="kw">zet</span> T_Y + (T_VY_NEW * DT) <span class="kw">in</span> T_Y_NEW
+
+            <span class="kw">zet</span> T_X_NEW <span class="kw">in element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_X
+            <span class="kw">zet</span> T_Y_NEW <span class="kw">in element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_Y
+            <span class="kw">zet</span> T_VX_NEW <span class="kw">in element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_VX
+            <span class="kw">zet</span> T_VY_NEW <span class="kw">in element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_VY
+
+            <span class="com"># --- Botsing Speler-Driehoek ---</span>
+            <span class="kw">zet</span> T_X_NEW - X_POS <span class="kw">in</span> AFST_TX
+            <span class="kw">zet</span> T_Y_NEW - Y_POS <span class="kw">in</span> AFST_TY
+            <span class="kw">zet</span> (AFST_TX * AFST_TX) + (AFST_TY * AFST_TY) <span class="kw">in</span> AFST_T_K
+            <span class="kw">zet</span> SPELER_STRAAL + DRIEHOEK_STRAAL <span class="kw">in</span> R_TOT_T
+            <span class="kw">zet</span> R_TOT_T * R_TOT_T <span class="kw">in</span> R_TOT_T_K
+
+            <span class="kw">indien</span> (AFST_T_K < R_TOT_T_K) <span class="kw">dan</span> (
+                <span class="kw">zet</span> LEVENS - <span class="num">1</span> <span class="kw">in</span> LEVENS
+                <span class="kw">indien</span> (LEVENS <= <span class="num">0</span>) <span class="kw">dan</span> (
+                    <span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> GAME_OVER
+                ) <span class="kw">anders</span> (
+                    <span class="kw">schrijf</span> <span class="str">"LEVEN VERLOREN! Levens over: "</span>
+                    <span class="kw">schrijf</span> LEVENS
+                    <span class="kw">nieuwe regel</span>
+                    <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> X_POS
+                    <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Y_POS
+                    <span class="kw">teller</span> j <span class="kw">loopt van</span> <span class="num">1</span> <span class="kw">tot</span> NUM_DRIEHOEKEN <span class="kw">en doe</span> (
+                        <span class="kw">zet willekeurig</span>(-SPEELGEBIED, SPEELGEBIED) <span class="kw">in element</span> j <span class="kw">van</span> LIJST_DRIEHOEK_X
+                        <span class="kw">zet willekeurig</span>(-SPEELGEBIED, SPEELGEBIED) <span class="kw">in element</span> j <span class="kw">van</span> LIJST_DRIEHOEK_Y
+                        <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in element</span> j <span class="kw">van</span> LIJST_DRIEHOEK_VX
+                        <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in element</span> j <span class="kw">van</span> LIJST_DRIEHOEK_VY
+                    )
+                    <span class="kw">wacht</span> <span class="num">500</span> <span class="kw">ms</span>
+                )
+            )
+        )
+    )
+
+    <span class="com"># --- 3. Botsingslogica Voedsel ---</span>
+    <span class="kw">zet</span> X_POS - VOEDSEL_X <span class="kw">in</span> AFST_X
+    <span class="kw">zet</span> Y_POS - VOEDSEL_Y <span class="kw">in</span> AFST_Y
+    <span class="kw">zet</span> (AFST_X * AFST_X) + (AFST_Y * AFST_Y) <span class="kw">in</span> AFST_KWADRAAT
+    <span class="kw">zet</span> SPELER_STRAAL + (VOEDSEL_GROOTTE / <span class="num">2</span>) <span class="kw">in</span> TOTALE_STRAAL
+    <span class="kw">zet</span> TOTALE_STRAAL * TOTALE_STRAAL <span class="kw">in</span> TOTALE_STRAAL_K
+
+    <span class="kw">indien</span> (AFST_KWADRAAT < TOTALE_STRAAL_K) <span class="kw">dan</span> (
+        <span class="kw">zet</span> Score + <span class="num">1</span> <span class="kw">in</span> Score
+        <span class="kw">schrijf</span> <span class="str">"Score: "</span>
+        <span class="kw">schrijf</span> Score
+        <span class="kw">nieuwe regel</span>
+        plaats_voedsel()
+        voeg_driehoek_toe()
+    )
+
+    <span class="com"># --- 4. Update de grafiek ---</span>
+    <span class="kw">zet lengte van</span> LIJST_DRIEHOEK_X <span class="kw">in</span> NUM_DRIEHOEKEN
+    <span class="kw">wis grafiek</span>
+    <span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>)
+    <span class="kw">verf achtergrond</span>
+
+    <span class="com"># Teken de Speler (Blauw) als eerste</span>
+    <span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">100</span>)
+    <span class="kw">cirkel straal</span> SPELER_STRAAL <span class="kw">op punt</span>(X_POS, Y_POS)
+
+    <span class="com"># Teken Voedsel (Lichtblauw)</span>
+    <span class="kw">stel kleur in</span> (<span class="num">50</span>, <span class="num">80</span>, <span class="num">100</span>)
+    <span class="kw">zet</span> VOEDSEL_X - (VOEDSEL_GROOTTE / <span class="num">2</span>) <span class="kw">in</span> VOEDSEL_X1
+    <span class="kw">zet</span> VOEDSEL_Y - (VOEDSEL_GROOTTE / <span class="num">2</span>) <span class="kw">in</span> VOEDSEL_Y1
+    <span class="kw">zet</span> VOEDSEL_X + (VOEDSEL_GROOTTE / <span class="num">2</span>) <span class="kw">in</span> VOEDSEL_X2
+    <span class="kw">zet</span> VOEDSEL_Y + (VOEDSEL_GROOTTE / <span class="num">2</span>) <span class="kw">in</span> VOEDSEL_Y2
+    <span class="kw">rechthoek uit punt</span>(VOEDSEL_X1, VOEDSEL_Y1) <span class="kw">tot punt</span>(VOEDSEL_X2, VOEDSEL_Y2)
+
+    <span class="com"># Teken Driehoeken en Veren boven de speler</span>
+    <span class="kw">indien</span> (NUM_DRIEHOEKEN > <span class="num">0</span>) <span class="kw">dan</span> (
+        <span class="kw">teller</span> i <span class="kw">loopt van</span> <span class="num">1</span> <span class="kw">tot</span> NUM_DRIEHOEKEN <span class="kw">en doe</span> (
+            <span class="kw">zet element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_X <span class="kw">in</span> T_X
+            <span class="kw">zet element</span> i <span class="kw">van</span> LIJST_DRIEHOEK_Y <span class="kw">in</span> T_Y
+
+            <span class="kw">stel kleur in</span> (<span class="num">50</span>, <span class="num">50</span>, <span class="num">50</span>)
+            <span class="kw">lijn dikte</span> <span class="num">2</span> <span class="kw">uit punt</span>(X_POS, Y_POS) <span class="kw">tot punt</span>(T_X, T_Y)
+
+            <span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
+            <span class="kw">driehoek met hoekpunten punt</span>(T_X, T_Y + <span class="num">15</span>), <span class="kw">punt</span>(T_X - <span class="num">10</span>, T_Y - <span class="num">10</span>), <span class="kw">punt</span>(T_X + <span class="num">10</span>, T_Y - <span class="num">10</span>)
+        )
+    )
+
+    <span class="com"># HUD</span>
+    <span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+    <span class="kw">graffiti grootte</span> <span class="num">16</span> <span class="kw">op punt</span>(-SPEELGEBIED - <span class="num">20</span>, SPEELGEBIED + <span class="num">20</span>) <span class="str">"Score: "</span> + Score
+    <span class="kw">graffiti grootte</span> <span class="num">16</span> <span class="kw">op punt</span>(-SPEELGEBIED - <span class="num">20</span>, SPEELGEBIED) <span class="str">"Levens: "</span> + LEVENS
+
+    <span class="kw">herteken</span>
+)
+
+<span class="com"># --- Hoofdlus van het spel ---</span>
+plaats_voedsel()
+
+<span class="kw">zolang</span> (AFSLUITEN <span class="kw">is</span> <span class="num">0</span> <span class="kw">en</span> GAME_OVER <span class="kw">is</span> <span class="num">0</span>) <span class="kw">doe</span> (
+    update_spel()
+    <span class="kw">wacht</span> <span class="num">30</span> <span class="kw">ms</span> 
+)
+
+<span class="com"># --- Eindscherm ---</span>
+<span class="kw">indien</span> (GAME_OVER <span class="kw">is</span> <span class="num">1</span>) <span class="kw">dan</span> (
+    <span class="kw">wis grafiek</span>
+    <span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>)
+    <span class="kw">verf achtergrond</span>
+    <span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
+    <span class="kw">graffiti grootte</span> <span class="num">50</span> <span class="kw">op</span> (<span class="num">-130</span>, <span class="num">20</span>) <span class="str">"GAME OVER"</span>
+    <span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+    <span class="kw">graffiti grootte</span> <span class="num">20</span> <span class="kw">op</span> (<span class="num">-90</span>, <span class="num">-40</span>) <span class="str">"Eindscore: "</span> + Score
+    <span class="kw">herteken</span>
+) <span class="kw">anders</span> (
+    <span class="kw">schrijf</span> <span class="str">"Spel afgelopen! Eindscore: "</span>
+    <span class="kw">schrijf</span> Score
+    <span class="kw">nieuwe regel</span>
+)
+<span class="kw">stop</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog11" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>11. Koch-sneeuwvlok</h2>
+        
+        <p>De Koch-sneeuwvlok is een van de meest bekende fractale krommen.<br>
+        Dit programma tekent het met behulp van recursie: elke rechte lijn is verdeeld in vier segmenten.<br>
+        De diepte van de recursie bepaalt de mate van detail van de uiteindelijke fractaal.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code11', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code11"><span class="com"># Programma om de Koch-sneeuwvlok-fractaal te tekenen</span>
+<span class="com">#</span>
+<span class="com"># We definiëren het detailniveau van de fractaal.</span>
+<span class="com"># Een waarde van 4 of 5 is een goed begin.</span>
+<span class="com"># Hogere waarden (6+) kunnen erg traag zijn.</span>
+<span class="kw">zet</span> <span class="num">6</span> <span class="kw">in</span> maxNiveau
+
+<span class="com"># We stellen de lijndikte en de kleur in</span>
+<span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> lijnDikte
+<span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">40</span>, <span class="num">80</span>) <span class="com"># Een donkerblauw</span>
+
+<span class="com"># We berekenen de constanten voor de rotatie van 60 graden (PI/3 radialen)</span>
+<span class="com"># De interpreter gebruikt Math.sin/cos, die radialen vereisen.</span>
+<span class="kw">zet</span> <span class="kw">PI</span> / <span class="num">3</span> <span class="kw">in</span> PIDERDE
+<span class="kw">zet cos</span>(PIDERDE) <span class="kw">in</span> cos60
+<span class="kw">zet</span> -<span class="kw">sin</span>(PIDERDE) <span class="kw">in</span> sin60
+
+<span class="com">#</span>
+<span class="com"># Dit is de recursieve procedure die een Koch-kromme tekent</span>
+<span class="com"># tussen twee punten (x1, y1) en (x2, y2).</span>
+<span class="com">#</span>
+<span class="kw">definieer procedure</span> tekenKoch(niveau, x1, y1, x2, y2) (
+    
+    <span class="com"># Basisscenario: als het niveau 0 is, teken dan een rechte lijn.</span>
+    <span class="kw">indien</span> (niveau == <span class="num">0</span>) <span class="kw">dan</span> (
+        <span class="kw">lijn dikte</span> lijnDikte <span class="kw">uit</span> (x1, y1) <span class="kw">tot</span> (x2, y2)
+    )
+    
+    <span class="com"># Recursief scenario: bereken de 4 segmenten en herhaal.</span>
+    <span class="kw">anders</span> (
+        <span class="com"># 1. Bereken de vector van punt 1 naar punt 2</span>
+        <span class="kw">zet</span> x2 - x1 <span class="kw">in</span> dx
+        <span class="kw">zet</span> y2 - y1 <span class="kw">in</span> dy
+        
+        <span class="com"># 2. Vind de punten A en B, die de lijn in 3 delen verdelen</span>
+        <span class="kw">zet</span> x1 + dx / <span class="num">3</span> <span class="kw">in</span> ax
+        <span class="kw">zet</span> y1 + dy / <span class="num">3</span> <span class="kw">in</span> ay
+        
+        <span class="kw">zet</span> x1 + dx * <span class="num">2</span> / <span class="num">3</span> <span class="kw">in</span> bx
+        <span class="kw">zet</span> y1 + dy * <span class="num">2</span> / <span class="num">3</span> <span class="kw">in</span> by
+        
+        <span class="com"># 3. Bereken het punt C (de "punt") door het segment A->B</span>
+        <span class="com">#    60 graden rond het punt A te draaien.</span>
+        <span class="kw">zet</span> (dx / <span class="num">3</span>) * cos60 - (dy / <span class="num">3</span>) * sin60 <span class="kw">in</span> cx_rel
+        <span class="kw">zet</span> (dx / <span class="num">3</span>) * sin60 + (dy / <span class="num">3</span>) * cos60 <span class="kw">in</span> cy_rel
+        
+        <span class="kw">zet</span> ax + cx_rel <span class="kw">in</span> cx
+        <span class="kw">zet</span> ay + cy_rel <span class="kw">in</span> cy
+        
+        <span class="com"># 4. Roep de procedure 4 keer op voor de nieuwe segmenten</span>
+        tekenKoch(niveau - <span class="num">1</span>, x1, y1, ax, ay)  <span class="com"># P1 -> A</span>
+        tekenKoch(niveau - <span class="num">1</span>, ax, ay, cx, cy)  <span class="com"># A -> C</span>
+        tekenKoch(niveau - <span class="num">1</span>, cx, cy, bx, by)  <span class="com"># C -> B</span>
+        tekenKoch(niveau - <span class="num">1</span>, bx, by, x2, y2)  <span class="com"># B -> P2</span>
+    )
+)
+
+<span class="com"># --- HOOFDPROGRAMMA ---</span>
+
+<span class="com"># We definiëren de 3 hoekpunten van een grote gelijkzijdige driehoek</span>
+<span class="com"># gecentreerd op de oorsprong (0, 0).</span>
+<span class="kw">zet</span> <span class="num">1000</span> <span class="kw">in</span> straal
+
+<span class="com"># Punt 1 (bovenaan)</span>
+<span class="kw">zet</span> straal * <span class="kw">cos</span>(<span class="kw">PI</span> / <span class="num">2</span>) <span class="kw">in</span> p1x
+<span class="kw">zet</span> straal * <span class="kw">sin</span>(<span class="kw">PI</span> / <span class="num">2</span>) <span class="kw">in</span> p1y
+
+<span class="com"># Punt 2 (linksonder)</span>
+<span class="kw">zet</span> straal * <span class="kw">cos</span>(<span class="num">7</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p2x
+<span class="kw">zet</span> straal * <span class="kw">sin</span>(<span class="num">7</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p2y
+
+<span class="com"># Punt 3 (rechtsonder)</span>
+<span class="kw">zet</span> straal * <span class="kw">cos</span>(<span class="num">11</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p3x
+<span class="kw">zet</span> straal * <span class="kw">sin</span>(<span class="num">11</span> * <span class="kw">PI</span> / <span class="num">6</span>) <span class="kw">in</span> p3y
+
+<span class="com"># We tekenen de sneeuwvlok door de procedure aan te roepen</span>
+<span class="com"># voor elk van de 3 zijden van de driehoek.</span>
+tekenKoch(maxNiveau, p1x, p1y, p2x, p2y)
+tekenKoch(maxNiveau, p2x, p2y, p3x, p3y)
+tekenKoch(maxNiveau, p3x, p3y, p1x, p1y)
+
+<span class="kw">kader grafiek</span></code></pre>
+
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog12" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>12. Polaire Krommen</h2>
+        <p>Generatie van complexe geometrische figuren met behulp van polaire coördinaten.<br>
+        Zet straal en hoek om in cartesische coördinaten (x, y) voor het tekenen.<br>
+        Maakt gebruik van wiskundige lussen om kleur en vorm te variëren tijdens het tekenen.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code12', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code12"><span class="kw">zet</span> <span class="num">300</span> <span class="kw">in</span> R0
+<span class="kw">zet</span> <span class="num">5000</span> <span class="kw">in</span> stappen
+<span class="kw">zet</span> <span class="num">2</span>*<span class="kw">PI</span>/stappen <span class="kw">in</span> inc
+<span class="kw">zet</span> <span class="num">3</span> <span class="kw">in</span> R
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> hoek
+
+<span class="kw">teller</span> I <span class="kw">loopt van</span> <span class="num">0</span> <span class="kw">tot</span> stappen-<span class="num">1</span> <span class="kw">en doe</span> (
+   <span class="kw">zet</span> hoek+inc <span class="kw">in</span> hoek
+   <span class="kw">zet</span> R0*<span class="kw">cos</span>(hoek)*<span class="kw">sin</span>(<span class="num">13</span>*hoek) <span class="kw">in</span> R1
+   <span class="kw">stel kleur in</span> (<span class="kw">afrond</span>(I/stappen)*<span class="num">100</span>, (<span class="num">1</span>-<span class="kw">afrond</span>(I/stappen))*<span class="num">100</span>, <span class="num">90</span>)
+
+   <span class="kw">cirkel straal</span> R <span class="kw">op</span> (R1*<span class="kw">cos</span>(hoek), R1*<span class="kw">sin</span>(hoek))
+)
+<span class="kw">kader grafiek</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog13" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>13. Bewerkingen op vectoren</h2>
+        <p>Een vectorcalculator die aangepaste functies definieert voor lineaire algebra.<br>
+        Implementeert de berekening van het inproduct (scalair product) en kruisproduct tussen twee 3D-vectoren.<br>
+        Vraagt invoer van de gebruiker voor coördinaten en toont de resultaten op het scherm.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code13', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code13"><span class="kw">wis scherm</span>
+
+<span class="com"># --- 1. Wiskundige Functies ---</span>
+
+<span class="kw">definieer functie</span> Inproduct(v1, v2) (
+  <span class="kw">zet element</span> <span class="num">1</span> <span class="kw">van</span> v1 <span class="kw">in</span> x1
+  <span class="kw">zet element</span> <span class="num">2</span> <span class="kw">van</span> v1 <span class="kw">in</span> y1
+  <span class="kw">zet element</span> <span class="num">3</span> <span class="kw">van</span> v1 <span class="kw">in</span> z1
+  
+  <span class="kw">zet element</span> <span class="num">1</span> <span class="kw">van</span> v2 <span class="kw">in</span> x2
+  <span class="kw">zet element</span> <span class="num">2</span> <span class="kw">van</span> v2 <span class="kw">in</span> y2
+  <span class="kw">zet element</span> <span class="num">3</span> <span class="kw">van</span> v2 <span class="kw">in</span> z2
+
+  <span class="kw">retourneer</span> (x1 * x2) + (y1 * y2) + (z1 * z2)
+)
+
+<span class="kw">definieer functie</span> Kruisproduct(v1, v2) (
+  <span class="kw">zet element</span> <span class="num">1</span> <span class="kw">van</span> v1 <span class="kw">in</span> x1
+  <span class="kw">zet element</span> <span class="num">2</span> <span class="kw">van</span> v1 <span class="kw">in</span> y1
+  <span class="kw">zet element</span> <span class="num">3</span> <span class="kw">van</span> v1 <span class="kw">in</span> z1
+  
+  <span class="kw">zet element</span> <span class="num">1</span> <span class="kw">van</span> v2 <span class="kw">in</span> x2
+  <span class="kw">zet element</span> <span class="num">2</span> <span class="kw">van</span> v2 <span class="kw">in</span> y2
+  <span class="kw">zet element</span> <span class="num">3</span> <span class="kw">van</span> v2 <span class="kw">in</span> z2
+
+  <span class="kw">zet</span> (y1 * z2) - (z1 * y2) <span class="kw">in</span> i
+  <span class="kw">zet</span> (z1 * x2) - (x1 * z2) <span class="kw">in</span> j
+  <span class="kw">zet</span> (x1 * y2) - (y1 * x2) <span class="kw">in</span> k
+
+  <span class="kw">retourneer lijst</span>(i, j, k)
+)
+
+<span class="com"># --- 2. Invoerfunctie ---</span>
+<span class="kw">definieer functie</span> VraagVector(Naam) (
+  <span class="kw">schrijf</span> <span class="str">"--- Gegevensinvoer voor "</span> + Naam + <span class="str">" ---"</span>
+  <span class="kw">vraag</span> x <span class="kw">met bericht</span> Naam + <span class="str">" -> X-coördinaat:"</span>
+  <span class="kw">vraag</span> y <span class="kw">met bericht</span> Naam + <span class="str">" -> Y-coördinaat:"</span>
+  <span class="kw">vraag</span> z <span class="kw">met bericht</span> Naam + <span class="str">" -> Z-coördinaat:"</span>
+  
+  <span class="com"># Retourneert de lijst die de vector beschrijft</span>
+  <span class="kw">retourneer lijst</span>(x, y, z)
+)
+
+<span class="com"># --- 3. Hoofdprogramma ---</span>
+
+<span class="kw">schrijf</span> <span class="str">"VECTOR CALCULATOR"</span>; <span class="kw">nieuwe regel</span>
+
+<span class="kw">zet</span> VraagVector(<span class="str">"Vector A"</span>) <span class="kw">in</span> A
+<span class="kw">zet</span> VraagVector(<span class="str">"Vector B"</span>) <span class="kw">in</span> B
+
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Vector A: "</span> + A; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Vector B: "</span> + B; <span class="kw">nieuwe regel</span>
+
+<span class="kw">schrijf</span> <span class="str">"Inproduct (Scalair product): "</span> + Inproduct(A, B); <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Kruisproduct (Uitproduct): "</span> + Kruisproduct(A, B)</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog14" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>14. Space Invaders (Nederlands)</h2>
+        
+        <p>Een complete versie van de klassieke arcade game, volledig gelokaliseerd.<br>
+        Beheert meerdere sprites, zwermbeweging van vijanden en spelerinvoer.<br>
+        Inclusief logica voor projectielen, vernietigbare schilden en score.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code14', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code14">
+<span class="com"># ------------------------------------------------------------------</span>
+<span class="com"># --------------------    MATITA: SPACE INVADERS   -----------------</span>   
+<span class="com"># ------------------------------------------------------------------</span>
+
+<span class="com"># --- KLEUREN ---</span>
+<span class="kw">zet</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Zwart
+<span class="kw">zet</span> (<span class="num">20</span>, <span class="num">100</span>, <span class="num">30</span>) <span class="kw">in</span> Groen
+<span class="kw">zet</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="kw">in</span> Wit
+<span class="kw">zet</span> (<span class="num">100</span>, <span class="num">20</span>, <span class="num">20</span>) <span class="kw">in</span> Rood
+<span class="kw">zet</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">20</span>) <span class="kw">in</span> Geel
+
+<span class="com"># --- SPRITES ---</span>
+<span class="kw">etiket</span> (
+  <span class="kw">stel kleur in</span> Groen
+  <span class="kw">rechthoek uit</span> (<span class="num">-20</span>, <span class="num">-10</span>) <span class="kw">tot</span> (<span class="num">20</span>, <span class="num">-6</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">-15</span>, <span class="num">-6</span>) <span class="kw">tot</span> (<span class="num">15</span>, <span class="num">0</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">-5</span>, <span class="num">0</span>) <span class="kw">tot</span> (<span class="num">5</span>, <span class="num">8</span>)
+) <span class="kw">als</span> Spelerschip
+
+<span class="kw">etiket</span> (
+  <span class="kw">stel kleur in</span> Wit
+  <span class="kw">rechthoek uit</span> (<span class="num">-12</span>, <span class="num">-8</span>) <span class="kw">tot</span> (<span class="num">12</span>, <span class="num">8</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">-8</span>, <span class="num">8</span>) <span class="kw">tot</span> (<span class="num">-4</span>, <span class="num">12</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">4</span>, <span class="num">8</span>) <span class="kw">tot</span> (<span class="num">8</span>, <span class="num">12</span>)
+  <span class="kw">stel kleur in</span> Zwart
+  <span class="kw">rechthoek uit</span> (<span class="num">-6</span>, <span class="num">-2</span>) <span class="kw">tot</span> (<span class="num">-2</span>, <span class="num">2</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">2</span>, <span class="num">-2</span>) <span class="kw">tot</span> (<span class="num">6</span>, <span class="num">2</span>)
+) <span class="kw">als</span> Alien1
+
+<span class="kw">etiket</span> (
+  <span class="kw">stel kleur in</span> Wit
+  <span class="kw">rechthoek uit</span> (<span class="num">-12</span>, <span class="num">-8</span>) <span class="kw">tot</span> (<span class="num">12</span>, <span class="num">8</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">-12</span>, <span class="num">4</span>) <span class="kw">tot</span> (<span class="num">-8</span>, <span class="num">8</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">8</span>, <span class="num">4</span>) <span class="kw">tot</span> (<span class="num">12</span>, <span class="num">8</span>)
+  <span class="kw">stel kleur in</span> Zwart
+  <span class="kw">rechthoek uit</span> (<span class="num">-6</span>, <span class="num">-2</span>) <span class="kw">tot</span> (<span class="num">-2</span>, <span class="num">2</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">2</span>, <span class="num">-2</span>) <span class="kw">tot</span> (<span class="num">6</span>, <span class="num">2</span>)
+) <span class="kw">als</span> Alien2
+
+<span class="kw">etiket</span> (
+  <span class="kw">stel kleur in</span> Geel
+  <span class="kw">rechthoek uit</span> (<span class="num">-10</span>, <span class="num">-2</span>) <span class="kw">tot</span> (<span class="num">10</span>, <span class="num">2</span>)
+  <span class="kw">rechthoek uit</span> (<span class="num">-2</span>, <span class="num">-10</span>) <span class="kw">tot</span> (<span class="num">2</span>, <span class="num">10</span>)
+  <span class="kw">stel kleur in</span> Wit
+  <span class="kw">rechthoek uit</span> (<span class="num">-6</span>, <span class="num">-6</span>) <span class="kw">tot</span> (<span class="num">6</span>, <span class="num">6</span>)
+) <span class="kw">als</span> Explosie
+
+<span class="com"># --- CONFIGURATIE ---</span>
+<span class="kw">zet</span> <span class="num">300</span> <span class="kw">in</span> SchermBreedte
+<span class="kw">zet</span> <span class="num">240</span> <span class="kw">in</span> SpelerNiveauY
+<span class="kw">zet</span> <span class="num">-220</span> <span class="kw">in</span> SpelerY
+<span class="kw">zet</span> <span class="num">6</span> <span class="kw">in</span> Spelersnelheid
+<span class="kw">zet</span> <span class="num">9</span> <span class="kw">in</span> Projectielsnelheid
+<span class="kw">zet</span> <span class="num">4</span> <span class="kw">in</span> Bomsnelheid
+<span class="kw">zet</span> <span class="num">12</span> <span class="kw">in</span> AlienBreedte
+<span class="kw">zet</span> <span class="num">8</span> <span class="kw">in</span> AlienHoogte
+<span class="kw">zet</span> <span class="num">5</span> <span class="kw">in</span> SchildBlokGrootte
+<span class="kw">zet</span> <span class="num">8</span> <span class="kw">in</span> ExplosieDuur
+
+<span class="com"># --- BEGINSTATUS ---</span>
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Score
+<span class="kw">zet</span> <span class="num">3</span> <span class="kw">in</span> Levens
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> SpelerX
+<span class="kw">zet onwaar in</span> ProjectielActief
+<span class="kw">zet punt</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Projectiel
+<span class="kw">zet lijst</span>() <span class="kw">in</span> Aliens
+<span class="kw">zet</span> <span class="num">-180</span> <span class="kw">in</span> ZwermX
+<span class="kw">zet</span> <span class="num">150</span> <span class="kw">in</span> ZwermY
+<span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> ZwermRichting
+<span class="kw">zet</span> <span class="num">3</span> <span class="kw">in</span> ZwermStapX
+<span class="kw">zet</span> <span class="num">-40</span> <span class="kw">in</span> ZwermStapY
+<span class="kw">zet</span> <span class="num">10</span> <span class="kw">in</span> ZwermVertraging
+<span class="kw">zet</span> ZwermVertraging <span class="kw">in</span> VertragingHuidig
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> ZwermTimer
+<span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> AnimatieFrame
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> AnimatieTimer
+<span class="kw">zet lijst</span>() <span class="kw">in</span> Bommen
+<span class="kw">zet</span> <span class="num">96</span> <span class="kw">in</span> BomKans
+<span class="kw">zet lijst</span>() <span class="kw">in</span> Explosies
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> RodeFlashTimer
+
+<span class="com"># Aliens Genereren</span>
+<span class="kw">teller</span> rij <span class="kw">loopt van</span> <span class="num">0</span> <span class="kw">tot</span> <span class="num">4</span> <span class="kw">en doe</span> (
+  <span class="kw">teller</span> col <span class="kw">loopt van</span> <span class="num">0</span> <span class="kw">tot</span> <span class="num">10</span> <span class="kw">en doe</span> (
+    <span class="kw">voeg punt</span>(col * <span class="num">40</span>, rij * <span class="num">-35</span>) <span class="kw">tot</span> Aliens
+  )
+)
+<span class="kw">zet lengte van</span> Aliens <span class="kw">in</span> TotaalAliens
+
+<span class="com"># --- SCHILDEN GENEREREN ---</span>
+<span class="kw">zet lijst</span>() <span class="kw">in</span> SchildBlokken
+<span class="kw">zet</span> <span class="num">-170</span> <span class="kw">in</span> SchildY
+<span class="kw">zet lijst</span>(<span class="num">-210</span>, <span class="num">-70</span>, <span class="num">70</span>, <span class="num">210</span>) <span class="kw">in</span> SchildPosities
+
+<span class="kw">voor elk</span> CentrumX <span class="kw">in</span> SchildPosities <span class="kw">doe</span> (
+  <span class="kw">teller</span> rij <span class="kw">loopt van</span> <span class="num">0</span> <span class="kw">tot</span> <span class="num">4</span> <span class="kw">en doe</span> (
+    <span class="kw">teller</span> col <span class="kw">loopt van</span> <span class="num">-5</span> <span class="kw">tot</span> <span class="num">5</span> <span class="kw">en doe</span> (
+      <span class="kw">indien niet</span> (rij < <span class="num">2</span> <span class="kw">en</span> col > <span class="num">-3</span> <span class="kw">en</span> col < <span class="num">3</span>) <span class="kw">dan</span> (
+        <span class="kw">voeg punt</span>(CentrumX + col * SchildBlokGrootte, SchildY + rij * SchildBlokGrootte) <span class="kw">tot</span> SchildBlokken
+      )
+    )
+  )
+)
+
+<span class="kw">zet</span> SchildBlokGrootte / <span class="num">2</span> <span class="kw">in</span> HalveBlok
+
+<span class="com"># Berekende constanten</span>
+<span class="kw">zet</span> -SchermBreedte <span class="kw">in</span> SchermLinks
+<span class="kw">zet</span> SchermBreedte <span class="kw">in</span> SchermRechts
+<span class="kw">zet</span> SpelerY - <span class="num">10</span> <span class="kw">in</span> HitBoxSpelerOnder
+<span class="kw">zet</span> SpelerY + <span class="num">10</span> <span class="kw">in</span> HitBoxSpelerBoven
+<span class="kw">zet</span> SchildY + <span class="num">25</span> <span class="kw">in</span> TopBarriereY
+
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Matita Space Invaders"</span>
+
+<span class="com"># --- SPEELLUS ---</span>
+<span class="kw">zolang</span> Levens > <span class="num">0</span> <span class="kw">en lengte van</span> Aliens > <span class="num">0</span> <span class="kw">doe</span> (
+  <span class="kw">globaal</span> SpelerX, ProjectielActief, Projectiel, ZwermTimer, ZwermX, ZwermY
+  <span class="kw">globaal</span> VertragingHuidig, AnimatieTimer, AnimatieFrame, Levens, Score
+  <span class="kw">globaal</span> Aliens, Bommen, SchildBlokken, Explosies, ZwermRichting, RodeFlashTimer
+
+  <span class="com"># 1. GRAFIEK EN ACHTERGROND</span>
+  <span class="kw">wis grafiek</span>
+  
+  <span class="com"># Beheer Rode Flash</span>
+  <span class="kw">indien</span> RodeFlashTimer > <span class="num">0</span> <span class="kw">dan</span> (
+    <span class="kw">stel kleur in</span> Rood
+    <span class="kw">verf achtergrond</span>
+    <span class="kw">zet</span> RodeFlashTimer - <span class="num">1</span> <span class="kw">in</span> RodeFlashTimer
+  ) <span class="kw">anders</span> (
+    <span class="kw">stel kleur in</span> Zwart
+    <span class="kw">verf achtergrond</span>
+  )
+
+  <span class="com"># Fix zoom (Basis zwarte rechthoek)</span>
+  <span class="kw">stel kleur in</span> Zwart
+  <span class="kw">rechthoek uit</span> (<span class="num">-320</span>, <span class="num">-260</span>) <span class="kw">tot</span> (<span class="num">320</span>, <span class="num">260</span>)
+
+  <span class="com"># Console Output</span>
+  <span class="kw">wis scherm</span>
+  <span class="kw">schrijf</span> <span class="str">"SCORE: "</span>
+  <span class="kw">schrijf</span> Score
+  <span class="kw">schrijf</span> <span class="str">"    LEVENS: "</span>
+  <span class="kw">schrijf</span> Levens
+
+  <span class="kw">zet lengte van</span> Aliens <span class="kw">in</span> NumAliens
+
+  <span class="com"># 2. BESTURING</span>
+  <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"LEFT"</span> <span class="kw">is ingedrukt</span>) <span class="kw">en</span> SpelerX > SchermLinks <span class="kw">dan</span> (
+    <span class="kw">zet</span> SpelerX - Spelersnelheid <span class="kw">in</span> SpelerX
+  )
+  <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"RIGHT"</span> <span class="kw">is ingedrukt</span>) <span class="kw">en</span> SpelerX < SchermRechts <span class="kw">dan</span> (
+    <span class="kw">zet</span> SpelerX + Spelersnelheid <span class="kw">in</span> SpelerX
+  )
+  <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"SPACE"</span> <span class="kw">is ingedrukt</span>) <span class="kw">en</span> ProjectielActief <span class="kw">is onwaar dan</span> (
+    <span class="kw">zet waar in</span> ProjectielActief
+    <span class="kw">zet punt</span>(SpelerX, SpelerY + <span class="num">20</span>) <span class="kw">in</span> Projectiel
+  )
+  <span class="kw">indien</span> (<span class="kw">toets</span> <span class="str">"X"</span> <span class="kw">is ingedrukt</span>) <span class="kw">dan</span> ( <span class="kw">stop</span> )
+
+  <span class="com"># 3. ALIENLOGICA</span>
+  <span class="kw">zet</span> ZwermTimer + <span class="num">1</span> <span class="kw">in</span> ZwermTimer
+  <span class="kw">indien</span> ZwermTimer >= VertragingHuidig <span class="kw">dan</span> (
+    <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> ZwermTimer
+    <span class="kw">zet</span> ZwermX + (ZwermStapX * ZwermRichting) <span class="kw">in</span> ZwermX
+    <span class="kw">zet</span> AnimatieTimer + <span class="num">1</span> <span class="kw">in</span> AnimatieTimer
+    <span class="kw">indien</span> AnimatieTimer > <span class="num">1</span> <span class="kw">dan</span> (
+      <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> AnimatieTimer
+      <span class="kw">indien</span> AnimatieFrame <span class="kw">gelijk</span> <span class="num">1</span> <span class="kw">dan</span> ( <span class="kw">zet</span> <span class="num">2</span> <span class="kw">in</span> AnimatieFrame ) <span class="kw">anders</span> ( <span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> AnimatieFrame )
+    )
+    
+    <span class="kw">zet onwaar in</span> MuurGeraakt
+    <span class="kw">voor elk</span> alien <span class="kw">in</span> Aliens <span class="kw">doe</span> (
+      <span class="kw">zet</span> ZwermX + <span class="kw">x van</span> alien <span class="kw">in</span> AX
+      <span class="kw">indien</span> (AX > SchermRechts <span class="kw">en</span> ZwermRichting <span class="kw">gelijk</span> <span class="num">1</span>) <span class="kw">of</span> (AX < SchermLinks <span class="kw">en</span> ZwermRichting <span class="kw">gelijk</span> <span class="num">-1</span>) <span class="kw">dan</span> (
+        <span class="kw">zet waar in</span> MuurGeraakt
+      )
+    )
+    <span class="kw">indien</span> MuurGeraakt <span class="kw">is waar dan</span> (
+      <span class="kw">zet</span> ZwermRichting * <span class="num">-1</span> <span class="kw">in</span> ZwermRichting
+      <span class="kw">zet</span> ZwermY + ZwermStapY <span class="kw">in</span> ZwermY
+    )
+  )
+
+  <span class="kw">indien willekeurig</span>(<span class="num">1</span>, <span class="num">100</span>) > BomKans <span class="kw">en</span> numAliens > <span class="num">0</span> <span class="kw">dan</span> (
+    <span class="kw">zet element willekeurig</span>(<span class="num">1</span>, numAliens) <span class="kw">van</span> Aliens <span class="kw">in</span> SchietendeAlien
+    <span class="kw">voeg punt</span>(ZwermX + <span class="kw">x van</span> SchietendeAlien, ZwermY + <span class="kw">y van</span> SchietendeAlien) <span class="kw">tot</span> Bommen
+  )
+
+  <span class="com"># 4. BOTSINGEN</span>
+  
+  <span class="com"># A. EIGEN Projectiel vs SCHILDEN</span>
+  <span class="kw">indien</span> ProjectielActief <span class="kw">is waar dan</span> (
+    <span class="kw">zet lijst</span>() <span class="kw">in</span> OverlevendeBlokken
+    <span class="kw">voor elk</span> blok <span class="kw">in</span> SchildBlokken <span class="kw">doe</span> (
+      <span class="kw">zet waar in</span> BewaarBlok
+      <span class="kw">zet x van</span> blok <span class="kw">in</span> SX
+      <span class="kw">zet y van</span> blok <span class="kw">in</span> SY
+      <span class="kw">zet x van</span> Projectiel <span class="kw">in</span> BX
+      <span class="kw">indien abs</span>(BX - SX) < HalveBlok <span class="kw">en</span> (<span class="kw">y van</span> Projectiel <= SY + HalveBlok) <span class="kw">en</span> (<span class="kw">y van</span> Projectiel + Projectielsnelheid >= SY - HalveBlok) <span class="kw">dan</span> (
+        <span class="kw">zet onwaar in</span> BewaarBlok
+        <span class="kw">zet onwaar in</span> ProjectielActief
+      )
+      <span class="kw">indien</span> BewaarBlok <span class="kw">is waar dan</span> ( <span class="kw">voeg</span> blok <span class="kw">tot</span> OverlevendeBlokken )
+    )
+    <span class="kw">zet</span> OverlevendeBlokken <span class="kw">in</span> SchildBlokken
+  )
+
+  <span class="com"># B. EIGEN Projectiel vs ALIENS</span>
+  <span class="kw">indien</span> ProjectielActief <span class="kw">is waar dan</span> (
+    <span class="kw">zet y van</span> Projectiel + Projectielsnelheid <span class="kw">in</span> ProjectielNextY
+    <span class="kw">zet x van</span> Projectiel <span class="kw">in</span> BX
+    <span class="kw">zet lijst</span>() <span class="kw">in</span> OverlevendeAliens
+    <span class="kw">voor elk</span> alien <span class="kw">in</span> Aliens <span class="kw">doe</span> (
+      <span class="kw">zet waar in</span> BewaarAlien
+      <span class="kw">zet</span> ZwermX + <span class="kw">x van</span> alien <span class="kw">in</span> AX
+      <span class="kw">zet</span> ZwermY + <span class="kw">y van</span> alien <span class="kw">in</span> AY
+      <span class="kw">indien abs</span>(BX - AX) < AlienBreedte <span class="kw">en y van</span> Projectiel <= AY + AlienHoogte <span class="kw">en</span> ProjectielNextY >= AY - AlienHoogte <span class="kw">dan</span> (
+        <span class="kw">zet onwaar in</span> ProjectielActief
+        <span class="kw">zet onwaar in</span> BewaarAlien
+        <span class="kw">zet</span> Score + <span class="num">10</span> <span class="kw">in</span> Score
+        <span class="kw">zet</span> ZwermVertraging * (<span class="kw">lengte van</span> Aliens / TotaalAliens) <span class="kw">in</span> VertragingHuidig
+        <span class="kw">voeg</span> (<span class="kw">punt</span>(AX, AY), ExplosieDuur) <span class="kw">tot</span> Explosies
+      )
+      <span class="kw">indien</span> BewaarAlien <span class="kw">is waar dan</span> ( <span class="kw">voeg</span> alien <span class="kw">tot</span> OverlevendeAliens )
+    )
+    <span class="kw">zet</span> OverlevendeAliens <span class="kw">in</span> Aliens
+  )
+
+  <span class="com"># C. VIJANDIGE Bommen vs SPELER en SCHILDEN</span>
+  <span class="kw">zet lijst</span>() <span class="kw">in</span> OverlevendeBommen
+  <span class="kw">voor elk</span> bom <span class="kw">in</span> Bommen <span class="kw">doe</span> (
+    <span class="kw">zet waar in</span> BomActief
+    <span class="kw">zet x van</span> bom <span class="kw">in</span> BX
+    <span class="kw">zet y van</span> bom <span class="kw">in</span> BY
+    <span class="kw">zet</span> BY - Bomsnelheid <span class="kw">in</span> BomNextY
+
+    <span class="com"># Raakt Speler?</span>
+    <span class="kw">indien abs</span>(BX - SpelerX) < <span class="num">20</span> <span class="kw">en</span> BY >= HitBoxSpelerOnder <span class="kw">en</span> BomNextY <= HitBoxSpelerBoven <span class="kw">dan</span> (
+      <span class="kw">zet</span> Levens - <span class="num">1</span> <span class="kw">in</span> Levens
+      <span class="kw">zet onwaar in</span> BomActief
+      <span class="kw">zet</span> <span class="num">25</span> <span class="kw">in</span> RodeFlashTimer
+      <span class="kw">voeg</span> (<span class="kw">punt</span>(SpelerX, SpelerY), ExplosieDuur) <span class="kw">tot</span> Explosies
+    )
+
+    <span class="com"># Raakt Schilden?</span>
+    <span class="kw">indien</span> BomActief <span class="kw">is waar dan</span> (
+      <span class="kw">zet lijst</span>() <span class="kw">in</span> OverlevendeBlokken
+      <span class="kw">voor elk</span> blok <span class="kw">in</span> SchildBlokken <span class="kw">doe</span> (
+        <span class="kw">zet waar in</span> BewaarBlok
+        <span class="kw">zet x van</span> blok <span class="kw">in</span> SX
+        <span class="kw">zet y van</span> blok <span class="kw">in</span> SY
+        <span class="com"># Botsing Schild</span>
+        <span class="kw">indien abs</span>(BX - SX) < HalveBlok <span class="kw">en</span> BY >= (SY - HalveBlok) <span class="kw">en</span> BomNextY <= (SY + HalveBlok) <span class="kw">dan</span> (
+          <span class="kw">zet onwaar in</span> BewaarBlok
+          <span class="kw">zet onwaar in</span> BomActief
+          <span class="kw">voeg</span> (<span class="kw">punt</span>(SX, SY), <span class="num">2</span>) <span class="kw">tot</span> Explosies
+        )
+        <span class="kw">indien</span> BewaarBlok <span class="kw">is waar dan</span> ( <span class="kw">voeg</span> blok <span class="kw">tot</span> OverlevendeBlokken )
+      )
+      <span class="kw">zet</span> OverlevendeBlokken <span class="kw">in</span> SchildBlokken
+    )
+    
+    <span class="kw">indien</span> BomActief <span class="kw">is waar dan</span> ( <span class="kw">voeg</span> bom <span class="kw">tot</span> OverlevendeBommen )
+  )
+  <span class="kw">zet</span> OverlevendeBommen <span class="kw">in</span> Bommen
+
+  <span class="com"># D. Controle INVASIE</span>
+  <span class="kw">voor elk</span> alien <span class="kw">in</span> Aliens <span class="kw">doe</span> (
+    <span class="kw">zet</span> ZwermY + <span class="kw">y van</span> alien <span class="kw">in</span> PosYAlien
+    <span class="kw">indien</span> (PosYAlien - <span class="num">10</span>) < TopBarriereY <span class="kw">dan</span> ( <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Levens )
+  )
+
+  <span class="com"># 5. FYSICA</span>
+  <span class="kw">indien</span> ProjectielActief <span class="kw">is waar dan</span> (
+    <span class="kw">stel y van</span> Projectiel <span class="kw">op</span> (<span class="kw">y van</span> Projectiel + Projectielsnelheid)
+    <span class="kw">indien y van</span> Projectiel > SpelerNiveauY <span class="kw">dan</span> ( <span class="kw">zet onwaar in</span> ProjectielActief )
+  )
+
+  <span class="kw">zet lijst</span>() <span class="kw">in</span> ActieveBommen
+  <span class="kw">voor elk</span> bom <span class="kw">in</span> Bommen <span class="kw">doe</span> (
+    <span class="kw">stel y van</span> bom <span class="kw">op</span> (<span class="kw">y van</span> bom - Bomsnelheid)
+    <span class="kw">indien y van</span> bom > -SpelerNiveauY <span class="kw">dan</span> ( <span class="kw">voeg</span> bom <span class="kw">tot</span> ActieveBommen )
+  )
+  <span class="kw">zet</span> ActieveBommen <span class="kw">in</span> Bommen
+  
+  <span class="kw">zet lijst</span>() <span class="kw">in</span> ActieveExplosies
+  <span class="kw">voor elk</span> exp <span class="kw">in</span> Explosies <span class="kw">doe</span> (
+    <span class="kw">zet element</span> <span class="num">1</span> <span class="kw">van</span> exp <span class="kw">in</span> PosExp
+    <span class="kw">zet element</span> <span class="num">2</span> <span class="kw">van</span> exp <span class="kw">in</span> TimerExp
+    <span class="kw">zet</span> TimerExp - <span class="num">1</span> <span class="kw">in</span> TimerExp
+    <span class="kw">indien</span> TimerExp > <span class="num">0</span> <span class="kw">dan</span> ( <span class="kw">voeg</span> (PosExp, TimerExp) <span class="kw">tot</span> ActieveExplosies )
+  )
+  <span class="kw">zet</span> ActieveExplosies <span class="kw">in</span> Explosies
+
+  <span class="com"># 6. TEKENEN</span>
+  <span class="kw">indien</span> AnimatieFrame <span class="kw">gelijk</span> <span class="num">1</span> <span class="kw">dan</span> (
+    <span class="kw">voor elk</span> alien <span class="kw">in</span> Aliens <span class="kw">doe</span> ( <span class="kw">teken</span> Alien1 <span class="kw">op punt</span>(ZwermX + <span class="kw">x van</span> alien, ZwermY + <span class="kw">y van</span> alien) )
+  ) <span class="kw">anders</span> (
+    <span class="kw">voor elk</span> alien <span class="kw">in</span> Aliens <span class="kw">doe</span> ( <span class="kw">teken</span> Alien2 <span class="kw">op punt</span>(ZwermX + <span class="kw">x van</span> alien, ZwermY + <span class="kw">y van</span> alien) )
+  )
+  
+  <span class="kw">voor elk</span> exp <span class="kw">in</span> Explosies <span class="kw">doe</span> ( <span class="kw">teken</span> Explosie <span class="kw">op</span> (<span class="kw">element</span> <span class="num">1</span> <span class="kw">van</span> exp) )
+
+  <span class="kw">teken</span> Spelerschip <span class="kw">op punt</span>(SpelerX, SpelerY)
+  
+  <span class="kw">stel kleur in</span> Groen
+  <span class="kw">voor elk</span> blok <span class="kw">in</span> SchildBlokken <span class="kw">doe</span> (
+    <span class="kw">zet x van</span> blok - HalveBlok <span class="kw">in</span> x1
+    <span class="kw">zet y van</span> blok - HalveBlok <span class="kw">in</span> y1
+    <span class="kw">zet x van</span> blok + HalveBlok <span class="kw">in</span> x2
+    <span class="kw">zet y van</span> blok + HalveBlok <span class="kw">in</span> y2
+    <span class="kw">rechthoek uit</span> (x1, y1) <span class="kw">tot</span> (x2, y2)
+  )
+
+  <span class="kw">indien</span> ProjectielActief <span class="kw">is waar dan</span> (
+    <span class="kw">stel kleur in</span> Wit
+    <span class="kw">rechthoek uit</span> (<span class="kw">x van</span> Projectiel - <span class="num">2</span>, <span class="kw">y van</span> Projectiel - <span class="num">8</span>) <span class="kw">tot</span> (<span class="kw">x van</span> Projectiel + <span class="num">2</span>, <span class="kw">y van</span> Projectiel + <span class="num">8</span>)
+  )
+
+  <span class="kw">stel kleur in</span> Rood
+  <span class="kw">voor elk</span> bom <span class="kw">in</span> Bommen <span class="kw">doe</span> (
+    <span class="kw">rechthoek uit</span> (<span class="kw">x van</span> bom - <span class="num">2</span>, <span class="kw">y van</span> bom - <span class="num">6</span>) <span class="kw">tot</span> (<span class="kw">x van</span> bom + <span class="num">2</span>, <span class="kw">y van</span> bom + <span class="num">6</span>)
+  )
+
+  <span class="com"># --- ZICHTBARE HUD (Als laatste getekend) ---</span>
+  <span class="kw">stel kleur in</span> Wit
+  <span class="kw">graffiti grootte</span> <span class="num">12</span> <span class="kw">op</span> (<span class="num">-290</span>, <span class="num">230</span>) <span class="str">"LEVENS: "</span> + Levens
+  <span class="kw">graffiti grootte</span> <span class="num">12</span> <span class="kw">op</span> (<span class="num">-290</span>, <span class="num">210</span>) <span class="str">"SCORE: "</span> + Score
+
+  <span class="kw">wacht</span> <span class="num">8</span> <span class="kw">ms</span>
+  <span class="kw">kader grafiek</span>
+)
+
+<span class="com"># --- SCHERM SPEL EINDE ---</span>
+<span class="kw">wis grafiek</span>
+<span class="kw">stel kleur in</span> Zwart
+<span class="kw">verf achtergrond</span>
+
+<span class="kw">stel kleur in</span> Rood
+<span class="kw">graffiti grootte</span> <span class="num">50</span> <span class="kw">op</span> (<span class="num">-130</span>, <span class="num">20</span>) <span class="str">"GAME OVER"</span>
+
+<span class="kw">stel kleur in</span> Wit
+<span class="kw">graffiti grootte</span> <span class="num">25</span> <span class="kw">op</span> (<span class="num">-90</span>, <span class="num">-40</span>) <span class="str">"SCORE: "</span> + Score
+
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"SPEL AFGELOPEN"</span>
+<span class="kw">schrijf</span> <span class="str">"Eindscore: "</span>
+<span class="kw">schrijf</span> Score</code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog15" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>15. Mandelbrot-fractaal</h2>
+        
+        <p>Progressieve weergave van de Mandelbrotverzameling, een beroemde wiskundige fractaal.<br>
+        Maakt gebruik van een "ontsnappingsalgoritme" op complexe getallen die op het pixelraster in kaart zijn gebracht.<br>
+        Het programma stelt je in staat verschillende gebieden van de fractaal te verkennen door de coördinaten in het configuratiegedeelte te decommentariëren.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code15', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code15"><span class="kw">wis grafiek</span>
+<span class="kw">wis scherm</span>
+
+<span class="com"># ==========================================</span>
+<span class="com">#     SELECTIE VAN DE BESTEMMING</span>
+<span class="com"># ==========================================</span>
+<span class="com"># Instructies: Haal ALLEEN de opmerkingen (verwijder #) weg </span>
+<span class="com"># bij het blok van het gebied dat je wilt bezoeken. Commentarieer de anderen.</span>
+
+<span class="com"># --- 1. STANDAARDWEERGAVE (De gehele verzameling) ---</span>
+ <span class="kw">zet</span> <span class="num">-0.75</span> <span class="kw">in</span> CENTRUM_X
+ <span class="kw">zet</span> <span class="num">0.0</span>   <span class="kw">in</span> CENTRUM_Y
+ <span class="kw">zet</span> <span class="num">140</span>   <span class="kw">in</span> ZOOM
+ <span class="kw">zet</span> <span class="num">80</span>    <span class="kw">in</span> MAX_ITERATIES
+
+<span class="com"># --- 2. ZEEPAARDJESVALLEI (Seahorse Valley) ---</span>
+<span class="com"># zet -0.748 in CENTRUM_X</span>
+<span class="com"># zet 0.1    in CENTRUM_Y</span>
+<span class="com"># zet 3000   in ZOOM</span>
+<span class="com"># zet 300    in MAX_ITERATIES</span>
+
+<span class="com"># --- 3. DE SATELLIET (Mini Mandelbrot) ---</span>
+<span class="com"># zet -1.7685 in CENTRUM_X</span>
+<span class="com"># zet 0.0005  in CENTRUM_Y</span>
+<span class="com"># zet 1000    in ZOOM</span>
+<span class="com"># zet 200     in MAX_ITERATIES</span>
+
+<span class="com"># --- 4. OLIFANTENVALLEI ---</span>
+<span class="com"># zet 0.275 in CENTRUM_X</span>
+<span class="com"># zet 0.006 in CENTRUM_Y</span>
+<span class="com"># zet 2500  in ZOOM</span>
+<span class="com"># zet 200   in MAX_ITERATIES</span>
+
+<span class="com"># --- 5. DIEPE SPIRAAL (Deep Zoom) ---</span>
+<span class="com"># zet -0.743643 in CENTRUM_X</span>
+<span class="com"># zet 0.131825  in CENTRUM_Y</span>
+<span class="com"># zet 40000     in ZOOM</span>
+<span class="com"># zet 1200      in MAX_ITERATIES</span>
+
+<span class="com"># ==========================================</span>
+<span class="com">#               EINDE CONFIGURATIE</span>
+<span class="com"># ==========================================</span>
+
+<span class="com"># --- Vensterafmetingen (Hoge Resolutie) ---</span>
+<span class="com"># Veelvouden van 32 om restblokken te vermijden</span>
+<span class="kw">zet</span> <span class="num">416</span> <span class="kw">in</span> HALVE_BREEDTE
+<span class="kw">zet</span> <span class="num">320</span> <span class="kw">in</span> HALVE_HOOGTE
+
+<span class="com"># Berekening randen voor renderen</span>
+<span class="kw">zet</span> -HALVE_BREEDTE <span class="kw">in</span> X_START
+<span class="kw">zet</span>  HALVE_BREEDTE <span class="kw">in</span> X_END
+<span class="kw">zet</span> -HALVE_HOOGTE   <span class="kw">in</span> Y_START
+<span class="kw">zet</span>  HALVE_HOOGTE   <span class="kw">in</span> Y_END
+
+<span class="com"># --- SETUP CAMERA ---</span>
+<span class="com"># We zetten de framing vast op het maximale gebied voordat we beginnen met rekenen</span>
+<span class="kw">rechthoek uit</span> (X_START, Y_START) <span class="kw">tot</span> (X_END, Y_END)
+<span class="kw">kader grafiek</span>
+<span class="kw">wis grafiek</span>
+
+<span class="com"># --- Logica Progressieve Rendering ---</span>
+<span class="kw">zet</span> <span class="num">32</span> <span class="kw">in</span> HUIDIGE_STAP
+<span class="kw">zet</span> <span class="num">1</span>  <span class="kw">in</span> MINIMUM_STAP
+<span class="kw">zet</span> <span class="num">0</span>  <span class="kw">in</span> MARGE
+
+<span class="kw">schrijf</span> <span class="str">"Renderen gecentreerd op ("</span> + CENTRUM_X + <span class="str">", "</span> + CENTRUM_Y + <span class="str">")"</span>
+<span class="kw">nieuwe regel</span>
+
+<span class="kw">zolang</span> (HUIDIGE_STAP >= MINIMUM_STAP) <span class="kw">doe</span> (
+    <span class="kw">globaal</span> HUIDIGE_STAP, Py
+    
+    <span class="kw">schrijf</span> <span class="str">"Detail verfijnen (Stap: "</span> + HUIDIGE_STAP + <span class="str">")..."</span>
+    <span class="com"># We gaan niet naar een nieuwe regel voor een schonere console</span>
+
+    <span class="com"># --- RIJLUS (Y) ---</span>
+    <span class="kw">zet</span> Y_START <span class="kw">in</span> Py
+    
+    <span class="kw">zolang</span> (Py < (Y_END + MARGE)) <span class="kw">doe</span> (
+        <span class="kw">globaal</span> Py, Px
+        
+        <span class="com"># --- KOLOMLUS (X) ---</span>
+        <span class="kw">zet</span> X_START <span class="kw">in</span> Px
+        
+        <span class="kw">zolang</span> (Px < (X_END + MARGE)) <span class="kw">doe</span> (
+            <span class="kw">globaal</span> Px, zx, zy, iter, straalKwadraat, tempX
+            
+            <span class="com"># 1. Coördinaten in kaart brengen</span>
+            <span class="kw">zet</span> (Px / ZOOM) + CENTRUM_X <span class="kw">in</span> cx
+            <span class="kw">zet</span> (Py / ZOOM) + CENTRUM_Y <span class="kw">in</span> cy
+            
+            <span class="com"># 2. Initialisatie Mandelbrot</span>
+            <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> zx
+            <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> zy
+            <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> iter
+            <span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> straalKwadraat
+            
+            <span class="com"># 3. Ontsnappingslus</span>
+            <span class="kw">zolang</span> ((straalKwadraat < <span class="num">4</span>) <span class="kw">en</span> (iter < MAX_ITERATIES)) <span class="kw">doe</span> (
+                <span class="kw">globaal</span> zx, zy, iter, straalKwadraat, tempX
+                
+                <span class="kw">zet</span> (zx * zx) - (zy * zy) + cx <span class="kw">in</span> tempX
+                <span class="kw">zet</span> (<span class="num">2</span> * zx * zy) + cy <span class="kw">in</span> zy
+                <span class="kw">zet</span> tempX <span class="kw">in</span> zx
+                <span class="kw">zet</span> (zx * zx) + (zy * zy) <span class="kw">in</span> straalKwadraat
+                <span class="kw">zet</span> iter + <span class="num">1</span> <span class="kw">in</span> iter
+            )
+
+            <span class="com"># 4. Kleuring (CORRECT 0-100)</span>
+            <span class="kw">indien</span> (iter == MAX_ITERATIES) <span class="kw">dan</span> (
+                <span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+            ) <span class="kw">anders</span> (
+                <span class="com"># Sinusoïdaal palet aangepast voor Matita (0-100)</span>
+                <span class="com"># 50 is het centrum, 50 is de amplitude. Max resultaat 100.</span>
+                <span class="kw">zet</span> <span class="num">0.1</span> <span class="kw">in</span> freq 
+                <span class="kw">zet</span> <span class="num">50</span> + <span class="num">50</span> * <span class="kw">sin</span>(freq * iter + <span class="num">0.0</span>) <span class="kw">in</span> R
+                <span class="kw">zet</span> <span class="num">50</span> + <span class="num">50</span> * <span class="kw">sin</span>(freq * iter + <span class="num">2.0</span>) <span class="kw">in</span> G
+                <span class="kw">zet</span> <span class="num">50</span> + <span class="num">50</span> * <span class="kw">sin</span>(freq * iter + <span class="num">4.0</span>) <span class="kw">in</span> B
+                <span class="kw">stel kleur in</span> (R, G, B)
+            )
+
+            <span class="com"># 5. Pixel Tekenen</span>
+            <span class="kw">rechthoek uit</span> (Px, Py) <span class="kw">tot</span> (Px + HUIDIGE_STAP + <span class="num">1</span>, Py + HUIDIGE_STAP + <span class="num">1</span>)
+
+            <span class="com"># Ga naar volgende kolom</span>
+            <span class="kw">zet</span> Px + HUIDIGE_STAP <span class="kw">in</span> Px
+        )
+        
+        <span class="com"># Scherm bijwerken</span>
+        <span class="kw">herteken</span>
+        <span class="kw">wacht</span> <span class="num">0</span> <span class="kw">ms</span> 
+        
+        <span class="com"># Ga naar volgende rij</span>
+        <span class="kw">zet</span> Py + HUIDIGE_STAP <span class="kw">in</span> Py
+    )
+
+    <span class="com"># Verhoog resolutie</span>
+    <span class="kw">zet</span> HUIDIGE_STAP / <span class="num">2</span> <span class="kw">in</span> HUIDIGE_STAP
+)
+
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Afbeelding voltooid!"</span>
+<span class="kw">kader grafiek</span></code></pre>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="prog16" class="program-section">
+        <a href="#indice" class="nav-link">↑ Terug naar inhoudsopgave</a>
+        <h2>16. Schatting van Pi (Monte Carlo)</h2>
+        <p>Een demonstratie van de Monte Carlo-methode om de waarde van Pi te schatten.<br>
+        Genereert willekeurige punten in een vierkant en telt hoeveel er in de ingeschreven cirkel vallen.<br>
+        De verhouding tussen de binnenste punten en de totale punten benadert de oppervlakte van de cirkel, en daarmee Pi.</p>
+
+        <div class="code-wrapper">
+            <div class="code-toolbar">
+                <span class="code-lang">Matita</span>
+                <button class="copy-btn" onclick="copyToClipboard('code16', this)">Kopieer Code</button>
+            </div>
+            <pre><code id="code16"><span class="kw">wis scherm</span>
+
+<span class="kw">definieer functie</span> modulus(P) (
+    <span class="kw">retourneer wortel</span>((<span class="kw">x van</span> P)^<span class="num">2</span>+(<span class="kw">y van</span> P)^<span class="num">2</span>)
+)
+
+<span class="kw">zet</span> <span class="num">10000</span> <span class="kw">in</span> AantalPunten
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> inCirkel
+<span class="kw">zet</span> (<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>) <span class="kw">in</span> zwart
+<span class="kw">zet</span> (<span class="num">0</span>,<span class="num">0</span>,<span class="num">100</span>) <span class="kw">in</span> blauw
+<span class="kw">zet</span> (<span class="num">100</span>,<span class="num">0</span>,<span class="num">0</span>) <span class="kw">in</span> rood
+
+<span class="kw">zet</span> <span class="num">2.5e-3</span> <span class="kw">in</span> Dikte
+<span class="kw">stel kleur in</span> zwart
+<span class="kw">lijn dikte</span> Dikte <span class="kw">uit</span> (<span class="num">-0.5</span>, <span class="num">-0.5</span>) <span class="kw">tot</span> (<span class="num">-0.5</span>, <span class="num">0.5</span>)
+<span class="kw">lijn dikte</span> Dikte <span class="kw">uit</span> (<span class="num">-0.5</span>, <span class="num">0.5</span>) <span class="kw">tot</span> (<span class="num">0.5</span>, <span class="num">0.5</span>)
+<span class="kw">lijn dikte</span> Dikte <span class="kw">uit</span> (<span class="num">0.5</span>, <span class="num">0.5</span>) <span class="kw">tot</span> (<span class="num">0.5</span>, <span class="num">-0.5</span>)
+<span class="kw">lijn dikte</span> Dikte <span class="kw">uit</span> (<span class="num">0.5</span>, <span class="num">-0.5</span>) <span class="kw">tot</span> (<span class="num">-0.5</span>, <span class="num">-0.5</span>)
+
+<span class="kw">teller</span> I <span class="kw">loopt van</span> <span class="num">1</span> <span class="kw">tot</span> AantalPunten <span class="kw">en doe</span> (
+<span class="kw">globaal</span> inCirkel    
+<span class="kw">zet willekeurig</span>() - <span class="num">0.5</span> <span class="kw">in</span> x
+    <span class="kw">zet willekeurig</span>() - <span class="num">0.5</span> <span class="kw">in</span> y
+    <span class="kw">zet punt</span>(x, y) <span class="kw">in</span> P
+
+    <span class="kw">indien</span> modulus(P) < <span class="num">0.5</span> <span class="kw">dan</span> (
+       <span class="kw">stel kleur in</span> rood
+       <span class="kw">cirkel straal</span> Dikte <span class="kw">op</span> (<span class="kw">x van</span> P, <span class="kw">y van</span> P)
+       <span class="kw">zet</span> inCirkel + <span class="num">1</span> <span class="kw">in</span> inCirkel
+       
+    ) <span class="kw">anders</span> (
+       <span class="kw">stel kleur in</span> blauw
+       <span class="kw">cirkel straal</span> Dikte <span class="kw">op</span> (<span class="kw">x van</span> P, <span class="kw">y van</span> P)
+      )
+) 
+
+<span class="kw">schrijf</span> <span class="str">"Punten: "</span> + AantalPunten + <span class="str">" waarvan binnen: "</span> + inCirkel
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Schatting van Pi: "</span> + (inCirkel / AantalPunten) * <span class="num">4</span>
+
+<span class="kw">kader grafiek</span></code></pre>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    function copyToClipboard(elementId, btnElement) {
+        // Zoek het codeblok
+        const codeElement = document.getElementById(elementId);
+        
+        // CORRECTIE: We gebruiken textContent in plaats van innerText.
+        // textContent haalt alleen de pure tekst op en negeert volledig
+        // de interne HTML-tags (zoals <span class="kw">) die voor kleuren worden gebruikt.
+        const textToCopy = codeElement.textContent;
+
+        // Gebruik de Clipboard API
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Visuele feedback
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "Gekopieerd!";
+            btnElement.style.backgroundColor = "#28a745"; // Succes groen
+
+            // Herstel de knop na 2 seconden
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.style.backgroundColor = ""; // Terug naar originele kleur (CSS)
+            }, 2000);
+        }).catch(err => {
+            console.error('Fout bij kopiëren: ', err);
+            btnElement.innerText = "Fout";
+            btnElement.style.backgroundColor = "#dc3545";
+        });
+    }
+</script>
+
+</body>
+</html>

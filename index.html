@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
+  
   <style>
     :root {
       --bg-app: #0f172a;
@@ -42,7 +42,7 @@
       overflow: hidden;
     }
 
-    .split-container { display: flex; height: 100vh; width: 100%; padding: 8px; gap: 8px; }
+    .split-container { display: flex; height: 100vh; width: 100%; padding: 8px; gap: 0; }
     .gutter { background: var(--bg-app); flex-shrink: 0; transition: background 0.2s; }
     .gutter:hover { background: var(--accent-color); }
     .gutter.gutter-horizontal { cursor: col-resize; width: 8px; }
@@ -404,6 +404,25 @@
       background: rgba(56, 189, 248, 0.16);
       outline: 1px solid rgba(56, 189, 248, 0.25);
     }
+
+      .lang-option {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .lang-option:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-primary);
+    }
+    .lang-option.active-lang {
+      color: var(--accent-color);
+    }
+
   </style>
 </head>
 <body>
@@ -419,13 +438,12 @@
           <button id="toggleCanvasButton" aria-label="Mostra/Nascondi Grafica">Grafica</button>
           <button id="runButton" aria-label="Esegui Codice">Esegui</button>
           <button id="stopButton" aria-label="Ferma Esecuzione" disabled>Stop</button>
-
         </div>
 
         <div class="header-right-group">
           <button id="getMatitalkButton" aria-label="Scarica Matita IDE">Scarica Matita</button>
           <div class="header-divider"></div>
-          <button id="langToggleButton" aria-label="Cambia Lingua">EN</button>
+          <button id="langToggleButton" aria-label="Cambia Lingua">EN ▾</button>
           <button id="fullscreenButton" aria-label="Schermo Intero">Full Screen</button>
           <button id="helpButton" aria-label="Apri Aiuto">Aiuto</button>
         </div>
@@ -439,6 +457,7 @@
       </div>
     </div>
 
+    <div class="gutter gutter-horizontal" id="splitGutter"></div>
     <div class="pane output-pane" id="output-pane">
       <pre id="outputArea" aria-live="polite" aria-label="Output del programma"></pre>
     </div>
@@ -470,19 +489,22 @@
 "use strict";
 
 function initMatita() {
+  
+  const AVAILABLE_LANGS = ["en", "it", "nl"];
+
   let storedLang = localStorage.getItem("matita_lang");
-  let isLanguageIT;
-  
-  if (storedLang !== null) {
-    // Se c'è una preferenza salvata, uso quella:
-    isLanguageIT = storedLang === "it";
+  let currentLang;
+
+  if (storedLang !== null && AVAILABLE_LANGS.includes(storedLang)) {
+    currentLang = storedLang;
   } else {
-    // Altrimenti, leggo la lingua del browser/dispositivo:
-    let browserLang = navigator.language || navigator.userLanguage || "";
-    isLanguageIT = browserLang.toLowerCase().startsWith("it");
+    let browserLang = (navigator.language || navigator.userLanguage || "en")
+      .toLowerCase().slice(0, 2);
+    currentLang = AVAILABLE_LANGS.includes(browserLang) ? browserLang : "en";
   }
-  
-  let lang = isLanguageIT ? "it" : "en";
+
+  let lang = currentLang;
+  let isLanguageIT = (currentLang === "it"); // mantenuto per compatibilità con versioni < 4.2
 
   const uiStrings = {
     it: {
@@ -544,7 +566,17 @@ function initMatita() {
       dimensionNeedsList: "Puoi ottenere la dimensione solo di una lista.",
       tockWithoutTick: "Impossibile usare 'tock': il cronometro non è stato avviato con 'tick'.",
       programStopped: "Programma fermato.",
-      expectedKeyword: (name) => `Attesa la parola chiave '${name}'.`,
+      expectedKeyword: (name) => {
+        const map = {
+          "OF": "di", "TO": "a", "AT": "in", "THEN": "allora", "YOU_DO": "esegui",
+          "IN": "in", "AND": "e", "PLACE": "posiziona", "DEG": "gradi",
+          "BACKGROUND": "sfondo", "SCALE": "scala", "AS": "come",
+          "THICKNESS": "spessore", "RADIUS": "raggio", "ITEM": "elemento",
+          "MS": "ms", "SAYING": "dicendo", "WITH": "con", "saying/with": "dicendo/con",
+          "VERTICES": "vertici", "GRAPHICS": "grafica", "SCREEN": "schermo", "FROM": "da"
+        };
+        return `Attesa la parola chiave '${map[name] || name.toLowerCase()}'.`;
+      },
       expectedIdent: "Atteso un identificatore (nome variabile/funzione).",
       expectedExpr: "Attesa un'espressione.",
       expectedComma: "Attesa ',' tra i vertici.",
@@ -635,7 +667,10 @@ function initMatita() {
       dimensionNeedsList: "You can only get the dimension of a list.",
       tockWithoutTick: "Cannot use 'tock': stopwatch not started with 'tick'.",
       programStopped: "Program stopped.",
-      expectedKeyword: (name) => `Expected keyword '${name}'.`,
+      expectedKeyword: (name) => {
+        const map = { "saying/with": "saying/with", "YOU_DO": "you do" };
+        return `Expected keyword '${map[name] || name.toLowerCase()}'.`;
+      },
       expectedIdent: "Expected an identifier (variable/function name).",
       expectedExpr: "Expected an expression.",
       expectedComma: "Expected ',' between vertices.",
@@ -663,6 +698,106 @@ function initMatita() {
       aliasRightVar: "A variable or list item is required on the right of 'alias'.",
       scientificPositive: "The value for 'scientific' must be a positive number.",
       aliasCreateFail: (msg) => `Cannot create alias: ${msg}`,
+    },
+
+    nl: {
+      title: "Matita", run: "Uitvoeren", open: "Openen", save: "Opslaan",
+      graphics: "Grafiek", savePng: "PNG opslaan",
+      fullscreen: "Volledig scherm", exitFullscreen: "Normaal scherm",
+      download: "Downloaden", help: "Help", lineIndicatorPrefix: "Regel",
+      placeholder: "Schrijf je code hier...",
+      canvasReady: "Voer code uit om te tekenen.",
+      canvasResized: "Formaat gewijzigd. Voer opnieuw uit.",
+      greetingMorning: "Goedemorgen", greetingAfternoon: "Goedemiddag",
+      greetingEvening: "Goedenavond", welcomeMessage: "Matita klaar.",
+      saveFilename: "matita_code.txt", downloadFilename: "matita.html",
+      errorPrefix: "Fout op regel", executionStopped: "Programma onderbroken:",
+      timeIs: "Het is", todayIs: "Vandaag is het",
+      warningShadowing: (name) => `Waarschuwing: lokale variabele '${name}' verbergt een globale variabele met dezelfde naam.`,
+      variableNotFound: (name) => `Kan geen variabele vinden met de naam '${name}'`,
+      functionExists: (name) => `Er bestaat al een functie of procedure met de naam '${name}'.`,
+      genericFail: (p) => `${p.msg}${p.expr ? ` in expressie: "${p.expr}"` : ""}`,
+      recursionLimit: "Recursielimiet overschreden. Roep je een procedure te vaak aan?",
+      invalidProcCallArgs: "Ongeldige argumenten voor procedure-aanroep. Verwacht 'met (...)'.",
+      unexpectedTextAfterProcName: "Onverwachte tekst na procedurenaam.",
+      mismatchedParen: "Ontbrekende haakjes in procedure-argumenten.",
+      procArgCount: (p) => `Procedure '${p.name}' verwacht ${p.expected} argumenten, maar kreeg er ${p.got}.`,
+      funcArgCount: (p) => `Functie '${p.name}' verwacht ${p.expected} argumenten, maar kreeg er ${p.got}.`,
+      funcNoReturn: (name) => `Functie '${name}' beëindigd zonder 'retourneer'.`,
+      invalidWait: "De wachttijd moet een niet-negatief getal zijn.",
+      listOnlyOp: (name) => `Deze bewerking vereist een lijst. '${name}' is geen lijst.`,
+      invalidIndex: (p) => `Index ${p.idx} is ongeldig voor lijst '${p.name}'.`,
+      cannotRemoveFromEmpty: "Kan geen elementen verwijderen uit een lege lijst.",
+      pointOnlySet: "Kan alleen 'x' of 'y' instellen op een puntvariabele.",
+      coordNotNumber: "De waarde voor een coördinaat moet een getal zijn.",
+      getPromptNotText: "Het bericht voor 'vraag' moet tekst zijn.",
+      invalidColor: "Ongeldige kleur. Gebruik een lijst van 3 getallen (r, g, b) van 0 tot 100.",
+      backgroundFilenameNotText: "De bestandsnaam van de achtergrond moet tekst zijn.",
+      backgroundScaleNotNumber: "De schaalfactor van de achtergrond moet een positief getal zijn.",
+      imageLoadError: (name) => `Kan afbeelding '${name}' niet laden.`,
+      imageEmpty: (name) => `Afbeelding '${name}' is leeg of kan niet worden geladen.`,
+      shapeParamsNotNumeric: (shape) => `Parameters voor ${shape} moeten numeriek zijn.`,
+      arcRadiusThicknessPositive: "Straal en dikte van de boog moeten positief zijn.",
+      graffitiMalformed: "Onjuiste 'graffiti' instructie. Syntaxis: graffiti grootte <N> op <POS> \"TEKST\"",
+      graffitiContentNotString: "De graffiti-inhoud moet een tekst zijn.",
+      graffitiSizeNotNumber: "De graffiti-grootte moet een positief getal zijn.",
+      labelMalformed: "Onjuiste 'etiket' instructie. Syntaxis: etiket (...) als <naam>",
+      importMalformed: "Onjuiste 'importeer' instructie. Syntaxis: importeer \"bestand\" als <naam>",
+      labelExists: (name) => `Er bestaat al een etiket met de naam '${name}'`,
+      labelNotFound: (name) => `Kan geen etiket vinden met de naam '${name}'`,
+      rotationNotNumber: "De rotatiehoek moet een getal zijn.",
+      scaleNotNumber: "De schaalfactor moet een positief getal zijn.",
+      loopNotList: (expr) => `'voor elk' vereist een lijst. '${expr}' is geen lijst.`,
+      infiniteLoop: "De lus heeft het maximum aantal iteraties overschreden. Is het een oneindige lus?",
+      unknownCommand: (cmd) => `Onbekende instructie: "${cmd}"`,
+      pointArgsNotNumeric: "Een punt vereist twee numerieke argumenten.",
+      pointPropOnlyXY: "Kan alleen 'x' of 'y' ophalen van een punt.",
+      invalidCoordinate: (expr) => `Ongeldige coördinaat: "${expr}". Gebruik een punt of een lijst als (x, y).`,
+      expectedParenAfterKeyword: "Verwacht '(' na het sleutelwoord.",
+      unbalancedParens: "Ongebalanceerde haakjes.",
+      unknownFunction: (name) => `Onbekende functie: '${name}'`,
+      triangleNeedsThreeVertices: (count) => `Een driehoek vereist 3 hoekpunten, maar er zijn er ${count} opgegeven.`,
+      dimensionNeedsList: "De lengte kan alleen worden opgevraagd van een lijst.",
+      tockWithoutTick: "Kan 'tock' niet gebruiken: stopwatch niet gestart met 'tick'.",
+      programStopped: "Programma gestopt.",
+      expectedKeyword: (name) => {
+        const map = {
+          "COLOR": "kleur in", "OF": "van", "TO": "tot", "AT": "op", "THEN": "dan", "YOU_DO": "doe",
+          "IN": "in", "AND": "en", "PLACE": "plaats", "DEG": "graden",
+          "BACKGROUND": "achtergrond", "SCALE": "schaal", "AS": "als",
+          "THICKNESS": "dikte", "RADIUS": "straal", "ITEM": "element",
+          "MS": "ms", "SAYING": "met bericht", "WITH": "met", "saying/with": "met",
+          "VERTICES": "hoekpunten", "GRAPHICS": "grafiek", "SCREEN": "scherm", "FROM": "uit"
+        };
+        return `Verwacht sleutelwoord '${map[name] || name.toLowerCase()}'.`;
+      },
+      expectedIdent: "Verwacht een naam (variabele of functie).",
+      expectedExpr: "Verwacht een expressie.",
+      expectedComma: "Verwacht ',' tussen hoekpunten.",
+      expectedFrom: "Verwacht 'uit'.",
+      expectedFuncProc: "Verwacht 'functie' of 'procedure'.",
+      expectedXY: "Verwacht 'x' of 'y'.",
+      expectedGraphicsScreen: "Verwacht 'grafiek' of 'scherm'.",
+      expectedAt: "Verwacht 'op'.",
+      expectedBy: "Verwacht 'door'.",
+      expectedOf: "Verwacht 'van'.",
+      expectedGoesFrom: "Verwacht 'loopt van'.",
+      expectedPressed: "Verwacht 'ingedrukt'.",
+      invalidInfix: "Ongeldige infix-operator.",
+      unexpectedEOF: "Onverwacht einde van het programma.",
+      malformedRemove: "Onjuiste 'verwijder' instructie.",
+      expectedVarAfterIn: "Na 'in' wordt een variabelenaam of expressie (alias) verwacht.",
+      unknownStatement: (val) => `Onbekende instructie die begint met '${val}'.`,
+      unexpectedToken: (val) => `Onverwacht symbool '${val}'.`,
+      notAList: (name) => `'${name}' is geen lijst.`,
+      invalidIndexVal: (idx) => `Ongeldige index: ${idx}`,
+      indexOutOfBounds: (idx) => `Index buiten bereik: ${idx}`,
+      itemNotAList: (idx) => `Element op index ${idx} is geen lijst.`,
+      invalidAliasDest: "Ongeldig doel voor alias of wijziging.",
+      aliasLeftVar: "Links van 'alias' is een variabelenaam vereist.",
+      aliasRightVar: "Rechts van 'alias' is een variabele of lijstelement vereist.",
+      scientificPositive: "De waarde voor 'wetenschappelijk' moet een positief getal zijn.",
+      aliasCreateFail: (msg) => `Kan alias niet aanmaken: ${msg}`,
     }
   };
 
@@ -838,7 +973,7 @@ function initMatita() {
   const langToggleButton = document.getElementById("langToggleButton");
 
   function applyUILanguage() {
-    lang = isLanguageIT ? "it" : "en";
+    lang = currentLang;
     document.title = uiStrings[lang].title;
     
     // Assegnazione pulita solo testo
@@ -854,7 +989,8 @@ function initMatita() {
     fullscreenButton.textContent = document.fullscreenElement ? uiStrings[lang].exitFullscreen : uiStrings[lang].fullscreen;
     
     codeInput.setAttribute("placeholder", uiStrings[lang].placeholder);
-    langToggleButton.textContent = isLanguageIT ? "EN" : "IT";
+    // Mostra il codice della prossima lingua nel ciclo
+    langToggleButton.textContent = currentLang.toUpperCase() + " ▾";
     
     if (typeof updateLineNumber === "function") updateLineNumber();
   }
@@ -864,14 +1000,14 @@ function initMatita() {
     "as long as": "fintanto", "you do": "esegui", "for each": "per ogni", "goes from": "va da", "as background": "come sfondo", "place it": "posiziona",
     "define": "definisci", "function": "funzione", "procedure": "procedura", "global": "globale", "return": "restituisci", "otherwise": "altrimenti",
     "index": "indice", "variable": "variabile", "put": "metti", "add": "aggiungi", "remove": "rimuovi", "insert": "inserisci", "first": "primo", "last": "ultimo",
-    "item": "elemento", "dimension": "dimensione", "list": "lista", "output": "scrivi", "newline": "accapo", "wait": "aspetta", "get": "chiedi",
+    "item": "elemento", "dimension": "dimensione", "list": "lista", "split": "dividi", "output": "scrivi", "newline": "accapo", "wait": "aspetta", "get": "chiedi",
     "saying": "dicendo", "set": "imposta", "color": "colore", "clear": "cancella", "graphics": "grafica", "frame": "inquadra", "screen": "schermo",
     "redraw": "ridisegna", "circle": "cerchio", "radius": "raggio", "circumference": "circonferenza", "thickness": "spessore", "rectangle": "rettangolo",
     "line": "linea", "triangle": "triangolo", "with": "con", "vertices": "vertici", "arc": "arco", "size": "grandezza", "draw": "disegna", "rotate": "ruota",
     "deg": "gradi", "place": "posiziona", "scale": "scala", "load": "carica", "paint": "dipingi", "background": "sfondo", "key": "tasto", "equals": "uguale",
     "pressed": "premuto", "import": "importa", "label": "etichetta", "true": "vero", "false": "falso", "squareroot": "radice", "trunc": "tronca", "round": "arrotonda",
     "min": "minimo", "max": "massimo", "random": "casuale", "point": "punto", "indexof": "indicedi", "decomposition": "scomposizione", "composition": "composizione",
-    "type": "tipo", "numeric": "numerico", "dice": "dado", "scientific": "scientifica",
+    "type": "tipo", "numeric": "numerico", "dice": "dado", "scientific": "scientifica", "digits": "decimali",
     "and": "e", "of": "di", "at": "in", "by": "di", "as": "come", "to": "a", "is": "vale", "if": "se", "then": "allora", "not": "non", "or": "o", "different": "diverso"
   };
 
@@ -879,65 +1015,189 @@ function initMatita() {
     "fintanto": "as long as", "esegui": "you do", "per ogni": "for each", "va da": "goes from", "come sfondo": "as background",
     "definisci": "define", "funzione": "function", "procedura": "procedure", "globale": "global", "restituisci": "return", "altrimenti": "otherwise",
     "indice": "index", "variabile": "variable", "metti": "put", "aggiungi": "add", "rimuovi": "remove", "inserisci": "insert", "primo": "first", "ultimo": "last",
-    "elemento": "item", "dimensione": "dimension", "lista": "list", "scrivi": "output", "accapo": "newline", "aspetta": "wait", "chiedi": "get",
+    "elemento": "item", "dimensione": "dimension", "lista": "list", "dividi": "split", "scrivi": "output", "accapo": "newline", "aspetta": "wait", "chiedi": "get",
     "dicendo": "saying", "imposta": "set", "colore": "color", "cancella": "clear", "grafica": "graphics", "inquadra": "frame", "schermo": "screen",
     "ridisegna": "redraw", "cerchio": "circle", "raggio": "radius", "circonferenza": "circumference", "spessore": "thickness", "rettangolo": "rectangle",
     "linea": "line", "triangolo": "triangle", "con": "with", "vertici": "vertices", "arco": "arc", "grandezza": "size", "disegna": "draw", "ruota": "rotate",
     "gradi": "deg", "posiziona": "place", "scala": "scale", "carica": "load", "dipingi": "paint", "sfondo": "background", "tasto": "key", "uguale": "equals",
     "premuto": "pressed", "importa": "import", "etichetta": "label", "vero": "true", "falso": "false", "radice": "squareroot", "tronca": "trunc", "arrotonda": "round",
     "minimo": "min", "massimo": "max", "casuale": "random", "punto": "point", "indicedi": "indexof", "scomposizione": "decomposition", "composizione": "composition",
-    "tipo": "type", "numerico": "numeric", "dado": "dice", "scientifica": "scientific", "diverso": "different",
+    "tipo": "type", "numerico": "numeric", "dado": "dice", "scientifica": "scientific", "diverso": "different", "decimali": "digits",
     "se": "if", "allora": "then", "ed": "and", "e": "and", "di": "of", "in": "in", "come": "as", "a": "to", "vale": "is", "o": "or", "non": "not"
   };
 
-  function translateEditorCode(toItalian) {
+
+  const dictEnToNl = {
+    "as long as": "zolang",        "you do": "doe",
+    "for each": "voor elk",        "goes from": "loopt van",
+    "as background": "als achtergrond",
+    "define": "definieer",         "function": "functie",
+    "procedure": "procedure",      "global": "globaal",
+    "return": "retourneer",        "stop": "stop",
+    "if": "indien",                "then": "dan",
+    "otherwise": "anders",         "index": "teller",
+    "variable": "variabele",       "put": "zet",
+    "add": "voeg",                 "remove": "verwijder",
+    "insert": "invoeg",            "first": "eerste",
+    "last": "laatste",             "item": "element",
+    "dimension": "lengte",         "list": "lijst",
+    "output": "schrijf",           "newline": "nieuwe regel",
+    "wait": "wacht",               "get": "vraag",
+    "saying": "met bericht",       "set": "stel",
+    "color": "kleur in",           "clear": "wis",
+    "graphics": "grafiek",         "frame": "kader",
+    "screen": "scherm",            "redraw": "herteken",
+    "circle": "cirkel",            "radius": "straal",
+    "circumference": "omtrek",     "thickness": "dikte",
+    "rectangle": "rechthoek",      "line": "lijn",
+    "triangle": "driehoek",        "with": "met",
+    "vertices": "hoekpunten",      "arc": "boog",
+    "size": "grootte",             "draw": "teken",
+    "rotate": "draai",             "deg": "graden",
+    "place": "plaats",             "it": "het",
+    "scale": "schaal",             "load": "laad",
+    "paint": "verf",               "background": "achtergrond",
+    "key": "toets",                "equals": "gelijk",
+    "pressed": "ingedrukt",        "import": "importeer",
+    "label": "etiket",             "true": "waar",
+    "false": "onwaar",             "squareroot": "wortel",
+    "trunc": "afkap",              "round": "afrond",
+    "min": "minimum",              "max": "maximum",
+    "random": "willekeurig",       "point": "punt",
+    "indexof": "indexvan",         "decomposition": "ontbinding",
+    "composition": "samenstelling","type": "type",
+    "numeric": "numeriek",         "dice": "dobbelsteen",
+    "scientific": "wetenschappelijk","digits": "cijfers",
+    "split": "splits",
+    "and": "en",     "or": "of",     "not": "niet",
+    "is": "is",      "mod": "modulo","different": "ongelijk",
+    "as": "als",     "to": "tot",   "by": "door",
+    "of": "van",     "from": "uit",  "in": "in",
+    "at": "op",      "null": "null", "tick": "tick",
+    "tock": "tock",  "ms": "ms"
+  };
+
+
+
+// --- DIZIONARI DI TRADUZIONE ---
+  // Struttura: langDicts["xx"] = dizionario EN→XX
+  // Per aggiungere una lingua: aggiungi langDicts["es"] = { "if": "si", ... }
+  const langDicts = {
+    it: dictEnToIt,
+    nl: dictEnToNl
+  };
+
+  
+  // Applica un dizionario EN→XX a un testo in un singolo passaggio (previene le doppie traduzioni)
+  function applyDict(code, dict) {
+    if (!dict) return code;
+    const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
+    
+    // Costruisce una singola espressione regolare per cercare e sostituire tutto in un colpo solo
+    const pattern = keys.map(k => k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+    const regex = new RegExp('\\b(' + pattern + ')\\b', 'gi');
+
+    const parts = code.split(/("[^"\\]*(?:\\[\s\S][^"\\]*)*"|#.*)/g);
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 0) {
+        parts[i] = parts[i].replace(regex, (match) => {
+          const translated = dict[match.toLowerCase()];
+          if (!translated) return match;
+          
+          // --- VARIABILI (Singola Lettera Maiuscola) ---
+          // Se la parola trovata è lunga esattamente 1 carattere ed è maiuscola (es. A, E, O, X, Y),
+          // la consideriamo una variabile e la lasciamo intatta, evitando di tradurre le preposizioni/congiunzioni.
+          if (match.length === 1 && match === match.toUpperCase()) {
+            return match;
+          }
+
+          return (match[0] === match[0].toUpperCase())
+            ? translated.charAt(0).toUpperCase() + translated.slice(1)
+            : translated;
+        });
+      }
+    }
+    return parts.join("");
+  }
+
+  // Costruisce il dizionario inverso XX→EN da un dizionario EN→XX
+  function invertDict(dict) {
+    const inv = {};
+    for (const [en, xx] of Object.entries(dict)) inv[xx] = en;
+    return inv;
+  }
+
+  function translateEditorCode(targetLang, prevLang) {
     const code = codeInput.value;
     if (!code.trim()) return;
 
-    const dict = toItalian ? dictEnToIt : dictItToEn;
-    // Ordiniamo le chiavi dalla più lunga alla più corta per evitare che parole singole sovrascrivano frasi intere (es. "for each" vs "for")
-    const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
+    // 1. Lingua di partenza del codice nell'editor
+    if (!prevLang) prevLang = AVAILABLE_LANGS.find(l => l !== targetLang) || "en";
 
-    // Dividiamo il testo isolando le stringhe ("...") e i commenti (#...) in modo da NON tradurli
-    const parts = code.split(/("[^"\\\\]*(?:\\\\.[^"\\\\]*)*"|#.*)/g);
-
-    for (let i = 0; i < parts.length; i++) {
-      if (i % 2 === 0) { // Gli indici pari sono il codice reale
-        let text = parts[i];
-        for (const key of keys) {
-          // \\b assicura di tradurre solo parole intere (es. evita che "list" modifichi la variabile "lista_spesa")
-          const regex = new RegExp('\\b' + key + '\\b', 'gi');
-          text = text.replace(regex, (match) => {
-            const translated = dict[key];
-            // Mantiene la lettera maiuscola se l'utente l'ha usata
-            if (match[0] === match[0].toUpperCase()) {
-              return translated.charAt(0).toUpperCase() + translated.slice(1);
-            }
-            return translated;
-          });
-        }
-        parts[i] = text;
-      }
+    // 2. Se la lingua precedente non era EN, prima traduci in EN (lingua pivot)
+    let codeInEn = code;
+    if (prevLang === "it") {
+      // Usa il dizionario IT->EN curato manualmente per evitare conflitti (es. in/at)
+      codeInEn = applyDict(code, dictItToEn);
+    } else if (prevLang !== "en" && langDicts[prevLang]) {
+      // Per le altre lingue, usa l'inversione automatica
+      codeInEn = applyDict(code, invertDict(langDicts[prevLang]));
     }
 
-    // Applichiamo la traduzione
-    codeInput.value = parts.join("");
-    
-    // Aggiorniamo l'evidenziazione e il conteggio righe
+    // 3. Se la lingua target non è EN, traduci da EN alla lingua target
+    let result = codeInEn;
+    if (targetLang !== "en" && langDicts[targetLang]) {
+      result = applyDict(codeInEn, langDicts[targetLang]);
+    }
+
+    codeInput.value = result;
     updateHighlighting(true);
     if (typeof updateLineNumber === "function") updateLineNumber();
   }
 
 
 
-  langToggleButton.addEventListener("click", () => {
-    isLanguageIT = !isLanguageIT;
-    localStorage.setItem("matita_lang", isLanguageIT ? "it" : "en");
-    applyUILanguage();
-    updateSuggestionsList();
+  const langDropdownMenu = document.getElementById("langDropdownMenu");
+
+  langToggleButton.addEventListener("click", (e) => {
+    e.stopPropagation();
     
-    // TRADUZIONE AUTOMATICA DELL'EDITOR
-    translateEditorCode(isLanguageIT);
+    // Aggiorna la classe active prima di aprire
+    document.querySelectorAll(".lang-option").forEach(opt => {
+      opt.classList.toggle("active-lang", opt.dataset.lang === currentLang);
+    });
+
+    // Calcola la posizione esatta del pulsante "EN ▾"
+    const btnRect = langToggleButton.getBoundingClientRect();
+    
+    // Posiziona il menu sotto il pulsante e allineato a destra
+    langDropdownMenu.style.top = `${btnRect.bottom + 8}px`;
+    langDropdownMenu.style.right = `${window.innerWidth - btnRect.right}px`;
+    langDropdownMenu.style.left = "auto"; // Previene conflitti se left era impostato
+    
+    langDropdownMenu.style.display = langDropdownMenu.style.display === "none" ? "block" : "none";
+  });
+
+
+  document.addEventListener("click", () => {
+    langDropdownMenu.style.display = "none";
+  });
+
+  document.querySelectorAll(".lang-option").forEach(opt => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const newLang = e.currentTarget.dataset.lang;
+      langDropdownMenu.style.display = "none";
+      if (newLang === currentLang) return;
+      const prevEditorLang = currentLang;
+      currentLang = newLang;
+      lang = currentLang;
+      isLanguageIT = (currentLang === "it");
+      localStorage.setItem("matita_lang", currentLang);
+      applyUILanguage();
+      updateSuggestionsList();
+      translateEditorCode(currentLang, prevEditorLang);
+    });
   });
 
   const CONSOLE_PROMPT = ":) ";
@@ -985,8 +1245,8 @@ function initMatita() {
     "set","color","clear","screen","graphics","redraw","frame",
     "circle","radius","circumference","thickness","rectangle","line","triangle","arc","graffiti","draw",
     "rotate","deg","place","it","at","scale","by","load","paint","background","as background",
-    "true","false","and","or","not","is","equals", "different", "mod","pi","infinity","nan",
-    "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","x","y","key","pressed",
+    "true","false","and","or","not","is","equals", "different", "digits", "mod","pi","infinity","nan",
+    "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","key","pressed",
     "split","decomposition","composition","unicode","indexof","tick","tock","null","import","label", "scientific"
   ];
 
@@ -1000,14 +1260,29 @@ function initMatita() {
     "cerchio","raggio","circonferenza","spessore","rettangolo","linea","triangolo","arco","graffiti","disegna",
     "ruota","gradi","posiziona","scala","carica","dipingi","sfondo","come sfondo",
     "vero","falso","e","o","non","uguale a","vale","uguale","diverso", "mod","pi","infinito","nan",
-    "radice","arrotonda","casuale","minimo","massimo","punto","x","y","tasto","premuto",
+    "radice","arrotonda","casuale","minimo","massimo","punto","tasto","premuto",
     "decimali","tronca","scomponi","scomposizione","composizione","unicode","indicedi","tick","tock","null","importa","etichetta","label", "scientifica"
   ];
 
-  const BUILTINS_EN = ["abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","cast","unicode","indexof","decomposition","composition","split", "dice", "type", "numeric", "valmin", "valmax", "argmin", "argmax"];
-  const BUILTINS_IT = ["radice","arrotonda","casuale","minimo","massimo","punto","tronca","cast","unicode","indicedi","scomposizione","composizione","scomponi", "dado", "numerico", "valmin", "valmax", "argmin", "argmax"];
+  const KEYWORDS_NL = ["alias", "tot", "inout", "definieer", "functie", "procedure", "globaal", "retourneer", "stop",
+  "indien", "dan", "anders", "zolang", "doe", "voor", "elk", "teller", "loopt", "van",
+  "zet", "in", "voeg", "verwijder", "invoeg", "eerste", "laatste", "element", "lengte", "lijst",
+  "schrijf", "nieuwe", "regel", "wacht", "ms", "vraag", "met", "bericht",
+  "stel", "kleur", "wis", "scherm", "grafiek", "herfteken", "kader",
+  "cirkel", "straal", "omtrek", "dikte", "rechthoek", "lijn", "driehoek", "boog", "graffiti", "teken",
+  "draai", "graden", "plaats", "op", "schaal", "door", "laad", "verf", "achtergrond",
+  "waar", "onwaar", "en", "of", "niet", "is", "gelijk", "ongelijk", "modulo", "pi", "nan",
+  "wortel", "afrond", "willekeurig", "minimum", "maximum", "punt", "toets", "ingedrukt",
+  "cijfers", "afkap", "ontbinding", "samenstelling", "splits", "unicode", "indexvan",
+  "tick", "tock", "null", "importeer", "etiket", "wetenschappelijk"];
 
-  const ALL_KEYWORDS = new Set([...KEYWORDS_EN, ...KEYWORDS_IT].map(s => s.toLowerCase()));
+
+  const BUILTINS_EN = ["abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","cast","unicode","indexof","decomposition","composition","split", "dice", "type", "numeric", "valmin", "valmax", "argmin", "argmax"];
+  const BUILTINS_IT = ["radice","arrotonda","casuale","minimo","massimo","punto","tronca","cast","unicode","indicedi","scomposizione","composizione","scomponi", "dado", "numerico", "valmin", "valmax", "argmin", "argmax", "dividi"];
+  const BUILTINS_NL = ["wortel", "afrond", "willekeurig", "minimum", "maximum", "punt", "afkap",
+  "unicode", "indexvan", "ontbinding", "samenstelling", "splits", "dobbelsteen", "numeriek", "valmin", "valmax", "argmin", "argmax"];
+
+  const ALL_KEYWORDS = new Set([...KEYWORDS_EN, ...KEYWORDS_IT, ...KEYWORDS_NL].map(s => s.toLowerCase()));
 
   function escapeHtml(s) {
     return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -1048,7 +1323,7 @@ function initMatita() {
         const raw = id[0];
         const lower = raw.toLowerCase();
         const isKw = ALL_KEYWORDS.has(lower);
-        const isBuiltin = [...BUILTINS_EN, ...BUILTINS_IT].includes(lower);
+        const isBuiltin = [...BUILTINS_EN, ...BUILTINS_IT, ...BUILTINS_NL].includes(lower);
         let cls;
         if (isBuiltin) cls = "tok-builtin";
         else if (isKw) cls = (raw === "A" || raw === "a") ? "tok-ident" : "tok-keyword";
@@ -1112,62 +1387,11 @@ function initMatita() {
   }
 
   // Suggestions
-  function buildSuggestions() {
-    if (isLanguageIT) {
-      return [
-        { label: "se (...) allora ( ... )", insert: "se (CONDIZIONE) allora (\n    \n)\n", detail: "Blocco condizionale" },
-        { label: "altrimenti ( ... )", insert: "altrimenti (\n    \n)\n", detail: "Ramo else" },
-        { label: "fintanto (...) esegui ( ... )", insert: "fintanto (CONDIZIONE) esegui (\n    \n)\n", detail: "Loop while" },
-        { label: "per ogni x in LISTA esegui ( ... )", insert: "per ogni x in LISTA esegui (\n    \n)\n", detail: "Loop su lista" },
-        { label: "inserisci VAL in elemento N di LISTA", insert: "inserisci VALORE in elemento INDICE di LISTA\n", detail: "Inserisce elemento in posizione" },
-        { label: "aggiungi val a lista", insert: "aggiungi VALORE a LISTA\n", detail: "Aggiunge in coda alla lista" },
-        { label: "rimuovi elemento n da lista", insert: "rimuovi elemento INDICE da LISTA\n", detail: "Rimuove l'elemento alla posizione n" },
-        { label: "rimuovi primo/ultimo da lista", insert: "rimuovi ultimo elemento da LISTA\n", detail: "Rimuove elemento in testa o coda" },
-        { label: "metti val in elemento n di lista", insert: "metti VALORE in elemento INDICE di LISTA\n", detail: "Sostituisce il valore esistente" },
-        { label: "elemento n di lista", insert: "elemento INDICE di LISTA", detail: "Legge il valore alla posizione n" },
-        { label: "dimensione di lista", insert: "dimensione di LISTA", detail: "Restituisce il numero di elementi" },
-        { label: "indice I va da A a B ed esegui ( ... )", insert: "indice I va da INIZIO a FINE ed esegui (\n    \n)\n", detail: "Loop for" },
-        { label: "definisci procedura nome(args) ( ... )", insert: "definisci procedura nome(a, b) (\n    \n)\n", detail: "Definisce una procedura" },
-        { label: "definisci funzione nome(args) ( ... )", insert: "definisci funzione nome(a, b) (\n    restituisci a + b\n)\n", detail: "Definisce una funzione" },
-        { label: "metti <expr> in <VAR>", insert: "metti ESPRESSIONE in VAR\n", detail: "Assegnamento" },
-        { label: "scrivi <expr>", insert: "scrivi ESPRESSIONE\n", detail: "Stampa a console" },
-        { label: "decimali <n>", insert: "decimali 2\n", detail: "Imposta precisione numeri reali" },
-        { label: "scientifica(N)", insert: "scientifica 1000000\n", detail: "Soglia notazione scientifica" },
-        { label: "accapo", insert: "accapo\n", detail: "Nuova riga" },
-        { label: "imposta colore (r,g,b)", insert: "imposta colore (ROSSO, VERDE, BLU)\n", detail: "Colore (0..100)" },
-        { label: "cancella grafica", insert: "cancella grafica\n", detail: "Svuota lista oggetti grafici" },
 
-        { label: "inquadra grafica", insert: "inquadra grafica\n", detail: "Adatta la telecamera per mostrare tutto" },
-        { label: "cancella schermo", insert: "cancella schermo\n", detail: "Pulisce la console" },
-        { label: "ridisegna", insert: "ridisegna\n", detail: "Ridisegna l'area grafica" },
-        { label: "cerchio raggio R in (x,y)", insert: "cerchio raggio RAGGIO in (X, Y)\n", detail: "Cerchio pieno" },
-        { label: "circonferenza raggio R spessore T in (x,y)", insert: "circonferenza raggio RAGGIO spessore SPESSORE in (X, Y)\n", detail: "Cerchio vuoto" },
-        { label: "rettangolo da (x1,y1) a (x2,y2)", insert: "rettangolo da (X1, Y1) a (X2, Y2)\n", detail: "Rettangolo pieno" },
-        { label: "linea spessore T da (x1,y1) a (x2,y2)", insert: "linea spessore SPESSORE da (X1, Y1) a (X2, Y2)\n", detail: "Segmento" },
-        { label: "triangolo con vertici (x1,y1),(x2,y2),(x3,y3)", insert: "triangolo con vertici (X1, Y1), (X2, Y2), (X3, Y3)\n", detail: "Triangolo pieno" },
-        { label: "arco raggio R spessore T da (x1,y1) a (x2,y2)", insert: "arco raggio RAGGIO spessore SPESSORE da (X1, Y1) a (X2, Y2)\n", detail: "Arco" },
-        { label: "graffiti grandezza N in (x,y) \"TESTO\"", insert: "graffiti grandezza GRANDEZZA in (X, Y) \"TESTO\"\n", detail: "Testo in area grafica" },
-        { label: "etichetta ( ... ) come NOME", insert: "etichetta (\n    \n) come NOME\n", detail: "Definisce un oggetto grafico" },
-        { label: "importa \"file\" come NOME", insert: "importa \"file\" come NOME\n", detail: "Importa immagine come oggetto" },
-        { label: "importa(\"libreria.txt\")", insert: "importa(\"libreria.txt\")\n", detail: "Includi codice da file di testo" },
-        { label: "disegna OGGETTO in (x,y)", insert: "disegna OGGETTO in (X, Y)\n", detail: "Disegna oggetto importato/etichettato" },
-        { label: "ruota OGGETTO di gradi e posiziona in (x,y)", insert: "ruota OGGETTO di ANGOLO gradi e posiziona in (X, Y)\n", detail: "Trasformazione" },
-        { label: "scala OGGETTO di fattore", insert: "scala OGGETTO di FATTORE\n", detail: "Scala" },
-        { label: "carica \"file\" scala F come sfondo", insert: "carica \"file\" scala FATTORE come sfondo\n", detail: "Sfondo immagine" },
-        { label: "dipingi sfondo", insert: "dipingi sfondo\n", detail: "Sfondo colore o immagine" },
-        { label: "aspetta N ms", insert: "aspetta DURATA ms\n", detail: "Pausa" },
-        { label: "chiedi VAR dicendo \"...\"", insert: "chiedi VAR dicendo \"MESSAGGIO\"\n", detail: "Input utente" },
-        { label: "tick", insert: "tick\n", detail: "Avvia il cronometro" },
-        { label: "tock", insert: "tock", detail: "Millisecondi trascorsi da tick" },
-        { label: "casuale(min, max)", insert: "casuale(MIN, MAX)", detail: "Numero casuale tra A e B" },
-        { label: "dado( facce )", insert: "dado(FACCE)", detail: "Numero intero tra 1 e N" },
-        { label: "tipo(x)", insert: "tipo(VALORE)", detail: "Restituisce 'number', 'string', 'list', 'point'..." },
-        { label: "numerico(x)", insert: "numerico(VALORE)", detail: "Vero se l'argomento è un numero valido" }
-    ];
-    }
-    return [
-    // Control Flow
+  const SUGGESTIONS_EN = [
+    
     { label: "if (...) then ( ... )", insert: "if (CONDITION) then (\n    \n)\n", detail: "Conditional block" },
+
     { label: "otherwise ( ... )", insert: "otherwise (\n    \n)\n", detail: "Else branch" },
     { label: "as long as (...) you do ( ... )", insert: "as long as (CONDITION) you do (\n    \n)\n", detail: "While loop" },
     { label: "for each x in LIST you do ( ... )", insert: "for each x in LIST you do (\n    \n)\n", detail: "List loop" },
@@ -1181,6 +1405,7 @@ function initMatita() {
     { label: "put val in item n of list", insert: "put VALUE in item INDEX of LIST\n", detail: "Replace item value" },
     { label: "item n of list", insert: "item INDEX of LIST", detail: "Read value at n" },
     { label: "dimension of list", insert: "dimension of LIST", detail: "Get list size" },
+    { label: "split(text)", insert: "split(TEXT)", detail: "Splits text into a list of characters" },
 
     // Definitions & Vars
     { label: "define procedure name(args) ( ... )", insert: "define procedure name(a, b) (\n    \n)\n", detail: "Define procedure" },
@@ -1231,7 +1456,113 @@ function initMatita() {
     { label: "random(min, max)", insert: "random(MIN, MAX)", detail: "Random number A to B" },
     { label: "dice( faces )", insert: "dice(FACES)", detail: "Random integer 1 to N" }
   ];
-}
+
+  const SUGGESTIONS_IT = [
+        { label: "se (...) allora ( ... )", insert: "se (CONDIZIONE) allora (\n    \n)\n", detail: "Blocco condizionale" },
+        { label: "altrimenti ( ... )", insert: "altrimenti (\n    \n)\n", detail: "Ramo else" },
+        { label: "fintanto (...) esegui ( ... )", insert: "fintanto (CONDIZIONE) esegui (\n    \n)\n", detail: "Loop while" },
+        { label: "per ogni x in LISTA esegui ( ... )", insert: "per ogni x in LISTA esegui (\n    \n)\n", detail: "Loop su lista" },
+        { label: "inserisci VAL in elemento N di LISTA", insert: "inserisci VALORE in elemento INDICE di LISTA\n", detail: "Inserisce elemento in posizione" },
+        { label: "aggiungi val a lista", insert: "aggiungi VALORE a LISTA\n", detail: "Aggiunge in coda alla lista" },
+        { label: "rimuovi elemento n da lista", insert: "rimuovi elemento INDICE da LISTA\n", detail: "Rimuove l'elemento alla posizione n" },
+        { label: "rimuovi primo/ultimo da lista", insert: "rimuovi ultimo elemento da LISTA\n", detail: "Rimuove elemento in testa o coda" },
+        { label: "metti val in elemento n di lista", insert: "metti VALORE in elemento INDICE di LISTA\n", detail: "Sostituisce il valore esistente" },
+        { label: "elemento n di lista", insert: "elemento INDICE di LISTA", detail: "Legge il valore alla posizione n" },
+        { label: "dimensione di lista", insert: "dimensione di LISTA", detail: "Restituisce il numero di elementi" },
+        { label: "indice I va da A a B ed esegui ( ... )", insert: "indice I va da INIZIO a FINE ed esegui (\n    \n)\n", detail: "Loop for" },
+        { label: "dividi(testo)", insert: "dividi(TESTO)", detail: "Divide il testo in una lista di caratteri" },
+        { label: "definisci procedura nome(args) ( ... )", insert: "definisci procedura nome(a, b) (\n    \n)\n", detail: "Definisce una procedura" },
+        { label: "definisci funzione nome(args) ( ... )", insert: "definisci funzione nome(a, b) (\n    restituisci a + b\n)\n", detail: "Definisce una funzione" },
+        { label: "metti <expr> in <VAR>", insert: "metti ESPRESSIONE in VAR\n", detail: "Assegnamento" },
+        { label: "scrivi <expr>", insert: "scrivi ESPRESSIONE\n", detail: "Stampa a console" },
+        { label: "decimali <n>", insert: "decimali 2\n", detail: "Imposta precisione numeri reali" },
+        { label: "scientifica(N)", insert: "scientifica 1000000\n", detail: "Soglia notazione scientifica" },
+        { label: "accapo", insert: "accapo\n", detail: "Nuova riga" },
+        { label: "imposta colore (r,g,b)", insert: "imposta colore (ROSSO, VERDE, BLU)\n", detail: "Colore (0..100)" },
+        { label: "cancella grafica", insert: "cancella grafica\n", detail: "Svuota lista oggetti grafici" },
+
+        { label: "inquadra grafica", insert: "inquadra grafica\n", detail: "Adatta la telecamera per mostrare tutto" },
+        { label: "cancella schermo", insert: "cancella schermo\n", detail: "Pulisce la console" },
+        { label: "ridisegna", insert: "ridisegna\n", detail: "Ridisegna l'area grafica" },
+        { label: "cerchio raggio R in (x,y)", insert: "cerchio raggio RAGGIO in (X, Y)\n", detail: "Cerchio pieno" },
+        { label: "circonferenza raggio R spessore T in (x,y)", insert: "circonferenza raggio RAGGIO spessore SPESSORE in (X, Y)\n", detail: "Cerchio vuoto" },
+        { label: "rettangolo da (x1,y1) a (x2,y2)", insert: "rettangolo da (X1, Y1) a (X2, Y2)\n", detail: "Rettangolo pieno" },
+        { label: "linea spessore T da (x1,y1) a (x2,y2)", insert: "linea spessore SPESSORE da (X1, Y1) a (X2, Y2)\n", detail: "Segmento" },
+        { label: "triangolo con vertici (x1,y1),(x2,y2),(x3,y3)", insert: "triangolo con vertici (X1, Y1), (X2, Y2), (X3, Y3)\n", detail: "Triangolo pieno" },
+        { label: "arco raggio R spessore T da (x1,y1) a (x2,y2)", insert: "arco raggio RAGGIO spessore SPESSORE da (X1, Y1) a (X2, Y2)\n", detail: "Arco" },
+        { label: "graffiti grandezza N in (x,y) \"TESTO\"", insert: "graffiti grandezza GRANDEZZA in (X, Y) \"TESTO\"\n", detail: "Testo in area grafica" },
+        { label: "etichetta ( ... ) come NOME", insert: "etichetta (\n    \n) come NOME\n", detail: "Definisce un oggetto grafico" },
+        { label: "importa \"file\" come NOME", insert: "importa \"file\" come NOME\n", detail: "Importa immagine come oggetto" },
+        { label: "importa(\"libreria.txt\")", insert: "importa(\"libreria.txt\")\n", detail: "Includi codice da file di testo" },
+        { label: "disegna OGGETTO in (x,y)", insert: "disegna OGGETTO in (X, Y)\n", detail: "Disegna oggetto importato/etichettato" },
+        { label: "ruota OGGETTO di gradi e posiziona in (x,y)", insert: "ruota OGGETTO di ANGOLO gradi e posiziona in (X, Y)\n", detail: "Trasformazione" },
+        { label: "scala OGGETTO di fattore", insert: "scala OGGETTO di FATTORE\n", detail: "Scala" },
+        { label: "carica \"file\" scala F come sfondo", insert: "carica \"file\" scala FATTORE come sfondo\n", detail: "Sfondo immagine" },
+        { label: "dipingi sfondo", insert: "dipingi sfondo\n", detail: "Sfondo colore o immagine" },
+        { label: "aspetta N ms", insert: "aspetta DURATA ms\n", detail: "Pausa" },
+        { label: "chiedi VAR dicendo \"...\"", insert: "chiedi VAR dicendo \"MESSAGGIO\"\n", detail: "Input utente" },
+        { label: "tick", insert: "tick\n", detail: "Avvia il cronometro" },
+        { label: "tock", insert: "tock", detail: "Millisecondi trascorsi da tick" },
+        { label: "casuale(min, max)", insert: "casuale(MIN, MAX)", detail: "Numero casuale tra A e B" },
+        { label: "dado( facce )", insert: "dado(FACCE)", detail: "Numero intero tra 1 e N" },
+        { label: "tipo(x)", insert: "tipo(VALORE)", detail: "Restituisce 'number', 'string', 'list', 'point'..." },
+        { label: "numerico(x)", insert: "numerico(VALORE)", detail: "Vero se l'argomento è un numero valido" }
+    ];
+
+    const SUGGESTIONS_NL = [
+      { label: "indien (...) dan ( ... )", insert: "indien (CONDITIE) dan (\n    \n)\n", detail: "Conditioneel blok" },
+      { label: "anders ( ... )", insert: "anders (\n    \n)\n", detail: "Else-tak" },
+      { label: "zolang (...) doe ( ... )", insert: "zolang (CONDITIE) doe (\n    \n)\n", detail: "While-lus" },
+      { label: "voor elk x in LIJST doe ( ... )", insert: "voor elk x in LIJST doe (\n    \n)\n", detail: "Lus over lijst" },
+      { label: "teller I loopt van A tot B en doe ( ... )", insert: "teller I loopt van BEGIN tot EINDE en doe (\n    \n)\n", detail: "For-lus" },
+      { label: "invoeg VAL in element N van LIJST", insert: "invoeg WAARDE in element INDEX van LIJST\n", detail: "Voegt in op positie" },
+      { label: "voeg val naar lijst", insert: "voeg WAARDE naar LIJST\n", detail: "Voegt toe aan einde" },
+      { label: "verwijder element n uit lijst", insert: "verwijder element INDEX uit LIJST\n", detail: "Verwijdert op positie n" },
+      { label: "verwijder eerste/laatste uit lijst", insert: "verwijder laatste element uit LIJST\n", detail: "Verwijdert hoofd of staart" },
+      { label: "zet val in element n van lijst", insert: "zet WAARDE in element INDEX van LIJST\n", detail: "Vervangt bestaande waarde" },
+      { label: "element n van lijst", insert: "element INDEX van LIJST", detail: "Leest waarde op positie n" },
+      { label: "lengte van lijst", insert: "lengte van LIJST", detail: "Geeft aantal elementen" },
+      { label: "splits(tekst)", insert: "splits(TEKST)", detail: "Splitst tekst in een lijst van tekens" },
+      { label: "definieer procedure naam(args) ( ... )", insert: "definieer procedure naam(a, b) (\n    \n)\n", detail: "Definieert een procedure" },
+      { label: "definieer functie naam(args) ( ... )", insert: "definieer functie naam(a, b) (\n    retourneer a + b\n)\n", detail: "Definieert een functie" },
+      { label: "zet <expr> in <VAR>", insert: "zet EXPRESSIE in VAR\n", detail: "Toewijzing" },
+      { label: "schrijf <expr>", insert: "schrijf EXPRESSIE\n", detail: "Afdrukken naar console" },
+      { label: "cijfers <n>", insert: "cijfers 2\n", detail: "Stel precisie decimalen in" },
+      { label: "wetenschappelijk(N)", insert: "wetenschappelijk 1000000\n", detail: "Drempelwaarde wetenschappelijke notatie" },
+      { label: "nieuwe regel", insert: "nieuwe regel\n", detail: "Nieuwe regel" },
+      { label: "stel kleur in (r,g,b)", insert: "stel kleur in (ROOD, GROEN, BLAUW)\n", detail: "Kleur (0..100)" },
+      { label: "wis grafiek", insert: "wis grafiek\n", detail: "Wist grafische objecten" },
+      { label: "kader grafiek", insert: "kader grafiek\n", detail: "Past camera aan alle objecten aan" },
+      { label: "wis scherm", insert: "wis scherm\n", detail: "Wist de console" },
+      { label: "herteken", insert: "herteken\n", detail: "Hertekent het grafische gebied" },
+      { label: "cirkel straal R op (x,y)", insert: "cirkel straal STRAAL op (X, Y)\n", detail: "Gevulde cirkel" },
+      { label: "omtrek straal R dikte D op (x,y)", insert: "omtrek straal STRAAL dikte DIKTE op (X, Y)\n", detail: "Holle cirkel" },
+      { label: "rechthoek uit (x1,y1) tot (x2,y2)", insert: "rechthoek uit (X1, Y1) tot (X2, Y2)\n", detail: "Gevuld rechthoek" },
+      { label: "lijn dikte D uit (x1,y1) tot (x2,y2)", insert: "lijn dikte DIKTE uit (X1, Y1) tot (X2, Y2)\n", detail: "Segment" },
+      { label: "driehoek met hoekpunten (x1,y1),(x2,y2),(x3,y3)", insert: "driehoek met hoekpunten (X1, Y1), (X2, Y2), (X3, Y3)\n", detail: "Gevulde driehoek" },
+      { label: "boog straal R dikte D uit (x1,y1) tot (x2,y2)", insert: "boog straal STRAAL dikte DIKTE uit (X1, Y1) tot (X2, Y2)\n", detail: "Boog" },
+      { label: "graffiti grootte N op (x,y) \"TEKST\"", insert: "graffiti grootte GROOTTE op (X, Y) \"TEKST\"\n", detail: "Tekst op canvas" },
+      { label: "etiket ( ... ) als NAAM", insert: "etiket (\n    \n) als NAAM\n", detail: "Definieert grafisch object" },
+      { label: "importeer \"bestand\" als NAAM", insert: "importeer \"bestand\" als NAAM\n", detail: "Importeert afbeelding als object" },
+      { label: "teken OBJECT op (x,y)", insert: "teken OBJECT op (X, Y)\n", detail: "Tekent object" },
+      { label: "draai OBJECT van HOEK graden en plaats op (x,y)", insert: "draai OBJECT van HOEK graden en plaats het op (X, Y)\n", detail: "Transformatie" },
+      { label: "schaal OBJECT door factor", insert: "schaal OBJECT door FACTOR\n", detail: "Schaalt object" },
+      { label: "laad \"bestand\" schaal F als achtergrond", insert: "laad \"bestand\" schaal FACTOR als achtergrond\n", detail: "Achtergrondafbeelding" },
+      { label: "verf achtergrond", insert: "verf achtergrond\n", detail: "Achtergrondkleur" },
+      { label: "wacht N ms", insert: "wacht DUUR ms\n", detail: "Pauze" },
+      { label: "vraag VAR met bericht \"...\"", insert: "vraag VAR met bericht \"BERICHT\"\n", detail: "Gebruikersinvoer" },
+      { label: "tick", insert: "tick\n", detail: "Start de stopwatch" },
+      { label: "tock", insert: "tock", detail: "Milliseconden verstreken na tick" },
+      { label: "willekeurig(min, max)", insert: "willekeurig(MIN, MAX)", detail: "Willekeurig getal van A tot B" },
+      { label: "dobbelsteen( vlakken )", insert: "dobbelsteen(VLAKKEN)", detail: "Geheel getal van 1 tot N" },
+      { label: "type(x)", insert: "type(WAARDE)", detail: "Geeft 'number', 'string', 'list', 'point'..." },
+      { label: "numeriek(x)", insert: "numeriek(WAARDE)", detail: "Waar als het argument een geldig getal is" }
+    ];
+
+  function buildSuggestions() {
+    const map = { it: SUGGESTIONS_IT, nl: SUGGESTIONS_NL, en: SUGGESTIONS_EN };
+    return map[currentLang] || SUGGESTIONS_EN;
+  }
 
   function getSuggestionCmd(s) {
     const src = String(s.insert || s.label || "").trim();
@@ -1712,14 +2043,28 @@ function initMatita() {
     const placeholdersIT = [
       "VAR","ESPRESSIONE","CONDIZIONE","LISTA","INDICE","INIZIO","FINE","MESSAGGIO","TESTO",
       "RAGGIO","SPESSORE","GRANDEZZA","ROSSO","VERDE","BLU","OGGETTO","ANGOLO","FATTORE",
-      "DURATA","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACCE"
+      "DURATA","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACCE", "VALORE", "NOME"
     ];
+    
     const placeholdersEN = [
       "VARIABLE","EXPRESSION","CONDITION","LIST","INDEX","START","END","PROMPT","TEXT",
       "RADIUS","THICKNESS","SIZE","RED","GREEN","BLUE","OBJECT","ANGLE","FACTOR",
-      "DURATION","X1","Y1","X2","Y2","X3","Y3","X","Y",  "MIN", "MAX", "FACES"
+      "DURATION","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACES", "VALUE", "NAME"
     ];
-    const tokens = isLanguageIT ? placeholdersIT : placeholdersEN;
+
+    const placeholdersNL = [
+      "VAR","EXPRESSIE","CONDITIE","LIJST","INDEX","BEGIN","EINDE","BERICHT","TEKST",
+      "STRAAL","DIKTE","GROOTTE","ROOD","GROEN","BLAUW","OBJECT","HOEK","FACTOR",
+      "DUUR","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "VLAKKEN", "WAARDE", "NAAM"
+    ];
+
+    const tokenMap = {
+      it: placeholdersIT,
+      nl: placeholdersNL,
+      en: placeholdersEN
+    };
+    
+    const tokens = tokenMap[currentLang] || placeholdersEN;
 
     let best = null;
     for (const t of tokens) {
@@ -3115,13 +3460,21 @@ function initMatita() {
           const colorExpr=this.parseExpression(0, null);
           return { type:"SetColor", colorExpr, line: t.line };
         }
+
         // set x|y of <expr> to <expr>
         const propTok=this.parseIdentifier();
         const prop=propTok.value.toLowerCase();
         if (!(prop==="x"||prop==="y")) this.throwParse(uiStrings[lang].expectedXY, propTok.line);
         this.expectKW("OF", t.line);
-        const targetExpr=this.parseExpression(0, new Set(["to","a"]));
-        this.expectKW("TO", t.line);
+        
+        // Aggiungiamo "at" (che deriva dall'olandese "op") al set di stop
+        const targetExpr=this.parseExpression(0, new Set(["to","a","at"]));
+        
+        // Accettiamo sia TO che AT
+        if (!this.matchKW("TO") && !this.matchKW("AT")) {
+             this.expectKW("TO", t.line); // Lancia l'errore se non trova nessuno dei due
+        }
+        
         const valueExpr=this.parseExpression(0, null);
         return { type:"SetPointProp", prop, targetExpr, valueExpr, line: t.line };
       }
@@ -3551,26 +3904,36 @@ function initMatita() {
     env.varOriginalNames = env.varOriginalNames || {};
     env.varOriginalNames[upper] = name;
 
-    const res = resolveVariable(scopeChain, name, upper); 
-
-    // CoW: Marca come condiviso invece di copiare profondamente tutto
     let storedValue = value;
     if (Array.isArray(value)) storedValue = markShared(value);
     else if (isPoint(value)) storedValue = deepCopyValue(value);
 
+    // 1. Risolvi eventuali alias (gli alias devono puntare al loro target originale)
+    const res = resolveVariable(scopeChain, name, upper);
     if (res && res.__isAlias) {
       assignVariable([res.targetScope], res.targetName, storedValue);
       return;
     }
 
-    if (res) { res.scope[res.name] = storedValue; return; }
-
     const upperName = upper;
+
+    // 2. Se la variabile è stata dichiarata esplicitamente "globale" all'interno di questo blocco
     if (isDeclaredGlobal(scopeChain, name)) {
       scopeChain[0][upperName] = storedValue;
       return;
     }
 
+    // 3. Seleziona lo scope corrente (l'ultimo livello della catena)
+    const currentScope = scopeChain[scopeChain.length - 1];
+
+    // 4. Se la variabile è già presente nello scope LOCALE corrente, la aggiorniamo
+    if (upperName in currentScope) {
+      currentScope[upperName] = storedValue;
+      return;
+    }
+
+    // 5. Altrimenti, stiamo creando una NUOVA variabile locale in questo blocco.
+    // Se questa variabile esiste già nello scope GLOBALE, stiamo facendo "shadowing"!
     if ((upperName in scopeChain[0]) && scopeChain.length > 1) {
       env.__shadowWarnings ||= new Set();
       if (!env.__shadowWarnings.has(upperName)) {
@@ -3579,7 +3942,8 @@ function initMatita() {
       }
     }
 
-    scopeChain[scopeChain.length - 1][upperName] = storedValue;
+    // Assegnazione effettiva nello scope corrente
+    currentScope[upperName] = storedValue;
   }
 
   function ensureNumber(v, key, line) {
@@ -3723,9 +4087,10 @@ function initMatita() {
     return (idx >= 0) ? (idx + 1) : 0; // 1-based; 0 = not found
   }
 
-  function builtin_split(args) {
+function builtin_split(args) {
     const s = String(args[0] ?? "");
-    const sep = (args.length >= 2) ? String(args[1]) : " ";
+    // il separatore di default è una stringa vuota ""
+    const sep = (args.length >= 2) ? String(args[1]) : ""; 
     return s.split(sep);
   }
 
@@ -3931,7 +4296,7 @@ function initMatita() {
   regBuiltin(["valmax"], (a) => builtin_valmax(a));
   regBuiltin(["argmin"], (a) => builtin_argmin(a));
   regBuiltin(["argmax"], (a) => builtin_argmax(a));
-regBuiltin(["split", "dividi"], (a)=>builtin_split(a));
+  regBuiltin(["split", "dividi"], (a)=>builtin_split(a));
   regBuiltin(["decomposition","scomposizione","scomponi"], (a)=>builtin_decomposition(a));
   regBuiltin(["composition","composizione"], (a)=>builtin_composition(a));
   regBuiltin(["type", "tipo"], (a) => builtin_type(a));
@@ -4448,16 +4813,28 @@ async function resolveMutableList(node, scopeChain) {
       }
 
       case "While": {
+        const loopScope = Object.create(null);
+        loopScope.__globalVars = new Set();
+        scopeChain.push(loopScope);
+
         const _t0 = performance.now();
         let _chk = 0;
-        while (true) {
-          const c = await evalExpr(st.cond, scopeChain);
-          if (!truthy(c)) break;
-          const r = await execBlock(st.block, scopeChain);
-          if (r && (r.__return || r === EXEC_STOP)) return r;
-          if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
+        let returnVal = null;
+        try {
+          while (true) {
+            const c = await evalExpr(st.cond, scopeChain);
+            if (!truthy(c)) break;
+            const r = await execBlock(st.block, scopeChain);
+            if (r && (r.__return || r === EXEC_STOP)) {
+              returnVal = r;
+              break;
+            }
+            if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
+          }
+        } finally {
+          scopeChain.pop();
         }
-        return null;
+        return returnVal;
       }
 
       case "ForEach": {
@@ -5289,16 +5666,28 @@ async function resolveMutableList(node, scopeChain) {
         if (st.elseBlock) return execBlockS(st.elseBlock, scopeChain);
         return null;
       }
+
       case "While": {
-        const _t0 = performance.now(); let _chk = 0;
-        while (true) {
-          if (!truthy(evalExprS(st.cond, scopeChain))) break;
-          const r = execBlockS(st.block, scopeChain);
-          if (r && (r.__return || r === EXEC_STOP)) return r;
-          if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
+        const loopScope = Object.create(null);
+        loopScope.__globalVars = new Set();
+        scopeChain.push(loopScope);
+
+        const _t0 = performance.now(); 
+        let _chk = 0; 
+        let returnVal = null;
+        try {
+          while (true) {
+            if (!truthy(evalExprS(st.cond, scopeChain))) break;
+            const r = execBlockS(st.block, scopeChain);
+            if (r && (r.__return || r === EXEC_STOP)) { returnVal = r; break; }
+            if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
+          }
+        } finally {
+          scopeChain.pop();
         }
-        return null;
+        return returnVal;
       }
+
       case "ForEach": {
         const list = evalExprS(st.listExpr, scopeChain);
         if (!Array.isArray(list)) fail("loopNotList", "<expr>", st.line);
@@ -5599,14 +5988,21 @@ async function resolveMutableList(node, scopeChain) {
       // Lex + parse con cache: se il sorgente non è cambiato, riusa l'AST precedente
       let ast;
       try {
-        if (src !== _cachedSrc) {
-          const lexer = new Lexer(src);
+        // Normalizza le lingue non native (non EN, non IT) in inglese prima del parsing
+        let srcToParse = src;
+        if (currentLang !== "en" && currentLang !== "it" && langDicts[currentLang]) {
+          srcToParse = applyDict(src, invertDict(langDicts[currentLang]));
+        }
+
+        if (srcToParse !== _cachedSrc) {
+          const lexer = new Lexer(srcToParse);
           const tokens = lexer.lexAll();
           const parser = new Parser(tokens);
           _cachedAst = parser.parseProgram();
-          _cachedSrc = src;
+          _cachedSrc = srcToParse;
         }
         ast = _cachedAst;
+
       } catch (e) {
         _cachedSrc = null;
         _cachedAst = null;
@@ -6027,9 +6423,10 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
   });
 
   helpButton.addEventListener("click", () => {
-    const helpFile = isLanguageIT ? "help_it.html" : "help_en.html";
-    window.open(helpFile, "_blank");
-  });
+    const helpFiles = { it: "help_it.html", nl: "help_nl.html" };
+    const helpFile = helpFiles[currentLang] || "help_en.html";
+    window.open(helpFile, "_blank");
+  });
 
   toggleCanvasButton.addEventListener("click", () => {
     if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
@@ -6231,16 +6628,40 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
     downloadText(uiStrings[lang].downloadFilename, full);
   });
 
-  // Split panes
-  try {
-    Split(["#editor-pane", "#output-pane"], { sizes: [60, 40], minSize: [320, 280], gutterSize: 8 });
-  } catch {}
+
+  // Split panes – resizer nativo
+  (function initSplitter() {
+    const container = document.querySelector(".split-container");
+    
+    // Ripristinati agli ID originali
+    const leftPane  = document.getElementById("editor-pane"); 
+    const rightPane = document.getElementById("output-pane");
+    const gutter    = document.getElementById("splitGutter");
+    
+    leftPane.style.flex  = "0 0 60%"; // Da il 60% dello spazio all'editor
+    rightPane.style.flex = "1 1 0";   // Lascia il resto all'output
+    
+    let dragging = false, startX = 0, startW = 0;
+    gutter.addEventListener("pointerdown", e => {
+      dragging = true; startX = e.clientX;
+      startW = leftPane.getBoundingClientRect().width;
+      gutter.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    gutter.addEventListener("pointermove", e => {
+      if (!dragging) return;
+      const total = container.getBoundingClientRect().width;
+      const newW = Math.max(320, Math.min(total - 288, startW + e.clientX - startX));
+      leftPane.style.flex = "0 0 " + ((newW / total) * 100).toFixed(2) + "%";
+    });
+    gutter.addEventListener("pointerup",     () => { dragging = false; });
+    gutter.addEventListener("pointercancel", () => { dragging = false; });
+  })();
 
   applyUILanguage();
   updateSuggestionsList();
 
-if (isLanguageIT) {
-    codeInput.value = `cancella schermo
+const _examples = {
+    it: `cancella schermo
 
 chiedi Nome dicendo "Come ti chiami?"
 metti "Ciao, " + Nome + ". Facciamo qualcosa insieme! " in Messaggio
@@ -6252,9 +6673,8 @@ metti 30 in H # dimensione testo
 indice I va da 1 a N ed esegui (
     imposta colore (50, 10*I, 100-10*I)
     graffiti grandezza H in punto(0, H*I) Nome
-)`;
-  } else {
-    codeInput.value = `clear screen
+)`,
+    en: `clear screen
 
 get Name saying "What's your name?"
 put "Hello, " + Name + ". Let's do something together! " in Message
@@ -6266,8 +6686,22 @@ put 30 in H # text size
 index I goes from 1 to N and you do (
     set color (50, 10*I, 100-10*I)
     graffiti size H at point(0, H*I) Name
-)`;
-  }
+)`,
+    nl: `wis scherm
+
+vraag Naam met bericht "Hoe heet je?"
+zet "Hallo, " + Naam + ". Laten we iets doen! " in Bericht
+schrijf Bericht
+
+zet 10 in N # aantal herhalingen
+zet 30 in H # tekstgrootte
+
+teller I loopt van 1 tot N en doe (
+    stel kleur in (50, 10*I, 100-10*I)
+    graffiti grootte H op punt(0, H*I) Naam
+)`
+  };
+  codeInput.value = _examples[currentLang] || _examples.en;
 
   // Initial paint
   updateLineNumber();
@@ -6281,5 +6715,12 @@ index I goes from 1 to N and you do (
 document.addEventListener("DOMContentLoaded", initMatita);
 
 </script>
+
+<div id="langDropdownMenu" style="display:none; position:fixed; background:rgba(2,6,23,0.97); border:1px solid var(--border-color); border-radius:var(--radius-md); z-index:9999; min-width:72px; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
+  <div class="lang-option" data-lang="en">EN</div>
+  <div class="lang-option" data-lang="it">IT</div>
+  <div class="lang-option" data-lang="nl">NL</div>
+</div>
+
 </body>
 </html>
