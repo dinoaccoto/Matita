@@ -7,7 +7,7 @@
     <meta name="author" content="Dino Accoto" />
     <meta name="description" content="A complete guide to programming with Matita v0.4.1." />
     <meta name="subject" content="Operational guide to programming with Matita (English syntax)" />
-    <meta name="keywords" content="programming, graphics, Matita, loops, variables, interactivity, lists, alias, inout, null, procedures, functions, scope, global, labels, dimension, newline, output, cast, unicode" />
+    <meta name="keywords" content="programming, graphics, Matita, loops, variables, interactivity, lists, alias, inout, null, procedures, functions, scope, global, labels, dimension, newline, write, cast, unicode" />
     <style>
         :root {
             --PrimaryBlue: #007BFF;
@@ -190,7 +190,7 @@
             <li><strong>Part One: Programming Fundamentals</strong>
                 <ol>
                     <li><a href="#intro">Language Basics</a></li>
-                    <li><a href="#output">The First Commands</a></li>
+                    <li><a href="#write">The First Commands</a></li>
                     <li><a href="#variables">Variables</a></li>
                     <li><a href="#math">Mathematics</a></li>
                     <li><a href="#lists">Lists</a></li>
@@ -259,41 +259,41 @@
     </section>
 
     <div class="pagebreak"></div>
-    <section id="output">
-        <h2>The First Commands: <code>output</code> and <code>clear</code></h2>
-        <p>The <code>output</code> command sends text messages to the console. Consider the following example:</p>
-        <pre><code><span class="kw">output</span> <span class="str">"Hello world"</span></code></pre>
+    <section id="write">
+        <h2>The First Commands: <code>write</code> and <code>clear</code></h2>
+        <p>The <code>write</code> command sends text messages to the console. Consider the following example:</p>
+        <pre><code><span class="kw">write</span> <span class="str">"Hello world"</span></code></pre>
         <p>In the console, the output will appear as:</p>
         <p><code>Hello World</code>, preceded by the system prompt <code>:)</code>.</p>
         
         <p>Matita executes the program by <em>interpreting</em> the instructions sequentially, from the first to the last:</p>
-        <pre><code><span class="kw">output</span> <span class="str">"A"</span>
-<span class="kw">output</span> <span class="str">"B"</span></code></pre>
+        <pre><code><span class="kw">write</span> <span class="str">"A"</span>
+<span class="kw">write</span> <span class="str">"B"</span></code></pre>
         <p>The previous code will produce the output <code>AB</code>.</p>
 
         <p>To insert a line break, the <code>newline</code> command is used:</p>
-        <pre><code><span class="kw">output</span> <span class="str">"A"</span>
+        <pre><code><span class="kw">write</span> <span class="str">"A"</span>
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"B"</span></code></pre>
+<span class="kw">write</span> <span class="str">"B"</span></code></pre>
         
         <p>The special escape character <code>\n</code> performs the same function as <code>newline</code> within a string. The previous program is equivalent to:</p>
-        <pre><code><span class="kw">output</span> <span class="str">"A\n"</span>
-<span class="kw">output</span> <span class="str">"B"</span></code></pre>
+        <pre><code><span class="kw">write</span> <span class="str">"A\n"</span>
+<span class="kw">write</span> <span class="str">"B"</span></code></pre>
 
         <p>It is possible to concatenate multiple strings using the <code>+</code> operator. Example:</p>
-        <pre><code><span class="kw">output</span> <span class="str">"Hello "</span> + <span class="str">"World.\n"</span></code></pre>
+        <pre><code><span class="kw">write</span> <span class="str">"Hello "</span> + <span class="str">"World.\n"</span></code></pre>
 
         <p>To clear the console of all previous text, the <code>clear screen</code> command is used.</p>
         <pre><code><span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"First line."</span>
+<span class="kw">write</span> <span class="str">"First line."</span>
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Second line."</span></code></pre>
+<span class="kw">write</span> <span class="str">"Second line."</span></code></pre>
 
         <p>A fundamental syntactic element is the <code>#</code> character, which indicates the start of a <strong>comment</strong>. The text following this character is ignored by the interpreter. Comments are useful for documenting the code:</p>
         <pre><code><span class="com"># this is a comment.</span>
 <span class="kw">put</span> <span class="num">31</span> <span class="kw">in</span> DaysInMarch <span class="com"># number of days in the month of March</span>
 <span class="com"># Let's show how many days March has:</span>
-<span class="kw">output</span> <span class="str">"March has "</span> + DaysInMarch + <span class="str">" days."</span></code></pre>
+<span class="kw">write</span> <span class="str">"March has "</span> + DaysInMarch + <span class="str">" days."</span></code></pre>
 
         <div class="note">
             <strong>Syntax highlighting and suggestions</strong><br>
@@ -302,11 +302,11 @@
 
         <h3>Multiple commands on one line</h3>
         <p>To insert multiple instructions on the same line, they must be separated with a semicolon (;):</p>
-        <pre><code><span class="kw">output</span> <span class="str">"hello."</span>; <span class="kw">newline</span></code></pre>
+        <pre><code><span class="kw">write</span> <span class="str">"hello."</span>; <span class="kw">newline</span></code></pre>
 
         <h3>Single command across multiple lines</h3>
         <p>Should a command be too long for a single line, it is possible to break it using a backslash <code>\</code> at the end of the line. The interpreter will consider the lines separated by <code>\</code> as a single instruction:</p>
-        <pre><code><span class="kw">output</span> \
+        <pre><code><span class="kw">write</span> \
 <span class="str">"instruction on two lines"</span></code></pre>
     </section>
 
@@ -321,9 +321,9 @@
         <p>Consider the following example:</p>
         <pre><code><span class="kw">put</span> <span class="num">5</span> <span class="kw">in</span> A
 <span class="kw">put</span> <span class="str">"Computer Science"</span> <span class="kw">in</span> B
-<span class="kw">output</span> <span class="str">"The value in A is "</span> + A
+<span class="kw">write</span> <span class="str">"The value in A is "</span> + A
 <span class="kw">newline</span>
-<span class="kw">output</span> B</code></pre>
+<span class="kw">write</span> B</code></pre>
         <p>The produced output will be:</p>
         <pre><code>:) The value in A is 5
 :) Computer Science</code></pre>
@@ -336,15 +336,15 @@
 
         <p>To update the value of a variable, the <code>put</code> command is used again.</p>
         <pre><code><span class="kw">put</span> <span class="num">100</span> <span class="kw">in</span> health
-<span class="kw">output</span> <span class="str">"Initial health: "</span> + health
+<span class="kw">write</span> <span class="str">"Initial health: "</span> + health
 <span class="kw">newline</span>
 <span class="kw">put</span> health - <span class="num">15</span> <span class="kw">in</span> health <span class="com"># The player takes 15 damage</span>
-<span class="kw">output</span> <span class="str">"Status updated. The health is now: "</span> + health</code></pre>
+<span class="kw">write</span> <span class="str">"Status updated. The health is now: "</span> + health</code></pre>
 
         <h3>User input: <code>get</code></h3>
         <p>The <code>get ... saying ...</code> command triggers a dialog window (prompt) that allows the user to enter data via the keyboard. The entered value is stored in the specified variable.</p>
         <pre><code><span class="kw">get</span> PlayerName <span class="kw">saying</span> <span class="str">"Enter username:"</span>
-<span class="kw">output</span> <span class="str">"Registered name: "</span> + PlayerName + <span class="str">". Procedure started."</span></code></pre>
+<span class="kw">write</span> <span class="str">"Registered name: "</span> + PlayerName + <span class="str">". Procedure started."</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
@@ -357,15 +357,15 @@
 <span class="kw">put</span> <span class="num">5</span> <span class="kw">in</span> B
 <span class="kw">put</span> A+B <span class="kw">in</span> Sum
 <span class="kw">put</span> A*B <span class="kw">in</span> Product
-<span class="kw">output</span> <span class="str">"A + B = "</span> + Sum; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"A * B = "</span> + Product</code></pre>
+<span class="kw">write</span> <span class="str">"A + B = "</span> + Sum; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"A * B = "</span> + Product</code></pre>
 
         <p>The <code>mod</code> operator ("<em>modulo</em>") returns the remainder of an integer division. For example, <code>10 mod 3</code> returns 1.</p>
         <pre><code><span class="kw">clear screen</span>
 <span class="kw">put</span> <span class="num">39</span> <span class="kw">in</span> A
 <span class="kw">put</span> <span class="num">7</span> <span class="kw">in</span> B
 <span class="kw">put</span> A <span class="kw">mod</span> B <span class="kw">in</span> C
-<span class="kw">output</span> <span class="str">"The remainder of "</span> + A + <span class="str">"/"</span> + B + <span class="str">" is "</span> + C</code></pre>
+<span class="kw">write</span> <span class="str">"The remainder of "</span> + A + <span class="str">"/"</span> + B + <span class="str">" is "</span> + C</code></pre>
 
         <h3>Operators and Expressions</h3>
         <p>In Matita, an expression is a combination of operands (numbers, texts, lists, points) and operators. The result can be assigned to a variable or used as a logical condition.</p>
@@ -387,7 +387,7 @@
 
         <p>Power example:</p>
         <pre><code><span class="kw">put</span> <span class="num">2</span>^<span class="num">3</span> <span class="kw">in</span> Cube
-<span class="kw">output</span> Cube <span class="com"># Output: 8</span></code></pre>
+<span class="kw">write</span> Cube <span class="com"># Output: 8</span></code></pre>
 
         <h3>Constants and Mathematical Functions</h3>
         <p>Matita includes various ready-to-use constants and mathematical functions. A complete list of predefined functions is available in Appendix A.</p>
@@ -404,9 +404,9 @@
         </ul>
 
         <p>Rounding example:</p>
-        <pre><code><span class="kw">output</span> <span class="kw">trunc</span>(<span class="num">3.9</span>) <span class="com"># Output: 3</span>
+        <pre><code><span class="kw">write</span> <span class="kw">trunc</span>(<span class="num">3.9</span>) <span class="com"># Output: 3</span>
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="kw">ceil</span>(<span class="num">3.1</span>)  <span class="com"># Output: 4</span></code></pre>
+<span class="kw">write</span> <span class="kw">ceil</span>(<span class="num">3.1</span>)  <span class="com"># Output: 4</span></code></pre>
 
         <h3>Points and Coordinates: <code>point</code></h3>
         <p>Besides simple numbers, Matita allows working with Cartesian coordinates via the <strong>point</strong> object. This is essential for graphics, but it can also be used for vector or geometric calculations.</p>
@@ -420,7 +420,7 @@
 
 <span class="com"># Distance calculation (simplified, X-axis only)</span>
 <span class="kw">put</span> (<span class="kw">x of</span> P2) - (<span class="kw">x of</span> P1) <span class="kw">in</span> Distance
-<span class="kw">output</span> <span class="str">"Horizontal distance: "</span> + Distance 
+<span class="kw">write</span> <span class="str">"Horizontal distance: "</span> + Distance 
 <span class="com"># Output: :) Horizontal distance: 10</span></code></pre>
 
         <h3>Generating Random Numbers</h3>
@@ -439,13 +439,13 @@
 <span class="kw">put</span> <span class="kw">dice</span>(<span class="num">6</span>) <span class="kw">in</span> Toss <span class="com"># e.g. 4 (gives an integer between 1 and 6)</span></code></pre>
 
         <h3>Defining Numeric Precision</h3>
-        <p>To control the number of decimal places displayed in the <code>output</code> command, the <code>digits</code> command can be used. This command only affects the <em>display</em> of the output in the console, not the internal value of the variable.</p>
+        <p>To control the number of decimal places displayed in the <code>write</code> command, the <code>digits</code> command can be used. This command only affects the <em>display</em> of the output in the console, not the internal value of the variable.</p>
         <pre><code><span class="kw">digits</span> <span class="num">2</span>
 <span class="kw">put</span> <span class="num">10</span> / <span class="num">3</span> <span class="kw">in</span> Result
-<span class="kw">output</span> Result <span class="com"># Output: 3.33</span>
+<span class="kw">write</span> Result <span class="com"># Output: 3.33</span>
 <span class="kw">newline</span>
 <span class="kw">digits</span> <span class="num">5</span>
-<span class="kw">output</span> Result <span class="com"># Output: 3.33333</span></code></pre>
+<span class="kw">write</span> Result <span class="com"># Output: 3.33333</span></code></pre>
 
         <h3>Scientific Notation: <code>scientific</code></h3>
         <p>When Matita handles very large numbers, the system can automatically switch to displaying in <strong>scientific notation</strong> to improve readability. The format used is "<code>number e exponent</code>".</p>
@@ -456,12 +456,12 @@
 <span class="kw">scientific</span>(<span class="num">100</span>) 
 <span class="kw">put</span> <span class="num">150</span> <span class="kw">in</span> Value
 
-<span class="kw">output</span> Value 
+<span class="kw">write</span> Value 
 <span class="com"># Output: :) 1.5e+2</span>
 
 <span class="com"># Let's change the decimals displayed in the mantissa</span>
 <span class="kw">digits</span> <span class="num">4</span>
-<span class="kw">output</span> Value
+<span class="kw">write</span> Value
 <span class="com"># Output: :) 1.5000e+2</span></code></pre>
 
         <h3>Operator Precedence</h3>
@@ -497,19 +497,19 @@
         <p><strong>Indexing in Matita is 1-based</strong>: the first element is at index 1, the second at index 2, etc.</p>
         <pre><code><span class="kw">put</span> (<span class="num">100</span>, <span class="num">200</span>, <span class="num">300</span>) <span class="kw">in</span> data
 <span class="kw">put</span> <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> data <span class="kw">in</span> Value <span class="com"># Value now contains 200</span>
-<span class="kw">output</span> Value <span class="com"># Prints 200</span></code></pre>
+<span class="kw">write</span> Value <span class="com"># Prints 200</span></code></pre>
 
         <p><strong>Searching for an element</strong>: To find the position of a specific value within the list, the <code>indexof(list, value)</code> command is used. If the element is found, its index is returned (starting from 1), otherwise 0 is returned.</p>
         <pre><code><span class="kw">put</span> (<span class="str">"Apple"</span>, <span class="str">"Pear"</span>, <span class="str">"Banana"</span>) <span class="kw">in</span> Fruits
 <span class="kw">put</span> <span class="kw">indexof</span>(Fruits, <span class="str">"Pear"</span>) <span class="kw">in</span> Position
-<span class="kw">output</span> <span class="str">"The Pear is at position "</span> + Position <span class="com"># Output: 2</span></code></pre>
+<span class="kw">write</span> <span class="str">"The Pear is at position "</span> + Position <span class="com"># Output: 2</span></code></pre>
 
         <h4>Determining the Dimension</h4>
         <p>To get the cardinality of the list (number of elements), use the <code>dimension of</code> operator.</p>
         <pre><code><span class="kw">put</span> (<span class="str">"red"</span>, <span class="str">"green"</span>, <span class="str">"blue"</span>, <span class="str">"yellow"</span>) <span class="kw">in</span> ColorList
 <span class="kw">put</span> <span class="kw">dimension of</span> ColorList <span class="kw">in</span> N <span class="com"># N now contains 4</span>
-<span class="kw">output</span> ColorList + <span class="str">" are "</span> + N + <span class="str">" colors\n"</span>
-<span class="kw">output</span> <span class="str">"the second color is "</span> + <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> ColorList</code></pre>
+<span class="kw">write</span> ColorList + <span class="str">" are "</span> + N + <span class="str">" colors\n"</span>
+<span class="kw">write</span> <span class="str">"the second color is "</span> + <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> ColorList</code></pre>
 
         <p>The output will be:</p>
         <pre><code>:) red,green,blue,yellow are 4 colors
@@ -550,8 +550,8 @@
 
 <span class="com"># Finally, output:</span>
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Shortest member: "</span> + ShortName + <span class="str">" ("</span> + <span class="kw">valmin</span>(HeightsList) + <span class="str">")"</span>; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Tallest member:  "</span> + TallName  + <span class="str">" ("</span> + <span class="kw">valmax</span>(HeightsList) + <span class="str">")"</span></code></pre>
+<span class="kw">write</span> <span class="str">"Shortest member: "</span> + ShortName + <span class="str">" ("</span> + <span class="kw">valmin</span>(HeightsList) + <span class="str">")"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Tallest member:  "</span> + TallName  + <span class="str">" ("</span> + <span class="kw">valmax</span>(HeightsList) + <span class="str">")"</span></code></pre>
         
         <p>Expected output:</p>
         <pre><code>:) Shortest member: Elena (165)
@@ -567,16 +567,16 @@
         <p><strong>Inserting at a specific position</strong>: To insert a value at an arbitrary position, shifting subsequent elements, use <code>insert ... in item ... of ...</code>. Syntax: <code>insert &lt;value&gt; in item &lt;index&gt; of &lt;listName&gt;</code></p>
         <pre><code><span class="kw">put</span> (<span class="str">"A"</span>, <span class="str">"C"</span>) <span class="kw">in</span> Letters
 <span class="kw">insert</span> <span class="str">"B"</span> <span class="kw">in item</span> <span class="num">2</span> <span class="kw">of</span> Letters
-<span class="kw">output</span> Letters
+<span class="kw">write</span> Letters
 <span class="com"># Output: :) (A, B, C)</span></code></pre>
 
         <p><strong>Removing at the head or tail</strong>:</p>
         <pre><code><span class="kw">put</span> (<span class="str">"red"</span>, <span class="str">"green"</span>, <span class="str">"blue"</span>, <span class="str">"yellow"</span>) <span class="kw">in</span> ColorList
 <span class="kw">remove first item from</span> ColorList
-<span class="kw">output</span> ColorList
+<span class="kw">write</span> ColorList
 <span class="kw">newline</span>
 <span class="kw">remove last item from</span> ColorList
-<span class="kw">output</span> ColorList</code></pre>
+<span class="kw">write</span> ColorList</code></pre>
         <p>Output:</p>
         <pre><code>:) (green, blue, yellow)
 :) (green, blue)</code></pre>
@@ -585,14 +585,14 @@
         <pre><code><span class="kw">clear screen</span>
 <span class="kw">put</span> (<span class="str">"A"</span>,<span class="str">"B"</span>,<span class="str">"C"</span>,<span class="str">"D"</span>) <span class="kw">in</span> LetterList
 <span class="kw">remove item</span> <span class="num">3</span> <span class="kw">from</span> LetterList
-<span class="kw">output</span> LetterList</code></pre>
+<span class="kw">write</span> LetterList</code></pre>
         <p>Output: <code>:) (A, B, D)</code></p>
 
         <p><strong>Updating an element</strong>: To overwrite a value at a given position, combine <code>put</code> with the element access.</p>
         <pre><code><span class="kw">put</span> (<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>) <span class="kw">in</span> Data
-<span class="kw">output</span> Data; <span class="kw">newline</span>
+<span class="kw">write</span> Data; <span class="kw">newline</span>
 <span class="kw">put</span> <span class="num">99</span> <span class="kw">in item</span> <span class="num">2</span> <span class="kw">of</span> Data
-<span class="kw">output</span> Data</code></pre>
+<span class="kw">write</span> Data</code></pre>
         <p>Output:</p>
         <pre><code>:) (10, 20, 30)
 :) (10, 99, 30)</code></pre>
@@ -603,7 +603,7 @@
         <pre><code><span class="kw">put</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> Numbers
 <span class="kw">for each</span> n <span class="kw">in</span> Numbers <span class="kw">you do</span> (
   <span class="kw">put</span> n * <span class="num">2</span> <span class="kw">in</span> Double
-  <span class="kw">output</span> Double
+  <span class="kw">write</span> Double
   <span class="kw">newline</span>
 )
 <span class="com"># Output:</span>
@@ -624,9 +624,9 @@
         <pre><code><span class="kw">clear screen</span>
 <span class="kw">get</span> Age <span class="kw">saying</span> <span class="str">"How old are you?"</span>
 <span class="kw">if</span> (Age >= <span class="num">18</span>) <span class="kw">then</span> (
-  <span class="kw">output</span> <span class="str">"You can get a driver's license."</span>
+  <span class="kw">write</span> <span class="str">"You can get a driver's license."</span>
 ) <span class="kw">otherwise</span> (
-  <span class="kw">output</span> <span class="str">"You have to wait "</span> + (<span class="num">18</span> - Age) + <span class="str">" more years."</span>
+  <span class="kw">write</span> <span class="str">"You have to wait "</span> + (<span class="num">18</span> - Age) + <span class="str">" more years."</span>
 )</code></pre>
 
         <h3>Loops</h3>
@@ -636,7 +636,7 @@
         <p>To execute instructions a predetermined number of times, the <code>index</code> loop is used. A local counter variable (often named <code>i</code>) is created and incremented automatically.</p>
         <p>Syntax: <code>index i goes from START to END and you do ( ... )</code></p>
         <pre><code><span class="kw">index</span> i <span class="kw">goes from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">5</span> <span class="kw">and you do</span> (
-  <span class="kw">output</span> <span class="str">"Iteration number "</span> + i
+  <span class="kw">write</span> <span class="str">"Iteration number "</span> + i
   <span class="kw">newline</span>
 )</code></pre>
         <p>Output:</p>
@@ -654,18 +654,18 @@
         <pre><code><span class="kw">clear screen</span>
 <span class="kw">put</span> <span class="num">10</span> <span class="kw">in</span> countdown
 <span class="kw">as long as</span> (countdown > <span class="num">0</span>) <span class="kw">you do</span> (
-  <span class="kw">output</span> countdown
+  <span class="kw">write</span> countdown
   <span class="kw">newline</span>
   <span class="kw">put</span> countdown - <span class="num">1</span> <span class="kw">in</span> countdown
   <span class="kw">wait</span> <span class="num">1000</span> <span class="kw">ms</span>
 )
-<span class="kw">output</span> <span class="str">"Start."</span></code></pre>
+<span class="kw">write</span> <span class="str">"Start."</span></code></pre>
         <p>The program decrements the variable every second and terminates when the condition <code>countdown &gt; 0</code> becomes false.</p>
 
         <h3>Stopping execution: <code>stop</code></h3>
         <p>The <code>stop</code> command immediately halts the execution of the entire program. It is often used within a conditional structure to terminate a loop or game when a certain condition is met.</p>
         <pre><code><span class="kw">if</span> (LivesLeft <span class="kw">equals</span> <span class="num">0</span>) <span class="kw">then</span> (
-  <span class="kw">output</span> <span class="str">"Game Over"</span>
+  <span class="kw">write</span> <span class="str">"Game Over"</span>
   <span class="kw">stop</span>
 )</code></pre>
 
@@ -685,11 +685,11 @@
                 <li><code>tock</code>: This is a special variable that contains the number of milliseconds elapsed since the last <code>tick</code> command.</li>
             </ul>
             <p>Measurement example:</p>
-            <pre><code><span class="kw">output</span> <span class="str">"Measurement started..."</span>
+            <pre><code><span class="kw">write</span> <span class="str">"Measurement started..."</span>
 <span class="kw">newline</span>
 <span class="kw">tick</span> <span class="com"># Start the stopwatch</span>
 <span class="kw">wait</span> <span class="num">1500</span> <span class="kw">ms</span>
-<span class="kw">output</span> <span class="str">"Elapsed time: "</span> + tock + <span class="str">" ms"</span></code></pre>
+<span class="kw">write</span> <span class="str">"Elapsed time: "</span> + tock + <span class="str">" ms"</span></code></pre>
             <p><strong>Note</strong>: If you attempt to read the value of <code>tock</code> without having first executed <code>tick</code>, the program will report an error.</p>
         </section>
     </section>
@@ -700,17 +700,17 @@
         <p>Matita offers simple commands to analyze and transform strings and numbers by treating them as lists of characters or digits.</p>
 
         <h3>Transforming a string into a list</h3>
-        <p>The <code>decomposition</code> command divides a string or a number into its individual characters, returning a list.</p>
-        <pre><code><span class="kw">put</span> <span class="str">"Hello"</span> <span class="kw">in</span> Text
+        <p>The <code>decomposition</code> command divides a string or a number into its individual characters, returning a list.</p>
+        <pre><code><span class="kw">put</span> <span class="str">"Hello"</span> <span class="kw">in</span> Text
 <span class="kw">put</span> <span class="kw">decomposition</span>(Text) <span class="kw">in</span> CharacterList
-<span class="kw">output</span> CharacterList
+<span class="kw">write</span> CharacterList
 <span class="com"># Output: :) (H, e, l, l, o)</span></code></pre>
 
         <h3>Splitting by separator: <code>split</code></h3>
         <p>Unlike simple character splitting, the <code>split(text, separator)</code> command divides a string based on a specific character (like a space or a comma).</p>
         <pre><code><span class="kw">put</span> <span class="str">"red,green,blue"</span> <span class="kw">in</span> CSV
 <span class="kw">put</span> <span class="kw">split</span>(CSV, <span class="str">","</span>) <span class="kw">in</span> Colors
-<span class="kw">output</span> Colors
+<span class="kw">write</span> Colors
 <span class="com"># Output: :) (red, green, blue)</span></code></pre>
 
         <h3>Specific Decomposition</h3>
@@ -718,26 +718,26 @@
         <pre><code><span class="com"># Divide a sentence into words</span>
 <span class="kw">put</span> <span class="str">"Matita is fun"</span> <span class="kw">in</span> Sentence
 <span class="kw">put</span> <span class="kw">decomposition</span>(Sentence, <span class="str">"WORDS"</span>) <span class="kw">in</span> WordList
-<span class="kw">output</span> WordList
+<span class="kw">write</span> WordList
 <span class="com"># Output: :) (Matita, is, fun)</span>
 
 <span class="com"># Divide a number into digits</span>
 <span class="kw">put</span> <span class="num">123.45</span> <span class="kw">in</span> Number
 <span class="kw">put</span> <span class="kw">decomposition</span>(Number, <span class="str">"DIGITS"</span>) <span class="kw">in</span> DigitList
-<span class="kw">output</span> DigitList
+<span class="kw">write</span> DigitList
 <span class="com"># Output: :) (1, 2, 3, ., 4, 5)</span></code></pre>
 
         <h3>Composition</h3>
         <p>The inverse operation to decomposition is <code>composition(list, TYPE)</code>, which joins the elements of a list into a single value. The available target types are <code>TEXT</code> and <code>NUMBER</code>.</p>
         <pre><code><span class="kw">put</span> (<span class="str">"S"</span>, <span class="str">"e"</span>, <span class="str">"a"</span>) <span class="kw">in</span> Letters
 <span class="kw">put</span> <span class="kw">composition</span>(Letters, <span class="str">"TEXT"</span>) <span class="kw">in</span> Word
-<span class="kw">output</span> Word
+<span class="kw">write</span> Word
 <span class="com"># Output: :) Sea</span>
 
 <span class="com"># Create a number from digits</span>
 <span class="kw">put</span> (<span class="num">3</span>, <span class="str">"."</span>, <span class="num">1</span>, <span class="num">4</span>) <span class="kw">in</span> Digits
 <span class="kw">put</span> <span class="kw">composition</span>(Digits, <span class="str">"NUMBER"</span>) <span class="kw">in</span> Value
-<span class="kw">output</span> Value * <span class="num">2</span> <span class="com"># We can do calculations because it's a number</span>
+<span class="kw">write</span> Value * <span class="num">2</span> <span class="com"># We can do calculations because it's a number</span>
 <span class="com"># Output: :) 6.28</span></code></pre>
 
         <h3>Type Inspection</h3>
@@ -747,11 +747,11 @@
             <li><code>numeric(x)</code> (or the equivalent <code>is_number(x)</code>): Returns <code>true</code> if the argument is a valid, finite number, <code>false</code> otherwise.</li>
         </ul>
         <pre><code><span class="kw">put</span> <span class="num">42</span> <span class="kw">in</span> X
-<span class="kw">output</span> <span class="kw">type</span>(X)        <span class="com"># Output: number</span>
-<span class="kw">output</span> <span class="kw">numeric</span>(X)    <span class="com"># Output: true</span>
+<span class="kw">write</span> <span class="kw">type</span>(X)        <span class="com"># Output: number</span>
+<span class="kw">write</span> <span class="kw">numeric</span>(X)    <span class="com"># Output: true</span>
 
 <span class="kw">put</span> <span class="str">"Hello"</span> <span class="kw">in</span> Y
-<span class="kw">output</span> <span class="kw">numeric</span>(Y)    <span class="com"># Output: false</span></code></pre>
+<span class="kw">write</span> <span class="kw">numeric</span>(Y)    <span class="com"># Output: false</span></code></pre>
 
         <h3>Type Conversion (Casting)</h3>
         <p>Sometimes it is necessary to treat a number as if it were text, for instance to concatenate it with other words, or conversely, to use it in a mathematical calculation. The <code>cast</code> command performs the type conversion operation.</p>
@@ -768,14 +768,14 @@
 <span class="kw">put</span> <span class="str">"1.2e3"</span> <span class="kw">in</span> S4  <span class="com"># 1200 in scientific notation</span>
 
 <span class="kw">put</span> <span class="kw">cast</span>(S1, <span class="str">"number"</span>) + <span class="kw">cast</span>(S2, <span class="str">"number"</span>) + <span class="kw">cast</span>(S3, <span class="str">"number"</span>) + <span class="kw">cast</span>(S4, <span class="str">"number"</span>) <span class="kw">in</span> Total
-<span class="kw">output</span> <span class="str">"Sum of casts: "</span> + Total 
+<span class="kw">write</span> <span class="str">"Sum of casts: "</span> + Total 
 <span class="kw">newline</span>
 
 <span class="com"># Test Number to String (Concatenation)</span>
 <span class="kw">put</span> <span class="num">500</span> <span class="kw">in</span> N1
 <span class="kw">put</span> <span class="num">12.5</span> <span class="kw">in</span> N2
 <span class="com"># Sums the strings (concatenation) instead of the numbers</span>
-<span class="kw">output</span> <span class="str">"Concatenation: "</span> + <span class="kw">cast</span>(N1, <span class="str">"text"</span>) + <span class="kw">cast</span>(N2, <span class="str">"text"</span>)
+<span class="kw">write</span> <span class="str">"Concatenation: "</span> + <span class="kw">cast</span>(N1, <span class="str">"text"</span>) + <span class="kw">cast</span>(N2, <span class="str">"text"</span>)
 
 <span class="com"># Expected output:</span>
 <span class="com"># :) Sum of casts: 1163.14</span>
@@ -791,13 +791,13 @@
         <p>Example:</p>
         <pre><code><span class="com"># Example 1: Generate a symbol from the code (Rocket)</span>
 <span class="kw">put</span> <span class="kw">unicode</span>(<span class="num">128640</span>) <span class="kw">in</span> RocketSymbol
-<span class="kw">output</span> <span class="str">"To infinity... "</span> + RocketSymbol
+<span class="kw">write</span> <span class="str">"To infinity... "</span> + RocketSymbol
 <span class="com"># Output: :) To infinity... 🚀</span>
 <span class="kw">newline</span>
 
 <span class="com"># Example 2: Get the code from a symbol (Smiley)</span>
 <span class="kw">put</span> <span class="kw">unicode</span>(<span class="str">"🙂"</span>) <span class="kw">in</span> SmileyCode
-<span class="kw">output</span> <span class="str">"The code of the smiley is: "</span> + SmileyCode
+<span class="kw">write</span> <span class="str">"The code of the smiley is: "</span> + SmileyCode
 <span class="com"># Output: :) The code of the smiley is: 128578</span></code></pre>
     </section>
 
@@ -817,7 +817,7 @@
         <p>Example of defining and calling a procedure:</p>
         <pre><code><span class="com"># Definition</span>
 <span class="kw">define procedure</span> greet(name) (
-  <span class="kw">output</span> <span class="str">"Hello, "</span> + name + <span class="str">". Welcome to Matita."</span>
+  <span class="kw">write</span> <span class="str">"Hello, "</span> + name + <span class="str">". Welcome to Matita."</span>
   <span class="kw">newline</span>
 )
 
@@ -834,7 +834,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 
 <span class="kw">put</span> <span class="num">7</span> <span class="kw">in</span> Number
 <span class="kw">put</span> Double(Number) <span class="kw">in</span> Doubled
-<span class="kw">output</span> <span class="str">"The double of "</span> + Number + <span class="str">" is "</span> + Doubled
+<span class="kw">write</span> <span class="str">"The double of "</span> + Number + <span class="str">" is "</span> + Doubled
 <span class="kw">newline</span></code></pre>
 
         <div class="note">
@@ -858,7 +858,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 
 <span class="kw">put</span> <span class="num">5</span> <span class="kw">in</span> Number
 <span class="kw">put</span> factorial(Number) <span class="kw">in</span> Result
-<span class="kw">output</span> Number + <span class="str">"! = "</span> + Result <span class="com"># Will show 120</span></code></pre>
+<span class="kw">write</span> Number + <span class="str">"! = "</span> + Result <span class="com"># Will show 120</span></code></pre>
 
         <p>If the chain of recursive calls is excessive, a stack overflow will occur (recursion limit exceeded).</p>
     </section>
@@ -878,11 +878,11 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 <span class="kw">put</span> <span class="num">1</span> <span class="kw">in</span> Number
 <span class="kw">as long as</span> (Number < <span class="num">6</span>) <span class="kw">you do</span> (
   <span class="kw">put</span> Number + <span class="num">1</span> <span class="kw">in</span> Number
-  <span class="kw">output</span> Number
+  <span class="kw">write</span> Number
   <span class="kw">newline</span>
 )
 <span class="com"># now we are out of the local block</span>
-<span class="kw">output</span> <span class="str">"Final value: "</span> + Number</code></pre>
+<span class="kw">write</span> <span class="str">"Final value: "</span> + Number</code></pre>
         <p>Output:</p>
         <pre><code>:) Warning: Local variable 'Number' is shadowing a global variable with the same name.
 :) 2
@@ -900,11 +900,11 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 <span class="kw">as long as</span> (Number < <span class="num">6</span>) <span class="kw">you do</span> (
   <span class="kw">global</span> Number
   <span class="kw">put</span> Number + <span class="num">1</span> <span class="kw">in</span> Number
-  <span class="kw">output</span> Number
+  <span class="kw">write</span> Number
   <span class="kw">newline</span>
 )
 <span class="com"># now we are out of the block</span>
-<span class="kw">output</span> <span class="str">"Final value: "</span> + Number</code></pre>
+<span class="kw">write</span> <span class="str">"Final value: "</span> + Number</code></pre>
         <p>Output:</p>
         <pre><code>:) 2
 :) 3
@@ -933,7 +933,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <p>Any read or write operation performed on <code>B</code> is intercepted by the interpreter and redirected to the target variable <code>A</code>. The following code:</p>
         <pre><code><span class="kw">put</span> <span class="num">4</span> <span class="kw">in</span> A
 <span class="kw">put</span> <span class="num">56</span> <span class="kw">in</span> (B <span class="kw">alias</span> A)
-<span class="kw">output</span> <span class="str">"A: "</span> + A + <span class="str">"; B: "</span> + B</code></pre>
+<span class="kw">write</span> <span class="str">"A: "</span> + A + <span class="str">"; B: "</span> + B</code></pre>
         <p>produces as output:</p>
         <p><code>:) A: 56; B: 56</code></p>
 
@@ -959,33 +959,23 @@ greet(<span class="str">"Maria"</span>)</code></pre>
     <section id="coordinates">
         <h2>Graphic Elements</h2>
         
-
-
-[Image of cartesian coordinate system]
-
-
         <p>The graphics area uses a Cartesian coordinate system. The position of each element is defined by a pair of coordinates <code>(x, y)</code>. The origin <code>(0, 0)</code> is located at the center of the area. Positive values of <code>x</code> indicate positions to the right, negative values to the left. Positive values of <code>y</code> indicate positions upwards, negative values downwards.</p>
         
         <p>Coordinates are represented as lists of two numbers. The explicit syntax <code>point(x, y)</code> can be used. To access the individual components of a point, the <code>x of</code> and <code>y of</code> properties are used.</p>
         
         <pre><code><span class="kw">put</span> <span class="kw">point</span>(<span class="num">10</span>, <span class="num">44</span>) <span class="kw">in</span> MyPoint
 <span class="kw">put</span> <span class="kw">x of</span> MyPoint <span class="kw">in</span> XCoordinate
-<span class="kw">output</span> XCoordinate</code></pre>
+<span class="kw">write</span> XCoordinate</code></pre>
 
         <p>To modify a single coordinate, the <code>set</code> command is used. This operation is fundamental to manage the movement of objects.</p>
         <pre><code><span class="com"># Move the point 10 steps down without changing the x</span>
 <span class="kw">set</span> <span class="kw">y of</span> MyPoint <span class="kw">to</span> (<span class="kw">y of</span> MyPoint - <span class="num">10</span>)
-<span class="kw">output</span> <span class="kw">y of</span> MyPoint <span class="com"># Will show 34</span></code></pre>
+<span class="kw">write</span> <span class="kw">y of</span> MyPoint <span class="com"># Will show 34</span></code></pre>
     </section>
 
     <section id="colors">
         <h2>Colors and Backgrounds</h2>
         
-
-
-[Image of RGB color model additive mixing]
-
-
         <p>Matita uses the RGB color model. Colors are defined by a list of three values <code>(R, G, B)</code>, representing respectively the percentages of Red, Green, and Blue, ranging from 0 to 100, inclusive.</p>
         
         <p>Example setting the background:</p>
@@ -999,8 +989,6 @@ greet(<span class="str">"Maria"</span>)</code></pre>
     <section id="shapes">
         <h2>Drawing Basic Shapes</h2>
         
-
-
         <p>After setting the current color, it is possible to draw graphic primitives.</p>
 
         <p><strong>Circle</strong>: Syntax <code>circle radius R at POS</code>. Draws a filled disk.</p>
@@ -1015,7 +1003,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <pre><code><span class="kw">set color</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">line thickness</span> <span class="num">2</span> <span class="kw">from</span> (<span class="num">-200</span>, <span class="num">-75</span>) <span class="kw">to</span> (<span class="num">-200</span>, <span class="num">-160</span>)</code></pre>
         <p><strong>Triangle</strong>: Syntax <code>triangle with vertices P1, P2, P3</code>. Draws a filled triangle connecting the three specified points separated by commas.</p>
-        <pre><code><span class="kw">set color</span> (<span class="num">0</span>, <span class="num">50</span>, <span class="num">100</span>)
+        <pre><code><span class="kw">set color</span> (<span class="num">0</span>, <span class="num">50</span>, <span class="num">100</span>)
 <span class="kw">triangle with vertices</span> (<span class="num">0</span>, <span class="num">50</span>), (<span class="num">-50</span>, <span class="num">-50</span>), (<span class="num">50</span>, <span class="num">-50</span>)</code></pre>
         <p><strong>Arc</strong>: Syntax <code>arc radius R thickness S from P1 to P2</code>. Draws a circular arc of a given radius, passing through the two given points. Since there are at most two circumferences of a given radius passing through two assigned points in the plane, the code will draw the arc that goes from the first to the second point rotating counterclockwise. This implies that if you reverse the order of the two points, you will get an arc with inverted concavity.</p>
         <pre><code><span class="kw">set color</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
@@ -1115,12 +1103,13 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         </ol>
 
         <p>Simple animation example:</p>
-        <pre><code><span class="kw">put</span> <span class="num">0</span> <span class="kw">in</span> X
-<span class="kw">as long as</span> (X < <span class="num">300</span>) <span class="kw">you do</span> (
+        <pre><code><span class="kw">put</span> <span class="num">-150</span> <span class="kw">in</span> X
+<span class="kw">as long as</span> (X < <span class="num">150</span>) <span class="kw">you do</span> (
   <span class="kw">put</span> X + <span class="num">2</span> <span class="kw">in</span> X
   <span class="kw">clear graphics</span>
   <span class="kw">circle radius</span> <span class="num">20</span> <span class="kw">at point</span>(X, <span class="num">0</span>)
   <span class="kw">wait</span> <span class="num">16</span> <span class="kw">ms</span>
+  <span class="kw">redraw</span>
 )</code></pre>
     </section>
 
@@ -1202,8 +1191,6 @@ greet(<span class="str">"Maria"</span>)</code></pre>
     <section id="transformations">
         <h2>Transformations: Scaling and Rotation</h2>
         
-
-
         <p>Labeled objects can undergo geometric transformations.</p>
 
         <h3>Scaling</h3>
@@ -1234,8 +1221,8 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <pre><code><span class="kw">load</span> <span class="str">"grass.png"</span> <span class="kw">scale</span> <span class="num">0.5</span> <span class="kw">as background</span>
 <span class="kw">paint background</span></code></pre>
     <h3>Importing External Code (Libraries)</h3>
-        <p>It is possible to split complex programs across multiple files. By using the <code>import</code> command without the <code>as</code> keyword, Matita will read a text file containing source code (e.g., useful procedures or functions) and execute it as if it were written directly in the main file.</p>
-        <pre><code><span class="kw">import</span> <span class="str">"my_library.txt"</span>
+        <p>It is possible to split complex programs across multiple files. By using the <code>import</code> command without the <code>as</code> keyword, Matita will read a text file containing source code (e.g., useful procedures or functions) and execute it as if it were written directly in the main file.</p>
+        <pre><code><span class="kw">import</span> <span class="str">"my_library.txt"</span>
 <span class="com"># Now you can use the functions defined in my_library.txt</span></code></pre>
     </section>
 
@@ -1258,7 +1245,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
             <li><strong>Snap</strong>: If active, the cursor is attracted and hooked to notable points of the objects already drawn (circle centers, rectangle vertices, line midpoints, etc.).</li>
             <li><strong>Ortho (⟂) and Alpha Angle (α)</strong>: By activating the Ortho tool, you can draw lines to support alignment. With a <strong>single click</strong> on the canvas, a base point is fixed; moving the mouse, the crosshair will be constrained to move only horizontally or vertically. By clicking the <strong>α</strong> button and entering a numeric value in the adjacent field, you can freely rotate the orthogonal axes by that number of degrees. A <strong>second click</strong> releases the base point.</li>
             <li><strong>Save PNG</strong>: Instantly exports and downloads the current content of the canvas as a <code>.png</code> image.</li>
-            <li><strong>Fit to Window (⛶)</strong>: Automatically adjusts the zoom and camera position to perfectly frame all drawn objects within the graphic window.</li>
+            <li><strong>Fit to Window (⛶)</strong>: Automatically adjusts the zoom and camera position to perfectly frame all drawn objects within the graphic window.</li>
         </ul>
 
         <h3>Coordinate Transfer</h3>
@@ -1294,7 +1281,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 <span class="kw">put</span> <span class="num">0</span> <span class="kw">in</span> Angle
 
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Controls: Arrow Keys (Move), A/D (Rotate), X (Exit)"</span>
+<span class="kw">write</span> <span class="str">"Controls: Arrow Keys (Move), A/D (Rotate), X (Exit)"</span>
 <span class="kw">newline</span>
 
 <span class="com"># Main game loop</span>
@@ -1347,7 +1334,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>put VALUE in NAME</code></td><td>Assigns a value to a variable (local by default in blocks).</td></tr>
             <tr><td><code>global NAME</code></td><td>Declares that the specified variables refer to the global scope.</td></tr>
             <tr><td><code>VAR2 alias VAR1</code></td><td>Creates an alias: VAR2 points to the same memory cell as VAR1.</td></tr>
-            <tr><td><code>output VALUE</code></td><td>Prints a value in the output console.</td></tr>
+            <tr><td><code>write VALUE</code></td><td>Prints a value in the console.</td></tr>
             <tr><td><code>newline</code></td><td>Inserts a line break in the console.</td></tr>
             <tr><td><code>clear screen</code></td><td>Clears all text present in the console.</td></tr>
             <tr><td><code>wait N ms</code></td><td>Suspends the execution of the program for N milliseconds.</td></tr>
@@ -1357,7 +1344,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <h3>Mathematics and Numbers</h3>
         <table>
             <tr><th>Command / Function</th><th>Description</th></tr>
-            <tr><td><code>digits N</code></td><td>Sets the number of decimal places displayed with <code>output</code>.</td></tr>
+            <tr><td><code>digits N</code></td><td>Sets the number of decimal places displayed with <code>write</code>.</td></tr>
             <tr><td><code>scientific(N)</code></td><td>Sets the threshold above which numbers use scientific notation (e.g. 1e+6).</td></tr>
             <tr><td><code>random()</code></td><td>Returns a decimal number between 0.0 and 1.0.</td></tr>
             <tr><td><code>random(MAX)</code></td><td>Returns a decimal number between 0 and MAX.</td></tr>
@@ -1412,7 +1399,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>insert X in item N of NAME</code></td><td>Inserts at position N.</td></tr>
             <tr><td><code>remove item N from NAME</code></td><td>Removes element at position N.</td></tr>
             <tr><td><code>decomposition(VAL)</code> / <code>split(V, SEP)</code></td><td>Divides strings into lists.</td></tr>
-            <tr><td><code>decomposition(V, T)</code></td><td>Advanced decomposition based on type.</td></tr>
+            <tr><td><code>decomposition(V, T)</code></td><td>Advanced decomposition based on type.</td></tr>
             <tr><td><code>composition(L, T)</code></td><td>Joins list into text or number.</td></tr>
             <tr><td><code>cast(VAL)</code> / <code>unicode(X)</code></td><td>Type conversion / Character encoding.</td></tr>
         </table>

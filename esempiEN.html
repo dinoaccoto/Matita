@@ -205,12 +205,12 @@
             </div>
             <pre><code id="code1"><span class="kw">get</span> Number <span class="kw">saying</span> <span class="str">"Enter a number for its table:"</span>
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Here is the table of "</span> + Number + <span class="str">":"</span>; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"-------------------------"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Here is the table of "</span> + Number + <span class="str">":"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"-------------------------"</span>; <span class="kw">newline</span>
 
 <span class="kw">index</span> I <span class="kw">goes from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">12</span> <span class="kw">and you do</span> (
     <span class="kw">put</span> Number * I <span class="kw">in</span> Result
-    <span class="kw">output</span> Number + <span class="str">" x "</span> + I + <span class="str">" = "</span> + Result; <span class="kw">newline</span>
+    <span class="kw">write</span> Number + <span class="str">" x "</span> + I + <span class="str">" = "</span> + Result; <span class="kw">newline</span>
 )</code></pre>
         </div>
     </section>
@@ -230,16 +230,16 @@
                 <button class="copy-btn" onclick="copyToClipboard('code2', this)">Copy Code</button>
             </div>
             <pre><code id="code2"><span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"--- Emoji UNICODE Table ---"</span>; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Symbol   |   Code"</span>
-<span class="kw">output</span> <span class="str">"------------------"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"--- Emoji UNICODE Table ---"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Symbol   |   Code"</span>
+<span class="kw">write</span> <span class="str">"------------------"</span>; <span class="kw">newline</span>
 
 <span class="kw">put</span> <span class="num">128512</span> <span class="kw">in</span> Start <span class="com"># where we start the UNICODE code</span>
 <span class="kw">put</span> <span class="num">128591</span> <span class="kw">in</span> End <span class="com"># where we stop</span>
 
 <span class="kw">index</span> N <span class="kw">goes from</span> Start <span class="kw">to</span> End <span class="kw">and you do</span> (
     <span class="kw">put unicode</span>(N) <span class="kw">in</span> Smiley
-    <span class="kw">output</span> <span class="str">"   "</span> + Smiley + <span class="str">"        |   "</span> + N; <span class="kw">newline</span>
+    <span class="kw">write</span> <span class="str">"   "</span> + Smiley + <span class="str">"        |   "</span> + N; <span class="kw">newline</span>
 )</code></pre>
         </div>
     </section>
@@ -267,8 +267,8 @@
 <span class="kw">get</span> text <span class="kw">saying</span> <span class="str">"Enter the text to translate in lowercase:"</span>
 <span class="kw">put split</span>(text) <span class="kw">in</span> charList
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Text: "</span> + text; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Morse: "</span>
+<span class="kw">write</span> <span class="str">"Text: "</span> + text; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Morse: "</span>
 
 <span class="kw">put unicode</span>(<span class="str">"a"</span>) <span class="kw">in</span> IndexA
 
@@ -276,12 +276,12 @@
     <span class="kw">put unicode</span>(letter) - IndexA + <span class="num">1</span> <span class="kw">in</span> j
     <span class="kw">if</span> (j >= <span class="num">1</span> <span class="kw">and</span> j <= <span class="num">26</span>) <span class="kw">then</span> (
         <span class="kw">put item</span> j <span class="kw">of</span> morseAlphabet <span class="kw">in</span> code
-        <span class="kw">output</span> code + <span class="str">" "</span>
+        <span class="kw">write</span> code + <span class="str">" "</span>
     ) <span class="kw">otherwise</span> (
         <span class="kw">if</span> (letter <span class="kw">equals</span> <span class="str">" "</span>) <span class="kw">then</span> (
-            <span class="kw">output</span> <span class="str">"   "</span> 
+            <span class="kw">write</span> <span class="str">"   "</span> 
         ) <span class="kw">otherwise</span> (
-            <span class="kw">output</span> <span class="str">"?"</span>
+            <span class="kw">write</span> <span class="str">"?"</span>
         )
     )
 )</code></pre>
@@ -309,8 +309,8 @@
 <span class="kw">put unicode</span>(<span class="str">"a"</span>) <span class="kw">in</span> baseA
 
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Original Text: "</span> + text; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Ciphertext:    "</span>
+<span class="kw">write</span> <span class="str">"Original Text: "</span> + text; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Ciphertext:    "</span>
 
 <span class="kw">for each</span> letter <span class="kw">in</span> charList <span class="kw">you do</span> (
     <span class="kw">put unicode</span>(letter) <span class="kw">in</span> code
@@ -319,9 +319,9 @@
         <span class="kw">put</span> index0 + shiftValue <span class="kw">in</span> shiftedIndex
         <span class="kw">put</span> shiftedIndex <span class="kw">mod</span> <span class="num">26</span> <span class="kw">in</span> newIndex
         <span class="kw">put</span> newIndex + baseA <span class="kw">in</span> cipherCode
-        <span class="kw">output unicode</span>(cipherCode)
+        <span class="kw">write unicode</span>(cipherCode)
     ) <span class="kw">otherwise</span> (<span class="com"># Leave unchanged if not a letter (space, punctuation, etc.):</span>
-        <span class="kw">output</span> letter
+        <span class="kw">write</span> letter
     )
 )</code></pre>
         </div>
@@ -350,17 +350,17 @@
 
 <span class="kw">put squareroot</span>(<span class="num">2</span>*EarthMass*G*(<span class="num">1</span>/EarthRadius - <span class="num">1</span>/(EarthRadius+H))) <span class="kw">in</span> v
 <span class="kw">digits</span> <span class="num">3</span>
-<span class="kw">output</span> <span class="str">"Fall height: "</span> + H; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Impact speed: "</span>; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"    "</span> + v + <span class="str">" m/s"</span>; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"    "</span> + v*<span class="num">3.6</span> + <span class="str">" km/h"</span>; <span class="kw">newline</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Fall height: "</span> + H; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Impact speed: "</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"    "</span> + v + <span class="str">" m/s"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"    "</span> + v*<span class="num">3.6</span> + <span class="str">" km/h"</span>; <span class="kw">newline</span>; <span class="kw">newline</span>
 
 <span class="kw">put</span> <span class="num">343</span> <span class="kw">in</span> c <span class="com"># speed of sound, sea level 15 degrees C</span>
-<span class="kw">output</span> <span class="str">"Mach: "</span> + v/c; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Mach: "</span> + v/c; <span class="kw">newline</span>
 
 <span class="kw">put squareroot</span>(<span class="num">2</span>*G*EarthMass/EarthRadius) <span class="kw">in</span> EscapeVelocity
 
-<span class="kw">output</span> <span class="str">"Relative to escape velocity: "</span> + v/EscapeVelocity*<span class="num">100</span> + <span class="str">"%"</span>; <span class="kw">newline</span></code></pre>
+<span class="kw">write</span> <span class="str">"Relative to escape velocity: "</span> + v/EscapeVelocity*<span class="num">100</span> + <span class="str">"%"</span>; <span class="kw">newline</span></code></pre>
         </div>
     </section>
 
@@ -379,11 +379,11 @@
                 <button class="copy-btn" onclick="copyToClipboard('code6', this)">Copy Code</button>
             </div>
             <pre><code id="code6"><span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">" Measuring your reaction time ..."</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">" Measuring your reaction time ..."</span>; <span class="kw">newline</span>
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"When the word 'START!' appears, press the SPACE BAR."</span>
+<span class="kw">write</span> <span class="str">"When the word 'START!' appears, press the SPACE BAR."</span>
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Press SPACE to begin..."</span>
+<span class="kw">write</span> <span class="str">"Press SPACE to begin..."</span>
 
 <span class="com"># Wait until the user presses space to start the game</span>
 <span class="kw">as long as</span> (<span class="kw">not</span> (<span class="kw">key</span> <span class="str">"SPACE"</span> <span class="kw">is pressed</span>)) <span class="kw">you do</span> (
@@ -396,7 +396,7 @@
 )
 
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Ready..."</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Ready..."</span>; <span class="kw">newline</span>
 
 <span class="com"># Calculate a random time between 2s and 5s</span>
 <span class="kw">put random</span>(<span class="num">2000</span>, <span class="num">5000</span>) <span class="kw">in</span> RandomWait
@@ -404,7 +404,7 @@
 
 
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"START!"</span>
+<span class="kw">write</span> <span class="str">"START!"</span>
 <span class="kw">tick</span> <span class="com"># Start the stopwatch</span>
 
 <span class="com"># Wait loop: runs as long as the space bar is NOT pressed</span>
@@ -416,13 +416,13 @@
 <span class="kw">put tock in</span> ReactionTime
 
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Reaction time: "</span> + ReactionTime + <span class="str">" ms."</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Reaction time: "</span> + ReactionTime + <span class="str">" ms."</span>; <span class="kw">newline</span>
 
 <span class="kw">newline</span>
 <span class="kw">if</span> (ReactionTime < <span class="num">250</span>) <span class="kw">then</span> (
-    <span class="kw">output</span> <span class="str">"Congratulations, lightning-fast reflexes!"</span>
+    <span class="kw">write</span> <span class="str">"Congratulations, lightning-fast reflexes!"</span>
 ) <span class="kw">otherwise</span> (
-    <span class="kw">output</span> <span class="str">"You can do better..."</span>
+    <span class="kw">write</span> <span class="str">"You can do better..."</span>
 )</code></pre>
         </div>
     </section>
@@ -481,7 +481,7 @@
     <section id="prog8" class="program-section">
         <a href="#indice" class="nav-link">↑ Back to contents</a>
         <h2>8. Guess the Number</h2>
-        <p>An example of textual input/output and complex conditional logic.<br>
+        <p>An example of textual input/write and complex conditional logic.<br>
         The computer uses binary search to guess the number the user is thinking of in just a few steps.<br>
         Processes user responses (Greater, Smaller, Correct) to narrow down the range.</p>
 
@@ -516,15 +516,15 @@ Press ENTER to start..."</span>
     <span class="kw">get</span> Answer <span class="kw">saying</span> (<span class="str">"Guess: "</span> + Guess + <span class="str">". Is the number you thought of Greater (press G), Smaller (press S), or is it Correct (press C)? Press X to exit: "</span>)
 
     <span class="kw">if</span> (Answer <span class="kw">equals</span> <span class="str">"X"</span>) <span class="kw">or</span> (Answer <span class="kw">equals</span> <span class="str">"x"</span>) <span class="kw">then</span> (
-        <span class="kw">output</span> <span class="str">"Attempts made: "</span> + Attempts; <span class="kw">newline</span>
+        <span class="kw">write</span> <span class="str">"Attempts made: "</span> + Attempts; <span class="kw">newline</span>
         <span class="kw">stop</span>
     )
 
     <span class="kw">if</span> (Answer <span class="kw">equals</span> <span class="str">"C"</span>) <span class="kw">or</span> (Answer <span class="kw">equals</span> <span class="str">"c"</span>) <span class="kw">then</span> (
         <span class="kw">newline</span>
-        <span class="kw">output</span> <span class="str">"Guessed! The number was "</span> + Guess + <span class="str">"."</span>
+        <span class="kw">write</span> <span class="str">"Guessed! The number was "</span> + Guess + <span class="str">"."</span>
         <span class="kw">newline</span>
-        <span class="kw">output</span> <span class="str">"Attempts: "</span> + Attempts; <span class="kw">newline</span>
+        <span class="kw">write</span> <span class="str">"Attempts: "</span> + Attempts; <span class="kw">newline</span>
         <span class="kw">stop</span>
     )
 
@@ -534,16 +534,16 @@ Press ENTER to start..."</span>
         <span class="kw">if</span> (Answer <span class="kw">equals</span> <span class="str">"S"</span>) <span class="kw">or</span> (Answer <span class="kw">equals</span> <span class="str">"s"</span>) <span class="kw">then</span> (
             <span class="kw">put</span> Guess - <span class="num">1</span> <span class="kw">in</span> Max
         ) <span class="kw">otherwise</span> (
-            <span class="kw">newline</span>; <span class="kw">output</span> <span class="str">"Invalid answer. Use G, S, C, or X."</span>
+            <span class="kw">newline</span>; <span class="kw">write</span> <span class="str">"Invalid answer. Use G, S, C, or X."</span>
             <span class="kw">newline</span>
         )
     )
 
     <span class="kw">if</span> (Min > Max) <span class="kw">then</span> (
         <span class="kw">newline</span>
-        <span class="kw">output</span> <span class="str">"Inconsistency in answers: no compatible number."</span>
+        <span class="kw">write</span> <span class="str">"Inconsistency in answers: no compatible number."</span>
         <span class="kw">newline</span>
-        <span class="kw">output</span> <span class="str">"Attempts made: "</span> + Attempts; <span class="kw">newline</span>
+        <span class="kw">write</span> <span class="str">"Attempts made: "</span> + Attempts; <span class="kw">newline</span>
         <span class="kw">stop</span>
     )
 )</code></pre>
@@ -651,12 +651,12 @@ Press ENTER to start..."</span>
 )
 
 <span class="com"># Start</span>
-<span class="kw">output</span> <span class="str">"Drawing a fractal tree with natural leaves..."</span>
+<span class="kw">write</span> <span class="str">"Drawing a fractal tree with natural leaves..."</span>
 <span class="kw">put point</span>(<span class="num">0</span>, <span class="num">-220</span>) <span class="kw">in</span> startPoint
 drawBranch(startPoint, <span class="num">90</span>, <span class="num">90</span>, <span class="num">9</span>)
 
 <span class="kw">frame graphics</span>
-<span class="kw">output</span> <span class="str">"Done! Run again for variation."</span></code></pre>
+<span class="kw">write</span> <span class="str">"Done! Run again for variation."</span></code></pre>
         </div>
     </section>
 
@@ -749,7 +749,7 @@ drawBranch(startPoint, <span class="num">90</span>, <span class="num">90</span>,
     <span class="kw">add</span> <span class="num">0</span> <span class="kw">to</span> LIST_TRIANGLE_VX
     <span class="kw">add</span> <span class="num">0</span> <span class="kw">to</span> LIST_TRIANGLE_VY
 
-    <span class="kw">output</span> <span class="str">"A new red triangle has appeared!"</span>
+    <span class="kw">write</span> <span class="str">"A new red triangle has appeared!"</span>
     <span class="kw">newline</span>
 )
 
@@ -816,8 +816,8 @@ drawBranch(startPoint, <span class="num">90</span>, <span class="num">90</span>,
                 <span class="kw">if</span> (LIVES <= <span class="num">0</span>) <span class="kw">then</span> (
                     <span class="kw">put</span> <span class="num">1</span> <span class="kw">in</span> GAME_OVER
                 ) <span class="kw">otherwise</span> (
-                    <span class="kw">output</span> <span class="str">"LIFE LOST! Lives left: "</span>
-                    <span class="kw">output</span> LIVES
+                    <span class="kw">write</span> <span class="str">"LIFE LOST! Lives left: "</span>
+                    <span class="kw">write</span> LIVES
                     <span class="kw">newline</span>
                     <span class="kw">put</span> <span class="num">0</span> <span class="kw">in</span> X_POS
                     <span class="kw">put</span> <span class="num">0</span> <span class="kw">in</span> Y_POS
@@ -842,8 +842,8 @@ drawBranch(startPoint, <span class="num">90</span>, <span class="num">90</span>,
 
     <span class="kw">if</span> (DIST_SQ < TOTAL_RADIUS_SQ) <span class="kw">then</span> (
         <span class="kw">put</span> Score + <span class="num">1</span> <span class="kw">in</span> Score
-        <span class="kw">output</span> <span class="str">"Score: "</span>
-        <span class="kw">output</span> Score
+        <span class="kw">write</span> <span class="str">"Score: "</span>
+        <span class="kw">write</span> Score
         <span class="kw">newline</span>
         place_food()
         add_triangle()
@@ -908,8 +908,8 @@ place_food()
     <span class="kw">graffiti size</span> <span class="num">20</span> <span class="kw">at</span> (<span class="num">-90</span>, <span class="num">-40</span>) <span class="str">"Final Score: "</span> + Score
     <span class="kw">redraw</span>
 ) <span class="kw">otherwise</span> (
-    <span class="kw">output</span> <span class="str">"Game Ended! Final Score: "</span>
-    <span class="kw">output</span> Score
+    <span class="kw">write</span> <span class="str">"Game Ended! Final Score: "</span>
+    <span class="kw">write</span> Score
     <span class="kw">newline</span>
 )
 <span class="kw">stop</span></code></pre>
@@ -1096,7 +1096,7 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
 
 <span class="com"># --- 2. Input Function ---</span>
 <span class="kw">define function</span> AskVector(Name) (
-  <span class="kw">output</span> <span class="str">"--- Data input for "</span> + Name + <span class="str">" ---"</span>
+  <span class="kw">write</span> <span class="str">"--- Data input for "</span> + Name + <span class="str">" ---"</span>
   <span class="kw">get</span> x <span class="kw">saying</span> Name + <span class="str">" -> X-coordinate:"</span>
   <span class="kw">get</span> y <span class="kw">saying</span> Name + <span class="str">" -> Y-coordinate:"</span>
   <span class="kw">get</span> z <span class="kw">saying</span> Name + <span class="str">" -> Z-coordinate:"</span>
@@ -1107,17 +1107,17 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
 
 <span class="com"># --- 3. Main Program ---</span>
 
-<span class="kw">output</span> <span class="str">"VECTOR CALCULATOR"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"VECTOR CALCULATOR"</span>; <span class="kw">newline</span>
 
 <span class="kw">put</span> AskVector(<span class="str">"Vector A"</span>) <span class="kw">in</span> A
 <span class="kw">put</span> AskVector(<span class="str">"Vector B"</span>) <span class="kw">in</span> B
 
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Vector A: "</span> + A; <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Vector B: "</span> + B; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Vector A: "</span> + A; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Vector B: "</span> + B; <span class="kw">newline</span>
 
-<span class="kw">output</span> <span class="str">"Dot Product (Scalar product): "</span> + DotProduct(A, B); <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Cross Product: "</span> + CrossProduct(A, B)</code></pre>
+<span class="kw">write</span> <span class="str">"Dot Product (Scalar product): "</span> + DotProduct(A, B); <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Cross Product: "</span> + CrossProduct(A, B)</code></pre>
         </div>
     </section>
 
@@ -1251,7 +1251,7 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
 <span class="kw">put</span> ShieldY + <span class="num">25</span> <span class="kw">in</span> TopBarrierY
 
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"Matita Space Invaders"</span>
+<span class="kw">write</span> <span class="str">"Matita Space Invaders"</span>
 
 <span class="com"># --- GAME LOOP ---</span>
 <span class="kw">as long as</span> Lives > <span class="num">0</span> <span class="kw">and dimension of</span> Aliens > <span class="num">0</span> <span class="kw">you do</span> (
@@ -1276,12 +1276,12 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
   <span class="kw">set color</span> Black
   <span class="kw">rectangle from</span> (<span class="num">-320</span>, <span class="num">-260</span>) <span class="kw">to</span> (<span class="num">320</span>, <span class="num">260</span>)
 
-  <span class="com"># Console Output</span>
+  <span class="com"># Console write</span>
   <span class="kw">clear screen</span>
-  <span class="kw">output</span> <span class="str">"SCORE: "</span>
-  <span class="kw">output</span> Score
-  <span class="kw">output</span> <span class="str">"    LIVES: "</span>
-  <span class="kw">output</span> Lives
+  <span class="kw">write</span> <span class="str">"SCORE: "</span>
+  <span class="kw">write</span> Score
+  <span class="kw">write</span> <span class="str">"    LIVES: "</span>
+  <span class="kw">write</span> Lives
 
   <span class="kw">put dimension of</span> Aliens <span class="kw">in</span> NumAliens
 
@@ -1483,9 +1483,9 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
 <span class="kw">graffiti size</span> <span class="num">25</span> <span class="kw">at</span> (<span class="num">-90</span>, <span class="num">-40</span>) <span class="str">"SCORE: "</span> + Score
 
 <span class="kw">clear screen</span>
-<span class="kw">output</span> <span class="str">"GAME OVER"</span>
-<span class="kw">output</span> <span class="str">"Final Score: "</span>
-<span class="kw">output</span> Score</code></pre>
+<span class="kw">write</span> <span class="str">"GAME OVER"</span>
+<span class="kw">write</span> <span class="str">"Final Score: "</span>
+<span class="kw">write</span> Score</code></pre>
         </div>
     </section>
 
@@ -1569,13 +1569,13 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
 <span class="kw">put</span> <span class="num">1</span>  <span class="kw">in</span> MIN_STEP
 <span class="kw">put</span> <span class="num">0</span>  <span class="kw">in</span> MARGIN
 
-<span class="kw">output</span> <span class="str">"Rendering centered at ("</span> + CENTER_X + <span class="str">", "</span> + CENTER_Y + <span class="str">")"</span>
+<span class="kw">write</span> <span class="str">"Rendering centered at ("</span> + CENTER_X + <span class="str">", "</span> + CENTER_Y + <span class="str">")"</span>
 <span class="kw">newline</span>
 
 <span class="kw">as long as</span> (CURRENT_STEP >= MIN_STEP) <span class="kw">you do</span> (
     <span class="kw">global</span> CURRENT_STEP, Py
     
-    <span class="kw">output</span> <span class="str">"Refining detail (Step: "</span> + CURRENT_STEP + <span class="str">")..."</span>
+    <span class="kw">write</span> <span class="str">"Refining detail (Step: "</span> + CURRENT_STEP + <span class="str">")..."</span>
     <span class="com"># We don't go to a new line for a cleaner console</span>
 
     <span class="com"># --- ROW LOOP (Y) ---</span>
@@ -1644,7 +1644,7 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
 )
 
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Image complete!"</span>
+<span class="kw">write</span> <span class="str">"Image complete!"</span>
 <span class="kw">frame graphics</span></code></pre>
         </div>
     </section>
@@ -1699,9 +1699,9 @@ drawKoch(maxLevel, p3x, p3y, p1x, p1y)
       )
 ) 
 
-<span class="kw">output</span> <span class="str">"Points: "</span> + NumPoints + <span class="str">" of which inside: "</span> + inCircle
+<span class="kw">write</span> <span class="str">"Points: "</span> + NumPoints + <span class="str">" of which inside: "</span> + inCircle
 <span class="kw">newline</span>
-<span class="kw">output</span> <span class="str">"Estimation of Pi: "</span> + (inCircle / NumPoints) * <span class="num">4</span>
+<span class="kw">write</span> <span class="str">"Estimation of Pi: "</span> + (inCircle / NumPoints) * <span class="num">4</span>
 
 <span class="kw">frame graphics</span></code></pre>
         </div>

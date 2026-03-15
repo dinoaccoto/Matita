@@ -28,8 +28,8 @@
 
       --console-bg: #020617;
 
-      --radius-sm: 4px;
-      --radius-md: 6px;
+      --radius-sm: 8px;
+      --radius-md: 14px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -761,16 +761,18 @@ function initMatita() {
       tockWithoutTick: "Kan 'tock' niet gebruiken: stopwatch niet gestart met 'tick'.",
       programStopped: "Programma gestopt.",
       expectedKeyword: (name) => {
-        const map = {
-          "COLOR": "kleur in", "OF": "van", "TO": "tot", "AT": "op", "THEN": "dan", "YOU_DO": "doe",
-          "IN": "in", "AND": "en", "PLACE": "plaats", "DEG": "graden",
-          "BACKGROUND": "achtergrond", "SCALE": "schaal", "AS": "als",
-          "THICKNESS": "dikte", "RADIUS": "straal", "ITEM": "element",
-          "MS": "ms", "SAYING": "met bericht", "WITH": "met", "saying/with": "met",
-          "VERTICES": "hoekpunten", "GRAPHICS": "grafiek", "SCREEN": "scherm", "FROM": "uit"
-        };
-        return `Verwacht sleutelwoord '${map[name] || name.toLowerCase()}'.`;
-      },
+        const map = {
+          "COLOR": "kleur in", "OF": "van", "TO": "tot", "AT": "op",
+          "THEN": "dan", "YOU_DO": "herhaal / doe",
+          "IN": "in", "AND": "en", "PLACE": "plaats", "DEG": "graden",
+          "BACKGROUND": "achtergrond", "SCALE": "met schaal", "AS": "als",
+          "THICKNESS": "dikte", "RADIUS": "straal", "ITEM": "element",
+          "MS": "ms", "SAYING": "met bericht", "WITH": "met",
+          "saying/with": "met", "VERTICES": "hoekpunten",
+          "GRAPHICS": "canvas / grafiek", "SCREEN": "scherm", "FROM": "van"
+        };
+        return `Verwacht sleutelwoord '${map[name] || name.toLowerCase()}'.`;
+      },
       expectedIdent: "Verwacht een naam (variabele of functie).",
       expectedExpr: "Verwacht een expressie.",
       expectedComma: "Verwacht ',' tussen hoekpunten.",
@@ -1000,7 +1002,7 @@ function initMatita() {
     "as long as": "fintanto", "you do": "esegui", "for each": "per ogni", "goes from": "va da", "as background": "come sfondo", "place it": "posiziona",
     "define": "definisci", "function": "funzione", "procedure": "procedura", "global": "globale", "return": "restituisci", "otherwise": "altrimenti",
     "index": "indice", "variable": "variabile", "put": "metti", "add": "aggiungi", "remove": "rimuovi", "insert": "inserisci", "first": "primo", "last": "ultimo",
-    "item": "elemento", "dimension": "dimensione", "list": "lista", "split": "dividi", "output": "scrivi", "newline": "accapo", "wait": "aspetta", "get": "chiedi",
+    "item": "elemento", "dimension": "dimensione", "list": "lista", "split": "dividi", "write": "scrivi", "newline": "accapo", "wait": "aspetta", "get": "chiedi",
     "saying": "dicendo", "set": "imposta", "color": "colore", "clear": "cancella", "graphics": "grafica", "frame": "inquadra", "screen": "schermo",
     "redraw": "ridisegna", "circle": "cerchio", "radius": "raggio", "circumference": "circonferenza", "thickness": "spessore", "rectangle": "rettangolo",
     "line": "linea", "triangle": "triangolo", "with": "con", "vertices": "vertici", "arc": "arco", "size": "grandezza", "draw": "disegna", "rotate": "ruota",
@@ -1008,45 +1010,32 @@ function initMatita() {
     "pressed": "premuto", "import": "importa", "label": "etichetta", "true": "vero", "false": "falso", "squareroot": "radice", "trunc": "tronca", "round": "arrotonda",
     "min": "minimo", "max": "massimo", "random": "casuale", "point": "punto", "indexof": "indicedi", "decomposition": "scomposizione", "composition": "composizione",
     "type": "tipo", "numeric": "numerico", "dice": "dado", "scientific": "scientifica", "digits": "decimali",
-    "and": "e", "of": "di", "at": "in", "by": "di", "as": "come", "to": "a", "is": "vale", "if": "se", "then": "allora", "not": "non", "or": "o", "different": "diverso"
+    "from": "da", "and": "e", "of": "di", "at": "in", "by": "di", "as": "come", "to": "a", "is": "vale", "if": "se", "then": "allora", "not": "non", "or": "o", "different": "diverso"
   };
 
-  const dictItToEn = {
-    "fintanto": "as long as", "esegui": "you do", "per ogni": "for each", "va da": "goes from", "come sfondo": "as background",
-    "definisci": "define", "funzione": "function", "procedura": "procedure", "globale": "global", "restituisci": "return", "altrimenti": "otherwise",
-    "indice": "index", "variabile": "variable", "metti": "put", "aggiungi": "add", "rimuovi": "remove", "inserisci": "insert", "primo": "first", "ultimo": "last",
-    "elemento": "item", "dimensione": "dimension", "lista": "list", "dividi": "split", "scrivi": "output", "accapo": "newline", "aspetta": "wait", "chiedi": "get",
-    "dicendo": "saying", "imposta": "set", "colore": "color", "cancella": "clear", "grafica": "graphics", "inquadra": "frame", "schermo": "screen",
-    "ridisegna": "redraw", "cerchio": "circle", "raggio": "radius", "circonferenza": "circumference", "spessore": "thickness", "rettangolo": "rectangle",
-    "linea": "line", "triangolo": "triangle", "con": "with", "vertici": "vertices", "arco": "arc", "grandezza": "size", "disegna": "draw", "ruota": "rotate",
-    "gradi": "deg", "posiziona": "place", "scala": "scale", "carica": "load", "dipingi": "paint", "sfondo": "background", "tasto": "key", "uguale": "equals",
-    "premuto": "pressed", "importa": "import", "etichetta": "label", "vero": "true", "falso": "false", "radice": "squareroot", "tronca": "trunc", "arrotonda": "round",
-    "minimo": "min", "massimo": "max", "casuale": "random", "punto": "point", "indicedi": "indexof", "scomposizione": "decomposition", "composizione": "composition",
-    "tipo": "type", "numerico": "numeric", "dado": "dice", "scientifica": "scientific", "diverso": "different", "decimali": "digits",
-    "se": "if", "allora": "then", "ed": "and", "e": "and", "di": "of", "in": "in", "come": "as", "a": "to", "vale": "is", "o": "or", "non": "not"
-  };
-
-
-  const dictEnToNl = {
-    "as long as": "zolang",        "you do": "doe",
-    "for each": "voor elk",        "goes from": "loopt van",
+const dictEnToNl = {
+    "as long as": "zolang",        "you do": "herhaal je",
+    "for each": "voor elke",       "goes from": "loopt van",
     "as background": "als achtergrond",
+    "paint background": "vul achtergrond in",
+    "frame graphics": "toon alles",
+    "clear graphics": "wis canvas",
     "define": "definieer",         "function": "functie",
     "procedure": "procedure",      "global": "globaal",
-    "return": "retourneer",        "stop": "stop",
-    "if": "indien",                "then": "dan",
+    "return": "geef",    "stop": "stop", "terug": "terug", "toe": "toe", "aan": "aan", "insert": "invoeg",
+    "if": "als",                   "then": "dan",
     "otherwise": "anders",         "index": "teller",
     "variable": "variabele",       "put": "zet",
     "add": "voeg",                 "remove": "verwijder",
-    "insert": "invoeg",            "first": "eerste",
+    "first": "eerste",
     "last": "laatste",             "item": "element",
     "dimension": "lengte",         "list": "lijst",
-    "output": "schrijf",           "newline": "nieuwe regel",
+    "write": "schrijf",           "newline": "nieuwe regel",
     "wait": "wacht",               "get": "vraag",
     "saying": "met bericht",       "set": "stel",
     "color": "kleur in",           "clear": "wis",
-    "graphics": "grafiek",         "frame": "kader",
-    "screen": "scherm",            "redraw": "herteken",
+    "graphics": "canvas",          "frame": "toon alles",
+    "screen": "scherm",            "redraw": "teken opnieuw",
     "circle": "cirkel",            "radius": "straal",
     "circumference": "omtrek",     "thickness": "dikte",
     "rectangle": "rechthoek",      "line": "lijn",
@@ -1056,35 +1045,79 @@ function initMatita() {
     "rotate": "draai",             "deg": "graden",
     "place": "plaats",             "it": "het",
     "scale": "schaal",             "load": "laad",
-    "paint": "verf",               "background": "achtergrond",
+    "paint": "vul",
+    "background": "achtergrond",
     "key": "toets",                "equals": "gelijk",
     "pressed": "ingedrukt",        "import": "importeer",
-    "label": "etiket",             "true": "waar",
+    "label": "label",              "true": "waar",
     "false": "onwaar",             "squareroot": "wortel",
-    "trunc": "afkap",              "round": "afrond",
-    "min": "minimum",              "max": "maximum",
+    "trunc": "afkappen",           "round": "afronden",
+    "min": "min",                  "max": "max",
     "random": "willekeurig",       "point": "punt",
-    "indexof": "indexvan",         "decomposition": "ontbinding",
-    "composition": "samenstelling","type": "type",
+    "indexof": "indexvan",         
+    "decomposition": "ontbind",    "composition": "samenvoegen",
+    "valmin": "minwaarde",         "valmax": "maxwaarde",
+    "argmin": "minindex",          "argmax": "maxindex",
+    "different": "verschilend",
+    "type": "type",
     "numeric": "numeriek",         "dice": "dobbelsteen",
-    "scientific": "wetenschappelijk","digits": "cijfers",
-    "split": "splits",
-    "and": "en",     "or": "of",     "not": "niet",
-    "is": "is",      "mod": "modulo","different": "ongelijk",
-    "as": "als",     "to": "tot",   "by": "door",
-    "of": "van",     "from": "uit",  "in": "in",
-    "at": "op",      "null": "null", "tick": "tick",
-    "tock": "tock",  "ms": "ms"
+    "scientific": "wetenschappelijk", "digits": "decimalen",
+    "split": "splits",             "infinity": "oneindig",
+    "and": "en",      "or": "of",      "not": "niet",
+    "is": "is",       "mod": "modulo",
+    "as": "als",      "to": "tot",     "by": "met",
+    "of": "van",      "from": "van",   "in": "in",
+    "at": "op",       "null": "null",  "tick": "tick",
+    "tock": "tock",   "ms": "ms"
   };
 
+  const dictItToEn = {
+    "come sfondo": "as background", "fintanto": "as long as", "esegui": "you do", "per ogni": "for each", "va da": "goes from", "place it": "posiziona",
+    "definisci": "define", "funzione": "function", "procedura": "procedure", "globale": "global", "restituisci": "return", "altrimenti": "otherwise",
+    "indice": "index", "variabile": "variable", "metti": "put", "aggiungi": "add", "rimuovi": "remove", "inserisci": "insert", "primo": "first", "ultimo": "last",
+    "elemento": "item", "dimensione": "dimension", "lista": "list", "dividi": "split", "scrivi": "write", "accapo": "newline", "aspetta": "wait", "chiedi": "get",
+    "dicendo": "saying", "imposta": "set", "colore": "color", "cancella": "clear", "grafica": "graphics", "inquadra": "frame", "schermo": "screen",
+    "ridisegna": "redraw", "cerchio": "circle", "raggio": "radius", "circonferenza": "circumference", "spessore": "thickness", "rettangolo": "rectangle",
+    "linea": "line", "triangolo": "triangle", "con": "with", "vertici": "vertices", "arco": "arc", "grandezza": "size", "disegna": "draw", "ruota": "rotate",
+    "gradi": "deg", "posiziona": "place", "scala": "scale", "carica": "load", "dipingi": "paint", "sfondo": "background", "tasto": "key", "uguale": "equals",
+    "premuto": "pressed", "importa": "import", "etichetta": "label", "vero": "true", "falso": "false", "radice": "squareroot", "tronca": "trunc", "arrotonda": "round",
+    "minimo": "min", "massimo": "max", "casuale": "random", "punto": "point", "indicedi": "indexof", "scomposizione": "decomposition", "composizione": "composition",
+    "tipo": "type", "numerico": "numeric", "dado": "dice", "scientifica": "scientific", "decimali": "digits",
+    "da": "from", "se": "if", "allora": "then", "e": "and", "ed": "and", "di": "of", "in": "in", "come": "as", "a": "to", "vale": "is", "o": "or", "non": "not", "diverso": "different"
+  };
 
+  const dictNlToEn = {
+    "als achtergrond": "as background", "vul achtergrond in": "paint background", "toon alles": "frame graphics",
+    "wis canvas": "clear graphics", "teken opnieuw": "redraw", "met bericht": "saying",
+    "nieuwe regel": "newline", "kleur in": "color", "toe aan": "to", "toe": "toe", "aan": "aan", "in bij": "in", "geef": "return",
+    "zolang": "as long as", "herhaal je": "you do", "je doet": "you do",
+    "voor elke": "for each", "voor elk": "for each", "loopt van": "goes from",
+    "definieer": "define", "functie": "function", "procedure": "procedure", "globaal": "global", "geef": "return", "stop": "stop",
+    "als": "if", "dan": "then", "anders": "otherwise", "teller": "index", "variabele": "variable", "zet": "put",
+    "voeg": "add", "verwijder": "remove", "invoeg": "insert", "eerste": "first", "laatste": "last", "element": "item",
+    "lengte": "dimension", "lijst": "list", "schrijf": "write", "wacht": "wait", "vraag": "get",
+    "stel": "set", "kleur": "color", "wis": "clear", "canvas": "graphics", "grafiek": "graphics", "scherm": "screen", "herteken": "redraw",
+    "cirkel": "circle", "straal": "radius", "omtrek": "circumference", "dikte": "thickness", "rechthoek": "rectangle", "lijn": "line", "driehoek": "triangle", "met": "with",
+    "hoekpunten": "vertices", "boog": "arc", "grootte": "size", "teken": "draw", "draai": "rotate", "graden": "deg", "plaats": "place", "het": "it",
+    "schaal": "scale", "laad": "load", "vul": "paint", "achtergrond": "background", "toets": "key", "gelijk": "equals", "ingedrukt": "pressed", "importeer": "import",
+    "label": "label", "etiket": "label", "waar": "true", "onwaar": "false", "wortel": "squareroot", "afkappen": "trunc", "afronden": "round",
+    "minwaarde": "valmin", "maxwaarde": "valmax",
+    "minindex": "argmin", "maxindex": "argmax", "min": "min", "max": "max", "willekeurig": "random", "punt": "point", "indexvan": "indexof", "ontbind": "decomposition", 
+    "samenvoegen": "composition",
+    "type": "type", "numeriek": "numeric", "dobbelsteen": "dice", "wetenschappelijk": "scientific", "decimalen": "digits", "cijfers": "digits",
+    "splits": "split", "oneindig": "infinity", "en": "and", "of": "or", "niet": "not", "is": "is", "modulo": "mod",
+    "verschilend": "different", "tot": "to", "van": "of", "uit": "from", "in": "in", "op": "at", "null": "null", "tick": "tick", "tock": "tock", "ms": "ms"
+  };
 
-// --- DIZIONARI DI TRADUZIONE ---
-  // Struttura: langDicts["xx"] = dizionario EN→XX
-  // Per aggiungere una lingua: aggiungi langDicts["es"] = { "if": "si", ... }
-  const langDicts = {
-    it: dictEnToIt,
-    nl: dictEnToNl
+  const EXAMPLE_EN = `clear screen\n\nget Name saying "What's your name?"\nput "Hello, " + Name + ". Let's do something together! " in Message\nwrite Message\n\nput 10 in N # number of repetitions\nput 30 in H # text size\n\nindex I goes from 1 to N and you do (\n    set color (50, 10*I, 100-10*I)\n    graffiti size H at point(0, H*I-150) Name\n)`;
+  const EXAMPLE_IT = `cancella schermo\n\nchiedi Nome dicendo "Come ti chiami?"\nmetti "Ciao, " + Nome+ ". Facciamo qualcosa insime! " in Messaggio\nscrivi Messaggio\n\nmetti 10 in N # numero di ripetizioni\nmetti 30 in H # altezza del testo\n\nindice I va da 1 a N e esegui (\n    imposta colore (50, 10*I, 100-10*I)\n    graffiti grandezza H in punto(0, H*I-150) Nome\n)`;
+  const EXAMPLE_NL = `wis scherm\n\nvraag Naam met bericht "Hoe heet je?"\nzet "Hallo, " + Naam + ". Laten we iets doen! " in Bericht\nschrijf Bericht\n\nzet 10 in N # aantal herhalingen\nzet 30 in H # tekstgrootte\n\nteller I loopt van 1 tot N en je doet (\n    stel kleur in (50, 10*I, 100-10*I)\n    graffiti grootte H op punt(0, H*I-150) Naam\n)`;
+
+  // ─── UNICO PUNTO DI REGISTRAZIONE LINGUE ───
+  const LANG_REGISTRY = {
+    en: { uiStrings: uiStrings.en, dict: null,       inverseDict: null,       example: EXAMPLE_EN, suggestions: null },
+    it: { uiStrings: uiStrings.it, dict: dictEnToIt, inverseDict: dictItToEn, example: EXAMPLE_IT,       suggestions: null },
+    nl: { uiStrings: uiStrings.nl, dict: dictEnToNl, inverseDict: dictNlToEn, example: EXAMPLE_NL, suggestions: null }
   };
 
   
@@ -1120,34 +1153,24 @@ function initMatita() {
     return parts.join("");
   }
 
-  // Costruisce il dizionario inverso XX→EN da un dizionario EN→XX
-  function invertDict(dict) {
-    const inv = {};
-    for (const [en, xx] of Object.entries(dict)) inv[xx] = en;
-    return inv;
+  function getInverseDict(lang) {
+    return LANG_REGISTRY[lang]?.inverseDict || {};
   }
 
   function translateEditorCode(targetLang, prevLang) {
     const code = codeInput.value;
     if (!code.trim()) return;
 
-    // 1. Lingua di partenza del codice nell'editor
     if (!prevLang) prevLang = AVAILABLE_LANGS.find(l => l !== targetLang) || "en";
 
-    // 2. Se la lingua precedente non era EN, prima traduci in EN (lingua pivot)
     let codeInEn = code;
-    if (prevLang === "it") {
-      // Usa il dizionario IT->EN curato manualmente per evitare conflitti (es. in/at)
-      codeInEn = applyDict(code, dictItToEn);
-    } else if (prevLang !== "en" && langDicts[prevLang]) {
-      // Per le altre lingue, usa l'inversione automatica
-      codeInEn = applyDict(code, invertDict(langDicts[prevLang]));
+    if (prevLang !== "en") {
+      codeInEn = applyDict(code, getInverseDict(prevLang));
     }
 
-    // 3. Se la lingua target non è EN, traduci da EN alla lingua target
     let result = codeInEn;
-    if (targetLang !== "en" && langDicts[targetLang]) {
-      result = applyDict(codeInEn, langDicts[targetLang]);
+    if (targetLang !== "en") {
+      result = applyDict(codeInEn, LANG_REGISTRY[targetLang]?.dict);
     }
 
     codeInput.value = result;
@@ -1237,52 +1260,34 @@ function initMatita() {
 
 
   const KEYWORDS_EN = [
-    "alias", "to", "inout",
-    "define","function","procedure","global","return","stop",
+    "alias", "to", "inout", "define","function","procedure","global","return","stop",
     "if","then","otherwise","as","long","you","do","for","each","index","goes","from","and",
     "put","in","add","remove","insert","first","last","item","of","dimension","list",
-    "output","newline","wait","ms","get","saying",
-    "set","color","clear","screen","graphics","redraw","frame",
+    "write","newline","wait","ms","get","saying","set","color","clear","screen","graphics","redraw","frame",
     "circle","radius","circumference","thickness","rectangle","line","triangle","arc","graffiti","draw",
-    "rotate","deg","place","it","at","scale","by","load","paint","background","as background",
-    "true","false","and","or","not","is","equals", "different", "digits", "mod","pi","infinity","nan",
+    "rotate","deg","place","it","at","scale","by","load","paint","background",
+    "true","false","or","not","is","equals", "different", "digits", "mod","pi","infinity","nan",
     "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","key","pressed",
     "split","decomposition","composition","unicode","indexof","tick","tock","null","import","label", "scientific"
   ];
 
-  const KEYWORDS_IT = [
-    "alias","a","ed","inout",
-    "definisci","funzione","procedura","globale","restituisci","stop",
-    "se","allora","altrimenti","come","fintanto","esegui","per","ogni","variabile","indice","va","da","e",
-    "metti","in","aggiungi","rimuovi","inserisci","primo","ultimo","elemento","di","dimensione","lista",
-    "scrivi","accapo","aspetta","ms","chiedi","dicendo",
-    "imposta","colore","cancella","schermo","grafica","ridisegna", "inquadra",
-    "cerchio","raggio","circonferenza","spessore","rettangolo","linea","triangolo","arco","graffiti","disegna",
-    "ruota","gradi","posiziona","scala","carica","dipingi","sfondo","come sfondo",
-    "vero","falso","e","o","non","uguale a","vale","uguale","diverso", "mod","pi","infinito","nan",
-    "radice","arrotonda","casuale","minimo","massimo","punto","tasto","premuto",
-    "decimali","tronca","scomponi","scomposizione","composizione","unicode","indicedi","tick","tock","null","importa","etichetta","label", "scientifica"
-  ];
-
-  const KEYWORDS_NL = ["alias", "tot", "inout", "definieer", "functie", "procedure", "globaal", "retourneer", "stop",
-  "indien", "dan", "anders", "zolang", "doe", "voor", "elk", "teller", "loopt", "van",
-  "zet", "in", "voeg", "verwijder", "invoeg", "eerste", "laatste", "element", "lengte", "lijst",
-  "schrijf", "nieuwe", "regel", "wacht", "ms", "vraag", "met", "bericht",
-  "stel", "kleur", "wis", "scherm", "grafiek", "herfteken", "kader",
-  "cirkel", "straal", "omtrek", "dikte", "rechthoek", "lijn", "driehoek", "boog", "graffiti", "teken",
-  "draai", "graden", "plaats", "op", "schaal", "door", "laad", "verf", "achtergrond",
-  "waar", "onwaar", "en", "of", "niet", "is", "gelijk", "ongelijk", "modulo", "pi", "nan",
-  "wortel", "afrond", "willekeurig", "minimum", "maximum", "punt", "toets", "ingedrukt",
-  "cijfers", "afkap", "ontbinding", "samenstelling", "splits", "unicode", "indexvan",
-  "tick", "tock", "null", "importeer", "etiket", "wetenschappelijk"];
-
-
   const BUILTINS_EN = ["abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","cast","unicode","indexof","decomposition","composition","split", "dice", "type", "numeric", "valmin", "valmax", "argmin", "argmax"];
-  const BUILTINS_IT = ["radice","arrotonda","casuale","minimo","massimo","punto","tronca","cast","unicode","indicedi","scomposizione","composizione","scomponi", "dado", "numerico", "valmin", "valmax", "argmin", "argmax", "dividi"];
-  const BUILTINS_NL = ["wortel", "afrond", "willekeurig", "minimum", "maximum", "punt", "afkap",
-  "unicode", "indexvan", "ontbinding", "samenstelling", "splits", "dobbelsteen", "numeriek", "valmin", "valmax", "argmin", "argmax"];
 
-  const ALL_KEYWORDS = new Set([...KEYWORDS_EN, ...KEYWORDS_IT, ...KEYWORDS_NL].map(s => s.toLowerCase()));
+  // Costruisce ALL_KEYWORDS unendo EN + tutte le traduzioni dei dict dinamicamente
+  function buildAllKeywords() {
+    const all = new Set(KEYWORDS_EN.map(k => k.toLowerCase()));
+    for (const { dict } of Object.values(LANG_REGISTRY)) {
+      if (dict) {
+        Object.values(dict).forEach(v => {
+          // Dividiamo espressioni composte (es. "als achtergrond") nei singoli token
+          v.split(/\s+/).forEach(word => all.add(word.toLowerCase()));
+        });
+      }
+    }
+    return all;
+  }
+  
+  const ALL_KEYWORDS = buildAllKeywords();
 
   function escapeHtml(s) {
     return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -1323,7 +1328,8 @@ function initMatita() {
         const raw = id[0];
         const lower = raw.toLowerCase();
         const isKw = ALL_KEYWORDS.has(lower);
-        const isBuiltin = [...BUILTINS_EN, ...BUILTINS_IT, ...BUILTINS_NL].includes(lower);
+        // Usa direttamente il registro universale delle funzioni per colorare!
+        const isBuiltin = (lower in BUILTINS);
         let cls;
         if (isBuiltin) cls = "tok-builtin";
         else if (isKw) cls = (raw === "A" || raw === "a") ? "tok-ident" : "tok-keyword";
@@ -1415,7 +1421,7 @@ function initMatita() {
     { label: "numeric(x)", insert: "numeric(VALUE)", detail: "True if the argument is a valid number" },
     
     // IO & System
-    { label: "output <expr>", insert: "output EXPRESSION\n", detail: "Print to console" },
+    { label: "write <expr>", insert: "write EXPRESSION\n", detail: "Print to console" },
     { label: "digits <n>", insert: "digits 2\n", detail: "Set float precision" },
     { label: "scientific(N)", insert: "scientific 1000000\n", detail: "Scientific notation threshold" },
     { label: "newline", insert: "newline\n", detail: "Print new line" },
@@ -1510,58 +1516,96 @@ function initMatita() {
     ];
 
     const SUGGESTIONS_NL = [
-      { label: "indien (...) dan ( ... )", insert: "indien (CONDITIE) dan (\n    \n)\n", detail: "Conditioneel blok" },
-      { label: "anders ( ... )", insert: "anders (\n    \n)\n", detail: "Else-tak" },
-      { label: "zolang (...) doe ( ... )", insert: "zolang (CONDITIE) doe (\n    \n)\n", detail: "While-lus" },
-      { label: "voor elk x in LIJST doe ( ... )", insert: "voor elk x in LIJST doe (\n    \n)\n", detail: "Lus over lijst" },
-      { label: "teller I loopt van A tot B en doe ( ... )", insert: "teller I loopt van BEGIN tot EINDE en doe (\n    \n)\n", detail: "For-lus" },
-      { label: "invoeg VAL in element N van LIJST", insert: "invoeg WAARDE in element INDEX van LIJST\n", detail: "Voegt in op positie" },
-      { label: "voeg val naar lijst", insert: "voeg WAARDE naar LIJST\n", detail: "Voegt toe aan einde" },
-      { label: "verwijder element n uit lijst", insert: "verwijder element INDEX uit LIJST\n", detail: "Verwijdert op positie n" },
-      { label: "verwijder eerste/laatste uit lijst", insert: "verwijder laatste element uit LIJST\n", detail: "Verwijdert hoofd of staart" },
-      { label: "zet val in element n van lijst", insert: "zet WAARDE in element INDEX van LIJST\n", detail: "Vervangt bestaande waarde" },
-      { label: "element n van lijst", insert: "element INDEX van LIJST", detail: "Leest waarde op positie n" },
-      { label: "lengte van lijst", insert: "lengte van LIJST", detail: "Geeft aantal elementen" },
-      { label: "splits(tekst)", insert: "splits(TEKST)", detail: "Splitst tekst in een lijst van tekens" },
-      { label: "definieer procedure naam(args) ( ... )", insert: "definieer procedure naam(a, b) (\n    \n)\n", detail: "Definieert een procedure" },
-      { label: "definieer functie naam(args) ( ... )", insert: "definieer functie naam(a, b) (\n    retourneer a + b\n)\n", detail: "Definieert een functie" },
-      { label: "zet <expr> in <VAR>", insert: "zet EXPRESSIE in VAR\n", detail: "Toewijzing" },
-      { label: "schrijf <expr>", insert: "schrijf EXPRESSIE\n", detail: "Afdrukken naar console" },
-      { label: "cijfers <n>", insert: "cijfers 2\n", detail: "Stel precisie decimalen in" },
-      { label: "wetenschappelijk(N)", insert: "wetenschappelijk 1000000\n", detail: "Drempelwaarde wetenschappelijke notatie" },
-      { label: "nieuwe regel", insert: "nieuwe regel\n", detail: "Nieuwe regel" },
-      { label: "stel kleur in (r,g,b)", insert: "stel kleur in (ROOD, GROEN, BLAUW)\n", detail: "Kleur (0..100)" },
-      { label: "wis grafiek", insert: "wis grafiek\n", detail: "Wist grafische objecten" },
-      { label: "kader grafiek", insert: "kader grafiek\n", detail: "Past camera aan alle objecten aan" },
-      { label: "wis scherm", insert: "wis scherm\n", detail: "Wist de console" },
-      { label: "herteken", insert: "herteken\n", detail: "Hertekent het grafische gebied" },
-      { label: "cirkel straal R op (x,y)", insert: "cirkel straal STRAAL op (X, Y)\n", detail: "Gevulde cirkel" },
-      { label: "omtrek straal R dikte D op (x,y)", insert: "omtrek straal STRAAL dikte DIKTE op (X, Y)\n", detail: "Holle cirkel" },
-      { label: "rechthoek uit (x1,y1) tot (x2,y2)", insert: "rechthoek uit (X1, Y1) tot (X2, Y2)\n", detail: "Gevuld rechthoek" },
-      { label: "lijn dikte D uit (x1,y1) tot (x2,y2)", insert: "lijn dikte DIKTE uit (X1, Y1) tot (X2, Y2)\n", detail: "Segment" },
-      { label: "driehoek met hoekpunten (x1,y1),(x2,y2),(x3,y3)", insert: "driehoek met hoekpunten (X1, Y1), (X2, Y2), (X3, Y3)\n", detail: "Gevulde driehoek" },
-      { label: "boog straal R dikte D uit (x1,y1) tot (x2,y2)", insert: "boog straal STRAAL dikte DIKTE uit (X1, Y1) tot (X2, Y2)\n", detail: "Boog" },
-      { label: "graffiti grootte N op (x,y) \"TEKST\"", insert: "graffiti grootte GROOTTE op (X, Y) \"TEKST\"\n", detail: "Tekst op canvas" },
-      { label: "etiket ( ... ) als NAAM", insert: "etiket (\n    \n) als NAAM\n", detail: "Definieert grafisch object" },
-      { label: "importeer \"bestand\" als NAAM", insert: "importeer \"bestand\" als NAAM\n", detail: "Importeert afbeelding als object" },
-      { label: "teken OBJECT op (x,y)", insert: "teken OBJECT op (X, Y)\n", detail: "Tekent object" },
-      { label: "draai OBJECT van HOEK graden en plaats op (x,y)", insert: "draai OBJECT van HOEK graden en plaats het op (X, Y)\n", detail: "Transformatie" },
-      { label: "schaal OBJECT door factor", insert: "schaal OBJECT door FACTOR\n", detail: "Schaalt object" },
-      { label: "laad \"bestand\" schaal F als achtergrond", insert: "laad \"bestand\" schaal FACTOR als achtergrond\n", detail: "Achtergrondafbeelding" },
-      { label: "verf achtergrond", insert: "verf achtergrond\n", detail: "Achtergrondkleur" },
-      { label: "wacht N ms", insert: "wacht DUUR ms\n", detail: "Pauze" },
-      { label: "vraag VAR met bericht \"...\"", insert: "vraag VAR met bericht \"BERICHT\"\n", detail: "Gebruikersinvoer" },
-      { label: "tick", insert: "tick\n", detail: "Start de stopwatch" },
-      { label: "tock", insert: "tock", detail: "Milliseconden verstreken na tick" },
-      { label: "willekeurig(min, max)", insert: "willekeurig(MIN, MAX)", detail: "Willekeurig getal van A tot B" },
-      { label: "dobbelsteen( vlakken )", insert: "dobbelsteen(VLAKKEN)", detail: "Geheel getal van 1 tot N" },
-      { label: "type(x)", insert: "type(WAARDE)", detail: "Geeft 'number', 'string', 'list', 'point'..." },
-      { label: "numeriek(x)", insert: "numeriek(WAARDE)", detail: "Waar als het argument een geldig getal is" }
-    ];
+      { label: "als (...) dan ( ... )", insert: "als (CONDITIE) dan (\n    \n)\n", detail: "Conditioneel blok" },
+      { label: "anders ( ... )", insert: "anders (\n    \n)\n", detail: "Else-tak" },
+      { label: "zolang (...) herhaal je ( ... )", insert: "zolang (CONDITIE) herhaal je (\n    \n)\n", detail: "While-lus" },
+      { label: "voor elke x in LIJST herhaal je ( ... )", insert: "voor elke x in LIJST herhaal je (\n    \n)\n", detail: "Lus over lijst" },
+      { label: "teller I loopt van A tot B en je doet ( ... )", insert: "teller I loopt van BEGIN tot EINDE en je doet (\n    \n)\n", detail: "For-lus" },
+      { label: "voeg VAL toe in element N van LIJST", insert: "voeg WAARDE toe in element INDEX van LIJST\n", detail: "Voegt in op positie" },
+      
+      { label: "voeg VAL toe aan LIJST", insert: "voeg WAARDE toe aan LIJST\n", detail: "Voegt toe aan einde" },
+      { label: "verwijder element n uit lijst", insert: "verwijder element INDEX uit LIJST\n", detail: "Verwijdert op positie n" },
+      { label: "verwijder eerste/laatste uit lijst", insert: "verwijder laatste element uit LIJST\n", detail: "Verwijdert hoofd of staart" },
+      { label: "zet val in element n van lijst", insert: "zet WAARDE in element INDEX van LIJST\n", detail: "Vervangt bestaande waarde" },
+      { label: "element n van lijst", insert: "element INDEX van LIJST", detail: "Leest waarde op positie n" },
+      { label: "lengte van lijst", insert: "lengte van LIJST", detail: "Geeft aantal elementen" },
+      { label: "splits(tekst)", insert: "splits(TEKST)", detail: "Splitst tekst in een lijst van tekens" },
+      { label: "definieer procedure naam(args) ( ... )", insert: "definieer procedure naam(a, b) (\n    \n)\n", detail: "Definieert een procedure" },
+      { label: "definieer functie naam(args) ( ... )", insert: "definieer functie naam(a, b) (\n    geef a + b terug\n)\n", detail: "Definieert een functie" },
+      { label: "geef <expr> terug", insert: "geef EXPRESSIE terug\n", detail: "Geeft waarde terug" },
+      { label: "zet <expr> in <VAR>", insert: "zet EXPRESSIE in VAR\n", detail: "Toewijzing" },
+      { label: "schrijf <expr>", insert: "schrijf EXPRESSIE\n", detail: "Afdrukken naar console" },
+      { label: "decimalen <n>", insert: "decimalen 2\n", detail: "Stel precisie decimalen in" },
+      { label: "wetenschappelijk(N)", insert: "wetenschappelijk 1000000\n", detail: "Drempelwaarde wetenschappelijke notatie" },
+      { label: "nieuwe regel", insert: "nieuwe regel\n", detail: "Nieuwe regel" },
+      { label: "stel kleur in (r,g,b)", insert: "stel kleur in (ROOD, GROEN, BLAUW)\n", detail: "Kleur (0..100)" },
+      { label: "wis canvas", insert: "wis canvas\n", detail: "Wist grafische objecten" },
+      { label: "toon alles", insert: "toon alles\n", detail: "Past camera aan alle objecten aan" },
+      { label: "wis scherm", insert: "wis scherm\n", detail: "Wist de console" },
+      { label: "teken opnieuw", insert: "teken opnieuw\n", detail: "Hertekent het grafische gebied" },
+      { label: "cirkel straal R op (x,y)", insert: "cirkel straal STRAAL op (X, Y)\n", detail: "Gevulde cirkel" },
+      { label: "omtrek straal R dikte D op (x,y)", insert: "omtrek straal STRAAL dikte DIKTE op (X, Y)\n", detail: "Holle cirkel" },
+      { label: "rechthoek van (x1,y1) tot (x2,y2)", insert: "rechthoek van (X1, Y1) tot (X2, Y2)\n", detail: "Gevuld rechthoek" },
+      { label: "lijn dikte D van (x1,y1) tot (x2,y2)", insert: "lijn dikte DIKTE van (X1, Y1) tot (X2, Y2)\n", detail: "Segment" },
+      { label: "driehoek met hoekpunten (x1,y1),(x2,y2),(x3,y3)", insert: "driehoek met hoekpunten (X1, Y1), (X2, Y2), (X3, Y3)\n", detail: "Gevulde driehoek" },
+      { label: "boog straal R dikte D van (x1,y1) tot (x2,y2)", insert: "boog straal STRAAL dikte DIKTE van (X1, Y1) tot (X2, Y2)\n", detail: "Boog" },
+      { label: "graffiti grootte N op (x,y) \"TEKST\"", insert: "graffiti grootte GROOTTE op (X, Y) \"TEKST\"\n", detail: "Tekst op canvas" },
+      { label: "label ( ... ) als NAAM", insert: "label (\n    \n) als NAAM\n", detail: "Definieert grafisch object" },
+      { label: "importeer \"bestand\" als NAAM", insert: "importeer \"bestand\" als NAAM\n", detail: "Importeert afbeelding als object" },
+      { label: "teken OBJECT op (x,y)", insert: "teken OBJECT op (X, Y)\n", detail: "Tekent object" },
+      { label: "draai OBJECT met HOEK graden en plaats op (x,y)", insert: "draai OBJECT met HOEK graden en plaats het op (X, Y)\n", detail: "Transformatie" },
+      { label: "schaal OBJECT met factor", insert: "schaal OBJECT met FACTOR\n", detail: "Schaalt object" },
+      { label: "laad \"bestand\" met schaal F als achtergrond", insert: "laad \"bestand\" met schaal FACTOR als achtergrond\n", detail: "Achtergrondafbeelding" },
+      { label: "vul achtergrond in", insert: "vul achtergrond in\n", detail: "Achtergrondkleur" },
+      { label: "wacht N ms", insert: "wacht DUUR ms\n", detail: "Pauze" },
+      { label: "vraag VAR met bericht \"...\"", insert: "vraag VAR met bericht \"BERICHT\"\n", detail: "Gebruikersinvoer" },
+      { label: "tick", insert: "tick\n", detail: "Start de stopwatch" },
+      { label: "tock", insert: "tock", detail: "Milliseconden verstreken na tick" },
+      { label: "willekeurig(min, max)", insert: "willekeurig(MIN, MAX)", detail: "Willekeurig getal van A tot B" },
+      { label: "dobbelsteen( vlakken )", insert: "dobbelsteen(VLAKKEN)", detail: "Geheel getal van 1 tot N" },
+      { label: "type(x)", insert: "type(WAARDE)", detail: "Geeft 'number', 'string', 'list', 'point'..." },
+      { label: "numeriek(x)", insert: "numeriek(WAARDE)", detail: "Waar als het argument een geldig getal is" },
+      { label: "ontbind(N)", insert: "ontbind(N)", detail: "Mantisse en exponent van een getal" },
+      { label: "samenvoegen(lijst)", insert: "samenvoegen(LIJST)", detail: "Voegt een lijst samen tot een waarde" },
+      { label: "stel x van PUNT in op VAL", insert: "stel x van PUNT in op WAARDE\n", detail: "Stel x-coördinaat in" },
+      { label: "stel y van PUNT in op VAL", insert: "stel y van PUNT in op WAARDE\n", detail: "Stel y-coördinaat in" },
+      { label: "minwaarde(lijst)", insert: "minwaarde(LIJST)", detail: "Geeft de kleinste waarde in de lijst" },
+      { label: "maxwaarde(lijst)", insert: "maxwaarde(LIJST)", detail: "Geeft de grootste waarde in de lijst" },
+      { label: "minindex(lijst)", insert: "minindex(LIJST)", detail: "Index van de kleinste waarde" },
+      { label: "maxindex(lijst)", insert: "maxindex(LIJST)", detail: "Index van de grootste waarde" },
+      { label: "afkappen(N)", insert: "afkappen(N)", detail: "Geeft het gehele deel (afgekapt)" },
+      { label: "afronden(N)", insert: "afronden(N)", detail: "Rondt af op het dichtstbijzijnde gehele getal" },
+      { label: "A verschilend van B", insert: "A verschilend van B", detail: "Ongelijkheidsoperator" }
+    ];
 
-  function buildSuggestions() {
-    const map = { it: SUGGESTIONS_IT, nl: SUGGESTIONS_NL, en: SUGGESTIONS_EN };
-    return map[currentLang] || SUGGESTIONS_EN;
+  // Agganciamo i suggerimenti al registro
+  LANG_REGISTRY.en.suggestions = SUGGESTIONS_EN;
+  LANG_REGISTRY.it.suggestions = SUGGESTIONS_IT; // Usiamo l'override IT per mantenere le descrizioni ('detail') italiane
+  LANG_REGISTRY.nl.suggestions = SUGGESTIONS_NL;
+
+  const _suggestionCache = new Map();
+
+  function buildSuggestions(lang) {
+    if (_suggestionCache.has(lang)) return _suggestionCache.get(lang);
+
+    const langData = LANG_REGISTRY[lang];
+    let result;
+
+    if (langData && langData.suggestions) {
+      result = langData.suggestions; // Override esplicito per lingue complesse (es. NL)
+    } else if (langData && langData.dict) {
+      // Auto-generazione per nuove lingue (es. DE, ES)
+      result = SUGGESTIONS_EN.map(s => ({
+        label: applyDict(s.label, langData.dict),
+        insert: applyDict(s.insert, langData.dict),
+        detail: s.detail // La UI descrittiva resta in lingua base
+      }));
+    } else {
+      result = SUGGESTIONS_EN;
+    }
+
+    _suggestionCache.set(lang, result);
+    return result;
   }
 
   function getSuggestionCmd(s) {
@@ -1574,7 +1618,7 @@ function initMatita() {
   let _collator;
 
   function updateSuggestionsList() {
-    RAW_SUGGESTIONS = buildSuggestions();
+    RAW_SUGGESTIONS = buildSuggestions(currentLang);
     _collator = new Intl.Collator(isLanguageIT ? "it" : "en", { sensitivity: "base", numeric: true });
     SUGGESTIONS = RAW_SUGGESTIONS
       .map(s => Object.assign({}, s, { cmd: getSuggestionCmd(s), labelLower: String(s.label || "").toLowerCase() }))
@@ -2482,6 +2526,20 @@ function initMatita() {
     return { minX, minY, maxX, maxY };
   }
 
+  function resetCameraToCenter() {
+     setupCanvas();
+     const dpr = gfxDpr || (window.devicePixelRatio || 1);
+
+     const w = gfxCanvas.width || Math.floor((gfxCanvas.getBoundingClientRect().width || 800) * dpr);
+     const h = gfxCanvas.height || Math.floor((gfxCanvas.getBoundingClientRect().height || 600) * dpr);
+
+     camera = {
+        tx: w / 2,
+        ty: h / 2,
+        scale: dpr
+      };
+  }
+
   function computeFitCamera(objects) {
     const bounds = calculateBoundingBox(objects);
     const dpr = gfxDpr || (window.devicePixelRatio || 1);
@@ -2807,83 +2865,84 @@ function initMatita() {
 
   // Keywords/phrases (case-insensitive). Parser accepts either Italian or English forms.
   const KW = {
-    DEFINE: [["define"],["definisci"]],
-    FUNCTION: [["function"],["funzione"]],
-    PROCEDURE: [["procedure"],["procedura"]],
-    GLOBAL: [["global"],["globale"]],
-    RETURN: [["return"],["restituisci"]],
-    STOP: [["stop"]],
-    IF: [["if"],["se"]],
-    THEN: [["then"],["allora"]],
-    OTHERWISE: [["otherwise"],["altrimenti"]],
-    AS_LONG_AS: [["as","long","as"],["fintanto"]],
-    YOU_DO: [["you","do"],["esegui"]],
-    FOR_EACH: [["for","each"],["per","ogni"]],
-    VARIABLE: [["index"],["variable"],["variabile"],["indice"]],
-    GOES_FROM: [["goes","from"],["va","da"]],
-    TO: [["to"],["a"]],
-    AND: [["and"],["e"],["ed"]],
-    IN: [["in"]],
-    PUT: [["put"],["metti"]],
-    ADD: [["add"],["aggiungi"]],
-    REMOVE: [["remove"],["rimuovi"]],
-    INSERT: [["insert"],["inserisci"]],
-    FIRST: [["first"],["primo"]],
-    LAST: [["last"],["ultimo"]],
-    ITEM: [["item"],["elemento"]],
-    OF: [["of"],["di"]],
-    DIMENSION: [["dimension"],["dimensione"]],
-    LIST: [["list"],["lista"]],
-    OUTPUT: [["output"],["scrivi"]],
-    NEWLINE: [["newline"],["accapo"]],
-    WAIT: [["wait"],["aspetta"]],
-    MS: [["ms"]],
-    GET: [["get"],["chiedi"]],
-    SAYING: [["saying"],["dicendo"]],
-    SET: [["set"],["imposta"]],
-    COLOR: [["color"],["colore"]],
-    CLEAR: [["clear"],["cancella"]],
-    GRAPHICS: [["graphics"],["grafica"]],
-    FRAME: [["frame"],["inquadra"]],
-    SCREEN: [["screen"],["schermo"]],
-    REDRAW: [["redraw"],["ridisegna"]],
-    CIRCLE: [["circle"],["cerchio"]],
-    RADIUS: [["radius"],["raggio"]],
-    CIRCUMFERENCE: [["circumference"],["circonferenza"]],
-    THICKNESS: [["thickness"],["spessore"]],
-    RECTANGLE: [["rectangle"],["rettangolo"]],
-    LINE: [["line"],["linea"]],
-    TRIANGLE: [["triangle"],["triangolo"]],
-    WITH: [["with"],["con"]],
-    VERTICES: [["vertices"],["vertici"]],
-    ARC: [["arc"],["arco"]],
-    GRAFFITI: [["graffiti"]],
-    SIZE: [["size"],["grandezza"]],
-    DRAW: [["draw"],["disegna"]],
-    ROTATE: [["rotate"],["ruota"]],
-    DEG: [["deg"],["gradi"]],
-    PLACE: [["place"],["posiziona"]],
-    IT: [["it"]],
-    AT: [["at"],["in"]],
-    SCALE: [["scale"],["scala"]],
-    BY: [["by"],["di"]],
-    LOAD: [["load"],["carica"]],
-    PAINT: [["paint"],["dipingi"]],
-    BACKGROUND: [["background"],["sfondo"]],
-    AS: [["as"],["come"]],
-    AS_BACKGROUND: [["as","background"],["come","sfondo"]],
-    ALIAS: [["alias"]],
-    INOUT: [["inout"]],
-    KEY: [["key"],["tasto"]],
-    IS: [["is"],["viene"],["vale"],["uguale"]],
-    EQUALS: [["equals"],["uguale"]],
-    PRESSED: [["pressed"],["premuto"]],
-    TICK: [["tick"]],
-    TOCK: [["tock"]],
-    IMPORT: [["import"],["importa"]],
-    LABEL: [["label"],["etichetta"]],
-    SCIENTIFIC: [["scientific"],["scientifica"]]
-  };
+    DEFINE: [["define"],["definisci"],["definieer"]],
+    FUNCTION: [["function"],["funzione"],["functie"]],
+    PROCEDURE: [["procedure"],["procedura"]],
+    GLOBAL: [["global"],["globale"],["globaal"]],
+    RETURN: [["return"],["restituisci"],["geef"]],
+    STOP: [["stop"]],
+    IF: [["if"],["se"],["als"]],
+    THEN: [["then"],["allora"],["dan"]],
+    OTHERWISE: [["otherwise"],["altrimenti"],["anders"]],
+    AS_LONG_AS: [["as","long","as"],["fintanto"],["zolang"]],
+    YOU_DO: [["you","do"],["esegui"],["herhaal","je"],["je","doet"]],
+    FOR_EACH: [["for","each"],["per","ogni"],["voor","elke"],["voor","elk"]],
+    VARIABLE: [["index"],["variable"],["variabile"],["indice"],["teller"],["variabele"]],
+    GOES_FROM: [["goes","from"],["va","da"],["loopt","van"]],
+    TO: [["to"],["a"],["tot"]],
+    AND: [["and"],["e"],["ed"],["en"]],
+    IN: [["in"]],
+    PUT: [["put"],["metti"],["zet"]],
+    ADD: [["add"],["aggiungi"],["voeg"]],
+    REMOVE: [["remove"],["rimuovi"],["verwijder"]],
+    INSERT: [["insert"],["inserisci"],["invoeg"]],
+    FIRST: [["first"],["primo"],["eerste"]],
+    LAST: [["last"],["ultimo"],["laatste"]],
+    ITEM: [["item"],["elemento"],["element"]],
+    OF: [["of"],["di"],["van"]],
+    DIMENSION: [["dimension"],["dimensione"],["lengte"]],
+    LIST: [["list"],["lista"],["lijst"]],
+    OUTPUT: [["write"],["scrivi"],["schrijf"]],
+    NEWLINE: [["newline"],["accapo"],["nieuwe","regel"]],
+    WAIT: [["wait"],["aspetta"],["wacht"]],
+    MS: [["ms"]],
+    GET: [["get"],["chiedi"],["vraag"]],
+    SAYING: [["saying"],["dicendo"],["met","bericht"]],
+    SET: [["set"],["imposta"],["stel"]],
+    COLOR: [["color"],["colore"],["kleur"]],
+    CLEAR: [["clear"],["cancella"],["wis"]],
+    GRAPHICS: [["graphics"],["grafica"],["canvas"],["grafiek"]],
+    FRAME: [["frame"],["inquadra"],["toon","alles"],["pas","grafiek","aan"]],
+    SCREEN: [["screen"],["schermo"],["scherm"]],
+    REDRAW: [["redraw"],["ridisegna"],["herteken"],["teken","opnieuw"]],
+    CIRCLE: [["circle"],["cerchio"],["cirkel"]],
+    RADIUS: [["radius"],["raggio"],["straal"]],
+    CIRCUMFERENCE: [["circumference"],["circonferenza"],["omtrek"]],
+    THICKNESS: [["thickness"],["spessore"],["dikte"]],
+    RECTANGLE: [["rectangle"],["rettangolo"],["rechthoek"]],
+    LINE: [["line"],["linea"],["lijn"]],
+    TRIANGLE: [["triangle"],["triangolo"],["driehoek"]],
+    WITH: [["with"],["con"],["met"]],
+    VERTICES: [["vertices"],["vertici"],["hoekpunten"]],
+    ARC: [["arc"],["arco"],["boog"]],
+    GRAFFITI: [["graffiti"]],
+    SIZE: [["size"],["grandezza"],["grootte"]],
+    DRAW: [["draw"],["disegna"],["teken"]],
+    ROTATE: [["rotate"],["ruota"],["draai"]],
+    DEG: [["deg"],["gradi"],["graden"]],
+    PLACE: [["place"],["posiziona"],["plaats"]],
+    IT: [["it"],["het"]],
+    AT: [["at"],["in"],["op"]],
+    SCALE: [["scale"],["scala"],["schaal"]],
+    LOAD_SCALE: [["scale"],["scala"],["met","schaal"]],
+    BY: [["by"],["di"],["met"],["door"]],
+    LOAD: [["load"],["carica"],["laad"]],
+    PAINT: [["paint"],["dipingi"],["vul"]],
+    BACKGROUND: [["background"],["sfondo"],["achtergrond"]],
+    AS: [["as"],["come"],["als"]],
+    AS_BACKGROUND: [["as","background"],["come","sfondo"],["als","achtergrond"]],
+    ALIAS: [["alias"]],
+    INOUT: [["inout"]],
+    KEY: [["key"],["tasto"],["toets"]],
+    IS: [["is"],["viene"],["vale"],["uguale"]],
+    EQUALS: [["equals"],["uguale"],["gelijk"]],
+    PRESSED: [["pressed"],["premuto"],["ingedrukt"]],
+    TICK: [["tick"]],
+    TOCK: [["tock"]],
+    IMPORT: [["import"],["importa"],["importeer"]],
+    LABEL: [["label"],["etichetta"]],
+    SCIENTIFIC: [["scientific"],["scientifica"],["wetenschappelijk"]]
+  };
 
 
   const EXEC_STOP = { type: "ExecutionStop" };
@@ -3115,28 +3174,28 @@ function initMatita() {
     }
 
     getOpPrecedence(tok) {
-      if (!tok) return 0;
-      if (tok.type==="OP") {
-        const op=tok.value;
-        if (op==="^") return 7;
-        if (op==="*" || op==="/" || op==="%") return 6;
-        if (op==="+" || op==="-") return 5;
-        if (op==="=="||op==="==="||op==="!="||op==="!=="||op==="<"||op===">"||op==="<="||op===">=") return 4;
-        if (op==="=") return 4;
-        return 0;
-      }
-      if (tok.type==="IDENT") {
-        const w=tok.value.toLowerCase();
-        if (w==="alias") return 1;
-        if (w==="or" || w==="o") return 1;
-        if (w==="and" || w==="e" || w==="ed") return 2;
-        if (w==="mod") return 6;
-        if (w==="is" || w==="equals" || w==="vale" || w==="uguale") return 4;
-        if (w==="diverso" || w==="different") return 4;
-        if (w==="of" || w==="di") return 8;
-      }
-      return 0;
-    }
+      if (!tok) return 0;
+      if (tok.type==="OP") {
+        const op=tok.value;
+        if (op==="^") return 7;
+        if (op==="*" || op==="/" || op==="%") return 6;
+        if (op==="+" || op==="-") return 5;
+        if (op==="=="||op==="==="||op==="!="||op==="!=="||op==="<"||op===">"||op==="<="||op===">=") return 4;
+        if (op==="=") return 4;
+        return 0;
+      }
+      if (tok.type==="IDENT") {
+        const w=tok.value.toLowerCase();
+        if (w==="alias") return 1;
+        if (w==="or" || w==="o" || (w==="of" && currentLang==="nl")) return 1;
+        if (w==="and" || w==="e" || w==="ed" || w==="en") return 2;
+        if (w==="mod" || w==="modulo") return 6;
+        if (w==="is" || w==="equals" || w==="vale" || w==="uguale" || w==="gelijk") return 4;
+        if (w==="diverso" || w==="different" || w==="verschilend") return 4;
+        if ((w==="of" && currentLang!=="nl") || w==="di" || w==="van") return 8;
+      }
+      return 0;
+    }
 
     parseExpression(precedence=0, stopSet=null) {
       let left = this.parsePrefix(stopSet);
@@ -3146,8 +3205,8 @@ function initMatita() {
 
         // special: x of POINT / y of POINT
         const w = (tok.type==="IDENT") ? tok.value.toLowerCase() : "";
-        if ((w==="of" || w==="di") && left.type==="Var" && (left.nameLower==="x" || left.nameLower==="y")) {
-          // consume 'of/di' and parse right
+        if ((w==="of" || w==="di" || w==="van") && left.type==="Var" && (left.nameLower==="x" || left.nameLower==="y")) {
+          // consume 'of/di/van' and parse right
           this.consume();
           const obj = this.parseExpression(7, stopSet);
           left = { type:"PointProp", prop:left.nameLower, object: obj, line:left.line };
@@ -3173,7 +3232,7 @@ function initMatita() {
       }
 
       // unary not
-      if (tok.type==="IDENT" && ["not","non"].includes(tok.value.toLowerCase())) {
+      if (tok.type==="IDENT" && ["not","non","niet"].includes(tok.value.toLowerCase())) {
         this.consume();
         const right=this.parseExpression(6, stopSet);
         return { type:"Unary", op:"not", right, line: tok.line };
@@ -3233,20 +3292,19 @@ function initMatita() {
 
       // item N of LIST
       if (this.matchKW("ITEM")) {
-        const idx=this.parseExpression(0, new Set(["of","di"])); // stop at of/di
+        const idx=this.parseExpression(0, new Set(["of","di","van"])); // stop at of/di/van
         this.expectKW("OF", tok.line);
         const list=this.parseExpression(7, stopSet);
         return { type:"ItemOf", list, index: idx, line: tok.line };
       }
 
       // key <expr> is pressed
-      if (this.matchKW("KEY")) {
-        const keyExpr=this.parseExpression(0, new Set(["is","viene","pressed","premuto","vale","uguale"]));
-        // optional: 'is/viene/vale/uguale'
-        this.matchPhrase([["is"],["viene"],["vale"],["uguale"]]);
-        if (!this.matchPhrase([["pressed"],["premuto"]])) this.throwParse(uiStrings[lang].expectedPressed, tok.line);
-        return { type:"KeyPressed", keyExpr, line: tok.line };
-      }
+      if (this.matchKW("KEY")) {
+        const keyExpr=this.parseExpression(0, new Set(["is","viene","pressed","premuto","vale","uguale","ingedrukt"]));
+        this.matchKW("IS"); 
+        if (!this.matchKW("PRESSED")) this.throwParse(uiStrings[lang].expectedPressed, tok.line);
+        return { type:"KeyPressed", keyExpr, line: tok.line };
+      }
 
       // identifier or function call
       if (tok.type==="IDENT") {
@@ -3256,12 +3314,13 @@ function initMatita() {
 
         // keywordish literals
         const litMap = {
-          "true": true, "vero": true,
-          "false": false, "falso": false,
-          "pi": Math.PI, "π": Math.PI,
-          "infinity": Infinity, "infinito": Infinity,
-          "nan": NaN, "null": null
-        };
+          "true": true, "vero": true, "waar": true,
+          "false": false, "falso": false, "onwaar": false,
+          "pi": Math.PI, "π": Math.PI,
+          "infinity": Infinity, "infinito": Infinity, "oneindig": Infinity,
+          "nan": NaN, "null": null
+        };
+
         if (nameLower in litMap) return { type:"Literal", value: litMap[nameLower], line: id.line };
 
         // function call?
@@ -3304,48 +3363,38 @@ function initMatita() {
         }
 
         // and/or/mod/is/equals
-        if (w==="and"||w==="e"||w==="ed") {
-          this.consume();
-          const right=this.parseExpression(opPrec, stopSet);
-          return { type:"Binary", op:"and", left, right, line:left.line };
-        }
-        if (w==="or"||w==="o") {
-          this.consume();
-          const right=this.parseExpression(opPrec, stopSet);
-          return { type:"Binary", op:"or", left, right, line:left.line };
-        }
-        if (w==="mod") {
-          this.consume();
-          const right=this.parseExpression(opPrec, stopSet);
-          return { type:"Binary", op:"%", left, right, line:left.line };
-        }
-        if (w==="is"||w==="equals"||w==="vale"||w==="uguale") {
-          // handle Italian phrase "uguale a" (consume optional "a")
-          this.consume();
-          if (this.peek().type==="IDENT" && this.peek().value.toLowerCase()==="a") this.consume();
-          const right=this.parseExpression(opPrec, stopSet);
-          return { type:"Binary", op:"===", left, right, line:left.line };
-        }
+        if (w==="and"||w==="e"||w==="ed"||w==="en") {
+          this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"and", left, right, line:left.line };
+        }
+        if (w==="or"||w==="o"||(w==="of" && currentLang==="nl")) {
+          this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"or", left, right, line:left.line };
+        }
+        if (w==="mod"||w==="modulo") {
+          this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"%", left, right, line:left.line };
+        }
+        if (w==="is"||w==="equals"||w==="vale"||w==="uguale"||w==="gelijk") {
+          this.consume();
+          if (this.peek().type==="IDENT" && (this.peek().value.toLowerCase()==="a" || this.peek().value.toLowerCase()==="aan")) this.consume();
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"===", left, right, line:left.line };
+        }
 
-        if (w==="diverso" || w==="different") {
-          this.consume(); // Consuma la parola 'diverso'
-          
-          // Controlla se la prossima parola è 'da' (o 'from') e consumala se presente
+        if (w==="diverso" || w==="different" || w==="verschilend") {
+          this.consume(); 
           const nextTok = this.peek();
           if (nextTok.type === "IDENT") {
              const nw = nextTok.value.toLowerCase();
-             if (nw === "da" || nw === "from") {
-                 this.consume();
-             }
+             if (nw === "da" || nw === "from" || nw === "van") this.consume();
           }
-
-          // Parsifica l'espressione a destra
-          const right = this.parseExpression(opPrec, stopSet);
-          
-          // Restituisce un nodo Binario con operatore !=
-          return { type:"Binary", op:"!=", left, right, line:left.line };
-        }
-      
+          const right = this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"!=", left, right, line:left.line };
+        }    
       }
 
       this.throwParse(uiStrings[lang].invalidInfix, tok.line);
@@ -3372,7 +3421,7 @@ function initMatita() {
       if (this.matchKW("DEFINE")) {
         const kindTok = this.matchKW("FUNCTION") || this.matchKW("PROCEDURE");
         if (!kindTok) this.throwParse(uiStrings[lang].expectedFuncProc, t.line);
-        const kind = (kindTok.value.toLowerCase()==="function" || kindTok.value.toLowerCase()==="funzione") ? "function" : "procedure";
+        const kind = (kindTok.value.toLowerCase()==="function" || kindTok.value.toLowerCase()==="funzione" || kindTok.value.toLowerCase()==="functie") ? "function" : "procedure";
         const nameTok=this.parseIdentifier();
 
         const lp=this.matchType("LPAREN");
@@ -3396,9 +3445,10 @@ function initMatita() {
       if (this.matchKW("RETURN")) {
         // optional expr until end-of-statement
         const expr = (!this.isStopToken(null, this.peek()) && this.peek().type!=="NEWLINE" && this.peek().type!=="SEMI" && this.peek().type!=="RPAREN")
-          ? this.parseExpression(0, null)
-          : null;
-        return { type:"Return", expr, line: t.line };
+          ? this.parseExpression(0, new Set(["terug"]))
+          : null;
+        this.matchPhrase([["terug"]]); // consuma "terug" opzionale
+        return { type:"Return", expr, line: t.line };
       }
 
       // stop
@@ -3406,7 +3456,7 @@ function initMatita() {
 
       // clear graphics / clear screen
       if (this.matchKW("CLEAR")) {
-        if (this.matchKW("GRAPHICS")) return { type:"ClearGraphics", line: t.line };
+        if (this.matchKW("GRAPHICS") || this.matchPhrase([["canvas"]])) return { type:"ClearGraphics", line: t.line };
         if (this.matchKW("SCREEN")) return { type:"ClearScreen", line: t.line };
         this.throwParse(uiStrings[lang].expectedGraphicsScreen, t.line);
       }
@@ -3423,7 +3473,7 @@ function initMatita() {
       }
 
       // digits/decimali
-      if (this.peek().type==="IDENT" && ["digits","decimali"].includes(lowerTok(this.peek()))) {
+      if (this.peek().type==="IDENT" && ["digits","decimali","decimalen"].includes(lowerTok(this.peek()))) {
         this.consume();
         const prec=this.parseExpression(0, null);
         return { type:"Digits", prec, line: t.line };
@@ -3457,9 +3507,10 @@ function initMatita() {
       if (this.matchKW("SET")) {
         // set color ...
         if (this.matchKW("COLOR")) {
-          const colorExpr=this.parseExpression(0, null);
-          return { type:"SetColor", colorExpr, line: t.line };
-        }
+          if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "in") this.consume(); // Consuma "in" per NL
+          const colorExpr=this.parseExpression(0, null);
+          return { type:"SetColor", colorExpr, line: t.line };
+        }
 
         // set x|y of <expr> to <expr>
         const propTok=this.parseIdentifier();
@@ -3467,35 +3518,45 @@ function initMatita() {
         if (!(prop==="x"||prop==="y")) this.throwParse(uiStrings[lang].expectedXY, propTok.line);
         this.expectKW("OF", t.line);
         
-        // Aggiungiamo "at" (che deriva dall'olandese "op") al set di stop
-        const targetExpr=this.parseExpression(0, new Set(["to","a","at"]));
+        const targetExpr=this.parseExpression(0, new Set(["to","a","tot","in"]));
         
-        // Accettiamo sia TO che AT
-        if (!this.matchKW("TO") && !this.matchKW("AT")) {
-             this.expectKW("TO", t.line); // Lancia l'errore se non trova nessuno dei due
+        // NL: "stel x van PUNT in op VAL"; EN: "to"; IT: "a"
+        if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "in") {
+          const afterIn = this.peek(1);
+          if (afterIn && afterIn.type === "IDENT" && afterIn.value.toLowerCase() === "op") {
+            this.consume(); // "in"
+            this.consume(); // "op"
+          } else {
+            this.throwParse(uiStrings[lang].expectedKeyword("TO"), t.line);
+          }
+        } else if (!this.matchKW("TO")) {
+          this.expectKW("TO", t.line);
         }
         
         const valueExpr=this.parseExpression(0, null);
         return { type:"SetPointProp", prop, targetExpr, valueExpr, line: t.line };
       }
 
-      // inquadra grafica / frame graphics
-      if (this.matchKW("FRAME")) {
-        this.expectKW("GRAPHICS", t.line);
-        return { type:"FrameGraphics", line: t.line };
-      }
+      // inquadra grafica / frame graphics / toon alles
+      if (this.matchKW("FRAME")) {
+        if (this.peek().type === "IDENT" && ["graphics","grafica","canvas","grafiek"].includes(this.peek().value.toLowerCase())) {
+          this.consume();
+        }
+        return { type:"FrameGraphics", line: t.line };
+      }
 
       // paint background
       if (this.matchKW("PAINT")) {
-        this.expectKW("BACKGROUND", t.line);
-        return { type:"PaintBackground", line: t.line };
-      }
+        this.expectKW("BACKGROUND", t.line);
+        if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "in") this.consume(); // Consuma "in" opzionale
+        return { type:"PaintBackground", line: t.line };
+      }
 
       // load <expr> scale <expr> as background
       if (this.matchKW("LOAD")) {
-        const filenameExpr=this.parseExpression(0, new Set(["scale","scala"]));
-        this.expectKW("SCALE", t.line);
-        const scaleExpr=this.parseExpression(0, new Set(["as","come"]));
+        const filenameExpr=this.parseExpression(0, new Set(["scale","scala","met"]));
+        if (!this.matchKW("LOAD_SCALE")) this.throwParse(uiStrings[lang].expectedKeyword("SCALE"), t.line);
+        const scaleExpr=this.parseExpression(0, new Set(["as","come","als"]));
         this.expectKW("AS", t.line);
         this.expectKW("BACKGROUND", t.line);
         return { type:"LoadBackground", filenameExpr, scaleExpr, line: t.line };
@@ -3504,7 +3565,7 @@ function initMatita() {
       // circle radius R at POS
       if (this.matchKW("CIRCLE")) {
         this.expectKW("RADIUS", t.line);
-        const r=this.parseExpression(0, new Set(["at","in"]));
+        const r=this.parseExpression(0, new Set(["at","in","op"]));
         this.expectKW("AT", t.line);
         const pos=this.parseExpression(0, null);
         return { type:"Circle", r, pos, line: t.line };
@@ -3513,9 +3574,9 @@ function initMatita() {
       // circumference radius R thickness T at POS
       if (this.matchKW("CIRCUMFERENCE")) {
         this.expectKW("RADIUS", t.line);
-        const r=this.parseExpression(0, new Set(["thickness","spessore"]));
+        const r=this.parseExpression(0, new Set(["thickness","spessore","dikte"]));
         this.expectKW("THICKNESS", t.line);
-        const th=this.parseExpression(0, new Set(["at","in"]));
+        const th=this.parseExpression(0, new Set(["at","in","op"]));
         this.expectKW("AT", t.line);
         const pos=this.parseExpression(0, null);
         return { type:"Circumference", r, th, pos, line: t.line };
@@ -3523,9 +3584,9 @@ function initMatita() {
 
       // rectangle from P1 to P2
       if (this.matchKW("RECTANGLE")) {
-        const fromTok=this.matchPhrase([["from"],["da"]]);
+        const fromTok=this.matchPhrase([["from"],["da"],["van"],["di"]]);
         if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
-        const p1=this.parseExpression(0, new Set(["to","a"]));
+        const p1=this.parseExpression(0, new Set(["to","a","tot"]));
         this.expectKW("TO", t.line);
         const p2=this.parseExpression(0, null);
         return { type:"Rectangle", p1, p2, line: t.line };
@@ -3534,10 +3595,10 @@ function initMatita() {
       // line thickness T from P1 to P2
       if (this.matchKW("LINE")) {
         this.expectKW("THICKNESS", t.line);
-        const th=this.parseExpression(0, new Set(["from","da"]));
-        const fromTok=this.matchPhrase([["from"],["da"]]);
+        const th=this.parseExpression(0, new Set(["from","da","van"]));
+        const fromTok=this.matchPhrase([["from"],["da"],["van"],["di"]]);
         if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
-        const p1=this.parseExpression(0, new Set(["to","a"]));
+        const p1=this.parseExpression(0, new Set(["to","a","tot"]));
         this.expectKW("TO", t.line);
         const p2=this.parseExpression(0, null);
         return { type:"Line", th, p1, p2, line: t.line };
@@ -3564,12 +3625,12 @@ function initMatita() {
       // arc radius R thickness T from P1 to P2
       if (this.matchKW("ARC")) {
         this.expectKW("RADIUS", t.line);
-        const r=this.parseExpression(0, new Set(["thickness","spessore"]));
+        const r=this.parseExpression(0, new Set(["thickness","spessore","dikte"]));
         this.expectKW("THICKNESS", t.line);
-        const th=this.parseExpression(0, new Set(["from","da"]));
-        const fromTok=this.matchPhrase([["from"],["da"]]);
+        const th=this.parseExpression(0, new Set(["from","da","van"]));
+        const fromTok=this.matchPhrase([["from"],["da"],["van"],["di"]]);
         if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
-        const p1=this.parseExpression(0, new Set(["to","a"]));
+        const p1=this.parseExpression(0, new Set(["to","a","tot"]));
         this.expectKW("TO", t.line);
         const p2=this.parseExpression(0, null);
         return { type:"Arc", r, th, p1, p2, line: t.line };
@@ -3578,7 +3639,7 @@ function initMatita() {
       // graffiti size N at POS CONTENT
       if (this.matchKW("GRAFFITI")) {
         this.expectKW("SIZE", t.line);
-        const sizeExpr=this.parseExpression(0, new Set(["at","in"]));
+        const sizeExpr=this.parseExpression(0, new Set(["at","in","op"]));
         this.expectKW("AT", t.line);
         const posExpr=this.parseExpression(0, null);
 
@@ -3626,13 +3687,13 @@ function initMatita() {
       if (this.matchKW("ROTATE")) {
         const nameTok=this.parseIdentifier();
         // "of/di"
-        this.matchPhrase([["of"],["di"]]) || this.throwParse(uiStrings[lang].expectedOf, t.line);
+        this.matchPhrase([["of"],["di"],["met"]]) || this.throwParse(uiStrings[lang].expectedOf, t.line);
         const angleExpr=this.parseExpression(0, new Set(["deg","gradi"]));
         this.expectKW("DEG", t.line);
         this.expectKW("AND", t.line);
         this.expectKW("PLACE", t.line);
-        // optional "it"
-        this.matchPhrase([["it"]]);
+        // optional "it" / "het" (NL)
+        this.matchPhrase([["it"],["het"]]);
         this.expectKW("AT", t.line);
         const posExpr=this.parseExpression(0, null);
         return { type:"RotatePlace", name:nameTok.value, angleExpr, posExpr, line: t.line };
@@ -3641,7 +3702,7 @@ function initMatita() {
       // scale NAME by FACTOR
       if (this.matchKW("SCALE")) {
         const nameTok=this.parseIdentifier();
-        this.matchPhrase([["by"],["di"]]) || this.throwParse(uiStrings[lang].expectedBy, t.line);
+        this.matchPhrase([["by"],["di"],["met"]]) || this.throwParse(uiStrings[lang].expectedBy, t.line);
         const factorExpr=this.parseExpression(0, null);
         return { type:"Scale", name:nameTok.value, factorExpr, line: t.line };
       }
@@ -3667,7 +3728,7 @@ function initMatita() {
         this.expectKW("IN", t.line);
         
         if (this.matchKW("ITEM")) {
-          const idx=this.parseExpression(0, new Set(["of","di"]));
+          const idx=this.parseExpression(0, new Set(["of","di","van"]));
           this.expectKW("OF", t.line);
           const listExpr=this.parseExpression(0, null);
           return { type:"PutItem", rhs, idx, listExpr, line: t.line };
@@ -3697,6 +3758,43 @@ function initMatita() {
           return { type:"PutVar", rhs, varName, varNameUpper, aliasExpr, line: t.line };
         }
       }
+    
+      // Verbi separabili NL: "voeg V toe [aan] L" (add) e "voeg V in [bij] element N van L" (insert)
+      if (t.type === "IDENT" && t.value.toLowerCase() === "voeg") {
+        this.consume(); // consuma "voeg"
+        const valueExpr = this.parseExpression(0, new Set(["toe","in","tot"])); // <-- Aggiunto "tot" al set di stop
+        const sepTok = this.peek();
+        const sepLower = (sepTok && sepTok.type === "IDENT") ? sepTok.value.toLowerCase() : "";
+
+        if (sepLower === "toe" || sepLower === "tot") {
+          this.consume(); // "toe"
+          // Insert: "voeg VAL toe in element N van LIJST"
+          if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "in") {
+            const afterIn = this.peek(1);
+            const isItemKw = afterIn && afterIn.type === "IDENT" &&
+              ["element","item","elemento"].includes(afterIn.value.toLowerCase());
+            if (isItemKw) {
+              this.consume(); // "in"
+              this.expectKW("ITEM", t.line);
+              const idx = this.parseExpression(0, new Set(["of","di","van"]));
+              if (!this.matchPhrase([["van"]]) && !this.matchKW("OF")) {
+                this.throwParse(uiStrings[lang].expectedKeyword("OF"), t.line);
+              }
+              const listTok = this.parseIdentifier();
+              return { type:"Insert", valueExpr, idx, listName:listTok.value, listNameUpper:listTok.value.toUpperCase(), line:t.line };
+            }
+          }
+          // Add: "voeg VAL toe [aan] LIJST"
+          if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "aan") this.consume();
+          const listTok = this.parseIdentifier();
+          return { type:"Add", valueExpr, listName:listTok.value, listNameUpper:listTok.value.toUpperCase(), line:t.line };
+        } else {
+          this.throwParse("Verwacht 'toe in element N van LIJST' of 'toe aan LIJST' na 'voeg'.", t.line);
+        }
+      }
+
+
+    
 
       // add <expr> to/a LISTVAR
       if (this.matchKW("ADD")) {
@@ -3711,20 +3809,20 @@ function initMatita() {
         // remove first/last item from LIST
         if (this.matchKW("FIRST")) {
           this.expectKW("ITEM", t.line);
-          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
           const listTok=this.parseIdentifier();
           return { type:"RemoveFirst", listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
         }
         if (this.matchKW("LAST")) {
           this.expectKW("ITEM", t.line);
-          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
           const listTok=this.parseIdentifier();
           return { type:"RemoveLast", listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
         }
-        // remove item <idx> from LIST  (English)  / rimuovi elemento <idx> da LISTA (IT)
+        // remove item <idx> from LIST
         if (this.matchKW("ITEM")) {
-          const idx=this.parseExpression(0, new Set(["from","da"]));
-          this.matchPhrase([["from"],["da"]]) || this.throwParse("Expected 'from/da'.", t.line);
+          const idx=this.parseExpression(0, new Set(["from","da","uit"]));
+          this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
           const listTok=this.parseIdentifier();
           return { type:"RemoveAt", idx, listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
         }
@@ -3736,7 +3834,7 @@ function initMatita() {
         const valueExpr=this.parseExpression(0, new Set(["at","in","a"]));
         if (!this.matchPhrase([["at"],["in"]])) this.throwParse(uiStrings[lang].expectedAt, t.line);
         this.expectKW("ITEM", t.line);
-        const idx=this.parseExpression(0, new Set(["of","di"]));
+        const idx=this.parseExpression(0, new Set(["of","di","van"]));
         this.expectKW("OF", t.line);
         const listTok=this.parseIdentifier();
         return { type:"Insert", valueExpr, idx, listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
@@ -3744,7 +3842,7 @@ function initMatita() {
 
       // control: if
       if (this.matchKW("IF")) {
-        const cond=this.parseExpression(0, new Set(["then","allora"]));
+        const cond=this.parseExpression(0, new Set(["then","allora","dan"]));
         this.expectKW("THEN", t.line);
         const thenBlock=this.parseBlock();
 
@@ -3758,7 +3856,7 @@ function initMatita() {
           const savePos=this.pos;
           if (this.matchKW("OTHERWISE")) {
             if (this.matchKW("IF")) {
-              const c=this.parseExpression(0, new Set(["then","allora"]));
+              const c=this.parseExpression(0, new Set(["then","allora","dan"]));
               this.expectKW("THEN", t.line);
               const b=this.parseBlock();
               elseIfs.push({ cond:c, block:b });
@@ -3784,7 +3882,7 @@ function initMatita() {
         const save=this.pos;
         const tokWhile=this.matchKW("AS_LONG_AS");
         if (tokWhile) {
-          const cond=this.parseExpression(0, new Set(["you","esegui"]));
+          const cond=this.parseExpression(0, new Set(["you","esegui","doe","herhaal"]));
           this.expectKW("YOU_DO", tokWhile.line);
           const block=this.parseBlock();
           return { type:"While", cond, block, line: tokWhile.line };
@@ -3799,7 +3897,7 @@ function initMatita() {
         if (tokFE) {
           const varTok=this.parseIdentifier();
           this.expectKW("IN", tokFE.line);
-          const listExpr=this.parseExpression(0, new Set(["you","esegui"]));
+          const listExpr=this.parseExpression(0, new Set(["you","esegui","doe","herhaal"]));
           this.expectKW("YOU_DO", tokFE.line);
           const block=this.parseBlock();
           return { type:"ForEach", varName: varTok.value, listExpr, block, line: tokFE.line };
@@ -3817,9 +3915,15 @@ function initMatita() {
           const varTok=this.parseIdentifier();
           const tokGF=this.matchKW("GOES_FROM");
           if (!tokGF) this.throwParse(uiStrings[lang].expectedGoesFrom, tokVar.line);
-          const startExpr=this.parseExpression(0, new Set(["to","a"]));
-          this.expectKW("TO", tokVar.line);
-          const endExpr=this.parseExpression(0, new Set(["and","e","ed","you","esegui"]));
+          const startExpr=this.parseExpression(0, new Set(["to","a","tot"]));
+          this.expectKW("TO", tokVar.line);
+          // Consuma opzionalmente "en met" per l'idioma NL "tot en met"
+          if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "en") {
+            this.consume();
+            if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "met") this.consume();
+          }
+
+          const endExpr=this.parseExpression(0, new Set(["and","e","ed","you","esegui","en","doe","herhaal"]));
           // accept 'and' (EN) or 'e/ed' (IT), then 'you do'/esegui
           this.expectKW("AND", tokVar.line);
           this.expectKW("YOU_DO", tokVar.line);
@@ -3899,7 +4003,7 @@ function initMatita() {
     return res.value;
   }
 
-  function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
+function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
     const upper = precalculatedUpper || name.toUpperCase();
     env.varOriginalNames = env.varOriginalNames || {};
     env.varOriginalNames[upper] = name;
@@ -3908,7 +4012,6 @@ function initMatita() {
     if (Array.isArray(value)) storedValue = markShared(value);
     else if (isPoint(value)) storedValue = deepCopyValue(value);
 
-    // 1. Risolvi eventuali alias (gli alias devono puntare al loro target originale)
     const res = resolveVariable(scopeChain, name, upper);
     if (res && res.__isAlias) {
       assignVariable([res.targetScope], res.targetName, storedValue);
@@ -3917,23 +4020,24 @@ function initMatita() {
 
     const upperName = upper;
 
-    // 2. Se la variabile è stata dichiarata esplicitamente "globale" all'interno di questo blocco
+    // 1. Se dichiarata globale, aggiorna il livello radice
     if (isDeclaredGlobal(scopeChain, name)) {
       scopeChain[0][upperName] = storedValue;
       return;
     }
 
-    // 3. Seleziona lo scope corrente (l'ultimo livello della catena)
-    const currentScope = scopeChain[scopeChain.length - 1];
-
-    // 4. Se la variabile è già presente nello scope LOCALE corrente, la aggiorniamo
-    if (upperName in currentScope) {
-      currentScope[upperName] = storedValue;
-      return;
+    // 2. Cerca la variabile lungo la catena di scope, MA escludendo scope[0] (globale)
+    // se siamo in uno scope annidato. Lo scope globale si modifica solo con 'global'.
+    const searchLimit = (scopeChain.length > 1) ? 1 : 0;
+    for (let i = scopeChain.length - 1; i >= searchLimit; i--) {
+      if (upperName in scopeChain[i]) {
+        scopeChain[i][upperName] = storedValue;
+        return;
+      }
     }
 
-    // 5. Altrimenti, stiamo creando una NUOVA variabile locale in questo blocco.
-    // Se questa variabile esiste già nello scope GLOBALE, stiamo facendo "shadowing"!
+    // 3. Se non esiste da nessuna parte, la stiamo creando per la prima volta.
+    // Verifica se stiamo per fare shadowing involontario del Global.
     if ((upperName in scopeChain[0]) && scopeChain.length > 1) {
       env.__shadowWarnings ||= new Set();
       if (!env.__shadowWarnings.has(upperName)) {
@@ -3942,8 +4046,8 @@ function initMatita() {
       }
     }
 
-    // Assegnazione effettiva nello scope corrente
-    currentScope[upperName] = storedValue;
+    // Creazione effettiva della nuova variabile nello scope corrente
+    scopeChain[scopeChain.length - 1][upperName] = storedValue;
   }
 
   function ensureNumber(v, key, line) {
@@ -4027,7 +4131,7 @@ function initMatita() {
   };
 
   const MAX_CALL_DEPTH = 200;
-  const MAX_LOOP_MS = 15000; // 15 secondi: durata massima accettabile per un loop
+  const MAX_LOOP_MS = Infinity; // INSERIRE QUI valori finiti per limitare la durata di un loop, es. 15000; per 15 secondi
 
   // --- Builtins ---
   function builtin_point(args, line) {
@@ -4282,25 +4386,31 @@ function builtin_split(args) {
   regBuiltin(["abs", "assoluto"], (a)=>Math.abs(a[0] ?? 0));
   regBuiltin(["sin", "seno"], (a)=>Math.sin(a[0] ?? 0));
   regBuiltin(["cos", "coseno"], (a)=>Math.cos(a[0] ?? 0));  
-  regBuiltin(["trunc","tronca"], (a)=>Math.trunc(a[0] ?? 0));
-  regBuiltin(["round","arrotonda"], (a)=>Math.round(a[0] ?? 0));
+  regBuiltin(["trunc","tronca","afkappen"], (a)=>Math.trunc(a[0] ?? 0));
+  regBuiltin(["round","arrotonda","afronden"], (a)=>Math.round(a[0] ?? 0));
   regBuiltin(["ceil", "intero_superiore"], (a)=>Math.ceil(a[0] ?? 0));
-  regBuiltin(["squareroot","radice"], (a)=>Math.sqrt(a[0] ?? 0));
-  regBuiltin(["min","minimo"], (a)=>Math.min(...a.map(x => (typeof x==="number"?x:NaN))));
-  regBuiltin(["max","massimo"], (a)=>Math.max(...a.map(x => (typeof x==="number"?x:NaN))));
-  regBuiltin(["random","casuale"], (a)=>builtin_random(a));
-  regBuiltin(["dice", "dado"], (a, line) => builtin_dice(a, line));
-  regBuiltin(["point","punto"], (a,line)=>builtin_point(a,line));
-  regBuiltin(["indexof","indicedi"], (a)=>builtin_indexof(a));
-  regBuiltin(["valmin"], (a) => builtin_valmin(a));
-  regBuiltin(["valmax"], (a) => builtin_valmax(a));
-  regBuiltin(["argmin"], (a) => builtin_argmin(a));
-  regBuiltin(["argmax"], (a) => builtin_argmax(a));
-  regBuiltin(["split", "dividi"], (a)=>builtin_split(a));
-  regBuiltin(["decomposition","scomposizione","scomponi"], (a)=>builtin_decomposition(a));
-  regBuiltin(["composition","composizione"], (a)=>builtin_composition(a));
+  regBuiltin(["squareroot","radice","wortel"], (a)=>Math.sqrt(a[0] ?? 0));
+  regBuiltin(["min","minimo"], (a) => {
+    if (a.length === 1 && Array.isArray(a[0])) return builtin_valmin(a);
+    return Math.min(...a.map(x => (typeof x==="number"?x:NaN)));
+  });
+  regBuiltin(["max","massimo"], (a) => {
+    if (a.length === 1 && Array.isArray(a[0])) return builtin_valmax(a);
+    return Math.max(...a.map(x => (typeof x==="number"?x:NaN)));
+  });
+  regBuiltin(["random","casuale","willekeurig"], (a)=>builtin_random(a));
+  regBuiltin(["dice", "dado","dobbelsteen"], (a, line) => builtin_dice(a, line));
+  regBuiltin(["point","punto","punt"], (a,line)=>builtin_point(a,line));
+  regBuiltin(["indexof","indicedi","indexvan"], (a)=>builtin_indexof(a));
+  regBuiltin(["valmin","minwaarde"], (a) => builtin_valmin(a));
+  regBuiltin(["valmax","maxwaarde"], (a) => builtin_valmax(a));
+  regBuiltin(["argmin","minindex"], (a) => builtin_argmin(a));
+  regBuiltin(["argmax","maxindex"], (a) => builtin_argmax(a));
+  regBuiltin(["split", "dividi", "splits"], (a)=>builtin_split(a));
+  regBuiltin(["decomposition","scomposizione","scomponi","ontbind"], (a)=>builtin_decomposition(a));
+  regBuiltin(["composition","composizione","samenvoegen"], (a)=>builtin_composition(a));
   regBuiltin(["type", "tipo"], (a) => builtin_type(a));
-  regBuiltin(["numeric", "numerico", "is_number", "è_numero"], (a) => builtin_is_numeric(a));
+  regBuiltin(["numeric", "numerico", "is_number", "è_numero", "numeriek"], (a) => builtin_is_numeric(a));
   regBuiltin(["cast"], (a)=>builtin_cast(a));
   regBuiltin(["unicode"], (a)=>builtin_unicode(a));
   regBuiltin(["tock"], (a,line)=>builtin_tock(a,line));
@@ -5977,7 +6087,7 @@ async function resolveMutableList(node, scopeChain) {
 
       env.varOriginalNames = {};
 
-      camera = { tx: 0, ty: 0, scale: 1 }; // Reset telecamera
+      resetCameraToCenter(); // Reset telecamera
 
       errorLine = -1;
       lastHighlightedCode = ""; // forza re-render per rimuovere eventuale highlight precedente
@@ -5990,9 +6100,9 @@ async function resolveMutableList(node, scopeChain) {
       try {
         // Normalizza le lingue non native (non EN, non IT) in inglese prima del parsing
         let srcToParse = src;
-        if (currentLang !== "en" && currentLang !== "it" && langDicts[currentLang]) {
-          srcToParse = applyDict(src, invertDict(langDicts[currentLang]));
-        }
+        if (currentLang !== "en" && currentLang !== "it" && currentLang !== "nl" && langDicts[currentLang]) {
+          srcToParse = applyDict(src, invertDict(langDicts[currentLang]));
+        }
 
         if (srcToParse !== _cachedSrc) {
           const lexer = new Lexer(srcToParse);
@@ -6050,10 +6160,8 @@ async function resolveMutableList(node, scopeChain) {
       }
 
       // Final redraw (if canvas visible)
-      computeFitCamera(env.gfxObjects);
-
       if (!canvasWindow.classList.contains("hidden")) {
-        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+         redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
       }
 
     } finally {
@@ -6660,48 +6768,14 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
   applyUILanguage();
   updateSuggestionsList();
 
-const _examples = {
-    it: `cancella schermo
+function getExample(lang) {
+    const langData = LANG_REGISTRY[lang];
+    if (langData && langData.example) return langData.example; // Es. EN o NL
+    if (langData && langData.dict) return applyDict(EXAMPLE_EN, langData.dict); // Auto-tradotto (Es. IT)
+    return EXAMPLE_EN;
+  }
 
-chiedi Nome dicendo "Come ti chiami?"
-metti "Ciao, " + Nome + ". Facciamo qualcosa insieme! " in Messaggio
-scrivi Messaggio
-
-metti 10 in N # numero di ripetizioni
-metti 30 in H # dimensione testo
-
-indice I va da 1 a N ed esegui (
-    imposta colore (50, 10*I, 100-10*I)
-    graffiti grandezza H in punto(0, H*I) Nome
-)`,
-    en: `clear screen
-
-get Name saying "What's your name?"
-put "Hello, " + Name + ". Let's do something together! " in Message
-output Message
-
-put 10 in N # number of repetitions
-put 30 in H # text size
-
-index I goes from 1 to N and you do (
-    set color (50, 10*I, 100-10*I)
-    graffiti size H at point(0, H*I) Name
-)`,
-    nl: `wis scherm
-
-vraag Naam met bericht "Hoe heet je?"
-zet "Hallo, " + Naam + ". Laten we iets doen! " in Bericht
-schrijf Bericht
-
-zet 10 in N # aantal herhalingen
-zet 30 in H # tekstgrootte
-
-teller I loopt van 1 tot N en doe (
-    stel kleur in (50, 10*I, 100-10*I)
-    graffiti grootte H op punt(0, H*I) Naam
-)`
-  };
-  codeInput.value = _examples[currentLang] || _examples.en;
+  codeInput.value = getExample(currentLang);
 
   // Initial paint
   updateLineNumber();
