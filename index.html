@@ -178,19 +178,6 @@
       box-shadow: none;
     }
 
-    /* PULSANTE DOWNLOAD SCARICA MATITA */
-    #getMatitalkButton {
-      color: var(--text-secondary);
-      text-decoration: underline;
-      text-decoration-color: transparent;
-      transition: all 0.2s ease;
-    }
-    #getMatitalkButton:hover {
-      color: var(--accent-color);
-      text-decoration-color: var(--accent-color);
-      background: transparent;
-    }
-
     #snapButton, #orthoButton, #orthoAngleButton {
       font-size: 1.1rem;
       padding: 2px 8px;
@@ -294,7 +281,7 @@
       position: absolute;
       left: 0; top: 0; bottom: 0;
       width: 44px;
-      background: rgba(0, 0, 0, 0.18);
+      background: var(--bg-pane);
       border-right: 1px solid rgba(255, 255, 255, 0.05);
       color: var(--text-secondary);
       font-family: 'Roboto Mono', monospace;
@@ -405,7 +392,7 @@
       outline: 1px solid rgba(56, 189, 248, 0.25);
     }
 
-      .lang-option {
+      .lang-option, .menu-option {
       padding: 8px 16px;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
@@ -415,7 +402,7 @@
       transition: background 0.15s, color 0.15s;
       white-space: nowrap;
     }
-    .lang-option:hover {
+    .lang-option:hover, .menu-option:hover {
       background: rgba(255,255,255,0.08);
       color: var(--text-primary);
     }
@@ -432,8 +419,7 @@
         <div class="header-left-group">
           <span id="lineIndicator" class="pane-header-title">riga: 1</span>
           <div class="header-divider"></div>
-          <button id="openButton" aria-label="Apri File">Apri</button>
-          <button id="saveButton" aria-label="Salva File">Salva</button>
+          <button id="fileMenuButton" aria-label="Menu File">File ▾</button>
           <div class="header-divider"></div>
           <button id="toggleCanvasButton" aria-label="Mostra/Nascondi Grafica">Grafica</button>
           <button id="runButton" aria-label="Esegui Codice">Esegui</button>
@@ -441,8 +427,6 @@
         </div>
 
         <div class="header-right-group">
-          <button id="getMatitalkButton" aria-label="Scarica Matita IDE">Scarica Matita</button>
-          <div class="header-divider"></div>
           <button id="langToggleButton" aria-label="Cambia Lingua">EN ▾</button>
           <button id="fullscreenButton" aria-label="Schermo Intero">Full Screen</button>
           <button id="helpButton" aria-label="Apri Aiuto">Aiuto</button>
@@ -486,7 +470,10 @@
   </div>
 
 <script>
+
 "use strict";
+
+const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
 
 function initMatita() {
   
@@ -1058,13 +1045,13 @@ const dictEnToNl = {
     "decomposition": "ontbind",    "composition": "samenvoegen",
     "valmin": "minwaarde",         "valmax": "maxwaarde",
     "argmin": "minindex",          "argmax": "maxindex",
-    "different": "verschilend",
+    "different": "verschillend",
     "type": "type",
     "numeric": "numeriek",         "dice": "dobbelsteen",
     "scientific": "wetenschappelijk", "digits": "decimalen",
     "split": "splits",             "infinity": "oneindig",
     "and": "en",      "or": "of",      "not": "niet",
-    "is": "is",       "mod": "modulo",
+    "is": "is",
     "as": "als",      "to": "tot",     "by": "met",
     "of": "van",      "from": "van",   "in": "in",
     "at": "op",       "null": "null",  "tick": "tick",
@@ -1105,12 +1092,12 @@ const dictEnToNl = {
     "minindex": "argmin", "maxindex": "argmax", "min": "min", "max": "max", "willekeurig": "random", "punt": "point", "indexvan": "indexof", "ontbind": "decomposition", 
     "samenvoegen": "composition",
     "type": "type", "numeriek": "numeric", "dobbelsteen": "dice", "wetenschappelijk": "scientific", "decimalen": "digits", "cijfers": "digits",
-    "splits": "split", "oneindig": "infinity", "en": "and", "of": "or", "niet": "not", "is": "is", "modulo": "mod",
-    "verschilend": "different", "tot": "to", "van": "of", "uit": "from", "in": "in", "op": "at", "null": "null", "tick": "tick", "tock": "tock", "ms": "ms"
+    "splits": "split", "oneindig": "infinity", "en": "and", "of": "or", "niet": "not", "is": "is",
+    "verschillend": "different", "tot": "to", "van": "of", "uit": "from", "in": "in", "op": "at", "null": "null", "tick": "tick", "tock": "tock", "ms": "ms"
   };
 
   const EXAMPLE_EN = `clear screen\n\nget Name saying "What's your name?"\nput "Hello, " + Name + ". Let's do something together! " in Message\nwrite Message\n\nput 10 in N # number of repetitions\nput 30 in H # text size\n\nindex I goes from 1 to N and you do (\n    set color (50, 10*I, 100-10*I)\n    graffiti size H at point(0, H*I-150) Name\n)`;
-  const EXAMPLE_IT = `cancella schermo\n\nchiedi Nome dicendo "Come ti chiami?"\nmetti "Ciao, " + Nome+ ". Facciamo qualcosa insime! " in Messaggio\nscrivi Messaggio\n\nmetti 10 in N # numero di ripetizioni\nmetti 30 in H # altezza del testo\n\nindice I va da 1 a N e esegui (\n    imposta colore (50, 10*I, 100-10*I)\n    graffiti grandezza H in punto(0, H*I-150) Nome\n)`;
+  const EXAMPLE_IT = `cancella schermo\n\nchiedi Nome dicendo "Come ti chiami?"\nmetti "Ciao, " + Nome+ ". Facciamo qualcosa insime! " in Messaggio\nscrivi Messaggio\n\nmetti 10 in N # numero di ripetizioni\nmetti 30 in H # altezza del testo\n\nindice I va da 1 a N ed esegui (\n    imposta colore (50, 10*I, 100-10*I)\n    graffiti grandezza H in punto(0, H*I-150) Nome\n)`;
   const EXAMPLE_NL = `wis scherm\n\nvraag Naam met bericht "Hoe heet je?"\nzet "Hallo, " + Naam + ". Laten we iets doen! " in Bericht\nschrijf Bericht\n\nzet 10 in N # aantal herhalingen\nzet 30 in H # tekstgrootte\n\nteller I loopt van 1 tot N en je doet (\n    stel kleur in (50, 10*I, 100-10*I)\n    graffiti grootte H op punt(0, H*I-150) Naam\n)`;
 
   // ─── UNICO PUNTO DI REGISTRAZIONE LINGUE ───
@@ -1157,23 +1144,474 @@ const dictEnToNl = {
     return LANG_REGISTRY[lang]?.inverseDict || {};
   }
 
+// ===== SERIALIZZATORE AST → CODICE SORGENTE =====
+
+  const _SER_FN = {
+    "abs":          {en:"abs",           it:"abs",              nl:"abs"},
+    "sin":          {en:"sin",           it:"seno",             nl:"sin"},
+    "cos":          {en:"cos",           it:"coseno",           nl:"cos"},
+    "trunc":        {en:"trunc",         it:"tronca",           nl:"afkappen"},
+    "round":        {en:"round",         it:"arrotonda",        nl:"afronden"},
+    "ceil":         {en:"ceil",          it:"intero_superiore", nl:"ceil"},
+    "squareroot":   {en:"squareroot",    it:"radice",           nl:"wortel"},
+    "min":          {en:"min",           it:"minimo",           nl:"min"},
+    "max":          {en:"max",           it:"massimo",          nl:"max"},
+    "random":       {en:"random",        it:"casuale",          nl:"willekeurig"},
+    "dice":         {en:"dice",          it:"dado",             nl:"dobbelsteen"},
+    "point":        {en:"point",         it:"punto",            nl:"punt"},
+    "indexof":      {en:"indexof",       it:"indicedi",         nl:"indexvan"},
+    "valmin":       {en:"valmin",        it:"valmin",           nl:"minwaarde"},
+    "valmax":       {en:"valmax",        it:"valmax",           nl:"maxwaarde"},
+    "argmin":       {en:"argmin",        it:"minindex",         nl:"minindex"},
+    "argmax":       {en:"argmax",        it:"maxindex",         nl:"maxindex"},
+    "split":        {en:"split",         it:"dividi",           nl:"splits"},
+    "decomposition":{en:"decomposition", it:"scomposizione",    nl:"ontbind"},
+    "composition":  {en:"composition",   it:"composizione",     nl:"samenvoegen"},
+    "type":         {en:"type",          it:"tipo",             nl:"type"},
+    "numeric":      {en:"numeric",       it:"numerico",         nl:"numeriek"},
+    "cast":         {en:"cast",          it:"cast",             nl:"cast"},
+    "unicode":      {en:"unicode",       it:"unicode",          nl:"unicode"},
+    "tock":         {en:"tock",          it:"tock",             nl:"tock"},
+  };
+
+
+  // Mappa inversa costruita UNA VOLTA SOLA: alias-in-qualsiasi-lingua → chiave canonica EN
+  const _SER_FN_REV = Object.create(null);
+  for (const [key, langs] of Object.entries(_SER_FN)) {
+    for (const alias of Object.values(langs)) {
+      _SER_FN_REV[alias.toLowerCase()] = key;
+    }
+  }
+
+  // Alias extra presenti in regBuiltin ma non coperti da _SER_FN
+  const _SER_FN_EXTRA = {
+    "assoluto":        "abs",
+    "seno":            "sin",
+    "coseno":          "cos",
+    "intero_superiore":"ceil",
+    "scomponi":        "decomposition",
+    "is_number":       "numeric",
+    "è_numero":        "numeric",
+    "minimo":          "min",
+    "massimo":         "max",
+    "indicedi":        "indexof",
+    "scomposizione":   "decomposition",
+    "composizione":    "composition",
+    "tipo":            "type",
+    "numerico":        "numeric",
+    "numeriek":        "numeric",
+    "dado":            "dice",
+    "punto":           "point",
+    "radice":          "squareroot",
+    "tronca":          "trunc",
+    "arrotonda":       "round",
+    "casuale":         "random",
+    "dividi":          "split",
+    "wortel":          "squareroot",
+    "afkappen":        "trunc",
+    "afronden":        "round",
+    "willekeurig":     "random",
+    "splits":          "split",
+    "ontbind":         "decomposition",
+    "samenvoegen":     "composition",
+    "minwaarde":       "valmin",
+    "maxwaarde":       "valmax",
+    "minindex":        "argmin",
+    "maxindex":        "argmax",
+    "dobbelsteen":     "dice",
+    "punt":            "point",
+    "indexvan":        "indexof",
+  };
+  for (const [alias, canonical] of Object.entries(_SER_FN_EXTRA)) {
+    if (!(alias in _SER_FN_REV)) _SER_FN_REV[alias] = canonical;
+  }
+
+  const _SER_EK = {
+    and:    {en:"and",           it:"e",             nl:"en"},
+    or:     {en:"or",            it:"o",             nl:"of"},
+    not:    {en:"not",           it:"non",           nl:"niet"},
+    of:     {en:"of",            it:"di",            nl:"van"},
+    item:   {en:"item",          it:"elemento",      nl:"element"},
+    dimof:  {en:"dimension of",  it:"dimensione di", nl:"lengte van"},
+    key:    {en:"key",           it:"tasto",         nl:"toets"},
+    pressed:{en:"pressed",       it:"premuto",       nl:"ingedrukt"},
+    true_:  {en:"true",          it:"vero",          nl:"waar"},
+    false_: {en:"false",         it:"falso",         nl:"onwaar"},
+    inf:    {en:"infinity",      it:"infinito",      nl:"oneindig"},
+    is:     {en:"is",            it:"vale",          nl:"is"},
+    diff:   {en:"different from",it:"diverso da",    nl:"verschillend van"},
+  };
+
+  function serializeExpr(node, lang) {
+    if (!node) return "";
+
+    const G = k => _SER_EK[k]?.[lang] || k;
+
+    switch (node.type) {
+      case "Literal": {
+        const v = node.value;
+        if (v === true)      return G("true_");
+        if (v === false)     return G("false_");
+        if (v === null)      return "null";
+        if (Array.isArray(v)) {
+          if (v.length === 0) return "()";
+          return "(" + v.map(item => serializeExpr({ type:"Literal", value:item }, lang)).join(", ") + ")";
+        }
+        if (typeof v === "number") {
+          if (Number.isNaN(v))    return "nan";
+          if (v === Infinity)     return G("inf");
+          if (v === -Infinity)    return "-" + G("inf");
+          if (v === Math.PI)      return "pi";
+          return String(v);
+        }
+        return JSON.stringify(v);
+      }
+
+      case "Var":
+        return node.name;
+      case "Tuple":
+        return "(" + node.items.map(n => serializeExpr(n, lang)).join(", ") + ")";
+      case "Unary":
+        if (node.op === "not") {
+          const inner = serializeExpr(node.right, lang);
+          const needsParens = node.right.type === "Binary" || node.right.type === "Unary";
+          return G("not") + " " + (needsParens ? "(" + inner + ")" : inner);
+        }
+        if (node.right.type === "Binary") return node.op + "(" + serializeExpr(node.right, lang) + ")";
+        return node.op + serializeExpr(node.right, lang);
+
+      case "Binary": {
+        const _prec = {"^":7,"*":6,"/":6,"%":6,"+":5,"-":5,
+          "==":4,"===":4,"!=":4,"!==":4,"<":4,">":4,"<=":4,">=":4,
+          "and":2,"or":1};
+        const pp = _prec[node.op] || 0;
+        const _w = (child, isRight) => {
+          const s = serializeExpr(child, lang);
+          if (child.type !== "Binary" && child.type !== "Unary") return s;
+          if (child.type === "Unary") return (pp >= 6) ? "(" + s + ")" : s;
+          const cp = _prec[child.op] || 0;
+          if (cp < pp) return "(" + s + ")";
+          if (isRight && cp === pp && "-/%^".includes(node.op)) return "(" + s + ")";
+          return s;
+        };
+        const L = _w(node.left, false);
+        const R = _w(node.right, true);
+        if (node.op === "and")   return L + " " + G("and")  + " " + R;
+        if (node.op === "or")    return L + " " + G("or")   + " " + R;
+        if (node.op === "===")   return L + " " + G("is")   + " " + R;
+        if (node.op === "!=")    return L + " " + G("diff") + " " + R;
+        if (node.op === "alias") return L + " alias " + R;
+        if (node.op === "%")     return L + " mod " + R;
+        return L + " " + node.op + " " + R;
+      }
+
+
+      case "Call": {
+        const nl_ = node.name.toLowerCase();
+        const canonical = _SER_FN_REV[nl_] || nl_;
+        const fname = (_SER_FN[canonical] && _SER_FN[canonical][lang]) || node.name;
+        return fname + "(" + node.args.map(a => serializeExpr(a, lang)).join(", ") + ")";
+      }
+
+
+      case "PointProp":
+        return node.prop + " " + G("of") + " " + serializeExpr(node.object, lang);
+      case "Dimension":
+        return G("dimof") + " " + serializeExpr(node.expr, lang);
+      case "ItemOf":
+        return G("item") + " " + serializeExpr(node.index, lang) + " " + G("of") + " " + serializeExpr(node.list, lang);
+      case "KeyPressed": {
+        const mid = lang === "en" ? " is " : " ";
+        return G("key") + " " + serializeExpr(node.keyExpr, lang) + mid + G("pressed");
+      }
+      default:
+        return "/*?*/";
+    }
+  }
+
+  function serializeBlock(block, lang, indent) {
+    if (!block || !block.stmts || block.stmts.length === 0) return "()";
+    const inner = indent + "    ";
+    return "(\n" + block.stmts.map(s => inner + serializeStmt(s, lang, inner)).join("\n") + "\n" + indent + ")";
+  }
+
+  const _SER_SK = {
+    put:      {en:"put",               it:"metti",              nl:"zet"},
+    in_:      {en:"in",                it:"in",                 nl:"in"},
+    add:      {en:"add",               it:"aggiungi",           nl:"voeg"},
+    add_to:   {en:"to",                it:"a",                  nl:"toe aan"},
+    insert:   {en:"insert",            it:"inserisci",          nl:"invoeg"},
+    ins_at:   {en:"at item",           it:"in elemento",        nl:"toe in element"},
+    ins_of:   {en:"of",                it:"di",                 nl:"van"},
+    remove:   {en:"remove",            it:"rimuovi",            nl:"verwijder"},
+    rem_item: {en:"item",              it:"elemento",           nl:"element"},
+    rem_from: {en:"from",              it:"da",                 nl:"uit"},
+    first:    {en:"first item from",   it:"primo elemento da",  nl:"eerste element uit"},
+    last:     {en:"last item from",    it:"ultimo elemento da", nl:"laatste element uit"},
+    item:     {en:"item",              it:"elemento",           nl:"element"},
+    of_:      {en:"of",                it:"di",                 nl:"van"},
+    write:    {en:"write",             it:"scrivi",             nl:"schrijf"},
+    newline:  {en:"newline",           it:"accapo",             nl:"nieuwe regel"},
+    wait:     {en:"wait",              it:"aspetta",            nl:"wacht"},
+    ms:       {en:"ms",                it:"ms",                 nl:"ms"},
+    get:      {en:"get",               it:"chiedi",             nl:"vraag"},
+    saying:   {en:"saying",            it:"dicendo",            nl:"met bericht"},
+    set_color:{en:"set color",         it:"imposta colore",     nl:"stel kleur in"},
+    clr_gfx:  {en:"clear graphics",    it:"cancella grafica",   nl:"wis canvas"},
+    clr_scr:  {en:"clear screen",      it:"cancella schermo",   nl:"wis scherm"},
+    frame:    {en:"frame graphics",    it:"inquadra grafica",   nl:"toon alles"},
+    redraw:   {en:"redraw",            it:"ridisegna",          nl:"teken opnieuw"},
+    paint_bg: {en:"paint background",  it:"dipingi sfondo",     nl:"vul achtergrond in"},
+    load:     {en:"load",              it:"carica",             nl:"laad"},
+    load_sc:  {en:"scale",             it:"scala",              nl:"met schaal"},
+    load_as:  {en:"as background",     it:"come sfondo",        nl:"als achtergrond"},
+    set_x:    {en:"set x of",          it:"imposta x di",       nl:"stel x van"},
+    set_y:    {en:"set y of",          it:"imposta y di",       nl:"stel y van"},
+    set_to:   {en:"to",                it:"a",                  nl:"in op"},
+    circle:   {en:"circle radius",     it:"cerchio raggio",     nl:"cirkel straal"},
+    at_:      {en:"at",                it:"in",                 nl:"op"},
+    circ:     {en:"circumference radius", it:"circonferenza raggio", nl:"omtrek straal"},
+    thick:    {en:"thickness",         it:"spessore",           nl:"dikte"},
+    rect:     {en:"rectangle from",    it:"rettangolo da",      nl:"rechthoek van"},
+    rect_to:  {en:"to",                it:"a",                  nl:"tot"},
+    line_:    {en:"line thickness",    it:"linea spessore",     nl:"lijn dikte"},
+    line_fr:  {en:"from",              it:"da",                 nl:"van"},
+    line_to:  {en:"to",                it:"a",                  nl:"tot"},
+    tri:      {en:"triangle with vertices", it:"triangolo con vertici", nl:"driehoek met hoekpunten"},
+    arc:      {en:"arc radius",        it:"arco raggio",        nl:"boog straal"},
+    arc_fr:   {en:"from",              it:"da",                 nl:"van"},
+    arc_to:   {en:"to",                it:"a",                  nl:"tot"},
+    graffiti: {en:"graffiti size",     it:"graffiti grandezza", nl:"graffiti grootte"},
+    grf_at:   {en:"at",                it:"in",                 nl:"op"},
+    label:    {en:"label",             it:"etichetta",          nl:"label"},
+    label_as: {en:"as",                it:"come",               nl:"als"},
+    import_:  {en:"import",            it:"importa",            nl:"importeer"},
+    import_as:{en:"as",                it:"come",               nl:"als"},
+    draw:     {en:"draw",              it:"disegna",            nl:"teken"},
+    draw_at:  {en:"at",                it:"in",                 nl:"op"},
+    rotate:   {en:"rotate",            it:"ruota",              nl:"draai"},
+    rot_of:   {en:"of",                it:"di",                 nl:"met"},
+    deg:      {en:"deg",               it:"gradi",              nl:"graden"},
+    rot_place:{en:"and place it at",   it:"e posiziona in",     nl:"en plaats het op"},
+    scale:    {en:"scale",             it:"scala",              nl:"schaal"},
+    scale_by: {en:"by",                it:"di",                 nl:"met"},
+    if_:      {en:"if",                it:"se",                 nl:"als"},
+    then_:    {en:"then",              it:"allora",             nl:"dan"},
+    else_:    {en:"otherwise",         it:"altrimenti",         nl:"anders"},
+    while_:   {en:"as long as",        it:"fintanto",           nl:"zolang"},
+    you_do:   {en:"you do",            it:"esegui",             nl:"herhaal je"},
+    for_each: {en:"for each",          it:"per ogni",           nl:"voor elke"},
+    fe_in:    {en:"in",                it:"in",                 nl:"in"},
+    index:    {en:"index",             it:"indice",             nl:"teller"},
+    goes_fr:  {en:"goes from",         it:"va da",              nl:"loopt van"},
+    to__:     {en:"to",                it:"a",                  nl:"tot"},
+    and__:    {en:"and",               it:"ed",                 nl:"en"},
+    define:   {en:"define",            it:"definisci",          nl:"definieer"},
+    fn:       {en:"function",          it:"funzione",           nl:"functie"},
+    proc:     {en:"procedure",         it:"procedura",          nl:"procedure"},
+    return_:  {en:"return",            it:"restituisci",        nl:"geef"},
+    ret_sfx:  {en:"",                  it:"",                   nl:"terug"},
+    stop_:    {en:"stop",              it:"stop",               nl:"stop"},
+    global_:  {en:"global",            it:"globale",            nl:"globaal"},
+    tick_:    {en:"tick",              it:"tick",               nl:"tick"},
+    digits_:  {en:"digits",            it:"decimali",           nl:"decimalen"},
+    sci_:     {en:"scientific",        it:"scientifica",        nl:"wetenschappelijk"},
+  };
+
+  function serializeStmt(node, lang, indent) {
+    indent = indent || "";
+    const sx = n => serializeExpr(n, lang);
+    const sb = b => serializeBlock(b, lang, indent);
+    const K = key => _SER_SK[key]?.[lang] || _SER_SK[key]?.en || key;
+
+    switch (node.type) {
+
+      case "GlobalDecl":
+        return K("global_") + " " + node.names.join(", ");
+
+      case "Define": {
+        const kk = node.kind === "function" ? K("fn") : K("proc");
+        const params = node.params.map(p => (p.inout ? "inout " : "") + p.name).join(", ");
+        return K("define") + " " + kk + " " + node.name + "(" + params + ") " + sb(node.body);
+      }
+
+      case "Return": {
+        const sfx = K("ret_sfx");
+        if (!node.expr) return K("return_") + (sfx ? " " + sfx : "");
+        return K("return_") + " " + sx(node.expr) + (sfx ? " " + sfx : "");
+      }
+
+      case "Stop":    return K("stop_");
+      case "Tick":    return K("tick_");
+      case "Redraw":  return K("redraw");
+      case "Newline": return K("newline");
+
+      case "ClearScreen":     return K("clr_scr");
+      case "ClearGraphics":   return K("clr_gfx");
+      case "FrameGraphics":   return K("frame");
+      case "PaintBackground": return K("paint_bg");
+
+      case "Digits":              return K("digits_") + " " + sx(node.prec);
+      case "ScientificThreshold": return K("sci_")    + " " + sx(node.valExpr);
+      case "Output":              return K("write")   + " " + sx(node.expr);
+      case "Wait":                return K("wait")    + " " + sx(node.duration) + " " + K("ms");
+
+      case "Get":
+        return K("get") + " " + node.varName + " " + K("saying") + " " + sx(node.promptExpr);
+
+      case "SetColor":
+        return K("set_color") + " " + sx(node.colorExpr);
+
+      case "SetPointProp":
+        return (node.prop === "x" ? K("set_x") : K("set_y")) +
+               " " + sx(node.targetExpr) + " " + K("set_to") + " " + sx(node.valueExpr);
+
+      case "LoadBackground":
+        return K("load") + " " + sx(node.filenameExpr) + " " +
+               K("load_sc") + " " + sx(node.scaleExpr) + " " + K("load_as");
+
+      case "PutVar":
+        if (node.aliasExpr) {
+          return K("put") + " " + sx(node.rhs) + " " + K("in_") + " (" + sx(node.aliasExpr) + ")";
+        }
+        if (node.targets && node.targets.length > 1) {
+          return K("put") + " " + sx(node.rhs) + " " + K("in_") + " " + node.targets.map(t => t.varName).join(", ");
+        }
+        return K("put") + " " + sx(node.rhs) + " " + K("in_") + " " + node.varName;
+
+      case "PutItem":
+        return K("put") + " " + sx(node.rhs) + " " + K("in_") + " " +
+               K("item") + " " + sx(node.idx) + " " + K("of_") + " " + sx(node.listExpr);
+
+      case "Add":
+        if (lang === "nl") return "voeg " + sx(node.valueExpr) + " toe aan " + node.listName;
+        return K("add") + " " + sx(node.valueExpr) + " " + K("add_to") + " " + node.listName;
+
+      case "Insert":
+        if (lang === "nl") return "voeg " + sx(node.valueExpr) + " toe in element " + sx(node.idx) + " van " + node.listName;
+        return K("insert") + " " + sx(node.valueExpr) + " " + K("ins_at") + " " + sx(node.idx) + " " + K("ins_of") + " " + node.listName;
+
+      case "RemoveFirst":
+        return K("remove") + " " + K("first") + " " + node.listName;
+
+      case "RemoveLast":
+        return K("remove") + " " + K("last") + " " + node.listName;
+
+      case "RemoveAt":
+        return K("remove") + " " + K("rem_item") + " " + sx(node.idx) + " " + K("rem_from") + " " + node.listName;
+
+      case "If": {
+        let s = K("if_") + " (" + sx(node.cond) + ") " + K("then_") + " " + sb(node.thenBlock);
+        for (const ei of node.elseIfs) {
+          s += "\n" + indent + K("else_") + " " + K("if_") + " (" + sx(ei.cond) + ") " + K("then_") + " " + sb(ei.block);
+        }
+        if (node.elseBlock) s += "\n" + indent + K("else_") + " " + sb(node.elseBlock);
+        return s;
+      }
+
+      case "While":
+        return K("while_") + " (" + sx(node.cond) + ") " + K("you_do") + " " + sb(node.block);
+
+      case "ForEach":
+        return K("for_each") + " " + node.varName + " " + K("fe_in") + " " +
+               sx(node.listExpr) + " " + K("you_do") + " " + sb(node.block);
+
+      case "ForRange":
+        return K("index") + " " + node.varName + " " + K("goes_fr") + " " +
+               sx(node.startExpr) + " " + K("to__") + " " + sx(node.endExpr) + " " +
+               K("and__") + " " + K("you_do") + " " + sb(node.block);
+
+      case "Circle":
+        return K("circle") + " " + sx(node.r) + " " + K("at_") + " " + sx(node.pos);
+
+      case "Circumference":
+        return K("circ") + " " + sx(node.r) + " " + K("thick") + " " + sx(node.th) + " " + K("at_") + " " + sx(node.pos);
+
+      case "Rectangle":
+        return K("rect") + " " + sx(node.p1) + " " + K("rect_to") + " " + sx(node.p2);
+
+      case "Line":
+        return K("line_") + " " + sx(node.th) + " " + K("line_fr") + " " + sx(node.p1) + " " + K("line_to") + " " + sx(node.p2);
+
+      case "Triangle":
+        return K("tri") + " " + sx(node.p1) + ", " + sx(node.p2) + ", " + sx(node.p3);
+
+      case "Arc":
+        return K("arc") + " " + sx(node.r) + " " + K("thick") + " " + sx(node.th) + " " +
+               K("arc_fr") + " " + sx(node.p1) + " " + K("arc_to") + " " + sx(node.p2);
+
+      case "Graffiti":
+        return K("graffiti") + " " + sx(node.sizeExpr) + " " + K("grf_at") + " " +
+               sx(node.posExpr) + " " + sx(node.contentExpr);
+
+      case "Label":
+        return K("label") + " " + sb(node.body) + " " + K("label_as") + " " + node.name;
+
+      case "Import":
+        return K("import_") + " " + sx(node.fileExpr) + " " + K("import_as") + " " + node.name;
+
+      case "Include": {
+        const impKw = {en:"import", it:"importa", nl:"importeer"}[lang] || "import";
+        return impKw + " " + sx(node.fileExpr);
+      }
+
+      case "Draw":
+        return K("draw") + " " + node.name + " " + K("draw_at") + " " + sx(node.posExpr);
+
+      case "RotatePlace":
+        return K("rotate") + " " + node.name + " " + K("rot_of") + " " +
+               sx(node.angleExpr) + " " + K("deg") + " " + K("rot_place") + " " + sx(node.posExpr);
+
+      case "Scale":
+        return K("scale") + " " + node.name + " " + K("scale_by") + " " + sx(node.factorExpr);
+
+      case "Alias":
+        if (node.targetName) return node.aliasName + " alias " + node.targetName;
+        return node.aliasName + " alias " + sx(node.targetExpr);
+
+      case "ProcCall": {
+        const nl_ = node.name.toLowerCase();
+        const canonical = _SER_FN_REV[nl_] || nl_;
+        const fname = (_SER_FN[canonical] && _SER_FN[canonical][lang]) || node.name;
+        
+        if (node.args.length === 0) return fname;
+        return fname + "(" + node.args.map(a => sx(a)).join(", ") + ")";
+      }
+
+      default:
+        return "/* " + node.type + " */";
+    }
+  }
+
+  function serializeProgram(ast, lang) {
+    if (!ast || !ast.stmts) return "";
+    return ast.stmts.map(s => serializeStmt(s, lang, "")).join("\n");
+  }
+
   function translateEditorCode(targetLang, prevLang) {
     const code = codeInput.value;
     if (!code.trim()) return;
 
-    if (!prevLang) prevLang = AVAILABLE_LANGS.find(l => l !== targetLang) || "en";
+    const savedLang = currentLang;
+    currentLang = prevLang || savedLang;
+    lang = currentLang;
 
-    let codeInEn = code;
-    if (prevLang !== "en") {
-      codeInEn = applyDict(code, getInverseDict(prevLang));
+    let ast;
+    try {
+      const lexer = new Lexer(code);
+      const tokens = lexer.lexAll();
+      const parser = new Parser(tokens);
+      ast = parser.parseProgram();
+    } catch (e) {
+      currentLang = savedLang;
+      lang = savedLang;
+      return;
     }
 
-    let result = codeInEn;
-    if (targetLang !== "en") {
-      result = applyDict(codeInEn, LANG_REGISTRY[targetLang]?.dict);
-    }
+    currentLang = savedLang;
+    lang = savedLang;
 
-    codeInput.value = result;
+    codeInput.value = serializeProgram(ast, targetLang);
     updateHighlighting(true);
     if (typeof updateLineNumber === "function") updateLineNumber();
   }
@@ -1181,6 +1619,32 @@ const dictEnToNl = {
 
 
   const langDropdownMenu = document.getElementById("langDropdownMenu");
+  const fileDropdownMenu = document.getElementById("fileDropdownMenu");
+  const fileMenuButton = document.getElementById("fileMenuButton");
+  const infoButton = document.getElementById("infoButton");
+
+  fileMenuButton.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const btnRect = fileMenuButton.getBoundingClientRect();
+    fileDropdownMenu.style.top = `${btnRect.bottom + 8}px`;
+    fileDropdownMenu.style.left = `${btnRect.left}px`;
+    fileDropdownMenu.style.display = fileDropdownMenu.style.display === "none" ? "block" : "none";
+    langDropdownMenu.style.display = "none"; // Chiude l'altro menu se aperto
+  });
+
+  infoButton.addEventListener("click", () => {
+    fileDropdownMenu.style.display = "none";
+    alert("Matita ver. 0.5.0\n(c) 2025-2026 Dino Accoto");
+  });
+
+  // Chiudi menu File al click sulle voci (le funzioni originali vengono comunque innescate grazie agli ID)
+  [openButton, saveButton, getMatitalkButton].forEach(btn => {
+    if(btn) {
+      btn.addEventListener("click", () => {
+        fileDropdownMenu.style.display = "none";
+      });
+    }
+  });
 
   langToggleButton.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -1204,6 +1668,7 @@ const dictEnToNl = {
 
   document.addEventListener("click", () => {
     langDropdownMenu.style.display = "none";
+    fileDropdownMenu.style.display = "none";
   });
 
   document.querySelectorAll(".lang-option").forEach(opt => {
@@ -1276,11 +1741,17 @@ const dictEnToNl = {
   // Costruisce ALL_KEYWORDS unendo EN + tutte le traduzioni dei dict dinamicamente
   function buildAllKeywords() {
     const all = new Set(KEYWORDS_EN.map(k => k.toLowerCase()));
-    for (const { dict } of Object.values(LANG_REGISTRY)) {
+    for (const { dict, inverseDict } of Object.values(LANG_REGISTRY)) {
+      // 1. Aggiunge i valori del dizionario diretto
       if (dict) {
         Object.values(dict).forEach(v => {
-          // Dividiamo espressioni composte (es. "als achtergrond") nei singoli token
           v.split(/\s+/).forEach(word => all.add(word.toLowerCase()));
+        });
+      }
+      // 2. Aggiunge le chiavi del dizionario inverso per catturare sinonimi come "ed", "doet", "uit", ecc.
+      if (inverseDict) {
+        Object.keys(inverseDict).forEach(k => {
+          k.split(/\s+/).forEach(word => all.add(word.toLowerCase()));
         });
       }
     }
@@ -1575,7 +2046,7 @@ const dictEnToNl = {
       { label: "maxindex(lijst)", insert: "maxindex(LIJST)", detail: "Index van de grootste waarde" },
       { label: "afkappen(N)", insert: "afkappen(N)", detail: "Geeft het gehele deel (afgekapt)" },
       { label: "afronden(N)", insert: "afronden(N)", detail: "Rondt af op het dichtstbijzijnde gehele getal" },
-      { label: "A verschilend van B", insert: "A verschilend van B", detail: "Ongelijkheidsoperator" }
+      { label: "A verschillend van B", insert: "A verschillend van B", detail: "Ongelijkheidsoperator" }
     ];
 
   // Agganciamo i suggerimenti al registro
@@ -2432,12 +2903,10 @@ const dictEnToNl = {
     if (_t !== "object") return v;
 
     if (Array.isArray(v)) {
-      const copy = v.map(deepCopyValue);
-      copy.__id = Math.random();
-      return copy;
+      return v.map(deepCopyValue);
     }
-    if (isPoint(v)) return { __type: "point", x: v.x, y: v.y, __id: Math.random() };
-    try { return JSON.parse(JSON.stringify(v)); } catch { return v; }
+    if (isPoint(v)) return { __type: "point", x: v.x, y: v.y };
+          try { return JSON.parse(JSON.stringify(v)); } catch { return v; }
   }
 
   // --- Copy-on-Write (CoW) Helpers ---
@@ -2578,93 +3047,106 @@ const dictEnToNl = {
     currentTransform.scale = camera.scale;
   }
 
-  function drawObject(obj) {
+    function drawObject(obj) {
     if (!obj || !obj.type) return;
-    gfxCtx.save();
+
     switch (obj.type) {
       case "rectangle": {
         gfxCtx.fillStyle = obj.color;
         gfxCtx.beginPath();
-        gfxCtx.moveTo(obj.v1.x,obj.v1.y);
-        gfxCtx.lineTo(obj.v2.x,obj.v2.y);
-        gfxCtx.lineTo(obj.v3.x,obj.v3.y);
-        gfxCtx.lineTo(obj.v4.x,obj.v4.y);
+        gfxCtx.moveTo(obj.v1.x, obj.v1.y);
+        gfxCtx.lineTo(obj.v2.x, obj.v2.y);
+        gfxCtx.lineTo(obj.v3.x, obj.v3.y);
+        gfxCtx.lineTo(obj.v4.x, obj.v4.y);
         gfxCtx.closePath();
         gfxCtx.fill();
-        break;
+        return;
       }
+
       case "circle": {
         gfxCtx.fillStyle = obj.color;
         gfxCtx.beginPath();
-        gfxCtx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+        gfxCtx.arc(obj.x, obj.y, obj.r, 0, 2 * Math.PI);
         gfxCtx.fill();
-        break;
+        return;
       }
+
       case "circumference": {
         gfxCtx.strokeStyle = obj.color;
         gfxCtx.lineWidth = obj.t;
         gfxCtx.beginPath();
-        gfxCtx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+        gfxCtx.arc(obj.x, obj.y, obj.r, 0, 2 * Math.PI);
         gfxCtx.stroke();
-        break;
+        return;
       }
+
       case "triangle": {
         gfxCtx.fillStyle = obj.color;
         gfxCtx.beginPath();
-        gfxCtx.moveTo(obj.v1.x,obj.v1.y);
-        gfxCtx.lineTo(obj.v2.x,obj.v2.y);
-        gfxCtx.lineTo(obj.v3.x,obj.v3.y);
+        gfxCtx.moveTo(obj.v1.x, obj.v1.y);
+        gfxCtx.lineTo(obj.v2.x, obj.v2.y);
+        gfxCtx.lineTo(obj.v3.x, obj.v3.y);
         gfxCtx.closePath();
         gfxCtx.fill();
-        break;
+        return;
       }
+
       case "line": {
         gfxCtx.strokeStyle = obj.color;
-        gfxCtx.lineWidth =obj.t;
+        gfxCtx.lineWidth = obj.t;
         gfxCtx.beginPath();
-        gfxCtx.moveTo(obj.x1,obj.y1);
-        gfxCtx.lineTo(obj.x2,obj.y2);
+        gfxCtx.moveTo(obj.x1, obj.y1);
+        gfxCtx.lineTo(obj.x2, obj.y2);
         gfxCtx.stroke();
-        break;
+        return;
       }
+
       case "arc": {
         const { r, t, x1, y1, x2, y2, color } = obj;
-        const dx=x2-x1, dy=y2-y1;
-        const d2 = dx*dx+dy*dy;
-        if (d2===0 || r < Math.sqrt(d2)/2) break;
-        const d=Math.sqrt(d2);
-        const h=Math.sqrt(r*r - d2/4);
-        const mx=(x1+x2)/2, my=(y1+y2)/2;
-        const cx=mx + h*(-dy/d), cy=my + h*(dx/d);
-        const a1=Math.atan2(y1-cy, x1-cx);
-        const a2=Math.atan2(y2-cy, x2-cx);
-        gfxCtx.strokeStyle=color;
-        gfxCtx.lineWidth=t;
+        const dx = x2 - x1, dy = y2 - y1;
+        const d2 = dx * dx + dy * dy;
+        if (d2 === 0 || r < Math.sqrt(d2) / 2) return;
+
+        const d = Math.sqrt(d2);
+        const h = Math.sqrt(r * r - d2 / 4);
+        const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        const cx = mx + h * (-dy / d), cy = my + h * (dx / d);
+        const a1 = Math.atan2(y1 - cy, x1 - cx);
+        const a2 = Math.atan2(y2 - cy, x2 - cx);
+
+        gfxCtx.strokeStyle = color;
+        gfxCtx.lineWidth = t;
         gfxCtx.beginPath();
-        gfxCtx.arc(cx,cy,r,a1,a2,false);
+        gfxCtx.arc(cx, cy, r, a1, a2, false);
         gfxCtx.stroke();
-        break;
+        return;
       }
+
       case "image":
       case "text": {
-        const centerX = obj.x + obj.width/2;
-        const centerY = obj.y + obj.height/2;
+        gfxCtx.save();
+
+        const centerX = obj.x + obj.width / 2;
+        const centerY = obj.y + obj.height / 2;
         gfxCtx.translate(centerX, centerY);
-        if (obj.rotation) gfxCtx.rotate(obj.rotation);
-        gfxCtx.scale(1,-1);
-        if (obj.type==="image") {
-          gfxCtx.drawImage(obj.img, -obj.width/2, -obj.height/2, obj.width, obj.height);
+        
+        gfxCtx.scale(1, -1);
+        if (obj.rotation) gfxCtx.rotate(-obj.rotation);
+
+        if (obj.type === "image") {
+          gfxCtx.drawImage(obj.img, -obj.width / 2, -obj.height / 2, obj.width, obj.height);
         } else {
-          gfxCtx.fillStyle=obj.color;
+          gfxCtx.fillStyle = obj.color;
           gfxCtx.font = `${obj.size}px 'Roboto Mono', monospace`;
-          gfxCtx.textAlign="center";
-          gfxCtx.textBaseline="middle";
+          gfxCtx.textAlign = "center";
+          gfxCtx.textBaseline = "middle";
           gfxCtx.fillText(obj.content, 0, 0);
         }
-        break;
+
+        gfxCtx.restore();
+        return;
       }
     }
-    gfxCtx.restore();
   }
 
   function clearCanvasScreenSpace() {
@@ -2698,7 +3180,24 @@ const dictEnToNl = {
     gfxCtx.restore();
   }
 
-  function redrawAll(objects, context) {
+  let renderQueued = false;
+
+function scheduleRedraw() {
+  if (renderQueued) return;
+  renderQueued = true;
+
+  requestAnimationFrame(() => {
+    renderQueued = false;
+    if (!canvasWindow.classList.contains("hidden")) {
+      redrawAll(env.gfxObjects, {
+        backgroundColor: env.backgroundColor,
+        backgroundImage: env.backgroundImage
+      });
+    }
+  });
+}
+
+function redrawAll(objects, context) {
     // --- GESTIONE VISIBILITÀ CURSORE ---
     // Se stiamo tracciando una linea Ortho, nascondiamo il puntatore reale del sistema
     if (isOrthoEnabled && orthoBasePoint) {
@@ -3191,7 +3690,8 @@ const dictEnToNl = {
         if (w==="and" || w==="e" || w==="ed" || w==="en") return 2;
         if (w==="mod" || w==="modulo") return 6;
         if (w==="is" || w==="equals" || w==="vale" || w==="uguale" || w==="gelijk") return 4;
-        if (w==="diverso" || w==="different" || w==="verschilend") return 4;
+        if (w==="diverso"||w==="different"||w==="verschillend") return 4;
+        if (w==="non"||w==="not"||w==="niet") return 4;
         if ((w==="of" && currentLang!=="nl") || w==="di" || w==="van") return 8;
       }
       return 0;
@@ -3385,7 +3885,23 @@ const dictEnToNl = {
           return { type:"Binary", op:"===", left, right, line:left.line };
         }
 
-        if (w==="diverso" || w==="different" || w==="verschilend") {
+        if (w==="non" || w==="not" || w==="niet") {
+          this.consume();
+          const nt = this.peek();
+          if (nt && nt.type==="IDENT" &&
+              ["uguale","equal","gelijk"].includes(nt.value.toLowerCase())) {
+              this.consume();
+          }
+          const nt2 = this.peek();
+          if (nt2 && nt2.type==="IDENT" &&
+              ["a","aan","to"].includes(nt2.value.toLowerCase())) {
+              this.consume();
+          }
+          const right=this.parseExpression(opPrec, stopSet);
+          return { type:"Binary", op:"!=", left, right, line:left.line };
+      }
+
+      if (w==="diverso" || w==="different" || w==="verschillend") {
           this.consume(); 
           const nextTok = this.peek();
           if (nextTok.type === "IDENT") {
@@ -3518,9 +4034,18 @@ const dictEnToNl = {
         if (!(prop==="x"||prop==="y")) this.throwParse(uiStrings[lang].expectedXY, propTok.line);
         this.expectKW("OF", t.line);
         
-        const targetExpr=this.parseExpression(0, new Set(["to","a","tot","in"]));
-        
+        let targetExpr;
+        if (this.matchKW("ITEM")) {
+          const idxExpr = this.parseExpression(0, new Set(["of","di","van"]));
+          this.expectKW("OF", t.line);
+          const listExpr = this.parseExpression(0, new Set(["to","a","tot","in"]));
+          targetExpr = { type: "ItemOf", list: listExpr, index: idxExpr, __lvalue: true, line: t.line };
+        } else {
+          targetExpr = this.parseExpression(0, new Set(["to","a","tot","in"]));
+        }
+
         // NL: "stel x van PUNT in op VAL"; EN: "to"; IT: "a"
+
         if (this.peek().type === "IDENT" && this.peek().value.toLowerCase() === "in") {
           const afterIn = this.peek(1);
           if (afterIn && afterIn.type === "IDENT" && afterIn.value.toLowerCase() === "op") {
@@ -3750,12 +4275,22 @@ const dictEnToNl = {
 
           } else {
               const varTok = this.parseIdentifier();
-              
               varName = varTok.value;
               varNameUpper = varName.toUpperCase();
-          }
-          
-          return { type:"PutVar", rhs, varName, varNameUpper, aliasExpr, line: t.line };
+
+              // Multi-target: put VAL in A, B, C
+              const extraTargets = [];
+              while (this.matchType("COMMA")) {
+                const nt = this.parseIdentifier();
+                extraTargets.push({ varName: nt.value, varNameUpper: nt.value.toUpperCase() });
+              }
+              if (extraTargets.length > 0) {
+                const targets = [{ varName, varNameUpper }, ...extraTargets];
+                return { type:"PutVar", rhs, varName, varNameUpper, targets, aliasExpr: null, line: t.line };
+              }
+            }
+
+            return { type:"PutVar", rhs, varName, varNameUpper, aliasExpr, line: t.line };
         }
       }
     
@@ -3973,81 +4508,108 @@ const dictEnToNl = {
   }
 
   function resolveVariable(scopeChain, name, precalculatedUpper = null) {
-    const upper = precalculatedUpper || name.toUpperCase(); // Usa il pre-calcolato, se c'è
-    if (isDeclaredGlobal(scopeChain, name)) {
-      if (upper in scopeChain[0]) {
-        const entry=scopeChain[0][upper];
+    const upper = precalculatedUpper || name.toUpperCase();
+
+    let isGlobal = false;
+    for (let i = scopeChain.length - 1; i >= 0; i--) {
+      if (scopeChain[i].__globalVars && scopeChain[i].__globalVars.has(upper)) {
+        isGlobal = true;
+        break;
+      }
+    }
+
+    if (isGlobal) {
+      const entry = scopeChain[0][upper];
+      if (entry !== undefined) {
         if (entry && entry.__isAlias) return entry;
         return { scope: scopeChain[0], name: upper, value: entry };
       }
       return null;
     }
-    for (let i=scopeChain.length-1;i>=0;i--) {
-      if (upper in scopeChain[i]) {
-        const entry=scopeChain[i][upper];
+
+    for (let i = scopeChain.length - 1; i >= 0; i--) {
+      const entry = scopeChain[i][upper];
+      if (entry !== undefined) {
         if (entry && entry.__isAlias) return entry;
         return { scope: scopeChain[i], name: upper, value: entry };
       }
     }
+
     return null;
   }
 
+
   function lookupVariable(scopeChain, name, precalculatedUpper = null) {
-    const res = resolveVariable(scopeChain, name, precalculatedUpper);
-    if (!res) return undefined;
-    if (res.__isAlias) return lookupVariable([res.targetScope], res.targetName);
-    // Se la variabile contiene il flag __isHardRef, restituisce l'oggetto puntato
-    if (res.value && res.value.__isHardRef) {
-        return res.value.value; 
+    const upper = precalculatedUpper || name.toUpperCase();
+
+    let isGlobal = false;
+    for (let i = scopeChain.length - 1; i >= 0; i--) {
+      if (scopeChain[i].__globalVars && scopeChain[i].__globalVars.has(upper)) {
+        isGlobal = true;
+        break;
+      }
     }
-    return res.value;
-  }
+
+    let entry;
+    if (isGlobal) {
+      entry = scopeChain[0][upper];
+    } else {
+      for (let i = scopeChain.length - 1; i >= 0; i--) {
+        if (scopeChain[i][upper] !== undefined) {
+          entry = scopeChain[i][upper];
+          break;
+        }
+      }
+    }
+
+    if (entry === undefined) return undefined;
+  if (entry === null || typeof entry !== "object") return entry;
+  if (entry.__isAlias) return lookupVariable([entry.targetScope], entry.targetName, entry.targetName);
+  if (entry.__isHardRef) return entry.value;
+  return entry;
+}
 
 function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
     const upper = precalculatedUpper || name.toUpperCase();
-    env.varOriginalNames = env.varOriginalNames || {};
     env.varOriginalNames[upper] = name;
 
     let storedValue = value;
     if (Array.isArray(value)) storedValue = markShared(value);
     else if (isPoint(value)) storedValue = deepCopyValue(value);
 
-    const res = resolveVariable(scopeChain, name, upper);
-    if (res && res.__isAlias) {
-      assignVariable([res.targetScope], res.targetName, storedValue);
-      return;
-    }
-
     const upperName = upper;
 
-    // 1. Se dichiarata globale, aggiorna il livello radice
-    if (isDeclaredGlobal(scopeChain, name)) {
-      scopeChain[0][upperName] = storedValue;
+  let isGlobal = false;
+  for (let g = scopeChain.length - 1; g >= 0; g--) {
+    if (scopeChain[g].__globalVars && scopeChain[g].__globalVars.has(upperName)) { isGlobal = true; break; }
+  }
+
+  if (isGlobal) {
+    const entry = scopeChain[0][upperName];
+    if (entry && entry.__isAlias) { assignVariable([entry.targetScope], entry.targetName, storedValue); return; }
+    scopeChain[0][upperName] = storedValue;
+    return;
+  }
+
+  const searchLimit = (scopeChain.length > 1) ? 1 : 0;
+  for (let i = scopeChain.length - 1; i >= searchLimit; i--) {
+    const entry = scopeChain[i][upperName];
+    if (entry !== undefined) {
+      if (entry && entry.__isAlias) { assignVariable([entry.targetScope], entry.targetName, storedValue); return; }
+      scopeChain[i][upperName] = storedValue;
       return;
     }
+  }
 
-    // 2. Cerca la variabile lungo la catena di scope, MA escludendo scope[0] (globale)
-    // se siamo in uno scope annidato. Lo scope globale si modifica solo con 'global'.
-    const searchLimit = (scopeChain.length > 1) ? 1 : 0;
-    for (let i = scopeChain.length - 1; i >= searchLimit; i--) {
-      if (upperName in scopeChain[i]) {
-        scopeChain[i][upperName] = storedValue;
-        return;
-      }
+  if ((upperName in scopeChain[0]) && scopeChain.length > 1) {
+    env.__shadowWarnings ||= new Set();
+    if (!env.__shadowWarnings.has(upperName)) {
+      env.__shadowWarnings.add(upperName);
+      appendLine(uiStrings[lang].warningShadowing(name), false);
     }
+  }
 
-    // 3. Se non esiste da nessuna parte, la stiamo creando per la prima volta.
-    // Verifica se stiamo per fare shadowing involontario del Global.
-    if ((upperName in scopeChain[0]) && scopeChain.length > 1) {
-      env.__shadowWarnings ||= new Set();
-      if (!env.__shadowWarnings.has(upperName)) {
-        env.__shadowWarnings.add(upperName);
-        appendLine(uiStrings[lang].warningShadowing(name), false);
-      }
-    }
-
-    // Creazione effettiva della nuova variabile nello scope corrente
-    scopeChain[scopeChain.length - 1][upperName] = storedValue;
+  scopeChain[scopeChain.length - 1][upperName] = storedValue;
   }
 
   function ensureNumber(v, key, line) {
@@ -4096,12 +4658,34 @@ function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
     setTimeout(() => URL.revokeObjectURL(a.href), 2500);
   }
 
-  function sleep(ms) {
-    return new Promise(res => {
-      env.__sleepResolve = res;
-      setTimeout(res, ms);
-    });
-  }
+    function sleep(ms) {
+      return new Promise(res => {
+        env.__sleepResolve = res;
+        env.__sleepCancel = null;
+
+        if (ms <= 17) {
+          const id = setTimeout(() => {
+            if (env.__sleepResolve === res) {
+              env.__sleepResolve = null;
+              env.__sleepCancel = null;
+            }
+            res();
+          }, ms);
+          env.__sleepCancel = () => clearTimeout(id);
+          return;
+        }
+
+        const id = setTimeout(() => {
+          if (env.__sleepResolve === res) {
+            env.__sleepResolve = null;
+            env.__sleepCancel = null;
+          }
+          res();
+        }, ms);
+
+        env.__sleepCancel = () => clearTimeout(id);
+      });
+    }
 
   async function loadImageFromUrl(url, line) {
     return new Promise((resolve, reject) => {
@@ -4116,6 +4700,7 @@ function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
   }
 
   // --- Runtime env ---
+  const __yieldMC = new MessageChannel();
   const env = {
     precision: null,
     currentColor: "rgb(0, 0, 0)",
@@ -4127,18 +4712,21 @@ function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
     tickTime: null,
     functions: Object.create(null), // NAME -> def
     procedures: Object.create(null),
-    callDepth: 0
+    callDepth: 0,
+    __sleepResolve: null,
+    __sleepCancel: null
   };
 
   const MAX_CALL_DEPTH = 200;
-  const MAX_LOOP_MS = Infinity; // INSERIRE QUI valori finiti per limitare la durata di un loop, es. 15000; per 15 secondi
-
+  // INSERIRE un numero finito per forzare la fine di un loop 
+  // dopo MAX_LOOP_MS ms (ma poi limiti alla durata di un gioco, ad esempio):
+  const MAX_LOOP_MS = Infinity; 
   // --- Builtins ---
   function builtin_point(args, line) {
-    if (args.length !== 2) return { __type: "point", x: 0, y: 0, __id: Math.random() };
+    if (args.length !== 2) return { __type: "point", x: 0, y: 0 };
     const x = args[0], y = args[1];
     if (typeof x !== "number" || typeof y !== "number") fail("pointArgsNotNumeric", null, line);
-    return { __type: "point", x, y, __id: Math.random() };
+    return { __type: "point", x, y };
   }
 
   function builtin_random(args) {
@@ -4156,32 +4744,26 @@ function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
 
     // 1. Funzione 'tipo(x)' / 'type(x)'
     // Restituisce sempre stringhe in Inglese
-  function builtin_type(args) {
-    const v = args[0];
-    
-    if (v === null) return "null";
-    
-    if (typeof v === "number") {
-        if (Number.isNaN(v)) return "nan"; // Utile per debug
+    function builtin_type(args) {
+      const v = args[0];
+      if (v === null) return "null";
+      if (typeof v === "number") {
+        if (Number.isNaN(v)) return "nan";
         return "number";
-    }
-    
-    if (typeof v === "string") return "string";
-    if (typeof v === "boolean") return "boolean";
-    if (Array.isArray(v)) return "list";
-    
-    // Controllo specifico per l'oggetto Punto
-    if (typeof v === "object" && v.__type === "point") return "point";
-    
-    return "unknown";
+      }
+      if (typeof v === "string") return "string";
+      if (typeof v === "boolean") return "boolean";
+      if (Array.isArray(v)) return "list";
+      if (typeof v === "object" && v.__type === "point") return "point";
+      return "unknown";
     }
 
-    // 2. Funzione 'numerico(x)' / 'numeric(x)'
-    function builtin_is_numeric(args) {
-    const v = args[0];
-    // Restituisce vero solo se è un numero AND (non è infinito OR NaN)
-    return typeof v === "number" && Number.isFinite(v);
-  }
+      // 2. Funzione 'numerico(x)' / 'numeric(x)'
+      function builtin_is_numeric(args) {
+      const v = args[0];
+      // Restituisce vero solo se è un numero AND (non è infinito OR NaN)
+      return typeof v === "number" && Number.isFinite(v);
+    }
 
   function builtin_indexof(args) {
     const arr = args[0];
@@ -4417,1646 +4999,653 @@ function builtin_split(args) {
 
 
   
-  
-  // --- Expression evaluator ---
-  async function evalExpr(node, scopeChain) {
+// ===== FASE A: ANALISI E CANONIZZAZIONE AST =====
+  const CANON_CALL = {
+    "assoluto": "abs", "seno": "sin", "coseno": "cos", "intero_superiore": "ceil",
+    "scomponi": "decomposition", "is_number": "numeric", "è_numero": "numeric",
+    "minimo": "min", "massimo": "max", "indicedi": "indexof", "scomposizione": "decomposition",
+    "composizione": "composition", "tipo": "type", "numerico": "numeric", "numeriek": "numeric",
+    "dado": "dice", "punto": "point", "radice": "squareroot", "tronca": "trunc",
+    "arrotonda": "round", "casuale": "random", "dividi": "split", "wortel": "squareroot",
+    "afkappen": "trunc", "afronden": "round", "willekeurig": "random", "splits": "split",
+    "ontbind": "decomposition", "samenvoegen": "composition", "minwaarde": "valmin",
+    "maxwaarde": "valmax", "minindex": "argmin", "maxindex": "argmax", "dobbelsteen": "dice",
+    "punt": "point", "indexvan": "indexof"
+  };
+
+  function canonicalizeCalls(node) {
+    if (!node || typeof node !== "object") return;
+    if (Array.isArray(node)) {
+      for (const x of node) canonicalizeCalls(x);
+      return;
+    }
+    if ((node.type === "Call" || node.type === "ProcCall") && node.name) {
+      const low = node.name.toLowerCase();
+      if (CANON_CALL[low]) node.name = CANON_CALL[low];
+    }
+    for (const v of Object.values(node)) {
+      if (v && typeof v === "object") canonicalizeCalls(v);
+    }
+  }
+
+  function markAsync(node) {
+    if (!node || typeof node !== "object") return false;
+    if (Array.isArray(node)) {
+        let arrAsync = false;
+        for (const item of node) { const res = markAsync(item); arrAsync = arrAsync || res; }
+        return arrAsync;
+    }
+    const selfAsync = ["Wait","Get","LoadBackground","Import","Include","RotatePlace"].includes(node.type);
+    let childAsync = false;
+    for (const v of Object.values(node)) {
+      if (v && typeof v === "object") { const res = markAsync(v); childAsync = childAsync || res; }
+    }
+    node.__async = selfAsync || childAsync;
+    if (["Program","Block","While","ForRange","ForEach","If"].includes(node.type)) {
+        node.__async = childAsync; 
+    }
+    return node.__async;
+  }
+
+  function extractListPath(node, isAsync) {
+    if (node.type === "Var") return { nameUpper: node.nameUpper, path: [] };
+    if (node.type === "ItemOf") {
+      const res = extractListPath(node.list, isAsync);
+      res.path.push(compileExpr(node.index, isAsync)); 
+      return res;
+    }
+    throw new Error("INVALID_ALIAS_DEST");
+  }
+
+  function buildTransformedLabelObjects(defL) {
+    const c = Math.cos(defL.rotation), s = Math.sin(defL.rotation), sc = defL.scale;
+    const tp = (x, y) => ({
+      x: x * sc * c - y * sc * s,
+      y: x * sc * s + y * sc * c
+    });
+
+    const out = [];
+
+    for (const o of defL.objects) {
+      if (o.type === "circle" || o.type === "circumference") {
+        const p = tp(o.x, o.y);
+        out.push({ ...o, x: p.x, y: p.y, r: o.r * sc, t: o.t ? o.t * sc : o.t });
+      } else if (o.type === "line") {
+        const p1 = tp(o.x1, o.y1);
+        const p2 = tp(o.x2, o.y2);
+        out.push({ ...o, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, t: o.t * sc });
+      } else if (o.type === "rectangle") {
+        out.push({
+          ...o,
+          v1: tp(o.v1.x, o.v1.y),
+          v2: tp(o.v2.x, o.v2.y),
+          v3: tp(o.v3.x, o.v3.y),
+          v4: tp(o.v4.x, o.v4.y)
+        });
+      } else if (o.type === "triangle") {
+        out.push({
+          ...o,
+          v1: tp(o.v1.x, o.v1.y),
+          v2: tp(o.v2.x, o.v2.y),
+          v3: tp(o.v3.x, o.v3.y)
+        });
+      } else if (o.type === "arc") {
+        const p1 = tp(o.x1, o.y1);
+        const p2 = tp(o.x2, o.y2);
+        out.push({ ...o, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, r: o.r * sc, t: o.t * sc });
+      } else if (o.type === "text" || o.type === "image") {
+        const centerX = o.x + o.width / 2;
+        const centerY = o.y + o.height / 2;
+        const pc = tp(centerX, centerY);
+        const width = o.width * sc;
+        const height = o.height * sc;
+
+        out.push({
+          ...o,
+          x: pc.x - width / 2,
+          y: pc.y - height / 2,
+          width,
+          height,
+          size: o.size ? o.size * sc : o.size,
+          rotation: (o.rotation || 0) + defL.rotation
+        });
+      }
+    }
+
+    return out;
+  }
+
+  function appendTranslatedLabelObjects(objects, posX, posY) {
+    for (const o of objects) {
+      if (o.type === "circle" || o.type === "circumference") {
+        env.gfxObjects.push({ ...o, x: o.x + posX, y: o.y + posY });
+      } else if (o.type === "line") {
+        env.gfxObjects.push({
+          ...o,
+          x1: o.x1 + posX, y1: o.y1 + posY,
+          x2: o.x2 + posX, y2: o.y2 + posY
+        });
+      } else if (o.type === "rectangle") {
+        env.gfxObjects.push({
+          ...o,
+          v1: { x: o.v1.x + posX, y: o.v1.y + posY },
+          v2: { x: o.v2.x + posX, y: o.v2.y + posY },
+          v3: { x: o.v3.x + posX, y: o.v3.y + posY },
+          v4: { x: o.v4.x + posX, y: o.v4.y + posY }
+        });
+      } else if (o.type === "triangle") {
+        env.gfxObjects.push({
+          ...o,
+          v1: { x: o.v1.x + posX, y: o.v1.y + posY },
+          v2: { x: o.v2.x + posX, y: o.v2.y + posY },
+          v3: { x: o.v3.x + posX, y: o.v3.y + posY }
+        });
+      } else if (o.type === "arc") {
+        env.gfxObjects.push({
+          ...o,
+          x1: o.x1 + posX, y1: o.y1 + posY,
+          x2: o.x2 + posX, y2: o.y2 + posY
+        });
+      } else if (o.type === "image" || o.type === "text") {
+        env.gfxObjects.push({ ...o, x: o.x + posX, y: o.y + posY });
+      }
+    }
+  }
+
+  // ===== FASE B: RUNTIME HELPER (rt) =====
+  const rt = {
+    getVar: (sc, name) => { const v = lookupVariable(sc, name, name); if (v === undefined) throw new Error(`VAR_NOT_FOUND:${name}`); return v; },
+    resolveVar: resolveVariable,
+    setVar: (sc, name, value) => assignVariable(sc, name, value, name),
+    maybeCopy: (v) => {
+      if (v === null || v === undefined) return v;
+      const t = typeof v;
+      if (t === "number" || t === "string" || t === "boolean") return v;
+      if (Array.isArray(v)) return markShared(v);
+      if (v.__type === "point") return { __type: "point", x: v.x, y: v.y };
+      return v;
+    },
+
+    makeScope: () => { const s = Object.create(null); s.__globalVars = new Set(); return s; },
+    truthy: truthy, t: truthy, toInt: toInt, deepCopy: deepCopyValue,
+    isPoint: isPoint, coordFromValue: coordFromValue, colorFromTuple: colorFromTuple,
+    fail: fail, wait: sleep, write: (val) => appendText(val, env.precision),
+    addGfx: addGraphicObject, tock: () => builtin_tock([], 0),
+    getPrecision: (v) => { const n = toInt(v); return (Number.isFinite(n) && n >= 0) ? n : null; },
+    setSciThreshold: (v) => { if (typeof v !== "number" || !Number.isFinite(v) || v < 0) throw new Error("SCI_POSITIVE"); env.sciThreshold = v; },
+    clearScreen: clearScreen,
+    clearGfx: () => { env.gfxObjects = []; snapPointsCache = null; },
+
+    frameGfx: () => {
+      if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
+      if (env.gfxObjects && env.gfxObjects.length > 0) {
+        computeFitCamera(env.gfxObjects);
+      }
+      redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    },
+    paintBg: () => { env.backgroundImage = null; env.backgroundColor = env.currentColor; },
+    redraw: () => {
+
+      if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
+      redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+    },
+    loadBg: async (f, sca) => {
+      if (typeof f !== "string") throw new Error("BG_FILE_NOT_TEXT");
+      if (typeof sca !== "number" || !Number.isFinite(sca) || sca <= 0) throw new Error("BG_SCALE_NOT_NUMBER");
+      const img = await loadImageFromUrl(f, 0); env.backgroundColor = null; env.backgroundImage = { img, scale: sca };
+    },
+    prompt: (msg, varName, varUpper, sc) => {
+      if (typeof msg !== "string") throw new Error("PROMPT_NOT_TEXT");
+      const ans = window.prompt(msg) ?? ""; const trimmed = ans.trim(); const num = Number(trimmed);
+      assignVariable(sc, varName, (trimmed !== "" && !isNaN(num)) ? num : ans, varUpper);
+    },
+    setPointProp: (target, prop, val) => {
+      if (!isPoint(target)) throw new Error("POINT_ONLY_SET");
+      if (typeof val !== "number" || !Number.isFinite(val)) throw new Error("COORD_NOT_NUMBER");
+      if (prop === "x") target.x = val; else target.y = val;
+    },
+    drawRect: (p1v, p2v) => {
+      const p1 = coordFromValue(p1v, 0); const p2 = coordFromValue(p2v, 0);
+      addGraphicObject({ type: "rectangle", v1: { x: p1.x, y: p1.y }, v2: { x: p2.x, y: p1.y }, v3: { x: p2.x, y: p2.y }, v4: { x: p1.x, y: p2.y }, color: env.currentColor });
+    },
+    drawLine: (th, p1v, p2v) => {
+      if (typeof th !== "number" || !Number.isFinite(th)) throw new Error("SHAPE_PARAMS_NOT_NUMERIC:line");
+      const p1 = coordFromValue(p1v, 0); const p2 = coordFromValue(p2v, 0);
+      addGraphicObject({ type: "line", x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, t: th, color: env.currentColor });
+    },
+    drawTri: (v1, v2, v3) => { addGraphicObject({ type: "triangle", v1: coordFromValue(v1, 0), v2: coordFromValue(v2, 0), v3: coordFromValue(v3, 0), color: env.currentColor }); },
+    drawArc: (r, th, p1v, p2v) => {
+      if (![r, th].every(v => typeof v === "number" && Number.isFinite(v) && v > 0)) throw new Error("ARC_RADIUS_THICKNESS_POSITIVE");
+      const p1 = coordFromValue(p1v, 0); const p2 = coordFromValue(p2v, 0);
+      addGraphicObject({ type: "arc", r, t: th, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, color: env.currentColor });
+    },
+    drawGraffiti: (size, posV, content) => {
+      if (typeof size !== "number" || !Number.isFinite(size) || size <= 0) throw new Error("GRAFFITI_SIZE_NOT_NUMBER");
+      const { x, y } = coordFromValue(posV, 0);
+      const str = (content == null) ? "" : String(content);
+const w = Math.max(10, size * 0.62 * str.length); const h = Math.max(10, size * 1.2);
+env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h, rotation: 0, size, content: str, color: env.currentColor });
+    },
+    startLabel: (nameU) => {
+      if (env.labels[nameU] || env.imports[nameU]) throw new Error(`LABEL_EXISTS:${nameU}`);
+      rt._savedGfx = env.gfxObjects; env.gfxObjects = [];
+    },
+    endLabel: (nameU) => {
+      env.labels[nameU] = { objects: env.gfxObjects.map(deepCopyValue), scale: 1, rotation: 0, transformedCacheKey: null, transformedObjects: null };
+      env.gfxObjects = rt._savedGfx; rt._savedGfx = null;
+    },
+    scaleObj: (nameU, factor) => {
+      if (typeof factor !== "number" || !Number.isFinite(factor) || factor <= 0) throw new Error("SCALE_NOT_NUMBER");
+      if (env.labels[nameU]) { env.labels[nameU].scale *= factor; env.labels[nameU].transformedCacheKey = null; }
+      else if (env.imports[nameU]) env.imports[nameU].scale *= factor;
+      else throw new Error(`LABEL_NOT_FOUND:${nameU}`);
+      snapPointsCache = null;
+    },
+    drawObj: (nameU, posV) => {
+      const pos = coordFromValue(posV, 0); const defL = env.labels[nameU]; const defI = env.imports[nameU];
+      if (!defL && !defI) throw new Error(`LABEL_NOT_FOUND:${nameU}`);
+      if (defI) {
+          const w = defI.width * defI.scale, h = defI.height * defI.scale;
+          env.gfxObjects.push({ type: "image", img: defI.img, x: pos.x - w/2, y: pos.y - h/2, width: w, height: h, rotation: defI.rotation }); return;
+      }
+      const key = defL.scale + "|" + defL.rotation;
+      if (defL.transformedCacheKey !== key) { defL.transformedObjects = buildTransformedLabelObjects(defL); defL.transformedCacheKey = key; }
+      appendTranslatedLabelObjects(defL.transformedObjects, pos.x, pos.y);
+    },
+    rotatePlaceObj: async (nameU, nameOrig, angle, posV, sc) => {
+      if (typeof angle !== "number" || !Number.isFinite(angle)) throw new Error("ROTATION_NOT_NUMBER");
+      const pos = coordFromValue(posV, 0); const rad = angle * Math.PI / 180;
+      if (env.imports[nameU]) {
+          const def = env.imports[nameU]; const w = def.width * def.scale, h = def.height * def.scale;
+          env.gfxObjects.push({ type: "image", img: def.img, x: pos.x - w/2, y: pos.y - h/2, width: w, height: h, rotation: rad }); return;
+      }
+      if (env.labels[nameU]) {
+          const def = env.labels[nameU]; const prevRot = def.rotation; def.rotation = rad;
+          rt.drawObj(nameU, posV); def.rotation = prevRot; snapPointsCache = null; return;
+      }
+      throw new Error(`LABEL_NOT_FOUND:${nameOrig}`);
+    },
+    importObj: async (nameU, f) => {
+      if (env.labels[nameU] || env.imports[nameU]) throw new Error(`LABEL_EXISTS:${nameU}`);
+      if (typeof f !== "string") throw new Error("BG_FILE_NOT_TEXT");
+      const img = await loadImageFromUrl(f, 0); env.imports[nameU] = { img, scale: 1, rotation: 0, width: img.naturalWidth, height: img.naturalHeight };
+    },
+    includeMod: async (f, sc) => {
+      if (typeof f !== "string") throw new Error("IMPORT_NOT_TEXT");
+      if (env.importedFiles.has(f)) return; env.importedFiles.add(f); let code = "";
+      try { const response = await fetch(f); if (!response.ok) throw new Error(`HTTP ${response.status}`); code = await response.text();
+      } catch (err) { throw new Error(`INCLUDE_FETCH_FAIL:${f}:${err.message}`); }
+      let ast;
+      try { ast = new Parser(new Lexer(code).lexAll()).parseProgram(); } catch (e) { throw new Error(`INCLUDE_PARSE_FAIL:${f}:${e.message}`); }
+      canonicalizeCalls(ast); markAsync(ast);
+      const executable = ast.__async ? new AsyncFunction('rt', 'env', 'sc', 'clearScreen', compileProgram(ast)) : new Function('rt', 'env', 'sc', 'clearScreen', compileProgram(ast));
+      await executable(rt, env, sc, clearScreen);
+    },
+    makeAliasSimple: (sc, aliasName, targetName) => {
+      const target = resolveVariable(sc, targetName, targetName);
+      if (!target) throw new Error(`VAR_NOT_FOUND:${targetName}`);
+      sc[sc.length - 1][aliasName] = { __isAlias: true, targetScope: target.__isAlias ? target.targetScope : target.scope, targetName: target.__isAlias ? target.targetName : target.name };
+    },
+    makeAliasPath: (sc, aliasName, baseName, indices) => {
+      sc[sc.length - 1][aliasName] = { __isHardRef: true, value: rt.resolveMutListPath(sc, baseName, indices) };
+    },
+    resolveMutListPath: (sc, varNameUpper, indices) => {
+      const res = resolveVariable(sc, varNameUpper, varNameUpper);
+      if (!res) throw new Error(`VAR_NOT_FOUND:${varNameUpper}`);
+      let target = res.__isAlias ? resolveVariable([res.targetScope], res.targetName) : res;
+      let curr = target.value;
+      if (!Array.isArray(curr)) throw new Error(`NOT_A_LIST:${varNameUpper}`);
+      if (curr.__shared) { curr = ensureWritable(curr); target.scope[target.name] = curr; }
+      for (let i = 0; i < indices.length; i++) {
+        const idx = toInt(indices[i]) - 1;
+        if (idx < 0 || idx >= curr.length) throw new Error(`INDEX_OUT_OF_BOUNDS:${indices[i]}`);
+        let next = curr[idx];
+        if (!Array.isArray(next)) throw new Error("ITEM_NOT_A_LIST");
+        if (next.__shared) { next = ensureWritable(next); curr[idx] = next; }
+        curr = next;
+      }
+      return curr;
+    },
+    listInsert: (sc, nameUpper, path, idx, val) => {
+      const lst = rt.resolveMutListPath(sc, nameUpper, path); const p = toInt(idx) - 1;
+      if (p < 0 || p > lst.length) throw new Error(`INDEX_OUT_OF_BOUNDS:${idx}`);
+      lst.splice(p, 0, deepCopyValue(val));
+    },
+    listAdd: (sc, nameUpper, path, val) => { rt.resolveMutListPath(sc, nameUpper, path).push(deepCopyValue(val)); },
+    putItem: (sc, nameUpper, path, idx, val) => {
+      const lst = rt.resolveMutListPath(sc, nameUpper, path); const p = toInt(idx) - 1;
+      if (p < 0 || p >= lst.length) throw new Error(`INDEX_OUT_OF_BOUNDS:${idx}`);
+      lst[p] = deepCopyValue(val);
+    },
+    getItem: (list, idx) => {
+      if (!Array.isArray(list)) throw new Error("NOT_A_LIST:<expr>");
+      const p = toInt(idx) - 1;
+      if (p < 0 || p >= list.length) throw new Error(`INDEX_OUT_OF_BOUNDS:${idx}`);
+      const v = list[p];
+      if (v === null) return null;
+      const _t = typeof v;
+      if (_t === "number" || _t === "string" || _t === "boolean") return v;
+      if (Array.isArray(v)) return markShared(v);
+      if (v.__type === "point") return { __type: "point", x: v.x, y: v.y };
+      return v;
+    },
+
+    listRemoveFirst: (sc, nameUpper, path) => {
+      const lst = rt.resolveMutListPath(sc, nameUpper, path);
+      if (lst.length === 0) throw new Error("REMOVE_EMPTY"); lst.shift();
+    },
+    listRemoveLast: (sc, nameUpper, path) => {
+      const lst = rt.resolveMutListPath(sc, nameUpper, path);
+      if (lst.length === 0) throw new Error("REMOVE_EMPTY"); lst.pop();
+    },
+    listRemoveAt: (sc, nameUpper, path, idx) => {
+      const lst = rt.resolveMutListPath(sc, nameUpper, path); const p = toInt(idx) - 1;
+      if (p < 0 || p >= lst.length) throw new Error(`INDEX_OUT_OF_BOUNDS:${idx}`);
+      lst.splice(p, 1);
+    },
+    callBuiltin: (name, args) => {
+      const fn = BUILTINS[name.toLowerCase()] || BUILTINS[CANON_CALL[name.toLowerCase()] || name.toLowerCase()];
+      if (fn) return fn(args, 0);
+      throw new Error(`UNKNOWN_FUNC:${name}`);
+    },
+
+    callUserFuncSync: (nameUpper, args, sc) => {
+      return rt.callUserFuncAsync(nameUpper, args, sc);
+    },
+
+    callUserFuncAsync: async (nameUpper, args, sc) => {
+      const def = env.functions[nameUpper]; if (!def) throw new Error(`UNKNOWN_FUNC:${nameUpper}`);
+      const res = await def(rt, env, [sc[0]], args, sc);
+      if (res && res.__return) return res.value;
+      if (res && res.type === "ExecutionStop") throw new Error("Execution stopped.");
+      return res;
+    },
+    callUserProcSync: (nameUpper, origName, args, sc) => {
+      return rt.callUserProcAsync(nameUpper, origName, args, sc);
+    },
+    callUserProcAsync: async (nameUpper, origName, args, sc) => {
+      const canon = CANON_CALL[origName.toLowerCase()] || origName.toLowerCase();
+      if (BUILTINS[canon]) { BUILTINS[canon](args.map(a => a.val), 0); return null; }
+      if (canon === "tock" && args.length === 0) { rt.write(rt.tock()); return null; }
+      const def = env.procedures[nameUpper]; if (!def) throw new Error(`UNKNOWN_CMD:${origName}`);
+      return await def(rt, env, [sc[0]], args, sc);
+    },
+
+    addOps: (a, b) => {
+      if (typeof a !== "string" && typeof b !== "string") return Number(a) + Number(b);
+      const p = env.precision;
+      const sa = (p === null && typeof a === "string") ? a : formatForOutput(a, p);
+      const sb = (p === null && typeof b === "string") ? b : formatForOutput(b, p);
+      return sa + sb;
+    },
+  };
+
+  // ===== FASE C: TRANSPILATORE (AST -> JS) =====
+  function compileExpr(node, isAsync) {
+    if (!node) return "null";
     switch (node.type) {
-      case "Literal": return node.value;
-
-      case "Var": {
-        // Se il nome della "variabile" è tock, restituisco il tempo trascorso da tick
-        if (node.nameLower === "tock") {
-          return builtin_tock([], node.line);
-        }
-
-        const v = lookupVariable(scopeChain, node.name, node.nameUpper); // Usa nameUpper
-        if (v === undefined) fail("variableNotFound", node.name, node.line);
-        return v;
-      }
-
-      case "Tuple": {
-        const arr = [];
-        for (const it of node.items) arr.push(await evalExpr(it, scopeChain));
-        arr.__id = Math.random();
-        return arr;
-      }
-
-      case "Unary": {
-        const r = await evalExpr(node.right, scopeChain);
-        if (node.op === "-") return -(typeof r === "number" ? r : Number(r));
-        if (node.op === "not") return !truthy(r);
-        return r;
-      }
-
+      case "Literal": return JSON.stringify(node.value);
+      case "Var": return node.nameLower === "tock" ? `rt.tock()` : `rt.getVar(sc, "${node.nameUpper}")`;
+      case "Tuple": return `[${node.items.map(i => compileExpr(i, isAsync)).join(", ")}]`;
+      
+      case "Unary":
+        if (node.op === "not") return `(!rt.t(${compileExpr(node.right, isAsync)}))`;
+        return `(${node.op}(${compileExpr(node.right, isAsync)}))`;
+      
       case "Binary": {
-        
-        if (node.op === "alias") {
-          if (node.left.type !== "Var") fail("aliasLeftVar", null, node.line);
-          if (node.right.type !== "Var" && node.right.type !== "ItemOf") {
-            fail("aliasRightVar", null, node.line);
-          }
-
-          const aliasName = node.left.name.toUpperCase();
-          const targetName = node.right.name.toUpperCase();
-
-          const targetRes = resolveVariable(scopeChain, targetName);
-          if (!targetRes) fail("variableNotFound", node.right.name, node.line);
-
-          let finalScope, finalName;
-          if (targetRes.__isAlias) {
-            finalScope = targetRes.targetScope;
-            finalName = targetRes.targetName;
-          } else {
-            finalScope = targetRes.scope;
-            finalName = targetRes.name;
-          }
-
-          const currentScope = scopeChain[scopeChain.length - 1];
-          currentScope[aliasName] = { __isAlias: true, targetScope: finalScope, targetName: finalName };
-
-          return lookupVariable(scopeChain, targetName);
-        }        
-        if (node.op === "and") {
-          const l = await evalExpr(node.left, scopeChain);
-          if (!truthy(l)) return false;
-          const r = await evalExpr(node.right, scopeChain);
-          return truthy(r);
-        }
-        if (node.op === "or") {
-          const l = await evalExpr(node.left, scopeChain);
-          if (truthy(l)) return true;
-          const r = await evalExpr(node.right, scopeChain);
-          return truthy(r);
-        }
-
-        const l = await evalExpr(node.left, scopeChain);
-        const r = await evalExpr(node.right, scopeChain);
-
-        switch (node.op) {
-          case "+": {
-            if (typeof l === "string" || typeof r === "string") {
-              return formatForOutput(l, env.precision) + formatForOutput(r, env.precision);
-            }
-            return Number(l) + Number(r);
-          }
-          case "-": return Number(l) - Number(r);
-          case "*": return Number(l) * Number(r);
-          case "/": return Number(l) / Number(r);
-          case "%": return Number(l) % Number(r);
-          case "^": return Math.pow(Number(l), Number(r));
-          case "==":
-          case "=":
-          case "===": return Object.is(l, r) || (l === r);
-          case "!=":
-          case "!==": return !(Object.is(l, r) || (l === r));
-          case "<": return Number(l) < Number(r);
-          case "<=": return Number(l) <= Number(r);
-          case ">": return Number(l) > Number(r);
-          case ">=": return Number(l) >= Number(r);
-          default: return NaN;
-        }
+        if (node.op === "and") return `(rt.t(${compileExpr(node.left, isAsync)}) && rt.t(${compileExpr(node.right, isAsync)}))`;
+        if (node.op === "or") return `(rt.t(${compileExpr(node.left, isAsync)}) || rt.t(${compileExpr(node.right, isAsync)}))`;
+        if (["===","==","="].includes(node.op)) return `(Object.is(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)}))`;
+        if (["!==","!="].includes(node.op)) return `(!Object.is(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)}))`;
+        if (node.op === "^") return `Math.pow(Number(${compileExpr(node.left, isAsync)}), Number(${compileExpr(node.right, isAsync)}))`;
+        if (node.op === "+") return `rt.addOps(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)})`;
+        const op = node.op === "%" ? "%" : node.op;
+        return `(Number(${compileExpr(node.left, isAsync)}) ${op} Number(${compileExpr(node.right, isAsync)}))`;
       }
 
       case "Call": {
-        const nameLower = node.name.toLowerCase();
-        const args = [];
-        for (const a of node.args) args.push(await evalExpr(a, scopeChain));
-
-        if (BUILTINS[nameLower]) return BUILTINS[nameLower](args, node.line);
-
-        const def = env.functions[node.name.toUpperCase()];
-        if (!def) fail("unknownFunction", node.name, node.line);
-        
-        return await callUserRoutine(def, args, node.args, scopeChain, true, node.line);
+        const nl_ = node.name.toLowerCase(); const canon = CANON_CALL[nl_] || nl_;
+        if (BUILTINS[canon]) return `rt.callBuiltin("${canon}", [${node.args.map(a => compileExpr(a, isAsync)).join(", ")}])`;
+        const callArgs = `[${node.args.map(a => `{val: ${compileExpr(a, isAsync)}, isVar: ${a.type === "Var"}, name: "${a.name || ""}"}`).join(", ")}]`;
+        return isAsync ? `(await rt.callUserFuncAsync("${node.name.toUpperCase()}", ${callArgs}, sc))` : `rt.callUserFuncSync("${node.name.toUpperCase()}", ${callArgs}, sc)`;
       }
-
-      case "PointProp": {
-        const obj = await evalExpr(node.object, scopeChain);
-        if (!isPoint(obj)) fail("pointPropOnlyXY", null, node.line);
-        return node.prop === "x" ? obj.x : obj.y;
-      }
-
-      case "Dimension": {
-        const v = await evalExpr(node.expr, scopeChain);
-        if (!Array.isArray(v)) fail("dimensionNeedsList", null, node.line);
-        return v.length;
-      }
-
-      case "ItemOf": {
-        const list = await evalExpr(node.list, scopeChain);
-        if (!Array.isArray(list)) fail("listOnlyOp", "<expr>", node.line);
-        const idxV = await evalExpr(node.index, scopeChain);
-        const idx = toInt(idxV);
-        if (!Number.isFinite(idx)) fail("invalidIndex", { idx: idxV, name: "<list>" }, node.line);
-        const pos = idx - 1; // 1-based
-        if (pos < 0 || pos >= list.length) fail("invalidIndex", { idx, name: "<list>" }, node.line);
-        return deepCopyValue(list[pos]);
-      }
-
-      case "KeyPressed": {
-        const k = await evalExpr(node.keyExpr, scopeChain);
-        const kk = String(k).toUpperCase();
-        return !!keyState[kk];
-      }
-
-      default:
-        throw new Error("Unknown expr node: " + node.type);
+      case "PointProp": return `(${compileExpr(node.object, isAsync)}).${node.prop}`;
+      case "Dimension": return `(${compileExpr(node.expr, isAsync)}).length`;
+      case "ItemOf": return `rt.getItem(${compileExpr(node.list, isAsync)}, ${compileExpr(node.index, isAsync)})`;
+      case "KeyPressed": return `(!!env.keyState[String(${compileExpr(node.keyExpr, isAsync)}).toUpperCase()])`;
+      default: return "null";
     }
   }
 
-  // --- Statement executor ---
-  async function execBlock(block, scopeChain) {
-    for (const st of block.stmts) {
-      const r = await execStatement(st, scopeChain);
-      if (r && (r.__return || r === EXEC_STOP)) return r;
-    }
-    return null;
-  }
-
-  function defineRoutine(node) {
-    const nameUpper = node.name.toUpperCase();
-    const def = {
-      kind: node.kind,
-      name: node.name,
-      params: node.params,
-      body: node.body,
-      line: node.line
-    };
-    if (node.kind === "function") {
-      if (env.functions[nameUpper] || env.procedures[nameUpper]) fail("functionExists", node.name, node.line);
-      env.functions[nameUpper] = def;
-    } else {
-      if (env.procedures[nameUpper] || env.functions[nameUpper]) fail("functionExists", node.name, node.line);
-      env.procedures[nameUpper] = def;
-    }
-  }
-
-  function ensureListByName(scopeChain, listName, line) {
-    const v = lookupVariable(scopeChain, listName);
-    if (!Array.isArray(v)) fail("listOnlyOp", listName, line);
-    return v;
-  }
-
-  function getVarRef(scopeChain, varName, line) {
-    const res = resolveVariable(scopeChain, varName);
-    if (!res) fail("variableNotFound", varName, line);
-    if (res.__isAlias) return { scope: res.targetScope, name: res.targetName };
-    return { scope: res.scope, name: res.name };
-  }
-
-async function resolveMutableList(node, scopeChain) {
-      if (node.type === "Var") {
-          const res = resolveVariable(scopeChain, node.name);
-          if (!res) throw new Error(uiStrings[lang].variableNotFound(node.name));
-          
-          let target = res.__isAlias ? resolveVariable([res.targetScope], res.targetName) : res;
-          let v = target.value;
-          
-          if (!Array.isArray(v)) throw new Error(uiStrings[lang].notAList(node.name));
-          
-          // CoW: Se è condivisa, stacca una copia univoca e aggiorna lo scope PRIMA di mutare
-          if (v.__shared) {
-              v = ensureWritable(v);
-              target.scope[target.name] = v;
-          }
-          return v; 
-      }
-      if (node.type === "ItemOf") {
-          const parentList = await resolveMutableList(node.list, scopeChain);
-          const idxV = await evalExpr(node.index, scopeChain);
-          const idx = toInt(idxV);
-          const pos = idx - 1; 
-
-          if (!Number.isFinite(idx)) throw new Error(uiStrings[lang].invalidIndexVal(idxV));
-          if (pos < 0 || pos >= parentList.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-          
-          let target = parentList[pos];
-          if (!Array.isArray(target)) throw new Error(uiStrings[lang].itemNotAList(idx));
-          
-          // CoW per liste annidate
-          if (target.__shared) {
-              target = ensureWritable(target);
-              parentList[pos] = target;
-          }
-          return target;
-        }
-        throw new Error(uiStrings[lang].invalidAliasDest);
-  }
-
-  async function execStatement(st, scopeChain) {
-    if (env.__forceStop) return EXEC_STOP;
-    switch (st.type) {
-      case "GlobalDecl": {
-        const cur = scopeChain[scopeChain.length - 1];
-        cur.__globalVars ||= new Set();
-        st.names.forEach(n => cur.__globalVars.add(n.toUpperCase()));
-        return null;
-      }
-
-      case "Define":
-        defineRoutine(st);
-        return null;
-
-      case "Return": {
-        const value = st.expr ? await evalExpr(st.expr, scopeChain) : null;
-        return { __return: true, value: deepCopyValue(value) };
-      }
-
-      case "Stop": return EXEC_STOP;
-
-      case "ClearScreen":
-        clearScreen();
-        return null;
-
-      case "ClearGraphics":
-        env.gfxObjects = [];
-        snapPointsCache = null;
-        return null;
-
-      case "FrameGraphics":
-        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
-        if (env.gfxObjects && env.gfxObjects.length > 0) {
-          computeFitCamera(env.gfxObjects);
-          redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
-        }
-        return null;
-
-      case "Digits": {
-        const v = await evalExpr(st.prec, scopeChain);
-        const n = toInt(v);
-        env.precision = (Number.isFinite(n) && n >= 0) ? n : null;
-        return null;
-      }
-
-      case "ScientificThreshold": {
-        const v = await evalExpr(st.valExpr, scopeChain);
-        if (typeof v !== "number" || !Number.isFinite(v) || v < 0) {
-             fail("scientificPositive", null, st.line);
-        }
-        env.sciThreshold = v;
-        return null;
-      }
-
-      case "Newline":
-        outputArea.appendChild(document.createTextNode("\n"));
-        return null;
-
-      case "Output": {
-        const v = await evalExpr(st.expr, scopeChain);
-        appendText(v, env.precision); 
-        return null;
-      }
-
-      case "Wait": {
-        const v = await evalExpr(st.duration, scopeChain);
-        if (typeof v !== "number" || !Number.isFinite(v) || v < 0) fail("invalidWait", null, st.line);
-        await sleep(v);
-        return null;
-      }
-
-      case "Tick":
-        env.tickTime = performance.now();
-        return null;
-
-      case "Redraw":
-        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
-        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
-        return null;
-
-      case "Get": {
-        const p = await evalExpr(st.promptExpr, scopeChain);
-        if (typeof p !== "string") fail("getPromptNotText", null, st.line);
-        
-        const ans = window.prompt(p) ?? "";
-        const trimmed = ans.trim();
-        const num = Number(trimmed);
-        
-        const finalVal = (trimmed !== "" && !isNaN(num)) ? num : ans;
-        
-        assignVariable(scopeChain, st.varName, finalVal, st.varNameUpper);
-        return null;
-      }
-      case "SetColor": {
-        const v = await evalExpr(st.colorExpr, scopeChain);
-        // Uso la funzione helper già presente per validare (r,g,b) tra 0 e 100
-        env.currentColor = colorFromTuple(v, st.line);
-        return null;
-      }
-      case "SetPointProp": {
-        const target = await evalExpr(st.targetExpr, scopeChain);
-        if (!isPoint(target)) fail("pointOnlySet", null, st.line);
-        const val = await evalExpr(st.valueExpr, scopeChain);
-        if (typeof val !== "number" || !Number.isFinite(val)) fail("coordNotNumber", null, st.line);
-        if (st.prop === "x") target.x = val; else target.y = val;
-        return null;
-      }
-
-      case "PaintBackground":
-        env.backgroundImage = null;
-        env.backgroundColor = env.currentColor;
-        return null;
-
-      case "LoadBackground": {
-        const f = await evalExpr(st.filenameExpr, scopeChain);
-        if (typeof f !== "string") fail("backgroundFilenameNotText", null, st.line);
-        const sc = await evalExpr(st.scaleExpr, scopeChain);
-        if (typeof sc !== "number" || !Number.isFinite(sc) || sc <= 0) fail("backgroundScaleNotNumber", null, st.line);
-        const img = await loadImageFromUrl(f, st.line);
-        env.backgroundColor = null;
-        env.backgroundImage = { img, scale: sc };
-        return null;
-      }
-
-      // --- Lists ---
-      case "PutVar": {
-        if (st.aliasExpr) {
-           await evalExpr(st.aliasExpr, scopeChain);
-        }
-        
-        const v = await evalExpr(st.rhs, scopeChain);
-        
-        assignVariable(scopeChain, st.varName, v, st.varNameUpper);
-        return null;
-      }
-
-    case "PutItem": {
-        // 1. Calcola l'indice
-        const idxV = await evalExpr(st.idx, scopeChain);
-        const idx = toInt(idxV);
-        const pos = idx - 1; // 1-based
-
-        // 2. Calcola il valore da inserire
-        const v = await evalExpr(st.rhs, scopeChain);
-
-        try {
-            // 3. Risolvi la lista target (Supporta Alias e Liste annidate)
-            // Nota: st.listExpr è già un nodo espressione, lo passiamo direttamente
-            const lst = await resolveMutableList(st.listExpr, scopeChain);
-
-            // 4. Controlli di sicurezza
-            if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) {
-                throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-            }
-
-            // 5. Modifica diretta
-            lst[pos] = deepCopyValue(v);
-
-        } catch (e) {
-            fail("genericFail", { msg: e.message }, st.line);
-        }
-        return null;
-      }
-
-      case "Add": {
-        const v = await evalExpr(st.valueExpr, scopeChain);
-        
-        // Dobbiamo capire se st.listName è un nome o se dobbiamo gestire espressioni.
-        try {
-            let lst;
-            
-            // Se nel parser "Add" ha solo listName (codice originale):
-            // Creiamo un nodo Var per usare la funzione helper
-            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
-            
-            // Risolviamo (gestisce sia liste normali che alias hard)
-            lst = await resolveMutableList(mockNode, scopeChain);
-            
-            // Modifica diretta
-            lst.push(deepCopyValue(v));
-            
-        } catch (e) {
-             fail("genericFail", { msg: e.message }, st.line);
-        }
-        return null;
-      }
-
-    case "Insert": {
-        const v = await evalExpr(st.valueExpr, scopeChain);
-        const idxV = await evalExpr(st.idx, scopeChain);
-        const idx = toInt(idxV);
-        const pos = idx - 1;
-
-        try {
-            // Creiamo il "finto nodo" perché il parser qui ci dà solo il nome stringa
-            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
-            
-            // Risolviamo il riferimento
-            const lst = await resolveMutableList(mockNode, scopeChain);
-
-            if (!Number.isFinite(idx) || pos < 0 || pos > lst.length) {
-                 throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-            }
-
-            // Modifica diretta (splice)
-            lst.splice(pos, 0, deepCopyValue(v));
-
-        } catch (e) {
-            fail("genericFail", { msg: e.message }, st.line);
-        }
-        return null;
-      }
-
-    case "RemoveFirst": {
-        try {
-            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
-            const lst = await resolveMutableList(mockNode, scopeChain);
-
-            if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
-            
-            lst.shift(); // Rimuove il primo elemento dall'originale
-
-        } catch (e) {
-            // Se l'errore non è quello standard, lo rilanciamo
-            if (e.message !== "Execution stopped.") 
-                fail("genericFail", { msg: e.message }, st.line);
-        }
-        return null;
-      }
-
-    case "RemoveLast": {
-        try {
-            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
-            const lst = await resolveMutableList(mockNode, scopeChain);
-
-            if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
-            
-            lst.pop(); // Rimuove l'ultimo elemento dall'originale
-
-        } catch (e) {
-            if (e.message !== "Execution stopped.") 
-                fail("genericFail", { msg: e.message }, st.line);
-        }
-        return null;
-      }
-
-    case "RemoveAt": {
-        const idxV = await evalExpr(st.idx, scopeChain);
-        const idx = toInt(idxV);
-        const pos = idx - 1;
-
-        try {
-            const mockNode = { type: "Var", name: st.listName, nameUpper: st.listNameUpper };
-            const lst = await resolveMutableList(mockNode, scopeChain);
-
-            if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) {
-                throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-            }
-
-            lst.splice(pos, 1); // Rimuove elemento specifico
-
-        } catch (e) {
-            fail("genericFail", { msg: e.message }, st.line);
-        }
-        return null;
-      }
-
-      // --- Control flow ---
-      case "If": {
-        const c = await evalExpr(st.cond, scopeChain);
-        if (truthy(c)) return await execBlock(st.thenBlock, scopeChain);
-        for (const ei of st.elseIfs) {
-          const cc = await evalExpr(ei.cond, scopeChain);
-          if (truthy(cc)) return await execBlock(ei.block, scopeChain);
-        }
-        if (st.elseBlock) return await execBlock(st.elseBlock, scopeChain);
-        return null;
-      }
-
-      case "While": {
-        const loopScope = Object.create(null);
-        loopScope.__globalVars = new Set();
-        scopeChain.push(loopScope);
-
-        const _t0 = performance.now();
-        let _chk = 0;
-        let returnVal = null;
-        try {
-          while (true) {
-            const c = await evalExpr(st.cond, scopeChain);
-            if (!truthy(c)) break;
-            const r = await execBlock(st.block, scopeChain);
-            if (r && (r.__return || r === EXEC_STOP)) {
-              returnVal = r;
-              break;
-            }
-            if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
-          }
-        } finally {
-          scopeChain.pop();
-        }
-        return returnVal;
-      }
-
-      case "ForEach": {
-        const list = await evalExpr(st.listExpr, scopeChain);
-        if (!Array.isArray(list)) fail("loopNotList", "<expr>", st.line);
-
-        const loopScope = Object.create(null);
-        loopScope.__globalVars = new Set();
-        
-        scopeChain.push(loopScope); // Push
-
-        const _t0 = performance.now();
-        let _chk = 0;
-        let returnVal = null;
-        try {
-          for (const item of list) {
-            assignVariable(scopeChain, st.varName, deepCopyValue(item));
-            const r = await execBlock(st.block, scopeChain);
-            if (r && (r.__return || r === EXEC_STOP)) {
-                returnVal = r;
-                break;
-            }
-            if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
-          }
-        } finally {
-          scopeChain.pop(); // Pop
-        }
-        return returnVal;
-      }
-
-      case "ForRange": {
-        const startV = await evalExpr(st.startExpr, scopeChain);
-        const endV   = await evalExpr(st.endExpr, scopeChain);
-        const a = toInt(startV);
-        const b = toInt(endV);
-
-        if (!Number.isFinite(a) || !Number.isFinite(b)) fail("shapeParamsNotNumeric", "for", st.line);
-
-        const step = (a <= b) ? 1 : -1;
-
-        const loopScope = Object.create(null);
-        loopScope.__globalVars = new Set();
-        
-        scopeChain.push(loopScope); 
-
-          const _t0 = performance.now();
-          let _chk = 0;
-          let returnVal = null;
-          try {
-            for (let i = a; (step > 0) ? (i <= b) : (i >= b); i += step) {
-              assignVariable(scopeChain, st.varName, i);
-              const r = await execBlock(st.block, scopeChain);
-              if (r && (r.__return || r === EXEC_STOP)) {
-                  returnVal = r;
-                  break;
-              }
-              if ((++_chk & 1023) === 0 && performance.now() - _t0 > MAX_LOOP_MS) fail("infiniteLoop", null, st.line);
-            }
-          } finally {
-            scopeChain.pop(); // Pulisco scope a fine loop
-          }
-        return returnVal;
-      }
-
-      // --- Graphics primitives ---
-      case "Circle": {
-        const r = await evalExpr(st.r, scopeChain);
-        if (typeof r !== "number" || !Number.isFinite(r)) fail("shapeParamsNotNumeric", "circle", st.line);
-        const pos = await evalExpr(st.pos, scopeChain);
-        const { x, y } = coordFromValue(pos, st.line, "");
-        addGraphicObject({ type: "circle", x, y, r, color: env.currentColor });
-        return null;
-      }
-
-      case "Circumference": {
-        const r = await evalExpr(st.r, scopeChain);
-        const th = await evalExpr(st.th, scopeChain);
-        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v))) fail("shapeParamsNotNumeric", "circumference", st.line);
-        const pos = await evalExpr(st.pos, scopeChain);
-        const { x, y } = coordFromValue(pos, st.line, "");
-        addGraphicObject({ type: "circumference", x, y, r, t: th, color: env.currentColor });
-        return null;
-      }
-
-      case "Rectangle": {
-        const p1v = await evalExpr(st.p1, scopeChain);
-        const p2v = await evalExpr(st.p2, scopeChain);
-        const p1 = coordFromValue(p1v, st.line, "");
-        const p2 = coordFromValue(p2v, st.line, "");
-        const x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
-        addGraphicObject({
-          type: "rectangle",
-          v1: { x: x1, y: y1 },
-          v2: { x: x2, y: y1 },
-          v3: { x: x2, y: y2 },
-          v4: { x: x1, y: y2 },
-          color: env.currentColor
+  function compileStmt(node, indent = "", isAsync = false) {
+    let code = `${indent}__line = ${node.line};\n`;
+    code += `${indent}if (env.__forceStop) return { type: "ExecutionStop" };\n`;
+    
+    switch (node.type) {
+      case "GlobalDecl":
+        code += `${indent}sc[sc.length - 1].__globalVars ||= new Set();\n`;
+        node.names.forEach(n => { code += `${indent}sc[sc.length - 1].__globalVars.add("${n.toUpperCase()}");\n`; });
+        break;
+      case "Define": {
+        const fnAsync = true;
+        const fnName = node.name.toUpperCase();
+        const fnKey = node.kind === "function" ? "functions" : "procedures";
+        code += `${indent}env.${fnKey}["${fnName}"] = async function(rt, env, scChain, args, _callerSc) {\n`;
+        code += `${indent}  if (env.callDepth >= 200) throw new Error("RECURSION_LIMIT");\n`;
+        code += `${indent}  env.callDepth++;\n`;
+        code += `${indent}  try {\n`;
+        code += `${indent}    const localScope = rt.makeScope(); const sc = [...scChain, localScope];\n`;
+        code += `${indent}    if (args.length !== ${node.params.length}) throw new Error("ARG_COUNT:${node.name}:${node.params.length}:" + args.length + ":${node.kind === "procedure" ? "proc" : "func"}");\n`;
+        node.params.forEach((p, i) => {
+            code += `${indent}    if (${p.inout} && args[${i}].isVar) {\n`;
+            code += `${indent}       const res = rt.resolveVar(_callerSc || scChain, args[${i}].name);\n`;
+            code += `${indent}       if (res) { localScope["${p.name.toUpperCase()}"] = { __isAlias: true, targetScope: res.__isAlias ? res.targetScope : res.scope, targetName: res.__isAlias ? res.targetName : res.name }; }\n`;
+            code += `${indent}       else { localScope["${p.name.toUpperCase()}"] = rt.deepCopy(args[${i}].val); }\n`;
+            code += `${indent}    } else { localScope["${p.name.toUpperCase()}"] = rt.deepCopy(args[${i}].val); }\n`;
         });
-        return null;
+        code += compileBlock(node.body, indent + "    ", true);
+        if (node.kind === "function") { code += `${indent}    throw new Error("FUNC_NO_RETURN:${node.name}");\n`; }
+        code += `${indent}  } finally { env.callDepth--; }\n`;
+        code += `${indent}};\n`;
+        break;
       }
-
-      case "Line": {
-        const th = await evalExpr(st.th, scopeChain);
-        if (typeof th !== "number" || !Number.isFinite(th)) fail("shapeParamsNotNumeric", "line", st.line);
-        const p1v = await evalExpr(st.p1, scopeChain);
-        const p2v = await evalExpr(st.p2, scopeChain);
-        const p1 = coordFromValue(p1v, st.line, "");
-        const p2 = coordFromValue(p2v, st.line, "");
-        addGraphicObject({
-          type: "line",
-          x1: p1.x, y1: p1.y,
-          x2: p2.x, y2: p2.y,
-          t: th,
-          color: env.currentColor
-        });
-        return null;
-      }
-
-      case "Triangle": {
-        // Valuta le tre espressioni separate
-        const v1 = await evalExpr(st.p1, scopeChain);
-        const v2 = await evalExpr(st.p2, scopeChain);
-        const v3 = await evalExpr(st.p3, scopeChain);
-
-        // Converte i risultati in coordinate
-        const p1 = coordFromValue(v1, st.line, "vertice 1");
-        const p2 = coordFromValue(v2, st.line, "vertice 2");
-        const p3 = coordFromValue(v3, st.line, "vertice 3");
-
-        addGraphicObject({ type: "triangle", v1: p1, v2: p2, v3: p3, color: env.currentColor });
-        return null;
-      }
-
-      case "Arc": {
-        const r = await evalExpr(st.r, scopeChain);
-        const th = await evalExpr(st.th, scopeChain);
-        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v) && v > 0)) fail("arcRadiusThicknessPositive", null, st.line);
-        const p1v = await evalExpr(st.p1, scopeChain);
-        const p2v = await evalExpr(st.p2, scopeChain);
-        const p1 = coordFromValue(p1v, st.line, "");
-        const p2 = coordFromValue(p2v, st.line, "");
-        addGraphicObject({ type:"arc", r, t: th, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, color: env.currentColor });
-        return null;
-      }
-
-      case "Graffiti": {
-        const size = await evalExpr(st.sizeExpr, scopeChain);
-        if (typeof size !== "number" || !Number.isFinite(size) || size <= 0) fail("graffitiSizeNotNumber", null, st.line);
-        const posV = await evalExpr(st.posExpr, scopeChain);
-        const { x, y } = coordFromValue(posV, st.line, "");
-        const content = await evalExpr(st.contentExpr, scopeChain);
-        if (typeof content !== "string") fail("graffitiContentNotString", null, st.line);
-
-        // approximate text bounds
-        const w = Math.max(10, size * 0.62 * content.length);
-        const h = Math.max(10, size * 1.2);
-
-        env.gfxObjects.push({
-          type: "text",
-          x: x - w/2, y: y - h/2,
-          width: w, height: h,
-          rotation: 0,
-          size,
-          content,
-          color: env.currentColor
-        });
-        return null;
-      }
-
-      // --- Label & import/draw ---
-      case "Label": {
-        const nameU = st.name.toUpperCase();
-        if (env.labels[nameU] || env.imports[nameU]) fail("labelExists", st.name, st.line);
-
-        const localObjects = [];
-        const savedObjects = env.gfxObjects;
-        env.gfxObjects = localObjects;
-
-        // Execute label body in its own local scope (can use globals)
-        const labelScope = Object.create(null);
-        labelScope.__globalVars = new Set();
-        const chain = scopeChain.concat([labelScope]);
-
-        const r = await execBlock(st.body, chain);
-
-        env.gfxObjects = savedObjects;
-        if (r === EXEC_STOP) return EXEC_STOP;
-        if (r && r.__return) return r;
-
-        env.labels[nameU] = { objects: localObjects.map(deepCopyValue), scale: 1, rotation: 0 };
-        return null;
-      }
-
-      case "Include": {
-        const filename = await evalExpr(st.fileExpr, scopeChain);
-        if (typeof filename !== "string") {
-          const msg = isLanguageIT 
-            ? "Il nome del file da importare deve essere un testo." 
-            : "The file name to import must be a text string.";
-          fail("genericFail", { msg: msg }, st.line);
+      case "Return": code += `${indent}return { __return: true, value: rt.deepCopy(${node.expr ? compileExpr(node.expr, isAsync) : "null"}) };\n`; break;
+      case "Stop": code += `${indent}return { type: "ExecutionStop" };\n`; break;
+      case "ClearScreen": code += `${indent}rt.clearScreen();\n`; break;
+      case "ClearGraphics": code += `${indent}rt.clearGfx();\n`; break;
+      case "FrameGraphics": code += `${indent}rt.frameGfx();\n`; break;
+      case "PaintBackground": code += `${indent}rt.paintBg();\n`; break;
+      case "Digits": code += `${indent}env.precision = rt.getPrecision(${compileExpr(node.prec, isAsync)});\n`; break;
+      case "ScientificThreshold": code += `${indent}rt.setSciThreshold(${compileExpr(node.valExpr, isAsync)});\n`; break;
+      case "Newline": code += `${indent}rt.write("\\n");\n`; break;
+      case "Output": code += `${indent}rt.write(${compileExpr(node.expr, isAsync)});\n`; break;
+      case "Wait": code += `${indent}await rt.wait(${compileExpr(node.duration, isAsync)});\n`; break;
+      case "Tick": code += `${indent}env.tickTime = performance.now();\n`; break;
+      case "Redraw": code += `${indent}rt.redraw();\n`; break;
+      case "Get": code += `${indent}rt.prompt(${compileExpr(node.promptExpr, isAsync)}, "${node.varName}", "${node.varNameUpper}", sc);\n`; break;
+      case "SetColor": code += `${indent}env.currentColor = rt.colorFromTuple(${compileExpr(node.colorExpr, isAsync)});\n`; break;
+      
+      case "SetPointProp":
+        if (node.targetExpr.type === "ItemOf" && node.targetExpr.__lvalue) {
+          code += `${indent}{\n`;
+          code += `${indent}  const __lst = ${compileExpr(node.targetExpr.list, isAsync)};\n`;
+          code += `${indent}  const __idx = rt.toInt(${compileExpr(node.targetExpr.index, isAsync)}) - 1;\n`;
+          code += `${indent}  if (__idx < 0 || __idx >= __lst.length) throw new Error("INDEX_OUT_OF_BOUNDS:" + (__idx+1));\n`;
+          code += `${indent}  const __pt = __lst[__idx];\n`;
+          code += `${indent}  rt.setPointProp(__pt, "${node.prop}", ${compileExpr(node.valueExpr, isAsync)});\n`;
+          code += `${indent}}\n`;
+        } else {
+          code += `${indent}rt.setPointProp(${compileExpr(node.targetExpr, isAsync)}, "${node.prop}", ${compileExpr(node.valueExpr, isAsync)});\n`;
         }
-
-        // Se il file è già stato importato, salta per evitare loop infiniti
-        if (env.importedFiles.has(filename)) return null; 
-        env.importedFiles.add(filename);
-
-        let code = "";
-        try {
-          // Usa fetch per leggere il file dalla stessa cartella
-          const response = await fetch(filename);
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          code = await response.text();
-        } catch (err) {
-          const msg = isLanguageIT 
-            ? `Impossibile leggere il file '${filename}'. Usa un server locale (es. Live Server). Errore: ${err.message}` 
-            : `Cannot read file '${filename}'. Please use a local server (e.g., Live Server). Error: ${err.message}`;
-          fail("genericFail", { msg: msg }, st.line);
-        }
-
-        // Analizza il codice importato
-        let ast;
-        try {
-          const lexer = new Lexer(code);
-          const tokens = lexer.lexAll();
-          const parser = new Parser(tokens);
-          ast = parser.parseProgram();
-        } catch (e) {
-          if (e && e.type === "ParseError") {
-            const msg = isLanguageIT
-              ? `Errore di sintassi in '${filename}' alla riga ${e.line + 1}: ${e.message}`
-              : `Syntax error in '${filename}' on line ${e.line + 1}: ${e.message}`;
-            fail("genericFail", { msg: msg }, st.line);
-          } else {
-            const msg = isLanguageIT
-              ? `Errore di analisi nel file '${filename}'`
-              : `Parsing error in file '${filename}'`;
-            fail("genericFail", { msg: msg }, st.line);
-          }
-        }
-
-        // Esegue il codice della libreria nello STESSO ambiente (scopeChain) del chiamante
-        for (const stmt of ast.stmts) {
-          const r = await execStatement(stmt, scopeChain);
-          if (r === EXEC_STOP) return EXEC_STOP;
-          if (r && r.__return) return r;
-        }
-        return null;
-      }
-
-      case "Import": {
-        const nameU = st.name.toUpperCase();
-        if (env.labels[nameU] || env.imports[nameU]) fail("labelExists", st.name, st.line);
-
-        const f = await evalExpr(st.fileExpr, scopeChain);
-        if (typeof f !== "string") fail("backgroundFilenameNotText", null, st.line);
-        const img = await loadImageFromUrl(f, st.line);
-        env.imports[nameU] = {
-          img,
-          scale: 1,
-          rotation: 0,
-          width: img.naturalWidth,
-          height: img.naturalHeight
-        };
-        return null;
-      }
-
-      case "Scale": {
-        const nameU = st.name.toUpperCase();
-        const factor = await evalExpr(st.factorExpr, scopeChain);
-        if (typeof factor !== "number" || !Number.isFinite(factor) || factor <= 0) fail("scaleNotNumber", null, st.line);
-
-        if (env.labels[nameU]) env.labels[nameU].scale *= factor;
-        else if (env.imports[nameU]) env.imports[nameU].scale *= factor;
-        else fail("labelNotFound", st.name, st.line);
-        snapPointsCache = null;
-        return null;
-      }
-
-      case "Draw": {
-        const nameU = st.name.toUpperCase();
-        const posV = await evalExpr(st.posExpr, scopeChain);
-        const pos = coordFromValue(posV, st.line, "");
-
-        const defL = env.labels[nameU];
-        const defI = env.imports[nameU];
-
-        if (!defL && !defI) fail("labelNotFound", st.name, st.line);
-
-        if (defI) {
-          const w = defI.width * defI.scale;
-          const h = defI.height * defI.scale;
-          env.gfxObjects.push({
-            type: "image",
-            img: defI.img,
-            x: pos.x - w/2,
-            y: pos.y - h/2,
-            width: w,
-            height: h,
-            rotation: defI.rotation
+        break;
+      
+      case "LoadBackground": code += `${indent}await rt.loadBg(${compileExpr(node.filenameExpr, isAsync)}, ${compileExpr(node.scaleExpr, isAsync)});\n`; break;
+      case "PutVar":
+        if (node.aliasExpr) {
+          const p = extractListPath(node.aliasExpr, isAsync);
+          code += `${indent}rt.makeAliasPath(sc, "${node.varNameUpper}", "${p.nameUpper}", [${p.path.join(", ")}]);\n`;
+        } else if (node.targets && node.targets.length > 1) {
+          code += `${indent}{ const __putRhs = ${compileExpr(node.rhs, isAsync)};\n`;
+          node.targets.forEach((tgt) => {
+            code += `${indent}  rt.setVar(sc, "${tgt.varNameUpper}", rt.maybeCopy(__putRhs));\n`;
           });
-          return null;
+          code += `${indent}}\n`;
+
+        } else {
+          code += `${indent}rt.setVar(sc, "${node.varNameUpper}", rt.maybeCopy(${compileExpr(node.rhs, isAsync)}));\n`;
         }
+        break;
 
-        // label
-        const c = Math.cos(defL.rotation), s = Math.sin(defL.rotation);
-        const sc = defL.scale;
-
-        const transformPoint = (x,y) => ({
-          x: pos.x + (x*sc*c - y*sc*s),
-          y: pos.y + (x*sc*s + y*sc*c)
-        });
-
-        for (const o of defL.objects) {
-          const obj = deepCopyValue(o);
-          if (obj.type === "circle" || obj.type === "circumference") {
-            const p = transformPoint(obj.x, obj.y);
-            obj.x = p.x; obj.y = p.y;
-            obj.r *= sc;
-            if (obj.t) obj.t *= sc;
-          } else if (obj.type === "line") {
-            const p1 = transformPoint(obj.x1, obj.y1);
-            const p2 = transformPoint(obj.x2, obj.y2);
-            obj.x1 = p1.x; obj.y1 = p1.y;
-            obj.x2 = p2.x; obj.y2 = p2.y;
-            obj.t *= sc;
-          } else if (obj.type === "rectangle") {
-            obj.v1 = transformPoint(obj.v1.x, obj.v1.y);
-            obj.v2 = transformPoint(obj.v2.x, obj.v2.y);
-            obj.v3 = transformPoint(obj.v3.x, obj.v3.y);
-            obj.v4 = transformPoint(obj.v4.x, obj.v4.y);
-          } else if (obj.type === "triangle") {
-            obj.v1 = transformPoint(obj.v1.x, obj.v1.y);
-            obj.v2 = transformPoint(obj.v2.x, obj.v2.y);
-            obj.v3 = transformPoint(obj.v3.x, obj.v3.y);
-          } else if (obj.type === "arc") {
-            const p1 = transformPoint(obj.x1, obj.y1);
-            const p2 = transformPoint(obj.x2, obj.y2);
-            obj.x1=p1.x; obj.y1=p1.y;
-            obj.x2=p2.x; obj.y2=p2.y;
-            obj.r *= sc;
-            obj.t *= sc;
-          } else if (obj.type === "text") {
-            const centerX = obj.x + obj.width/2;
-            const centerY = obj.y + obj.height/2;
-            const pc = transformPoint(centerX, centerY);
-            obj.size *= sc;
-            obj.width *= sc;
-            obj.height *= sc;
-            obj.x = pc.x - obj.width/2;
-            obj.y = pc.y - obj.height/2;
-            obj.rotation = (obj.rotation || 0) + defL.rotation;
-          }
-          env.gfxObjects.push(obj);
-        }
-        return null;
+      case "PutItem": {
+        const p = extractListPath(node.listExpr, isAsync);
+        code += `${indent}rt.putItem(sc, "${p.nameUpper}", [${p.path.join(", ")}], ${compileExpr(node.idx, isAsync)}, ${compileExpr(node.rhs, isAsync)});\n`;
+        break;
       }
-
-      case "RotatePlace": {
-        const nameU = st.name.toUpperCase();
-        const angle = await evalExpr(st.angleExpr, scopeChain);
-        if (typeof angle !== "number" || !Number.isFinite(angle)) fail("rotationNotNumber", null, st.line);
-        const posV = await evalExpr(st.posExpr, scopeChain);
-        const pos = coordFromValue(posV, st.line, "");
-
-        const rad = angle * Math.PI / 180;
-
-        if (env.imports[nameU]) {
-          const def = env.imports[nameU];
-          const w = def.width * def.scale;
-          const h = def.height * def.scale;
-          env.gfxObjects.push({
-            type: "image",
-            img: def.img,
-            x: pos.x - w/2,
-            y: pos.y - h/2,
-            width: w,
-            height: h,
-            rotation: rad
-          });
-          return null;
+      case "Add": code += `${indent}rt.listAdd(sc, "${node.listNameUpper}", [], ${compileExpr(node.valueExpr, isAsync)});\n`; break;
+      case "Insert": code += `${indent}rt.listInsert(sc, "${node.listNameUpper}", [], ${compileExpr(node.idx, isAsync)}, ${compileExpr(node.valueExpr, isAsync)});\n`; break;
+      case "RemoveFirst": code += `${indent}rt.listRemoveFirst(sc, "${node.listNameUpper}", []);\n`; break;
+      case "RemoveLast": code += `${indent}rt.listRemoveLast(sc, "${node.listNameUpper}", []);\n`; break;
+      case "RemoveAt": code += `${indent}rt.listRemoveAt(sc, "${node.listNameUpper}", [], ${compileExpr(node.idx, isAsync)});\n`; break;
+      case "If":
+        code += `${indent}if (rt.t(${compileExpr(node.cond, isAsync)})) {\n${compileBlock(node.thenBlock, indent + "  ", isAsync)}${indent}}\n`;
+        for (const ei of node.elseIfs) {
+          code += `${indent}else if (rt.t(${compileExpr(ei.cond, isAsync)})) {\n${compileBlock(ei.block, indent + "  ", isAsync)}${indent}}\n`;
         }
 
-        if (env.labels[nameU]) {
-          const def = env.labels[nameU];
-          const prevRot = def.rotation;
-          def.rotation = rad;
-          const drawStmt = { type:"Draw", name: st.name, posExpr: st.posExpr, line: st.line };
-          const r = await execStatement(drawStmt, scopeChain);
-          def.rotation = prevRot;
-          snapPointsCache = null;
-          return r;
+        if (node.elseBlock) { code += `${indent}else {\n${compileBlock(node.elseBlock, indent + "  ", isAsync)}${indent}}\n`; }
+        break;
+      case "While":
+        code += `${indent}{\n${indent}  const __loopScope = rt.makeScope(); sc.push(__loopScope);\n${indent}  try {\n${indent}    while (true) {\n`;
+        code += `${indent}      __line = ${node.line};\n${indent}      if (env.__forceStop) return { type: "ExecutionStop" };\n`;
+        code += `${indent}      if (!rt.t(${compileExpr(node.cond, isAsync)})) break;\n`;
+        code += compileBlock(node.block, indent + "      ", isAsync);
+        if (isAsync) {
+          code += `${indent}      if ((++__chk & 255) === 0) { const now = performance.now(); if (now - __lastYield > 14) { await new Promise(r => { __yieldMC.port1.onmessage = r; __yieldMC.port2.postMessage(null); }); __lastYield = performance.now(); } if (now - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop"); }\n`;
+        } else {
+          code += `${indent}      if ((++__chk & 1023) === 0 && performance.now() - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop");\n`;
         }
-
-        fail("labelNotFound", st.name, st.line);
-      }
-
-      // --- Alias ---
-      case "Alias": {
-        const aU = st.aliasName.toUpperCase();
-        
-        // CASO 1: Alias su Variabile Semplice
-        if (st.targetName) { 
-           const target = resolveVariable(scopeChain, st.targetName);
-           if (!target) fail("variableNotFound", st.targetName, st.line);
-
-           let targetScope, targetName;
-           if (target.__isAlias) { targetScope = target.targetScope; targetName = target.targetName; }
-           else { targetScope = target.scope; targetName = target.name; }
-
-           scopeChain[scopeChain.length - 1][aU] = { __isAlias: true, targetScope, targetName };
-           return null;
+        code += `${indent}    }\n${indent}  } finally { sc.pop(); }\n${indent}}\n`;
+        break;
+      case "ForEach":
+        code += `${indent}{\n${indent}  const __list = ${compileExpr(node.listExpr, isAsync)};\n${indent}  if (!Array.isArray(__list)) throw new Error("LOOP_NOT_LIST");\n`;
+        code += `${indent}  const __loopScope = rt.makeScope(); sc.push(__loopScope);\n${indent}  try {\n${indent}    for (const __item of __list) {\n`;
+        code += `${indent}      __line = ${node.line};\n${indent}      if (env.__forceStop) return { type: "ExecutionStop" };\n`;
+        code += `${indent}      rt.setVar(sc, "${node.varName.toUpperCase()}", rt.maybeCopy(__item));\n`;
+        code += compileBlock(node.block, indent + "      ", isAsync);
+        if (isAsync) {
+          code += `${indent}      if ((++__chk & 255) === 0) { const now = performance.now(); if (now - __lastYield > 14) { await new Promise(r => { __yieldMC.port1.onmessage = r; __yieldMC.port2.postMessage(null); }); __lastYield = performance.now(); } if (now - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop"); }\n`;
+        } else {
+          code += `${indent}      if ((++__chk & 1023) === 0 && performance.now() - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop");\n`;
         }
-
-        // --- CASO 2: Alias su Espressione (Elemento di Lista) ---
-        
-        try {
-            // Ottieni il "Puntatore" alla lista reale usando la nuova helper
-            const refToList = await resolveMutableList(st.targetExpr, scopeChain);
-            
-            // Salviamo nello scope corrente un "Riferimento diretto" (Hard Reference)
-            const currentScope = scopeChain[scopeChain.length - 1];
-            
-            // Usiamo un oggetto speciale riconoscibile da lookupVariable
-            currentScope[aU] = { 
-                __isHardRef: true, 
-                value: refToList   // Riferimento JS originale
-            };
-            
-        } catch (e) {
-            fail("genericFail", {msg: uiStrings[lang].aliasCreateFail(e.message)}, st.line);
+        code += `${indent}    }\n${indent}  } finally { sc.pop(); }\n${indent}}\n`;
+        break;
+      case "ForRange":
+        code += `${indent}{\n${indent}  const __start = rt.toInt(${compileExpr(node.startExpr, isAsync)});\n${indent}  const __end = rt.toInt(${compileExpr(node.endExpr, isAsync)});\n`;
+        code += `${indent}  if (!Number.isFinite(__start) || !Number.isFinite(__end)) throw new Error("FOR_NOT_NUMERIC");\n`;
+        code += `${indent}  const __step = (__start <= __end) ? 1 : -1;\n`;
+        code += `${indent}  const __loopScope = rt.makeScope(); sc.push(__loopScope);\n${indent}  try {\n`;
+        code += `${indent}    for (let __i = __start; (__step > 0) ? (__i <= __end) : (__i >= __end); __i += __step) {\n`;
+        code += `${indent}      __line = ${node.line};\n${indent}      if (env.__forceStop) return { type: "ExecutionStop" };\n`;
+        code += `${indent}      rt.setVar(sc, "${node.varName.toUpperCase()}", __i);\n`;
+        code += compileBlock(node.block, indent + "      ", isAsync);
+        if (isAsync) {
+          code += `${indent}      if ((++__chk & 255) === 0) { const now = performance.now(); if (now - __lastYield > 14) { await new Promise(r => { __yieldMC.port1.onmessage = r; __yieldMC.port2.postMessage(null); }); __lastYield = performance.now(); } if (now - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop"); }\n`;
+        } else {
+          code += `${indent}      if ((++__chk & 1023) === 0 && performance.now() - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop");\n`;
         }
-        return null;
-      }
+        code += `${indent}    }\n${indent}  } finally { sc.pop(); }\n${indent}}\n`;
+        break;
+      case "Circle": code += `${indent}rt.addGfx({type: "circle", r: ${compileExpr(node.r, isAsync)}, ...rt.coordFromValue(${compileExpr(node.pos, isAsync)}), color: env.currentColor});\n`; break;
+      case "Circumference": code += `${indent}rt.addGfx({type: "circumference", r: ${compileExpr(node.r, isAsync)}, t: ${compileExpr(node.th, isAsync)}, ...rt.coordFromValue(${compileExpr(node.pos, isAsync)}), color: env.currentColor});\n`; break;
+      case "Rectangle": code += `${indent}rt.drawRect(${compileExpr(node.p1, isAsync)}, ${compileExpr(node.p2, isAsync)});\n`; break;
+      case "Line": code += `${indent}rt.drawLine(${compileExpr(node.th, isAsync)}, ${compileExpr(node.p1, isAsync)}, ${compileExpr(node.p2, isAsync)});\n`; break;
+      case "Triangle": code += `${indent}rt.drawTri(${compileExpr(node.p1, isAsync)}, ${compileExpr(node.p2, isAsync)}, ${compileExpr(node.p3, isAsync)});\n`; break;
+      case "Arc": code += `${indent}rt.drawArc(${compileExpr(node.r, isAsync)}, ${compileExpr(node.th, isAsync)}, ${compileExpr(node.p1, isAsync)}, ${compileExpr(node.p2, isAsync)});\n`; break;
+      case "Graffiti": code += `${indent}rt.drawGraffiti(${compileExpr(node.sizeExpr, isAsync)}, ${compileExpr(node.posExpr, isAsync)}, ${compileExpr(node.contentExpr, isAsync)});\n`; break;
+      case "Label":
+        code += `${indent}rt.startLabel("${node.name.toUpperCase()}");\n${indent}{\n${indent}  const __labelScope = rt.makeScope(); sc.push(__labelScope);\n${indent}  try {\n`;
+        code += compileBlock(node.body, indent + "    ", isAsync);
+        code += `${indent}  } finally { sc.pop(); }\n${indent}}\n${indent}rt.endLabel("${node.name.toUpperCase()}");\n`;
+        break;
+      case "Import": code += `${indent}await rt.importObj("${node.name.toUpperCase()}", ${compileExpr(node.fileExpr, isAsync)});\n`; break;
+      case "Include": code += `${indent}await rt.includeMod(${compileExpr(node.fileExpr, isAsync)}, sc);\n`; break;
+      case "Scale": code += `${indent}rt.scaleObj("${node.name.toUpperCase()}", ${compileExpr(node.factorExpr, isAsync)});\n`; break;
+      case "Draw": code += `${indent}rt.drawObj("${node.name.toUpperCase()}", ${compileExpr(node.posExpr, isAsync)});\n`; break;
+      case "RotatePlace": code += `${indent}await rt.rotatePlaceObj("${node.name.toUpperCase()}", "${node.name}", ${compileExpr(node.angleExpr, isAsync)}, ${compileExpr(node.posExpr, isAsync)}, sc);\n`; break;
+      case "Alias":
+        if (node.targetName) code += `${indent}rt.makeAliasSimple(sc, "${node.aliasName.toUpperCase()}", "${node.targetName.toUpperCase()}");\n`;
+        else { const p = extractListPath(node.targetExpr, isAsync); code += `${indent}rt.makeAliasPath(sc, "${node.aliasName.toUpperCase()}", "${p.nameUpper}", [${p.path.join(", ")}]);\n`; }
+        break;
 
-      // --- Procedure calls ---
       case "ProcCall": {
-        const nameLower = st.name.toLowerCase();
-
-        if (nameLower === "tock" && st.args.length === 0) {
-          const v = builtin_tock([], st.line);
-          appendLine(v, false, env.precision);
-          return null;
-        }
-
-        if (BUILTINS[nameLower]) {
-          const args = [];
-          for (const a of st.args) args.push(await evalExpr(a, scopeChain));
-          BUILTINS[nameLower](args, st.line);
-          return null;
-        }
-
-        const def = env.procedures[st.name.toUpperCase()];
-        if (!def) fail("unknownCommand", st.name, st.line);
-
-        const args = [];
-        for (const a of st.args) args.push(await evalExpr(a, scopeChain));
-        
-        return await callUserRoutine(def, args, st.args, scopeChain, false, st.line);
+        const callCode = `rt.${isAsync ? "callUserProcAsync" : "callUserProcSync"}("${node.name.toUpperCase()}", "${node.name}", [${node.args.map(a => `{val: ${compileExpr(a, isAsync)}, isVar: ${a.type === "Var"}, name: "${a.name || ""}"}`).join(", ")}], sc)`;
+        code += `${indent}{ const __resProc = ${isAsync ? "await " : ""}${callCode};\n`;
+        code += `${indent}  if (__resProc && (__resProc.__return || __resProc.type === "ExecutionStop")) return __resProc; }\n`;
+        break;
       }
-
-      default:
-        throw new Error("Unknown statement: " + st.type);
     }
+    return code;
   }
 
-  async function callUserRoutine(def, argValues, argNodes, callerScopeChain, wantReturn, callLine) {
-    if (env.callDepth >= MAX_CALL_DEPTH) fail("recursionLimit", null, callLine);
-    env.callDepth++;
+  function compileBlock(block, indent = "", isAsync = false) {
+    let code = "";
+    for (const st of block.stmts) { code += compileStmt(st, indent, isAsync); }
+    return code;
+  }
 
-    try {
-      const localScope = Object.create(null);
-      localScope.__globalVars = new Set();
-      const scopeChain = [callerScopeChain[0], localScope]; 
-
-      const expected = def.params.length;
-      const got = argValues.length;
-      if (got !== expected) {
-        if (def.kind === "procedure") fail("procArgCount", { name: def.name, expected, got }, callLine);
-        else fail("funcArgCount", { name: def.name, expected, got }, callLine);
+  function compileProgram(ast) {
+    const isAsync = true;
+    let code = `
+      let __line = 0; let __chk = 0;
+      const __t0 = performance.now(); let __lastYield = __t0;
+      try {
+    `;
+    code += compileBlock(ast, "        ", isAsync);
+    code += `
+      } catch(e) {
+         if (e && e.message === "Execution stopped.") return;
+         const msg = (e && e.message) ? String(e.message) : String(e);
+         if (msg.startsWith("VAR_NOT_FOUND:")) rt.fail("variableNotFound", msg.split(":")[1], __line);
+         else if (msg.startsWith("NOT_A_LIST:")) rt.fail("notAList", msg.split(":")[1], __line);
+         else if (msg.startsWith("UNKNOWN_FUNC:")) rt.fail("unknownFunction", msg.split(":")[1], __line);
+         else if (msg.startsWith("UNKNOWN_CMD:")) rt.fail("unknownCommand", msg.split(":")[1], __line);
+         else if (msg.startsWith("ARG_COUNT:")) { const pts = msg.split(":"); rt.fail(pts[3] === "proc" ? "procArgCount" : "funcArgCount", {name: pts[1], expected: pts[2], got: pts[4]}, __line); }
+         else if (msg.startsWith("FUNC_NO_RETURN:")) rt.fail("funcNoReturn", msg.split(":")[1], __line);
+         else if (msg === "RECURSION_LIMIT") rt.fail("recursionLimit", null, __line);
+         else if (msg === "LOOP_NOT_LIST") rt.fail("loopNotList", "<expr>", __line);
+         else if (msg === "FOR_NOT_NUMERIC") rt.fail("shapeParamsNotNumeric", "for", __line);
+         else if (msg.startsWith("INDEX_OUT_OF_BOUNDS:")) rt.fail("indexOutOfBounds", msg.split(":")[1] || "?", __line);
+         else if (msg === "REMOVE_EMPTY") rt.fail("cannotRemoveFromEmpty", null, __line);
+         else if (msg === "ITEM_NOT_A_LIST") rt.fail("itemNotAList", "?", __line);
+         else if (msg.startsWith("LABEL_EXISTS:")) rt.fail("labelExists", msg.split(":")[1], __line);
+         else if (msg.startsWith("LABEL_NOT_FOUND:")) rt.fail("labelNotFound", msg.split(":")[1], __line);
+         else if (msg === "SCALE_NOT_NUMBER") rt.fail("scaleNotNumber", null, __line);
+         else if (msg === "ROTATION_NOT_NUMBER") rt.fail("rotationNotNumber", null, __line);
+         else if (msg === "BG_FILE_NOT_TEXT") rt.fail("backgroundFilenameNotText", null, __line);
+         else if (msg === "BG_SCALE_NOT_NUMBER") rt.fail("backgroundScaleNotNumber", null, __line);
+         else if (msg === "PROMPT_NOT_TEXT") rt.fail("getPromptNotText", null, __line);
+         else if (msg === "POINT_ONLY_SET") rt.fail("pointOnlySet", null, __line);
+         else if (msg === "COORD_NOT_NUMBER") rt.fail("coordNotNumber", null, __line);
+         else if (msg.startsWith("SHAPE_PARAMS_NOT_NUMERIC:")) rt.fail("shapeParamsNotNumeric", msg.split(":")[1], __line);
+         else if (msg === "ARC_RADIUS_THICKNESS_POSITIVE") rt.fail("arcRadiusThicknessPositive", null, __line);
+         else if (msg === "GRAFFITI_SIZE_NOT_NUMBER") rt.fail("graffitiSizeNotNumber", null, __line);
+         else if (msg === "GRAFFITI_CONTENT_NOT_STRING") rt.fail("graffitiContentNotString", null, __line);
+         else if (msg === "SCI_POSITIVE") rt.fail("scientificPositive", null, __line);
+         else if (msg === "infiniteLoop") rt.fail("infiniteLoop", null, __line);
+         else if (msg.startsWith("INCLUDE_FETCH_FAIL:") || msg.startsWith("INCLUDE_PARSE_FAIL:")) {
+            const pts = msg.split(":");
+            rt.fail("genericFail", {msg: pts[0] === "INCLUDE_FETCH_FAIL" ? \`Impossibile caricare '\${pts[1]}': \${pts[2]}\` : \`Errore sintassi in '\${pts[1]}': \${pts[2]}\`}, __line);
+         }
+         else rt.fail("genericFail", {msg: msg}, __line);
       }
-
-      for (let i = 0; i < expected; i++) {
-        const p = def.params[i];
-        const pNameU = p.name.toUpperCase();
-
-        // LOGICA INOUT
-        if (p.inout) {
-          // Controllo se l'argomento passato è una variabile (nodo tipo "Var")
-          const argNode = argNodes[i];
-          if (argNode && argNode.type === "Var") {
-            // Risolvo la variabile nel contesto del chiamante
-            const res = resolveVariable(callerScopeChain, argNode.name);
-            
-            // Se esiste, creo un ALIAS locale invece di copiare il valore
-            if (res) {
-              let targetScope, targetName;
-              if (res.__isAlias) { 
-                 // Se stiamo passando una catea di alas (alias a un altro alias)
-                 targetScope = res.targetScope;
-                 targetName = res.targetName;
-              } else {
-                 targetScope = res.scope;
-                 targetName = res.name;
-              }
-              // Collegamento:
-              localScope[pNameU] = { __isAlias: true, targetScope, targetName };
-              continue; // Ora al prossimo parametro, finito qui
-            }
-          }
-          // Se inout è richiesto ma passiamo un numero (es. proc(5)) o variabile inesistente,
-          // ricadiamo nel comportamento di default (copia per valore).
-        }
-
-        // Comportamento standard (passaggio per valore / deep copy)
-        localScope[pNameU] = deepCopyValue(argValues[i]);
-      }
-
-      const r = await execBlock(def.body, scopeChain);
-
-      if (r === EXEC_STOP) return EXEC_STOP;
-
-      if (wantReturn) {
-        if (r && r.__return) return deepCopyValue(r.value);
-        fail("funcNoReturn", def.name, def.line);
-      } else {
-        return null;
-      }
-    } finally {
-      env.callDepth--;
-    }
+    `;
+    return code;
   }
 
   let _cachedSrc = null;
   let _cachedAst = null;
-
-// ===== PRE-ANALISI: verifica se il programma usa costrutti async =====
-  function astCanWait(node) {
-    if (!node || typeof node !== "object") return false;
-    if (Array.isArray(node)) return node.some(astCanWait);
-    const ASYNC_NODES = new Set(["Wait","Get","LoadBackground","Import","Include"]);
-    if (ASYNC_NODES.has(node.type)) return true;
-    return Object.values(node).some(v => v && typeof v === "object" && astCanWait(v));
-  }
-
-  // ===== EXECUTOR SINCRONO (usato quando il programma non contiene wait/get/import) =====
-
-  function evalExprS(node, scopeChain) {
-    switch (node.type) {
-      case "Literal": return node.value;
-      case "Var": {
-        if (node.nameLower === "tock") return builtin_tock([], node.line);
-        const v = lookupVariable(scopeChain, node.name, node.nameUpper);
-        if (v === undefined) fail("variableNotFound", node.name, node.line);
-        return v;
-      }
-      case "Tuple": {
-        const arr = [];
-        for (const it of node.items) arr.push(evalExprS(it, scopeChain));
-        arr.__id = Math.random();
-        return arr;
-      }
-      case "Unary": {
-        const r = evalExprS(node.right, scopeChain);
-        if (node.op === "-") return -(typeof r === "number" ? r : Number(r));
-        if (node.op === "not") return !truthy(r);
-        return r;
-      }
-      case "Binary": {
-        if (node.op === "alias") {
-          if (node.left.type !== "Var") fail("aliasLeftVar", null, node.line);
-          if (node.right.type !== "Var" && node.right.type !== "ItemOf") fail("aliasRightVar", null, node.line);
-          const aliasName = node.left.name.toUpperCase();
-          const targetName = node.right.name.toUpperCase();
-          const targetRes = resolveVariable(scopeChain, targetName);
-          if (!targetRes) fail("variableNotFound", node.right.name, node.line);
-          let finalScope, finalName;
-          if (targetRes.__isAlias) { finalScope = targetRes.targetScope; finalName = targetRes.targetName; }
-          else { finalScope = targetRes.scope; finalName = targetRes.name; }
-          scopeChain[scopeChain.length - 1][aliasName] = { __isAlias: true, targetScope: finalScope, targetName: finalName };
-          return lookupVariable(scopeChain, targetName);
-        }
-        if (node.op === "and") {
-          const l = evalExprS(node.left, scopeChain);
-          if (!truthy(l)) return false;
-          return truthy(evalExprS(node.right, scopeChain));
-        }
-        if (node.op === "or") {
-          const l = evalExprS(node.left, scopeChain);
-          if (truthy(l)) return true;
-          return truthy(evalExprS(node.right, scopeChain));
-        }
-        const l = evalExprS(node.left, scopeChain);
-        const r = evalExprS(node.right, scopeChain);
-        switch (node.op) {
-          case "+": return (typeof l === "string" || typeof r === "string")
-            ? formatForOutput(l, env.precision) + formatForOutput(r, env.precision)
-            : Number(l) + Number(r);
-          case "-":   return Number(l) - Number(r);
-          case "*":   return Number(l) * Number(r);
-          case "/":   return Number(l) / Number(r);
-          case "%":   return Number(l) % Number(r);
-          case "^":   return Math.pow(Number(l), Number(r));
-          case "==": case "=": case "===": return Object.is(l, r) || (l === r);
-          case "!=": case "!==": return !(Object.is(l, r) || (l === r));
-          case "<":  return Number(l) <  Number(r);
-          case "<=": return Number(l) <= Number(r);
-          case ">":  return Number(l) >  Number(r);
-          case ">=": return Number(l) >= Number(r);
-          default:   return NaN;
-        }
-      }
-      case "Call": {
-        const nameLower = node.name.toLowerCase();
-        const args = [];
-        for (const a of node.args) args.push(evalExprS(a, scopeChain));
-        if (BUILTINS[nameLower]) return BUILTINS[nameLower](args, node.line);
-        const def = env.functions[node.name.toUpperCase()];
-        if (!def) fail("unknownFunction", node.name, node.line);
-        return callUserRoutineS(def, args, node.args, scopeChain, true, node.line);
-      }
-      case "PointProp": {
-        const obj = evalExprS(node.object, scopeChain);
-        if (!isPoint(obj)) fail("pointPropOnlyXY", null, node.line);
-        return node.prop === "x" ? obj.x : obj.y;
-      }
-      case "Dimension": {
-        const v = evalExprS(node.expr, scopeChain);
-        if (!Array.isArray(v)) fail("dimensionNeedsList", null, node.line);
-        return v.length;
-      }
-      case "ItemOf": {
-        const list = evalExprS(node.list, scopeChain);
-        if (!Array.isArray(list)) fail("listOnlyOp", "<expr>", node.line);
-        const idxV = evalExprS(node.index, scopeChain);
-        const idx = toInt(idxV);
-        if (!Number.isFinite(idx)) fail("invalidIndex", { idx: idxV, name: "<list>" }, node.line);
-        const pos = idx - 1;
-        if (pos < 0 || pos >= list.length) fail("invalidIndex", { idx, name: "<list>" }, node.line);
-        return deepCopyValue(list[pos]);
-      }
-      case "KeyPressed": {
-        const k = evalExprS(node.keyExpr, scopeChain);
-        return !!keyState[String(k).toUpperCase()];
-      }
-      default: throw new Error("Unknown expr node: " + node.type);
-    }
-  }
-
-  function resolveMutableListS(node, scopeChain) {
-    if (node.type === "Var") {
-      const res = resolveVariable(scopeChain, node.name);
-      if (!res) throw new Error(uiStrings[lang].variableNotFound(node.name));
-      let target = res.__isAlias ? resolveVariable([res.targetScope], res.targetName) : res;
-      let v = target.value;
-      if (!Array.isArray(v)) throw new Error(uiStrings[lang].notAList(node.name));
-      if (v.__shared) { v = ensureWritable(v); target.scope[target.name] = v; }
-      return v;
-    }
-    if (node.type === "ItemOf") {
-      const parentList = resolveMutableListS(node.list, scopeChain);
-      const idxV = evalExprS(node.index, scopeChain);
-      const idx = toInt(idxV);
-      const pos = idx - 1;
-      if (!Number.isFinite(idx)) throw new Error(uiStrings[lang].invalidIndexVal(idxV));
-      if (pos < 0 || pos >= parentList.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-      let target = parentList[pos];
-      if (!Array.isArray(target)) throw new Error(uiStrings[lang].itemNotAList(idx));
-      if (target.__shared) { target = ensureWritable(target); parentList[pos] = target; }
-      return target;
-    }
-    throw new Error(uiStrings[lang].invalidAliasDest);
-  }
-
-  function execBlockS(block, scopeChain) {
-    for (const st of block.stmts) {
-      const r = execStatementS(st, scopeChain);
-      if (r && (r.__return || r === EXEC_STOP)) return r;
-    }
-    return null;
-  }
-
-  const _LOOP_MS = 15000;
-
-  function execStatementS(st, scopeChain) {
-    if (env.__forceStop) return EXEC_STOP;
-    switch (st.type) {
-
-      case "GlobalDecl": {
-        const cur = scopeChain[scopeChain.length - 1];
-        cur.__globalVars ||= new Set();
-        st.names.forEach(n => cur.__globalVars.add(n.toUpperCase()));
-        return null;
-      }
-      case "Define":
-        defineRoutine(st);
-        return null;
-      case "Return": {
-        const value = st.expr ? evalExprS(st.expr, scopeChain) : null;
-        return { __return: true, value: deepCopyValue(value) };
-      }
-      case "Stop": return EXEC_STOP;
-      case "ClearScreen": clearScreen(); return null;
-      case "ClearGraphics":
-        env.gfxObjects = [];
-        snapPointsCache = null;
-        return null;
-      case "FrameGraphics":
-        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
-        if (env.gfxObjects && env.gfxObjects.length > 0) {
-          computeFitCamera(env.gfxObjects);
-          redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
-        }
-        return null;
-      case "Digits": {
-        const v = evalExprS(st.prec, scopeChain);
-        const n = toInt(v);
-        env.precision = (Number.isFinite(n) && n >= 0) ? n : null;
-        return null;
-      }
-      case "ScientificThreshold": {
-        const v = evalExprS(st.valExpr, scopeChain);
-        if (typeof v !== "number" || !Number.isFinite(v) || v < 0) fail("scientificPositive", null, st.line);
-        env.sciThreshold = v;
-        return null;
-      }
-      case "Newline":
-        outputArea.appendChild(document.createTextNode("\n"));
-        return null;
-      case "Output": {
-        const v = evalExprS(st.expr, scopeChain);
-        appendText(v, env.precision);
-        return null;
-      }
-      case "Tick":
-        env.tickTime = performance.now();
-        return null;
-      case "Redraw":
-        if (canvasWindow.classList.contains("hidden")) showCanvasWindow();
-        redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
-        return null;
-      case "SetColor": {
-        const v = evalExprS(st.colorExpr, scopeChain);
-        env.currentColor = colorFromTuple(v, st.line);
-        return null;
-      }
-      case "SetPointProp": {
-        const target = evalExprS(st.targetExpr, scopeChain);
-        if (!isPoint(target)) fail("pointOnlySet", null, st.line);
-        const val = evalExprS(st.valueExpr, scopeChain);
-        if (typeof val !== "number" || !Number.isFinite(val)) fail("coordNotNumber", null, st.line);
-        if (st.prop === "x") target.x = val; else target.y = val;
-        return null;
-      }
-      case "PaintBackground":
-        env.backgroundImage = null;
-        env.backgroundColor = env.currentColor;
-        return null;
-      case "PutVar": {
-        if (st.aliasExpr) evalExprS(st.aliasExpr, scopeChain);
-        const v = evalExprS(st.rhs, scopeChain);
-        assignVariable(scopeChain, st.varName, v, st.varNameUpper);
-        return null;
-      }
-      case "PutItem": {
-        const idxV = evalExprS(st.idx, scopeChain);
-        const idx = toInt(idxV);
-        const pos = idx - 1;
-        const v = evalExprS(st.rhs, scopeChain);
-        try {
-          const lst = resolveMutableListS(st.listExpr, scopeChain);
-          if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-          lst[pos] = deepCopyValue(v);
-        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
-        return null;
-      }
-      case "Add": {
-        const v = evalExprS(st.valueExpr, scopeChain);
-        try {
-          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
-          lst.push(deepCopyValue(v));
-        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
-        return null;
-      }
-      case "Insert": {
-        const v = evalExprS(st.valueExpr, scopeChain);
-        const idxV = evalExprS(st.idx, scopeChain);
-        const idx = toInt(idxV);
-        const pos = idx - 1;
-        try {
-          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
-          if (!Number.isFinite(idx) || pos < 0 || pos > lst.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-          lst.splice(pos, 0, deepCopyValue(v));
-        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
-        return null;
-      }
-      case "RemoveFirst": {
-        try {
-          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
-          if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
-          lst.shift();
-        } catch (e) { if (e.message !== "Execution stopped.") fail("genericFail", { msg: e.message }, st.line); }
-        return null;
-      }
-      case "RemoveLast": {
-        try {
-          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
-          if (lst.length === 0) fail("cannotRemoveFromEmpty", null, st.line);
-          lst.pop();
-        } catch (e) { if (e.message !== "Execution stopped.") fail("genericFail", { msg: e.message }, st.line); }
-        return null;
-      }
-      case "RemoveAt": {
-        const idxV = evalExprS(st.idx, scopeChain);
-        const idx = toInt(idxV);
-        const pos = idx - 1;
-        try {
-          const lst = resolveMutableListS({ type:"Var", name:st.listName, nameUpper:st.listNameUpper }, scopeChain);
-          if (!Number.isFinite(idx) || pos < 0 || pos >= lst.length) throw new Error(uiStrings[lang].indexOutOfBounds(idx));
-          lst.splice(pos, 1);
-        } catch (e) { fail("genericFail", { msg: e.message }, st.line); }
-        return null;
-      }
-      case "If": {
-        const c = evalExprS(st.cond, scopeChain);
-        if (truthy(c)) return execBlockS(st.thenBlock, scopeChain);
-        for (const ei of st.elseIfs) {
-          if (truthy(evalExprS(ei.cond, scopeChain))) return execBlockS(ei.block, scopeChain);
-        }
-        if (st.elseBlock) return execBlockS(st.elseBlock, scopeChain);
-        return null;
-      }
-
-      case "While": {
-        const loopScope = Object.create(null);
-        loopScope.__globalVars = new Set();
-        scopeChain.push(loopScope);
-
-        const _t0 = performance.now(); 
-        let _chk = 0; 
-        let returnVal = null;
-        try {
-          while (true) {
-            if (!truthy(evalExprS(st.cond, scopeChain))) break;
-            const r = execBlockS(st.block, scopeChain);
-            if (r && (r.__return || r === EXEC_STOP)) { returnVal = r; break; }
-            if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
-          }
-        } finally {
-          scopeChain.pop();
-        }
-        return returnVal;
-      }
-
-      case "ForEach": {
-        const list = evalExprS(st.listExpr, scopeChain);
-        if (!Array.isArray(list)) fail("loopNotList", "<expr>", st.line);
-        const loopScope = Object.create(null);
-        loopScope.__globalVars = new Set();
-        scopeChain.push(loopScope);
-        const _t0 = performance.now(); let _chk = 0; let returnVal = null;
-        try {
-          for (const item of list) {
-            assignVariable(scopeChain, st.varName, deepCopyValue(item));
-            const r = execBlockS(st.block, scopeChain);
-            if (r && (r.__return || r === EXEC_STOP)) { returnVal = r; break; }
-            if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
-          }
-        } finally { scopeChain.pop(); }
-        return returnVal;
-      }
-      case "ForRange": {
-        const a = toInt(evalExprS(st.startExpr, scopeChain));
-        const b = toInt(evalExprS(st.endExpr, scopeChain));
-        if (!Number.isFinite(a) || !Number.isFinite(b)) fail("shapeParamsNotNumeric", "for", st.line);
-        const step = (a <= b) ? 1 : -1;
-        const loopScope = Object.create(null);
-        loopScope.__globalVars = new Set();
-        scopeChain.push(loopScope);
-        const _t0 = performance.now(); let _chk = 0; let returnVal = null;
-        try {
-          for (let i = a; (step > 0) ? (i <= b) : (i >= b); i += step) {
-            assignVariable(scopeChain, st.varName, i);
-            const r = execBlockS(st.block, scopeChain);
-            if (r && (r.__return || r === EXEC_STOP)) { returnVal = r; break; }
-            if ((++_chk & 1023) === 0 && performance.now() - _t0 > _LOOP_MS) fail("infiniteLoop", null, st.line);
-          }
-        } finally { scopeChain.pop(); }
-        return returnVal;
-      }
-      case "Circle": {
-        const r = evalExprS(st.r, scopeChain);
-        if (typeof r !== "number" || !Number.isFinite(r)) fail("shapeParamsNotNumeric", "circle", st.line);
-        const { x, y } = coordFromValue(evalExprS(st.pos, scopeChain), st.line, "");
-        addGraphicObject({ type:"circle", x, y, r, color: env.currentColor });
-        return null;
-      }
-      case "Circumference": {
-        const r = evalExprS(st.r, scopeChain);
-        const th = evalExprS(st.th, scopeChain);
-        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v))) fail("shapeParamsNotNumeric", "circumference", st.line);
-        const { x, y } = coordFromValue(evalExprS(st.pos, scopeChain), st.line, "");
-        addGraphicObject({ type:"circumference", x, y, r, t: th, color: env.currentColor });
-        return null;
-      }
-      case "Rectangle": {
-        const p1 = coordFromValue(evalExprS(st.p1, scopeChain), st.line, "");
-        const p2 = coordFromValue(evalExprS(st.p2, scopeChain), st.line, "");
-        addGraphicObject({ type:"rectangle",
-          v1:{x:p1.x,y:p1.y}, v2:{x:p2.x,y:p1.y},
-          v3:{x:p2.x,y:p2.y}, v4:{x:p1.x,y:p2.y},
-          color: env.currentColor });
-        return null;
-      }
-      case "Line": {
-        const th = evalExprS(st.th, scopeChain);
-        if (typeof th !== "number" || !Number.isFinite(th)) fail("shapeParamsNotNumeric", "line", st.line);
-        const p1 = coordFromValue(evalExprS(st.p1, scopeChain), st.line, "");
-        const p2 = coordFromValue(evalExprS(st.p2, scopeChain), st.line, "");
-        addGraphicObject({ type:"line", x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y, t:th, color: env.currentColor });
-        return null;
-      }
-      case "Triangle": {
-        addGraphicObject({ type:"triangle",
-          v1: coordFromValue(evalExprS(st.p1, scopeChain), st.line, ""),
-          v2: coordFromValue(evalExprS(st.p2, scopeChain), st.line, ""),
-          v3: coordFromValue(evalExprS(st.p3, scopeChain), st.line, ""),
-          color: env.currentColor });
-        return null;
-      }
-      case "Arc": {
-        const r = evalExprS(st.r, scopeChain);
-        const th = evalExprS(st.th, scopeChain);
-        if (![r,th].every(v => typeof v==="number" && Number.isFinite(v) && v>0)) fail("arcRadiusThicknessPositive", null, st.line);
-        const p1 = coordFromValue(evalExprS(st.p1, scopeChain), st.line, "");
-        const p2 = coordFromValue(evalExprS(st.p2, scopeChain), st.line, "");
-        addGraphicObject({ type:"arc", r, t:th, x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y, color: env.currentColor });
-        return null;
-      }
-      case "Graffiti": {
-        const size = evalExprS(st.sizeExpr, scopeChain);
-        if (typeof size !== "number" || !Number.isFinite(size) || size <= 0) fail("graffitiSizeNotNumber", null, st.line);
-        const { x, y } = coordFromValue(evalExprS(st.posExpr, scopeChain), st.line, "");
-        const content = evalExprS(st.contentExpr, scopeChain);
-        if (typeof content !== "string") fail("graffitiContentNotString", null, st.line);
-        const w = Math.max(10, size * 0.62 * content.length);
-        const h = Math.max(10, size * 1.2);
-        env.gfxObjects.push({ type:"text", x:x-w/2, y:y-h/2, width:w, height:h, rotation:0, size, content, color:env.currentColor });
-        return null;
-      }
-      case "Label": {
-        const nameU = st.name.toUpperCase();
-        if (env.labels[nameU] || env.imports[nameU]) fail("labelExists", st.name, st.line);
-        const localObjects = [];
-        const savedObjects = env.gfxObjects;
-        env.gfxObjects = localObjects;
-        const labelScope = Object.create(null);
-        labelScope.__globalVars = new Set();
-        const r = execBlockS(st.body, scopeChain.concat([labelScope]));
-        env.gfxObjects = savedObjects;
-        if (r === EXEC_STOP) return EXEC_STOP;
-        if (r && r.__return) return r;
-        env.labels[nameU] = { objects: localObjects.map(deepCopyValue), scale:1, rotation:0 };
-        return null;
-      }
-      case "Scale": {
-        const nameU = st.name.toUpperCase();
-        const factor = evalExprS(st.factorExpr, scopeChain);
-        if (typeof factor !== "number" || !Number.isFinite(factor) || factor <= 0) fail("scaleNotNumber", null, st.line);
-        if (env.labels[nameU]) env.labels[nameU].scale *= factor;
-        else if (env.imports[nameU]) env.imports[nameU].scale *= factor;
-        else fail("labelNotFound", st.name, st.line);
-        snapPointsCache = null;
-        return null;
-      }
-      case "Draw": {
-        const nameU = st.name.toUpperCase();
-        const pos = coordFromValue(evalExprS(st.posExpr, scopeChain), st.line, "");
-        const defL = env.labels[nameU], defI = env.imports[nameU];
-        if (!defL && !defI) fail("labelNotFound", st.name, st.line);
-        if (defI) {
-          const w = defI.width*defI.scale, h = defI.height*defI.scale;
-          env.gfxObjects.push({ type:"image", img:defI.img, x:pos.x-w/2, y:pos.y-h/2, width:w, height:h, rotation:defI.rotation });
-          return null;
-        }
-        const c = Math.cos(defL.rotation), s = Math.sin(defL.rotation), sc = defL.scale;
-        const tp = (x,y) => ({ x: pos.x+(x*sc*c - y*sc*s), y: pos.y+(x*sc*s + y*sc*c) });
-        for (const o of defL.objects) {
-          const obj = deepCopyValue(o);
-          if (obj.type==="circle"||obj.type==="circumference") {
-            const p=tp(obj.x,obj.y); obj.x=p.x; obj.y=p.y; obj.r*=sc; if(obj.t)obj.t*=sc;
-          } else if (obj.type==="line") {
-            const p1=tp(obj.x1,obj.y1),p2=tp(obj.x2,obj.y2); obj.x1=p1.x;obj.y1=p1.y;obj.x2=p2.x;obj.y2=p2.y;obj.t*=sc;
-          } else if (obj.type==="rectangle") {
-            obj.v1=tp(obj.v1.x,obj.v1.y);obj.v2=tp(obj.v2.x,obj.v2.y);obj.v3=tp(obj.v3.x,obj.v3.y);obj.v4=tp(obj.v4.x,obj.v4.y);
-          } else if (obj.type==="triangle") {
-            obj.v1=tp(obj.v1.x,obj.v1.y);obj.v2=tp(obj.v2.x,obj.v2.y);obj.v3=tp(obj.v3.x,obj.v3.y);
-          } else if (obj.type==="arc") {
-            const p1=tp(obj.x1,obj.y1),p2=tp(obj.x2,obj.y2); obj.x1=p1.x;obj.y1=p1.y;obj.x2=p2.x;obj.y2=p2.y;obj.r*=sc;obj.t*=sc;
-          } else if (obj.type==="text") {
-            const cx=obj.x+obj.width/2,cy=obj.y+obj.height/2,pc=tp(cx,cy);
-            obj.size*=sc;obj.width*=sc;obj.height*=sc;obj.x=pc.x-obj.width/2;obj.y=pc.y-obj.height/2;
-            obj.rotation=(obj.rotation||0)+defL.rotation;
-          }
-          env.gfxObjects.push(obj);
-        }
-        return null;
-      }
-      case "RotatePlace": {
-        const nameU = st.name.toUpperCase();
-        const angle = evalExprS(st.angleExpr, scopeChain);
-        if (typeof angle !== "number" || !Number.isFinite(angle)) fail("rotationNotNumber", null, st.line);
-        const pos = coordFromValue(evalExprS(st.posExpr, scopeChain), st.line, "");
-        const rad = angle * Math.PI / 180;
-        if (env.imports[nameU]) {
-          const def = env.imports[nameU];
-          const w=def.width*def.scale, h=def.height*def.scale;
-          env.gfxObjects.push({ type:"image", img:def.img, x:pos.x-w/2, y:pos.y-h/2, width:w, height:h, rotation:rad });
-          return null;
-        }
-        if (env.labels[nameU]) {
-          const def = env.labels[nameU];
-          const prevRot = def.rotation;
-          def.rotation = rad;
-          const r = execStatementS({ type:"Draw", name:st.name, posExpr:st.posExpr, line:st.line }, scopeChain);
-          def.rotation = prevRot;
-          snapPointsCache = null;
-          return r;
-        }
-        fail("labelNotFound", st.name, st.line);
-        break;
-      }
-      case "Alias": {
-        const aU = st.aliasName.toUpperCase();
-        if (st.targetName) {
-          const target = resolveVariable(scopeChain, st.targetName);
-          if (!target) fail("variableNotFound", st.targetName, st.line);
-          let targetScope, targetName;
-          if (target.__isAlias) { targetScope=target.targetScope; targetName=target.targetName; }
-          else { targetScope=target.scope; targetName=target.name; }
-          scopeChain[scopeChain.length-1][aU] = { __isAlias:true, targetScope, targetName };
-          return null;
-        }
-        try {
-          const refToList = resolveMutableListS(st.targetExpr, scopeChain);
-          scopeChain[scopeChain.length-1][aU] = { __isHardRef:true, value:refToList };
-        } catch(e) { fail("genericFail", { msg: uiStrings[lang].aliasCreateFail(e.message) }, st.line); }
-        return null;
-      }
-      case "ProcCall": {
-        const nameLower = st.name.toLowerCase();
-        if (nameLower === "tock" && st.args.length === 0) {
-          appendLine(builtin_tock([], st.line), false, env.precision);
-          return null;
-        }
-        if (BUILTINS[nameLower]) {
-          const args = [];
-          for (const a of st.args) args.push(evalExprS(a, scopeChain));
-          BUILTINS[nameLower](args, st.line);
-          return null;
-        }
-        const def = env.procedures[st.name.toUpperCase()];
-        if (!def) fail("unknownCommand", st.name, st.line);
-        const args = [];
-        for (const a of st.args) args.push(evalExprS(a, scopeChain));
-        return callUserRoutineS(def, args, st.args, scopeChain, false, st.line);
-      }
-      default: throw new Error("Unknown statement: " + st.type);
-    }
-  }
-
-  function callUserRoutineS(def, argValues, argNodes, callerScopeChain, wantReturn, callLine) {
-    if (env.callDepth >= MAX_CALL_DEPTH) fail("recursionLimit", null, callLine);
-    env.callDepth++;
-    try {
-      const localScope = Object.create(null);
-      localScope.__globalVars = new Set();
-      const scopeChain = [callerScopeChain[0], localScope];
-      const expected = def.params.length, got = argValues.length;
-      if (got !== expected) {
-        if (def.kind === "procedure") fail("procArgCount", { name:def.name, expected, got }, callLine);
-        else fail("funcArgCount", { name:def.name, expected, got }, callLine);
-      }
-      for (let i = 0; i < expected; i++) {
-        const p = def.params[i];
-        const pNameU = p.name.toUpperCase();
-        if (p.inout) {
-          const argNode = argNodes[i];
-          if (argNode && argNode.type === "Var") {
-            const res = resolveVariable(callerScopeChain, argNode.name);
-            if (res) {
-              let targetScope, targetName;
-              if (res.__isAlias) { targetScope=res.targetScope; targetName=res.targetName; }
-              else { targetScope=res.scope; targetName=res.name; }
-              localScope[pNameU] = { __isAlias:true, targetScope, targetName };
-              continue;
-            }
-          }
-        }
-        localScope[pNameU] = deepCopyValue(argValues[i]);
-      }
-      const r = execBlockS(def.body, scopeChain);
-      if (r === EXEC_STOP) return EXEC_STOP;
-      if (wantReturn) {
-        if (r && r.__return) return deepCopyValue(r.value);
-        fail("funcNoReturn", def.name, def.line);
-      }
-      return null;
-    } finally { env.callDepth--; }
-  }
-  // ===== FINE EXECUTOR SINCRONO =====
-
-
+  let _cachedJs = null;
+  let _cachedExec = null;
 
   // --- Run pipeline ---
   async function runProgram() {
@@ -6070,49 +5659,42 @@ async function resolveMutableList(node, scopeChain) {
     try {
       clearScreen();
       env.gfxObjects = [];
-      snapPointsCache = null; // annullo cache quando gli oggetti cambiano
+      snapPointsCache = null; 
       env.labels = Object.create(null);
       env.imports = Object.create(null);
       env.functions = Object.create(null);
       env.procedures = Object.create(null);
       env.callDepth = 0;
-      env.importedFiles = new Set(); // Tiene traccia dei file già caricati per evitare loop infiniti (A carica B, che carica A...)
+      env.importedFiles = new Set(); 
       env.backgroundColor = null;
       env.backgroundImage = null;
       env.currentColor = "rgb(0, 0, 0)";
       env.precision = null;
-      env.sciThreshold = 1000000; // Di default switcho a scientific notation sopra tale valore
+      env.sciThreshold = 1000000; 
       env.tickTime = null;
       env.__shadowWarnings = new Set();
+      env.keyState = keyState; 
 
       env.varOriginalNames = {};
 
-      resetCameraToCenter(); // Reset telecamera
+      resetCameraToCenter();
 
       errorLine = -1;
-      lastHighlightedCode = ""; // forza re-render per rimuovere eventuale highlight precedente
+      lastHighlightedCode = ""; 
       updateHighlighting(true);
 
       const src = codeInput.value ?? "";
 
-      // Lex + parse con cache: se il sorgente non è cambiato, riusa l'AST precedente
       let ast;
       try {
-        // Normalizza le lingue non native (non EN, non IT) in inglese prima del parsing
-        let srcToParse = src;
-        if (currentLang !== "en" && currentLang !== "it" && currentLang !== "nl" && langDicts[currentLang]) {
-          srcToParse = applyDict(src, invertDict(langDicts[currentLang]));
-        }
-
-        if (srcToParse !== _cachedSrc) {
-          const lexer = new Lexer(srcToParse);
+        if (src !== _cachedSrc) {
+          const lexer = new Lexer(src);
           const tokens = lexer.lexAll();
           const parser = new Parser(tokens);
           _cachedAst = parser.parseProgram();
-          _cachedSrc = srcToParse;
+          // La cache del sorgente NON si aggiorna qui, ma dopo la compilazione JIT
         }
         ast = _cachedAst;
-
       } catch (e) {
         _cachedSrc = null;
         _cachedAst = null;
@@ -6124,44 +5706,74 @@ async function resolveMutableList(node, scopeChain) {
         return;
       }
 
-
-      // Execute: sceglie il percorso sincrono (più veloce) se il programma non usa wait/get/import
       const globalScope = Object.create(null);
       globalScope.__globalVars = new Set();
       const scopeChain = [globalScope];
       env.lastGlobalScope = globalScope;
 
-      const _useSync = !astCanWait(ast);
+      let jsCode, executable;
 
       try {
-        if (_useSync) {
-          // Percorso sincrono: nessun overhead di async/await
-          for (const st of ast.stmts) {
-            const r = execStatementS(st, scopeChain);
-            if (r === EXEC_STOP) break;
-            if (r && r.__return) break;
-          }
+        if (src !== _cachedSrc || !_cachedExec) {
+          // 1. Pre-elaborazione dell'AST
+          canonicalizeCalls(ast);
+          markAsync(ast);
+
+          // 2. Transpilation (AST -> JS puro)
+          jsCode = compileProgram(ast);
+          _cachedJs = jsCode;
+
+          // 3. Compilazione JIT
+          _cachedExec = new AsyncFunction('rt', 'env', 'sc', 'clearScreen', '__yieldMC', jsCode);
+          
+          // Salvo cache sorgente solo dopo che tutto è stato compilato con successo
+          _cachedSrc = src;
         } else {
-          // Percorso asincrono: necessario per wait/get/import/include
-          for (const st of ast.stmts) {
-            const r = await execStatement(st, scopeChain);
-            if (r === EXEC_STOP) break;
-            if (r && r.__return) break;
-          }
+          jsCode = _cachedJs;
         }
+        executable = _cachedExec;
+              
+      } catch (compileErr) {
+      const _jitMsg = {
+        en: "Internal JIT compilation error.",
+        it: "Errore interno di compilazione JIT.",
+        nl: "Interne JIT-compilatiefout."
+      };
+      // Tenta di risalire alla riga sorgente ispezionando il codice JS generato.
+      // new Function() lancia SyntaxError con numero di riga relativo al codice generato;
+      // risaliamo all'ultima istruzione __line = N prima di quel punto.
+      let _srcLine = null;
+      if (jsCode && compileErr instanceof SyntaxError) {
+        const _stackMatch = (compileErr.stack || "").match(/<anonymous>:(\d+)/);
+        if (_stackMatch) {
+          const _jsLineNum = parseInt(_stackMatch[1], 10);
+          // Prende solo le righe JS fino al punto dell'errore, poi le scansiona al contrario
+          const _jsLinesUntilError = jsCode.split("\n").slice(0, _jsLineNum).reverse().join("\n");
+          const _srcLineMatch = _jsLinesUntilError.match(/__line\s*=\s*(\d+)/);
+          if (_srcLineMatch) _srcLine = parseInt(_srcLineMatch[1], 10) + 1;
+        }
+      }
+
+      const _lineInfo = _srcLine ? ` ${uiStrings[lang].errorPrefix} ${_srcLine}:` : "";
+      const _detail = compileErr?.message ? ` ${compileErr.message}` : "";
+      appendLine(`${_jitMsg[lang] || _jitMsg.en}${_lineInfo}${_detail}`, true);
+      console.error("JIT Error:", compileErr, "\nGenerated code:\n", jsCode);
+      return;
+    }
+
+      // 4. Esecuzione NATIVA!
+      try {
+         await executable(rt, env, scopeChain, clearScreen, __yieldMC);
       } catch (e) {
-        if (e === EXEC_STOP) {
-          appendLine(uiStrings[lang].programStopped, false);
-        } else if (e && e.message === "Execution stopped.") {
-          // already reported by fail()
+        if (e && e.message === "Execution stopped.") {
+          // SILENT EXIT (L'errore è già stato stampato formattato da rt.fail)
         } else {
           appendLine(`${uiStrings[lang].executionStopped} ${String(e?.message ?? e)}`, true);
         }
       }
 
-      // Final redraw (if canvas visible)
       if (!canvasWindow.classList.contains("hidden")) {
-         redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
+         scheduleRedraw();
       }
 
     } finally {
@@ -6169,9 +5781,9 @@ async function resolveMutableList(node, scopeChain) {
       runButton.disabled = false;
       stopButton.disabled = true;
       env.__sleepResolve = null;
+      env.__sleepCancel = null;
     }
   }
-
 
 // ===== Gestione Pan, Zoom e Long-Press =====
 
@@ -6229,8 +5841,8 @@ async function resolveMutableList(node, scopeChain) {
     if (isRunning) return;
 
     const pt = getEventCoordinate(e);
-    let finalX = Math.round(pt.x * 100) / 100;
-    let finalY = Math.round(pt.y * 100) / 100;
+    let finalX = Math.round(pt.x * 10000) / 10000;
+    let finalY = Math.round(pt.y * 10000) / 10000;
 
     let coordText = `(${finalX}, ${finalY})`;
 
@@ -6424,9 +6036,10 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
       let distX = targetForDist.x - orthoBasePoint.x;
       let distY = targetForDist.y - orthoBasePoint.y;
       let dist = Math.sqrt(distX * distX + distY * distY); 
-      canvasWindowTitle.textContent = `dist: ${dist.toFixed(2)}`;
+      canvasWindowTitle.textContent = `dist: ${dist.toFixed(4)}`;
     } else {
-      canvasWindowTitle.textContent = `x: ${worldX.toFixed(2)} | y: ${worldY.toFixed(2)}`;
+      const __dec = Math.min(8, Math.max(2, Math.floor(Math.log10(currentTransform.scale)) + 2));
+      canvasWindowTitle.textContent = `x: ${worldX.toFixed(__dec)} | y: ${worldY.toFixed(__dec)}`;
     }
 
     if (needsRedraw && !isRunning) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
@@ -6438,7 +6051,7 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
     isDraggingCanvas = false;
     try { gfxCanvas.releasePointerCapture(e.pointerId); } catch {}
 
-    // Rilasciando il mouse si annulla sempre il potenziale Long Press non ancora scattato
+    // Rilasciando il mouse si annulla sempre un potenziale Long Press non ancora scattato
     clearTimeout(longPressTimer);
     longPressTimer = null;
 
@@ -6526,9 +6139,15 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
   stopButton.addEventListener("click", () => {
     if (isRunning) {
       env.__forceStop = true;
-      if (env.__sleepResolve) env.__sleepResolve(); // Sblocca immediatamente eventuali "aspetta N ms"
-    }
-  });
+            if (env.__sleepCancel) env.__sleepCancel();
+            if (env.__sleepResolve) {
+              const r = env.__sleepResolve;
+              env.__sleepResolve = null;
+              env.__sleepCancel = null;
+              r(); // Sblocca immediatamente eventuali "aspetta N ms"
+            }
+          }
+    });
 
   helpButton.addEventListener("click", () => {
     const helpFiles = { it: "help_it.html", nl: "help_nl.html" };
@@ -6634,10 +6253,20 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
 
   // Resize: Ridisegna in automatico se ci sono oggetti, altrimenti mostra messaggio
   function handleCanvasResize() {
-    if (canvasWindow.classList.contains("hidden")) return;
-    
-    // Se c'è un disegno in memoria, fa il redraw e lo adatta al nuovo schermo intero
-    if (env.gfxObjects && env.gfxObjects.length > 0) {
+  if (canvasWindow.classList.contains("hidden")) return;
+
+  gfxDpr = window.devicePixelRatio || 1;
+  const _rect = gfxCanvas.getBoundingClientRect();
+  if (_rect.width > 0 && _rect.height > 0 && lastCanvasW > 0 && lastCanvasH > 0) {
+    const _newW = Math.floor(_rect.width * gfxDpr);
+    const _newH = Math.floor(_rect.height * gfxDpr);
+    if (_newW !== lastCanvasW || _newH !== lastCanvasH) {
+      camera.tx += (_newW - lastCanvasW) / 2;
+      camera.ty += (_newH - lastCanvasH) / 2;
+    }
+  }
+
+  if (env.gfxObjects && env.gfxObjects.length > 0) {
       redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
     } else if (!isRunning) {
       drawReadyScreen(uiStrings[lang].canvasResized);
@@ -6789,6 +6418,14 @@ function getExample(lang) {
 document.addEventListener("DOMContentLoaded", initMatita);
 
 </script>
+
+<div id="fileDropdownMenu" style="display:none; position:fixed; background:rgba(2,6,23,0.97); border:1px solid var(--border-color); border-radius:var(--radius-md); z-index:9999; min-width:140px; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
+  <div class="menu-option" id="openButton">Apri</div>
+  <div class="menu-option" id="saveButton">Salva</div>
+  <div class="menu-option" id="getMatitalkButton">Download</div>
+  <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 4px 0;"></div>
+  <div class="menu-option" id="infoButton">Info</div>
+</div>
 
 <div id="langDropdownMenu" style="display:none; position:fixed; background:rgba(2,6,23,0.97); border:1px solid var(--border-color); border-radius:var(--radius-md); z-index:9999; min-width:72px; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
   <div class="lang-option" data-lang="en">EN</div>
