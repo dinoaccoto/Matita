@@ -1324,6 +1324,10 @@ const dictEnToNl = {
         const mid = lang === "en" ? " is " : " ";
         return G("key") + " " + serializeExpr(node.keyExpr, lang) + mid + G("pressed");
       }
+      case "IsPlaying": {
+        const isplayingW = {en:"is playing", it:"sta suonando", nl:"is aan het afspelen"}[lang] || "is playing";
+        return isplayingW + " " + node.name;
+      }
       default:
         return "/*?*/";
     }
@@ -1578,6 +1582,61 @@ const dictEnToNl = {
         return fname + "(" + node.args.map(a => sx(a)).join(", ") + ")";
       }
 
+      case "SoundDef": {
+        const p = node.params;
+        const kind = p.kind || "noise";
+        const _soundW = {en:"sound",    it:"suono",  nl:"geluid"}[lang] || "sound";
+        const _noiseW = {en:"noise",    it:"rumore", nl:"ruis"  }[lang] || "noise";
+        const _sweepW = {en:"sweep",    it:"scivola",nl:"sweep" }[lang] || "sweep";
+        const _notesW = {en:"notes",    it:"note",   nl:"noten" }[lang] || "notes";
+        const _durW   = {en:"duration", it:"durata", nl:"duur"  }[lang] || "duration";
+        const _fromW  = {en:"from",     it:"da",     nl:"van"   }[lang] || "from";
+        const _toW    = {en:"to",       it:"a",      nl:"tot"   }[lang] || "to";
+        
+        const ind2 = indent + "    ";
+        let inner = ind2;
+        if (kind === "noise") {
+          inner += _noiseW;
+        } else if (kind === "sweep") {
+          inner += _sweepW;
+          if (p.freqFromExpr && p.freqToExpr)
+            inner += " " + _fromW + " " + sx(p.freqFromExpr) + " " + _toW + " " + sx(p.freqToExpr) + " hz";
+        } else if (kind === "notes") {
+          inner += _notesW;
+          if (p.notesExpr) inner += " (" + p.notesExpr.map(n => sx(n.freq) + (n.dur ? ":" + sx(n.dur) : "")).join(", ") + ")";
+          if (p.tempoExpr) inner += "\n" + ind2 + "tempo " + sx(p.tempoExpr);
+        }
+        if (p.wave)         inner += "\n" + ind2 + "wave " + p.wave;
+        if (p.loop)         inner += "\n" + ind2 + "loop true";
+        if (p.durationExpr) inner += "\n" + ind2 + _durW + " " + sx(p.durationExpr) + " ms";
+        if (p.attackExpr)   inner += "\n" + ind2 + "attack " + sx(p.attackExpr);
+        if (p.decayExpr)    inner += "\n" + ind2 + "decay " + sx(p.decayExpr);
+        if (p.sustainExpr)  inner += "\n" + ind2 + "sustain " + sx(p.sustainExpr);
+        if (p.releaseExpr)  inner += "\n" + ind2 + "release " + sx(p.releaseExpr);
+        if (p.filterExpr)   inner += "\n" + ind2 + "filter " + sx(p.filterExpr);
+        if (p.panExpr)      inner += "\n" + ind2 + "pan " + sx(p.panExpr);
+        if (p.detuneExpr)   inner += "\n" + ind2 + "detune " + sx(p.detuneExpr);
+        return _soundW + " " + node.name + " (\n" + inner + "\n" + indent + ")";
+      }
+
+      case "PlaySound": {
+        const playW = {en:"play", it:"suona", nl:"speel"}[lang] || "play";
+        return playW + " " + node.name;
+      }
+      
+      case "StopSound": {
+        const stopW = {en:"stop", it:"ferma", nl:"stop"}[lang] || "stop";
+        return stopW + " " + node.name;
+      }
+
+      case "SetVolume":
+        return "volume " + node.name + " " + sx(node.levelExpr);
+
+      case "FadeSound":
+        const fadeKW = {en:"fade", it:"dissolvenza", nl:"fade"}[lang] || "fade";
+        const dirKW = node.fadeIn ? ({en:"in", it:"in", nl:"in"}[lang] || "in") : ({en:"out", it:"uscita", nl:"uit"}[lang] || "out");
+        return fadeKW + " " + node.name + " " + dirKW + " " + sx(node.durationExpr) + " ms";
+
       default:
         return "/* " + node.type + " */";
     }
@@ -1725,7 +1784,8 @@ const dictEnToNl = {
 
 
   const KEYWORDS_EN = [
-    "alias", "to", "inout", "define","function","procedure","global","return","stop",
+    "alias", "to", "inout", "define","function","procedure","global","return","stop",
+    "sound", "play", "volume", "noise", "sweep", "notes", "loop", "tempo", "filter", "wave", "attack", "decay", "duration",
     "if","then","otherwise","as","long","you","do","for","each","index","goes","from","and",
     "put","in","add","remove","insert","first","last","item","of","dimension","list",
     "write","newline","wait","ms","get","saying","set","color","clear","screen","graphics","redraw","frame",
@@ -1931,8 +1991,13 @@ const dictEnToNl = {
     { label: "tick", insert: "tick\n", detail: "Start stopwatch" },
     { label: "tock", insert: "tock", detail: "Elapsed ms since tick" },
     { label: "random(min, max)", insert: "random(MIN, MAX)", detail: "Random number A to B" },
-    { label: "dice( faces )", insert: "dice(FACES)", detail: "Random integer 1 to N" }
-  ];
+    { label: "dice( faces )", insert: "dice(FACES)", detail: "Random integer 1 to N" },
+    // Audio
+    { label: "sound NAME ( ... )", insert: "sound NAME (\n    noise duration 500 ms\n)\n", detail: "Define a new sound" },
+    { label: "play SOUND_NAME", insert: "play SOUND_NAME\n", detail: "Play a defined sound" },
+    { label: "stop SOUND_NAME", insert: "stop SOUND_NAME\n", detail: "Stop a looping sound" },
+    { label: "volume SOUND_NAME LEVEL", insert: "volume SOUND_NAME 50\n", detail: "Set sound volume (0-100)" }
+  ];
 
   const SUGGESTIONS_IT = [
         { label: "se (...) allora ( ... )", insert: "se (CONDIZIONE) allora (\n    \n)\n", detail: "Blocco condizionale" },
@@ -1983,8 +2048,13 @@ const dictEnToNl = {
         { label: "casuale(min, max)", insert: "casuale(MIN, MAX)", detail: "Numero casuale tra A e B" },
         { label: "dado( facce )", insert: "dado(FACCE)", detail: "Numero intero tra 1 e N" },
         { label: "tipo(x)", insert: "tipo(VALORE)", detail: "Restituisce 'number', 'string', 'list', 'point'..." },
-        { label: "numerico(x)", insert: "numerico(VALORE)", detail: "Vero se l'argomento è un numero valido" }
-    ];
+        { label: "numerico(x)", insert: "numerico(VALORE)", detail: "Vero se l'argomento è un numero valido" },
+        // Audio
+        { label: "suono NOME ( ... )", insert: "suono NOME (\n    rumore durata 500 ms\n)\n", detail: "Definisce un nuovo suono — usa 'play' e 'stop' per riprodurlo" },
+        { label: "play NOME_SUONO", insert: "play NOME_SUONO\n", detail: "Riproduce un suono" },
+        { label: "stop NOME_SUONO", insert: "stop NOME_SUONO\n", detail: "Ferma un suono in loop" },
+        { label: "volume NOME_SUONO LIVELLO", insert: "volume NOME_SUONO 50\n", detail: "Imposta il volume (0-100)" }
+    ];
 
     const SUGGESTIONS_NL = [
       { label: "als (...) dan ( ... )", insert: "als (CONDITIE) dan (\n    \n)\n", detail: "Conditioneel blok" },
@@ -2046,7 +2116,12 @@ const dictEnToNl = {
       { label: "maxindex(lijst)", insert: "maxindex(LIJST)", detail: "Index van de grootste waarde" },
       { label: "afkappen(N)", insert: "afkappen(N)", detail: "Geeft het gehele deel (afgekapt)" },
       { label: "afronden(N)", insert: "afronden(N)", detail: "Rondt af op het dichtstbijzijnde gehele getal" },
-      { label: "A verschillend van B", insert: "A verschillend van B", detail: "Ongelijkheidsoperator" }
+      { label: "A verschillend van B", insert: "A verschillend van B", detail: "Ongelijkheidsoperator" },
+      // Audio
+      { label: "geluid NAAM ( ... )", insert: "geluid NAAM (\n    ruis duur 500 ms\n)\n", detail: "Definieert een nieuw geluid" },
+      { label: "play GELUID_NAAM", insert: "play GELUID_NAAM\n", detail: "Speelt een geluid af" },
+      { label: "stop GELUID_NAAM", insert: "stop GELUID_NAAM\n", detail: "Stopt een geluid in loop" },
+      { label: "volume GELUID_NAAM NIVEAU", insert: "volume GELUID_NAAM 50\n", detail: "Stelt het volume in (0-100)" }
     ];
 
   // Agganciamo i suggerimenti al registro
@@ -2556,22 +2631,25 @@ const dictEnToNl = {
 
     // Placeholder selection logic
     const placeholdersIT = [
-      "VAR","ESPRESSIONE","CONDIZIONE","LISTA","INDICE","INIZIO","FINE","MESSAGGIO","TESTO",
-      "RAGGIO","SPESSORE","GRANDEZZA","ROSSO","VERDE","BLU","OGGETTO","ANGOLO","FATTORE",
-      "DURATA","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACCE", "VALORE", "NOME"
-    ];
+      "VAR","ESPRESSIONE","CONDIZIONE","LISTA","INDICE","INIZIO","FINE","MESSAGGIO","TESTO",
+      "RAGGIO","SPESSORE","GRANDEZZA","ROSSO","VERDE","BLU","OGGETTO","ANGOLO","FATTORE",
+      "DURATA","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACCE", "VALORE", "NOME",
+      "NOME_SUONO", "LIVELLO"
+    ];
     
     const placeholdersEN = [
-      "VARIABLE","EXPRESSION","CONDITION","LIST","INDEX","START","END","PROMPT","TEXT",
-      "RADIUS","THICKNESS","SIZE","RED","GREEN","BLUE","OBJECT","ANGLE","FACTOR",
-      "DURATION","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACES", "VALUE", "NAME"
-    ];
+      "VARIABLE","EXPRESSION","CONDITION","LIST","INDEX","START","END","PROMPT","TEXT",
+      "RADIUS","THICKNESS","SIZE","RED","GREEN","BLUE","OBJECT","ANGLE","FACTOR",
+      "DURATION","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "FACES", "VALUE", "NAME",
+      "SOUND_NAME", "LEVEL"
+    ];
 
     const placeholdersNL = [
-      "VAR","EXPRESSIE","CONDITIE","LIJST","INDEX","BEGIN","EINDE","BERICHT","TEKST",
-      "STRAAL","DIKTE","GROOTTE","ROOD","GROEN","BLAUW","OBJECT","HOEK","FACTOR",
-      "DUUR","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "VLAKKEN", "WAARDE", "NAAM"
-    ];
+      "VAR","EXPRESSIE","CONDITIE","LIJST","INDEX","BEGIN","EINDE","BERICHT","TEKST",
+      "STRAAL","DIKTE","GROOTTE","ROOD","GROEN","BLAUW","OBJECT","HOEK","FACTOR",
+      "DUUR","X1","Y1","X2","Y2","X3","Y3","X","Y", "MIN", "MAX", "VLAKKEN", "WAARDE", "NAAM",
+      "GELUID_NAAM", "NIVEAU"
+    ];
 
     const tokenMap = {
       it: placeholdersIT,
@@ -3440,8 +3518,14 @@ function redrawAll(objects, context) {
     TOCK: [["tock"]],
     IMPORT: [["import"],["importa"],["importeer"]],
     LABEL: [["label"],["etichetta"]],
-    SCIENTIFIC: [["scientific"],["scientifica"],["wetenschappelijk"]]
-  };
+    SCIENTIFIC: [["scientific"],["scientifica"],["wetenschappelijk"]],
+    SOUND: [["sound"],["suono"],["geluid"]],
+    PLAY: [["play"],["suona"],["speel"]],
+    VOLUME: [["volume"]],
+    FADE: [["fade"],["dissolvenza"]],
+    OUT: [["out"],["uscita"],["uit"]],
+    IS_PLAYING: [["is", "playing"], ["sta", "suonando"], ["is", "aan", "het", "afspelen"]]
+  };
 
 
   const EXEC_STOP = { type: "ExecutionStop" };
@@ -3545,10 +3629,10 @@ function redrawAll(objects, context) {
           if (ch === "\"") return this.readString();
 
           // punctuation
-          if ("(),;[]".includes(ch)) {
+          if ("(),;[]:".includes(ch)) {
             const line = this.line, col = this.col;
             this.nextChar();
-            const map = { "(": "LPAREN", ")": "RPAREN", ",": "COMMA", ";": "SEMI", "[": "LBRACK", "]": "RBRACK" };
+            const map = { "(": "LPAREN", ")": "RPAREN", ",": "COMMA", ";": "SEMI", "[": "LBRACK", "]": "RBRACK", ":": "COLON" };
             return this.makeToken(map[ch], ch, line, col);
           }
 
@@ -3798,8 +3882,14 @@ function redrawAll(objects, context) {
         return { type:"ItemOf", list, index: idx, line: tok.line };
       }
 
+      // is playing NAME
+      if (this.matchKW("IS_PLAYING")) {
+        const nameTok = this.parseIdentifier();
+        return { type: "IsPlaying", name: nameTok.value, line: tok.line };
+      }
+
       // key <expr> is pressed
-      if (this.matchKW("KEY")) {
+      if (this.matchKW("KEY")) {
         const keyExpr=this.parseExpression(0, new Set(["is","viene","pressed","premuto","vale","uguale","ingedrukt"]));
         this.matchKW("IS"); 
         if (!this.matchKW("PRESSED")) this.throwParse(uiStrings[lang].expectedPressed, tok.line);
@@ -3967,8 +4057,14 @@ function redrawAll(objects, context) {
         return { type:"Return", expr, line: t.line };
       }
 
-      // stop
-      if (this.matchKW("STOP")) return { type:"Stop", line: t.line };
+      // stop [sound]
+      if (this.matchKW("STOP")) {
+        if (this.peek().type === "IDENT" && !this.isStopToken(null, this.peek())) {
+          const nameTok = this.parseIdentifier();
+          return { type: "StopSound", name: nameTok.value, line: t.line };
+        }
+        return { type:"Stop", line: t.line };
+      }
 
       // clear graphics / clear screen
       if (this.matchKW("CLEAR")) {
@@ -4010,6 +4106,92 @@ function redrawAll(objects, context) {
         const expr=this.parseExpression(0, null);
         return { type:"Output", expr, line: t.line };
       }
+
+      if (this.matchKW("SOUND")) {
+        const nameTok = this.parseIdentifier();
+        const lp = this.matchType("LPAREN");
+        if (!lp) this.throwParse(uiStrings[lang].expectedParenAfterKeyword, t.line);
+        const params = {};
+        while (!this.eof() && this.peek().type !== "RPAREN") {
+          this.skipSeparators(); // <--- IMPORTANTE: Salta gli a capo vuoti
+          if (this.peek().type === "RPAREN") break;
+          
+          const kwTok = this.consume();
+          const key = kwTok.value.toLowerCase();
+          
+          if (["noise", "rumore", "ruis"].includes(key)) params.kind = "noise";
+          else if (["sweep", "scivola"].includes(key)) params.kind = "sweep";
+          else if (["notes", "note", "noten"].includes(key)) {
+            params.kind = "notes";
+            this.matchType("LPAREN");
+            const notes = [];
+            while(this.peek().type !== "RPAREN" && !this.eof()) {
+              this.skipSeparators();
+              const freqExpr = this.parseExpression(0, new Set(["ms"]));
+              let durExpr = null;
+              if (this.matchType("COLON")) durExpr = this.parseExpression(0, new Set(["ms"]));
+              notes.push({ freq: freqExpr, dur: durExpr });
+              this.matchType("COMMA");
+              this.skipSeparators();
+            }
+            this.matchType("RPAREN");
+            params.notesExpr = notes;
+          }
+          else if (["wave", "onda", "golf"].includes(key)) {
+            params.wave = this.consume().value.toLowerCase();
+          }
+          else if (["loop", "ripeti", "herhaal"].includes(key)) {
+            const v = this.consume().value.toLowerCase();
+            params.loop = (v === "true" || v === "vero" || v === "waar");
+          }
+          else {
+            if (key === "from" || key === "da" || key === "van") {
+              params.freqFromExpr = this.parseExpression(0, new Set(["to","a","tot"]));
+              this.matchPhrase([["to"],["a"],["tot"]]);
+              params.freqToExpr = this.parseExpression(0, new Set(["hz", "ms"]));
+              // <--- IMPORTANTE: Consuma 'hz' o 'ms' se l'utente li ha scritti
+              if (this.peek().type === "IDENT" && ["hz", "ms"].includes(this.peek().value.toLowerCase())) this.consume();
+            } else {
+              let canonKey = key;
+              if (["durata","duur"].includes(key)) canonKey = "duration";
+              if (["attacco"].includes(key)) canonKey = "attack";
+              if (["decadimento"].includes(key)) canonKey = "decay";
+              if (["rilascio"].includes(key)) canonKey = "release";
+              if (["sostieni"].includes(key)) canonKey = "sustain";
+              if (["filtro"].includes(key)) canonKey = "filter";
+              if (["pan", "panorama"].includes(key)) canonKey = "pan";
+              if (["detune", "stona"].includes(key)) canonKey = "detune";
+              
+              params[canonKey + "Expr"] = this.parseExpression(0, new Set(["ms","hz"]));
+              if (this.peek().type === "IDENT" && ["ms","hz"].includes(this.peek().value.toLowerCase())) this.consume();
+            }
+          }
+        }
+        if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, t.line);
+        return { type: "SoundDef", name: nameTok.value, params, line: t.line };
+      }
+
+      if (this.matchKW("PLAY")) {
+        const nameTok = this.parseIdentifier();
+        return { type: "PlaySound", name: nameTok.value, line: t.line };
+      }
+
+      if (this.matchKW("FADE")) {
+        const nameTok = this.parseIdentifier();
+        let fadeIn = true;
+        if (this.matchKW("IN")) fadeIn = true;
+        else if (this.matchKW("OUT")) fadeIn = false;
+        else this.throwParse("Expected 'in' or 'out' / 'uit' / 'uscita'", t.line);
+        const durationExpr = this.parseExpression(0, new Set(["ms"]));
+        if (this.peek().type === "IDENT" && lowerTok(this.peek()) === "ms") this.consume();
+        return { type: "FadeSound", name: nameTok.value, fadeIn, durationExpr, line: t.line };
+      }
+
+      if (this.matchKW("VOLUME")) {
+        const nameTok = this.parseIdentifier();
+        const levelExpr = this.parseExpression(0, null);
+        return { type: "SetVolume", name: nameTok.value, levelExpr, line: t.line };
+      }
 
       // get/chiedi VAR saying/dicendo <expr>
       if (this.matchKW("GET")) {
@@ -4702,7 +4884,11 @@ function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
   // --- Runtime env ---
   const __yieldMC = new MessageChannel();
   const env = {
-    precision: null,
+    audioCtx: null,
+    masterGain: null,
+    sounds: Object.create(null),
+    soundHandles: Object.create(null),
+    precision: null,
     currentColor: "rgb(0, 0, 0)",
     gfxObjects: [],
     labels: Object.create(null),   // NAME -> {objects, scale, rotation}
@@ -5152,6 +5338,144 @@ function builtin_split(args) {
     }
   }
 
+  // --- Web Audio API Synth Engine (Polifonia, ADSR, Pan, Detune) ---
+  function applyADSRAndEffects(audioCtx, src, masterGain, params) {
+    const attack = Math.max((params.attack ?? 10) / 1000, 0.005);
+    const decay = Math.max((params.decay ?? 100) / 1000, 0.005);
+    const sustain = (params.sustain !== undefined) ? params.sustain / 100 : 0.5;
+    const release = (params.release ?? 300) / 1000;
+    const dur = (params.duration ?? 500) / 1000;
+    const panVal = (params.pan ?? 0) / 100;
+    const detuneVal = params.detune ?? 0;
+
+    if (src.detune) src.detune.value = detuneVal;
+
+    const gainNode = audioCtx.createGain();
+    const now = audioCtx.currentTime;
+    
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(1, now + attack);
+    gainNode.gain.exponentialRampToValueAtTime(Math.max(sustain, 0.001), now + attack + decay);
+    
+    if (!params.loop) {
+        gainNode.gain.setValueAtTime(Math.max(sustain, 0.001), now + dur);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + dur + release);
+        src.stop(now + dur + release);
+    }
+
+    let lastNode = gainNode;
+    if (audioCtx.createStereoPanner) {
+        const panner = audioCtx.createStereoPanner();
+        panner.pan.value = Math.max(-1, Math.min(1, panVal));
+        gainNode.connect(panner);
+        lastNode = panner;
+    }
+    lastNode.connect(masterGain);
+    return gainNode;
+  }
+
+  function synthNoise(params, audioCtx, masterGain) {
+    const dur = (params.duration ?? 500) / 1000;
+    const release = (params.release ?? 300) / 1000;
+    const totalTime = params.loop ? 10 : (dur + release);
+    
+    const bufSize = Math.max(1, Math.floor(audioCtx.sampleRate * totalTime));
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.loop = params.loop;
+
+    let filter = null;
+    if (params.filter) {
+        filter = audioCtx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = params.filter;
+        src.connect(filter);
+    }
+
+    src.start(); // deve partire prima di programmare lo stop nell'ADSR
+    
+    const gainNode = applyADSRAndEffects(audioCtx, src, masterGain, params);
+    if (filter) filter.connect(gainNode); else src.connect(gainNode);
+    
+    return { stop: () => src.stop(), gainNode, src };
+  }
+  function synthSweep(params, audioCtx, masterGain) {
+    const from = params.freqFrom ?? 800;
+    const to = params.freqTo ?? 200;
+    const dur = (params.duration ?? 200) / 1000;
+
+    const osc = audioCtx.createOscillator();
+    osc.type = params.wave ?? "sawtooth";
+    osc.frequency.setValueAtTime(from, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(to, audioCtx.currentTime + dur);
+
+    osc.start();
+    const gainNode = applyADSRAndEffects(audioCtx, osc, masterGain, params);
+    osc.connect(gainNode);
+    return { stop: () => osc.stop(), gainNode, src: osc };
+  }
+
+  function synthNotes(params, audioCtx, masterGain) {
+    const notes = params.notes || [{freq: 440, dur: null}];
+    const bpm = params.tempo || 120;
+    const sampleRate = audioCtx.sampleRate;
+    
+    let totalTime = 0;
+    const noteEvents = [];
+    for (const n of notes) {
+      const d = n.dur ? (n.dur / 1000) : (60 / bpm);
+      noteEvents.push({ freq: n.freq, dur: d });
+      totalTime += d;
+    }
+    
+    const totalSamples = Math.floor(totalTime * sampleRate);
+    const buffer = audioCtx.createBuffer(1, totalSamples, sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    let currentSample = 0;
+    for (const ne of noteEvents) {
+      const freq = ne.freq;
+      const noteSamples = Math.floor(ne.dur * sampleRate);
+      for (let j = 0; j < noteSamples; j++) {
+        const t = j / sampleRate;
+        let val = 0;
+        if (params.wave === "sine" || !params.wave) val = Math.sin(2 * Math.PI * freq * t);
+        else if (params.wave === "square") val = Math.sign(Math.sin(2 * Math.PI * freq * t));
+        else if (params.wave === "sawtooth") val = 2 * ((freq * t) % 1) - 1;
+        else if (params.wave === "triangle") val = 1 - 4 * Math.abs(Math.round(freq * t) - freq * t);
+        
+        let env = 1;
+        const attack = 0.01; const decay = 0.05;
+        if (t < attack) env = t / attack;
+        else if (t > ne.dur - decay) env = Math.max(0, (ne.dur - t) / decay);
+        
+        if (currentSample < totalSamples) data[currentSample++] = val * env * 0.3;
+      }
+    }
+    
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    src.loop = !!params.loop;
+    
+    // Su notes ignoriamo l'ADSR generico e applichiamo solo volume/pan master
+    const gainNode = audioCtx.createGain();
+    let lastNode = gainNode;
+    if (params.pan !== undefined && audioCtx.createStereoPanner) {
+        const panner = audioCtx.createStereoPanner();
+        panner.pan.value = Math.max(-1, Math.min(1, params.pan / 100));
+        gainNode.connect(panner);
+        lastNode = panner;
+    }
+    lastNode.connect(masterGain);
+    src.connect(gainNode);
+    src.start();
+    return { stop: () => src.stop(), gainNode, src };
+  }
+
   // ===== FASE B: RUNTIME HELPER (rt) =====
   const rt = {
     getVar: (sc, name) => { const v = lookupVariable(sc, name, name); if (v === undefined) throw new Error(`VAR_NOT_FOUND:${name}`); return v; },
@@ -5171,6 +5495,66 @@ function builtin_split(args) {
     isPoint: isPoint, coordFromValue: coordFromValue, colorFromTuple: colorFromTuple,
     fail: fail, wait: sleep, write: (val) => appendText(val, env.precision),
     addGfx: addGraphicObject, tock: () => builtin_tock([], 0),
+    isPlaying: (nameU) => {
+      return env.soundHandles[nameU] && env.soundHandles[nameU].length > 0;
+    },
+    defineSound: (nameU, params) => { env.sounds[nameU] = params; },
+    playSound: (nameU, origName) => {
+      const params = env.sounds[nameU];
+      if (!params) throw new Error(`SOUND_NOT_FOUND:${origName}`);
+      if (!env.audioCtx) {
+        env.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        env.masterGain = env.audioCtx.createGain();
+        env.masterGain.connect(env.audioCtx.destination);
+      }
+      if (env.audioCtx.state === "suspended") env.audioCtx.resume();
+      const handle = (params.kind === "noise") ? synthNoise(params, env.audioCtx, env.masterGain)
+                   : (params.kind === "sweep") ? synthSweep(params, env.audioCtx, env.masterGain)
+                   : (params.kind === "notes") ? synthNotes(params, env.audioCtx, env.masterGain) : null;
+      if (handle) {
+        if (!env.soundHandles[nameU]) env.soundHandles[nameU] = [];
+        env.soundHandles[nameU].push(handle);
+        // Pulizia automatica man mano che finiscono
+        if (handle.src) {
+           handle.src.onended = () => {
+             const idx = env.soundHandles[nameU].indexOf(handle);
+             if (idx > -1) env.soundHandles[nameU].splice(idx, 1);
+           };
+        }
+      }
+    },
+    stopSound: (nameU) => {
+      const handles = env.soundHandles[nameU];
+      if (handles) { 
+        handles.forEach(h => { try { h.stop(); } catch(e){} }); 
+        delete env.soundHandles[nameU]; 
+      }
+    },
+    setVolume: (nameU, level) => {
+      const handles = env.soundHandles[nameU];
+      if (handles && env.audioCtx) {
+         handles.forEach(h => {
+             if(h.gainNode) h.gainNode.gain.setValueAtTime(Math.max(0, Math.min(level, 100)) / 100, env.audioCtx.currentTime);
+         });
+      }
+    },
+    fadeSound: (nameU, fadeIn, duration) => {
+      const handles = env.soundHandles[nameU];
+      if (handles && env.audioCtx) {
+         const now = env.audioCtx.currentTime;
+         const target = fadeIn ? 1 : 0.001; 
+         handles.forEach(h => {
+             if(h.gainNode) {
+                 h.gainNode.gain.cancelScheduledValues(now);
+                 h.gainNode.gain.setValueAtTime(h.gainNode.gain.value, now);
+                 h.gainNode.gain.linearRampToValueAtTime(target, now + (duration/1000));
+                 if (!fadeIn) setTimeout(() => { try { h.stop(); } catch(e){} }, duration);
+             }
+         });
+         if (!fadeIn) setTimeout(() => { delete env.soundHandles[nameU]; }, duration);
+      }
+    },
+
     getPrecision: (v) => { const n = toInt(v); return (Number.isFinite(n) && n >= 0) ? n : null; },
     setSciThreshold: (v) => { if (typeof v !== "number" || !Number.isFinite(v) || v < 0) throw new Error("SCI_POSITIVE"); env.sciThreshold = v; },
     clearScreen: clearScreen,
@@ -5413,6 +5797,7 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       case "Dimension": return `(${compileExpr(node.expr, isAsync)}).length`;
       case "ItemOf": return `rt.getItem(${compileExpr(node.list, isAsync)}, ${compileExpr(node.index, isAsync)})`;
       case "KeyPressed": return `(!!env.keyState[String(${compileExpr(node.keyExpr, isAsync)}).toUpperCase()])`;
+      case "IsPlaying": return `rt.isPlaying("${node.name.toUpperCase()}")`;
       default: return "null";
     }
   }
@@ -5451,6 +5836,22 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       }
       case "Return": code += `${indent}return { __return: true, value: rt.deepCopy(${node.expr ? compileExpr(node.expr, isAsync) : "null"}) };\n`; break;
       case "Stop": code += `${indent}return { type: "ExecutionStop" };\n`; break;
+      case "SoundDef": {
+        let paramsObj = `{ kind: "${node.params.kind}", wave: "${node.params.wave || 'sine'}", loop: ${!!node.params.loop}`;
+        if (node.params.notesExpr) paramsObj += `, notes: [${node.params.notesExpr.map(n => `{freq: ${compileExpr(n.freq, isAsync)}, dur: ${n.dur ? compileExpr(n.dur, isAsync) : "null"}}`).join(",")}]`;
+        if (node.params.freqFromExpr) paramsObj += `, freqFrom: ${compileExpr(node.params.freqFromExpr, isAsync)}`;
+        if (node.params.freqToExpr) paramsObj += `, freqTo: ${compileExpr(node.params.freqToExpr, isAsync)}`;
+        for (const k of ["duration", "attack", "decay", "sustain", "release", "filter", "tempo", "pan", "detune"]) {
+          if (node.params[k + "Expr"]) paramsObj += `, ${k}: ${compileExpr(node.params[k + "Expr"], isAsync)}`;
+        }
+        paramsObj += " }";
+        code += `${indent}rt.defineSound("${node.name.toUpperCase()}", ${paramsObj});\n`;
+        break;
+      }
+      case "PlaySound": code += `${indent}rt.playSound("${node.name.toUpperCase()}", "${node.name}");\n`; break;
+      case "StopSound": code += `${indent}rt.stopSound("${node.name.toUpperCase()}");\n`; break;
+      case "SetVolume": code += `${indent}rt.setVolume("${node.name.toUpperCase()}", ${compileExpr(node.levelExpr, isAsync)});\n`; break;
+      case "FadeSound": code += `${indent}rt.fadeSound("${node.name.toUpperCase()}", ${node.fadeIn}, ${compileExpr(node.durationExpr, isAsync)});\n`; break;
       case "ClearScreen": code += `${indent}rt.clearScreen();\n`; break;
       case "ClearGraphics": code += `${indent}rt.clearGfx();\n`; break;
       case "FrameGraphics": code += `${indent}rt.frameGfx();\n`; break;
@@ -5619,6 +6020,7 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
          else if (msg === "ITEM_NOT_A_LIST") rt.fail("itemNotAList", "?", __line);
          else if (msg.startsWith("LABEL_EXISTS:")) rt.fail("labelExists", msg.split(":")[1], __line);
          else if (msg.startsWith("LABEL_NOT_FOUND:")) rt.fail("labelNotFound", msg.split(":")[1], __line);
+         else if (msg.startsWith("SOUND_NOT_FOUND:")) rt.fail("genericFail", {msg: "Non trovo un suono chiamato '" + msg.split(":")[1] + "'"}, __line);
          else if (msg === "SCALE_NOT_NUMBER") rt.fail("scaleNotNumber", null, __line);
          else if (msg === "ROTATION_NOT_NUMBER") rt.fail("rotationNotNumber", null, __line);
          else if (msg === "BG_FILE_NOT_TEXT") rt.fail("backgroundFilenameNotText", null, __line);
@@ -5665,7 +6067,12 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       env.functions = Object.create(null);
       env.procedures = Object.create(null);
       env.callDepth = 0;
-      env.importedFiles = new Set(); 
+      env.importedFiles = new Set();
+      Object.values(env.soundHandles || {}).flat().forEach(h => { try { h.stop?.(); } catch {} });
+      env.sounds = Object.create(null);
+      env.soundHandles = Object.create(null);
+      // Chiude l'audioContext precedente per uccidere i suoni appesi
+      if (env.audioCtx) { try { env.audioCtx.close(); } catch(e){} env.audioCtx = null; env.masterGain = null; }
       env.backgroundColor = null;
       env.backgroundImage = null;
       env.currentColor = "rgb(0, 0, 0)";
@@ -5673,7 +6080,7 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       env.sciThreshold = 1000000; 
       env.tickTime = null;
       env.__shadowWarnings = new Set();
-      env.keyState = keyState; 
+      env.keyState = keyState;
 
       env.varOriginalNames = {};
 
@@ -5765,6 +6172,9 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       try {
          await executable(rt, env, scopeChain, clearScreen, __yieldMC);
       } catch (e) {
+        // AMMAZZA I SUONI in caso di errore runtime nel programma dell'utente
+        Object.values(env.soundHandles || {}).flat().forEach(h => { try { h.stop?.(); } catch {} });
+        
         if (e && e.message === "Execution stopped.") {
           // SILENT EXIT (L'errore è già stato stampato formattato da rt.fail)
         } else {
@@ -6139,6 +6549,10 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
   stopButton.addEventListener("click", () => {
     if (isRunning) {
       env.__forceStop = true;
+      Object.values(env.soundHandles || {}).flat().forEach(h => { try { h.stop?.(); } catch {} });
+      env.soundHandles = Object.create(null);
+      if (env.audioCtx) { try { env.audioCtx.close(); } catch(e){} env.audioCtx = null; env.masterGain = null; }
+
             if (env.__sleepCancel) env.__sleepCancel();
             if (env.__sleepResolve) {
               const r = env.__sleepResolve;
