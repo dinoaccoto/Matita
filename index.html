@@ -553,6 +553,11 @@ function initMatita() {
       dimensionNeedsList: "Puoi ottenere la dimensione solo di una lista.",
       tockWithoutTick: "Impossibile usare 'tock': il cronometro non è stato avviato con 'tick'.",
       programStopped: "Programma fermato.",
+      soundNotFound: (name) => `Non trovo un suono chiamato '${name}'`,
+      notADict: "Questa variabile non è un dizionario.",
+      keyNotFound: (key) => `Chiave '${key}' non trovata nel dizionario.`,
+      includeFetchFail: (p) => `Impossibile caricare '${p.file}': ${p.err}`,
+      includeParseFail: (p) => `Errore sintassi in '${p.file}': ${p.err}`,
       expectedKeyword: (name) => {
         const map = {
           "OF": "di", "TO": "a", "AT": "in", "THEN": "allora", "YOU_DO": "esegui",
@@ -654,6 +659,11 @@ function initMatita() {
       dimensionNeedsList: "You can only get the dimension of a list.",
       tockWithoutTick: "Cannot use 'tock': stopwatch not started with 'tick'.",
       programStopped: "Program stopped.",
+      soundNotFound: (name) => `I can't find a sound named '${name}'`,
+      notADict: "This variable is not a dictionary.",
+      keyNotFound: (key) => `Key '${key}' not found in the dictionary.`,
+      includeFetchFail: (p) => `Cannot load '${p.file}': ${p.err}`,
+      includeParseFail: (p) => `Syntax error in '${p.file}': ${p.err}`,
       expectedKeyword: (name) => {
         const map = { "saying/with": "saying/with", "YOU_DO": "you do" };
         return `Expected keyword '${map[name] || name.toLowerCase()}'.`;
@@ -747,6 +757,11 @@ function initMatita() {
       dimensionNeedsList: "De lengte kan alleen worden opgevraagd van een lijst.",
       tockWithoutTick: "Kan 'tock' niet gebruiken: stopwatch niet gestart met 'tick'.",
       programStopped: "Programma gestopt.",
+      soundNotFound: (name) => `Kan geen geluid vinden met de naam '${name}'`,
+      notADict: "Deze variabele is geen woordenboek.",
+      keyNotFound: (key) => `Sleutel '${key}' niet gevonden in het woordenboek.`,
+      includeFetchFail: (p) => `Kan '${p.file}' niet laden: ${p.err}`,
+      includeParseFail: (p) => `Syntactische fout in '${p.file}': ${p.err}`,
       expectedKeyword: (name) => {
         const map = {
           "COLOR": "kleur in", "OF": "van", "TO": "tot", "AT": "op",
@@ -1047,8 +1062,8 @@ const dictEnToNl = {
     "argmin": "minindex",          "argmax": "maxindex",
     "different": "verschillend",
     "type": "type",
-    "numeric": "numeriek",         "dice": "dobbelsteen",
-    "scientific": "wetenschappelijk", "digits": "decimalen",
+    "numeric": "numeriek", "dice": "dobbelsteen",
+    "scientific": "wetenschappelijk", "digits": "decimalen", "whichlanguage": "welketaal",
     "split": "splits",             "infinity": "oneindig",
     "and": "en",      "or": "of",      "not": "niet",
     "is": "is",
@@ -1069,8 +1084,8 @@ const dictEnToNl = {
     "gradi": "deg", "posiziona": "place", "scala": "scale", "carica": "load", "dipingi": "paint", "sfondo": "background", "tasto": "key", "uguale": "equals",
     "premuto": "pressed", "importa": "import", "etichetta": "label", "vero": "true", "falso": "false", "radice": "squareroot", "tronca": "trunc", "arrotonda": "round",
     "minimo": "min", "massimo": "max", "casuale": "random", "punto": "point", "indicedi": "indexof", "scomposizione": "decomposition", "composizione": "composition",
-    "tipo": "type", "numerico": "numeric", "dado": "dice", "scientifica": "scientific", "decimali": "digits",
-    "da": "from", "se": "if", "allora": "then", "e": "and", "ed": "and", "di": "of", "in": "in", "come": "as", "a": "to", "vale": "is", "o": "or", "non": "not", "diverso": "different"
+    "tipo": "type", "numerico": "numeric", "dado": "dice", "scientifica": "scientific", "decimali": "digits", "chelingua": "whichlanguage",
+    "da": "from", "se": "if", "ha": "has", "chiave": "key", "chiavi": "keys", "allora": "then", "e": "and", "ed": "and", "di": "of", "in": "in", "come": "as", "a": "to", "vale": "is", "o": "or", "non": "not", "diverso": "different"
   };
 
   const dictNlToEn = {
@@ -1091,8 +1106,8 @@ const dictEnToNl = {
     "minwaarde": "valmin", "maxwaarde": "valmax",
     "minindex": "argmin", "maxindex": "argmax", "min": "min", "max": "max", "willekeurig": "random", "punt": "point", "indexvan": "indexof", "ontbind": "decomposition", 
     "samenvoegen": "composition",
-    "type": "type", "numeriek": "numeric", "dobbelsteen": "dice", "wetenschappelijk": "scientific", "decimalen": "digits", "cijfers": "digits",
-    "splits": "split", "oneindig": "infinity", "en": "and", "of": "or", "niet": "not", "is": "is",
+    "type": "type", "numeriek": "numeric", "dobbelsteen": "dice", "wetenschappelijk": "scientific", "decimalen": "digits", "cijfers": "digits", "welketaal": "whichlanguage",
+    "splits": "split", "heeft": "has", "sleutel": "key", "sleutels": "keys", "oneindig": "infinity", "en": "and", "of": "or", "niet": "not", "is": "is",
     "verschillend": "different", "tot": "to", "van": "of", "uit": "from", "in": "in", "op": "at", "null": "null", "tick": "tick", "tock": "tock", "ms": "ms"
   };
 
@@ -1140,9 +1155,6 @@ const dictEnToNl = {
     return parts.join("");
   }
 
-  function getInverseDict(lang) {
-    return LANG_REGISTRY[lang]?.inverseDict || {};
-  }
 
 // ===== SERIALIZZATORE AST → CODICE SORGENTE =====
 
@@ -1172,6 +1184,7 @@ const dictEnToNl = {
     "cast":         {en:"cast",          it:"cast",             nl:"cast"},
     "unicode":      {en:"unicode",       it:"unicode",          nl:"unicode"},
     "tock":         {en:"tock",          it:"tock",             nl:"tock"},
+    "whichlanguage":{en:"whichlanguage", it:"chelingua",        nl:"welketaal"},
   };
 
 
@@ -1238,8 +1251,11 @@ const dictEnToNl = {
     true_:  {en:"true",          it:"vero",          nl:"waar"},
     false_: {en:"false",         it:"falso",         nl:"onwaar"},
     inf:    {en:"infinity",      it:"infinito",      nl:"oneindig"},
-    is:     {en:"is",            it:"vale",          nl:"is"},
+    is:     {en:"is",             it:"vale",         nl:"is"},
     diff:   {en:"different from",it:"diverso da",    nl:"verschillend van"},
+    has:    {en:"has",            it:"ha",           nl:"heeft"},
+    key:    {en:"key",            it:"chiave",       nl:"sleutel"},
+    keys:   {en:"keys",           it:"chiavi",       nl:"sleutels"},
   };
 
   function serializeExpr(node, lang) {
@@ -1320,6 +1336,11 @@ const dictEnToNl = {
         return G("dimof") + " " + serializeExpr(node.expr, lang);
       case "ItemOf":
         return G("item") + " " + serializeExpr(node.index, lang) + " " + G("of") + " " + serializeExpr(node.list, lang);
+      case "DictHas":
+        const inKw = {en:"in", it:"in", nl:"in"}[lang];
+        return G("has") + " " + G("key") + " " + serializeExpr(node.key, lang) + " " + inKw + " " + serializeExpr(node.dict, lang);
+      case "DictKeys":
+        return G("keys") + " " + G("of") + " " + serializeExpr(node.dict, lang);
       case "KeyPressed": {
         const mid = lang === "en" ? " is " : " ";
         return G("key") + " " + serializeExpr(node.keyExpr, lang) + mid + G("pressed");
@@ -1486,6 +1507,15 @@ const dictEnToNl = {
       case "PutItem":
         return K("put") + " " + sx(node.rhs) + " " + K("in_") + " " +
                K("item") + " " + sx(node.idx) + " " + K("of_") + " " + sx(node.listExpr);
+
+      case "DictPut":
+        return K("put") + " " + sx(node.rhs) + " " + K("in_") + " " + node.varNameUpper + "[" + sx(node.keyExpr) + "]";
+
+      case "DictRemove": {
+        const remKW = {en:"remove key", it:"rimuovi chiave", nl:"verwijder sleutel"}[lang];
+        const fromKW = {en:"from", it:"da", nl:"uit"}[lang];
+        return remKW + " " + sx(node.keyExpr) + " " + fromKW + " " + node.varNameUpper;
+      }
 
       case "Add":
         if (lang === "nl") return "voeg " + sx(node.valueExpr) + " toe aan " + node.listName;
@@ -1693,7 +1723,7 @@ const dictEnToNl = {
 
   infoButton.addEventListener("click", () => {
     fileDropdownMenu.style.display = "none";
-    alert("Matita ver. 0.6.0\n(c) 2025-2026 Dino Accoto");
+    alert("Matita ver. 0.5.0\n(c) 2025-2026 Dino Accoto");
   });
 
   // Chiudi menu File al click sulle voci (le funzioni originali vengono comunque innescate grazie agli ID)
@@ -1784,19 +1814,19 @@ const dictEnToNl = {
 
 
   const KEYWORDS_EN = [
-    "alias", "to", "inout", "define","function","procedure","global","return","stop",
-    "sound", "play", "volume", "noise", "sweep", "notes", "loop", "tempo", "filter", "wave", "attack", "decay", "duration",
+    "alias", "to", "inout", "define","function","procedure","global","return","stop", "keys", "has", "key",
+    "sound", "play", "volume", "fade", "out", "noise", "sweep", "notes", "loop", "tempo", "filter", "wave", "attack", "decay", "duration",
+    "suono", "suona", "ferma", "dissolvenza", "uscita", "rumore", "scivola", "note", "onda", "durata", "attacco", "decadimento", "rilascio", "sostieni", "filtro", "stona", "panorama",
+    "geluid", "speel", "uit", "ruis", "noten", "golf", "duur", "herhaal",
     "if","then","otherwise","as","long","you","do","for","each","index","goes","from","and",
     "put","in","add","remove","insert","first","last","item","of","dimension","list",
     "write","newline","wait","ms","get","saying","set","color","clear","screen","graphics","redraw","frame",
     "circle","radius","circumference","thickness","rectangle","line","triangle","arc","graffiti","draw",
     "rotate","deg","place","it","at","scale","by","load","paint","background",
     "true","false","or","not","is","equals", "different", "digits", "mod","pi","infinity","nan",
-    "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","key","pressed",
+    "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","pressed",
     "split","decomposition","composition","unicode","indexof","tick","tock","null","import","label", "scientific"
   ];
-
-  const BUILTINS_EN = ["abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","cast","unicode","indexof","decomposition","composition","split", "dice", "type", "numeric", "valmin", "valmax", "argmin", "argmax"];
 
   // Costruisce ALL_KEYWORDS unendo EN + tutte le traduzioni dei dict dinamicamente
   function buildAllKeywords() {
@@ -1870,7 +1900,7 @@ const dictEnToNl = {
         continue;
       }
 
-      if ("()[],".includes(ch)) { out += `<span class="tok-punc">${escapeHtml(ch)}</span>`; i++; continue; }
+      if ("()[],:{}".includes(ch)) { out += `<span class="tok-punc">${escapeHtml(ch)}</span>`; i++; continue; }
       if ("+-*/%<>=!^;".includes(ch)) {
         const op = line.slice(i).match(RE_OP);
         
@@ -1987,9 +2017,20 @@ const dictEnToNl = {
     { label: "load \"file\" scale F as background", insert: "load \"file\" scale FACTOR as background\n", detail: "Image background" },
     { label: "paint background", insert: "paint background\n", detail: "Fill background with color" },
 
+    // Dictionaries
+    { label: "put {} in D",                   insert: "put {} in DICT\n",                              detail: "Empty dictionary" },
+    { label: "put {k:v} in D",                insert: "put {\"KEY\": VALUE} in DICT\n",               detail: "Dictionary with entries" },
+    { label: "D[\"key\"]",                    insert: "DICT[\"KEY\"]",                                 detail: "Read value from dictionary" },
+    { label: "put val in D[\"key\"]",         insert: "put VALUE in DICT[\"KEY\"]\n",                  detail: "Write value to dictionary" },
+    { label: "has key K in D",                insert: "has key \"KEY\" in DICT",                       detail: "True if key exists" },
+    { label: "keys of D",                     insert: "keys of DICT",                                  detail: "List of all keys" },
+    { label: "remove key K from D",           insert: "remove key \"KEY\" from DICT\n",                detail: "Delete a key" },
+    { label: "dimension of D",                insert: "dimension of DICT",                             detail: "Number of keys in dictionary" },
+
     // Math & Time
     { label: "tick", insert: "tick\n", detail: "Start stopwatch" },
     { label: "tock", insert: "tock", detail: "Elapsed ms since tick" },
+    { label: "whichlanguage()", insert: "whichlanguage()", detail: "Returns active language (EN, IT, NL)" },
     { label: "random(min, max)", insert: "random(MIN, MAX)", detail: "Random number A to B" },
     { label: "dice( faces )", insert: "dice(FACES)", detail: "Random integer 1 to N" },
     // Audio
@@ -2043,8 +2084,20 @@ const dictEnToNl = {
         { label: "dipingi sfondo", insert: "dipingi sfondo\n", detail: "Sfondo colore o immagine" },
         { label: "aspetta N ms", insert: "aspetta DURATA ms\n", detail: "Pausa" },
         { label: "chiedi VAR dicendo \"...\"", insert: "chiedi VAR dicendo \"MESSAGGIO\"\n", detail: "Input utente" },
+        
+        // Dizionari
+        { label: "metti {} in D",                  insert: "metti {} in DICT\n",                           detail: "Dizionario vuoto" },
+        { label: "metti {k:v} in D",               insert: "metti {\"CHIAVE\": VALORE} in DICT\n",         detail: "Dizionario con voci" },
+        { label: "D[\"chiave\"]",                  insert: "DICT[\"CHIAVE\"]",                              detail: "Legge un valore dal dizionario" },
+        { label: "metti val in D[\"chiave\"]",     insert: "metti VALORE in DICT[\"CHIAVE\"]\n",            detail: "Scrive un valore nel dizionario" },
+        { label: "ha chiave K in D",               insert: "ha chiave \"CHIAVE\" in DICT",                  detail: "Vero se la chiave esiste" },
+        { label: "chiavi di D",                    insert: "chiavi di DICT",                                detail: "Lista di tutte le chiavi" },
+        { label: "rimuovi chiave K da D",          insert: "rimuovi chiave \"CHIAVE\" da DICT\n",           detail: "Elimina una chiave" },
+        { label: "dimensione di D",                insert: "dimensione di DICT",                            detail: "Numero di chiavi nel dizionario" },
+        
         { label: "tick", insert: "tick\n", detail: "Avvia il cronometro" },
         { label: "tock", insert: "tock", detail: "Millisecondi trascorsi da tick" },
+        { label: "chelingua()", insert: "chelingua()", detail: "Restituisce la lingua attiva (EN, IT, NL)" },
         { label: "casuale(min, max)", insert: "casuale(MIN, MAX)", detail: "Numero casuale tra A e B" },
         { label: "dado( facce )", insert: "dado(FACCE)", detail: "Numero intero tra 1 e N" },
         { label: "tipo(x)", insert: "tipo(VALORE)", detail: "Restituisce 'number', 'string', 'list', 'point'..." },
@@ -2100,9 +2153,19 @@ const dictEnToNl = {
       { label: "vul achtergrond in", insert: "vul achtergrond in\n", detail: "Achtergrondkleur" },
       { label: "wacht N ms", insert: "wacht DUUR ms\n", detail: "Pauze" },
       { label: "vraag VAR met bericht \"...\"", insert: "vraag VAR met bericht \"BERICHT\"\n", detail: "Gebruikersinvoer" },
-      { label: "tick", insert: "tick\n", detail: "Start de stopwatch" },
+      // Woordenboeken
+      { label: "zet {} in D",                    insert: "zet {} in DICT\n",                              detail: "Leeg woordenboek" },
+      { label: "zet {k:v} in D",                 insert: "zet {\"SLEUTEL\": WAARDE} in DICT\n",           detail: "Woordenboek met waarden" },
+      { label: "D[\"sleutel\"]",                 insert: "DICT[\"SLEUTEL\"]",                              detail: "Leest waarde uit woordenboek" },
+      { label: "zet val in D[\"sleutel\"]",      insert: "zet WAARDE in DICT[\"SLEUTEL\"]\n",             detail: "Schrijft waarde naar woordenboek" },
+      { label: "heeft sleutel K in D",           insert: "heeft sleutel \"SLEUTEL\" in DICT",              detail: "Waar als sleutel bestaat" },
+      { label: "sleutels van D",                 insert: "sleutels van DICT",                              detail: "Lijst van alle sleutels" },
+      { label: "verwijder sleutel K uit D",      insert: "verwijder sleutel \"SLEUTEL\" uit DICT\n",       detail: "Verwijdert een sleutel" },
+      { label: "lengte van D",                   insert: "lengte van DICT",},
+      { label: "tick", insert: "tick\n", detail: "Start de stopwatch" },
       { label: "tock", insert: "tock", detail: "Milliseconden verstreken na tick" },
-      { label: "willekeurig(min, max)", insert: "willekeurig(MIN, MAX)", detail: "Willekeurig getal van A tot B" },
+      { label: "welketaal()", insert: "welketaal()", detail: "Geeft de actieve taal terug (EN, IT, NL)" },      
+      { label: "willekeurig(min, max)", insert: "willekeurig(MIN, MAX)", detail: "Willekeurig getal van A tot B" },
       { label: "dobbelsteen( vlakken )", insert: "dobbelsteen(VLAKKEN)", detail: "Geheel getal van 1 tot N" },
       { label: "type(x)", insert: "type(WAARDE)", detail: "Geeft 'number', 'string', 'list', 'point'..." },
       { label: "numeriek(x)", insert: "numeriek(WAARDE)", detail: "Waar als het argument een geldig getal is" },
@@ -2354,7 +2417,6 @@ const dictEnToNl = {
 
   // --- 2) Helpers ---
   const found = new Map();
-  const isWordCharLocal = (ch) => /[A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]/.test(ch);
 
   const add = (name, type, score) => {
       if (!name) return;
@@ -2370,9 +2432,8 @@ const dictEnToNl = {
     if (!prev || score > prev.score) found.set(lower, { name, type, score });
   };
 
-  const tokLower = (t) => (t && t.type === "IDENT" ? t.value.toLowerCase() : "");
-
   const matchPhraseAt = (i, words) => {
+
     for (let k = 0; k < words.length; k++) {
       const t = tokens[i + k];
       if (!t || t.type !== "IDENT" || t.value.toLowerCase() !== words[k]) return false;
@@ -2938,8 +2999,13 @@ const dictEnToNl = {
     if (typeof value === "number") return formatNumber(value, precision);
     if (isPoint(value)) return `Point(${formatNumber(value.x, precision)}, ${formatNumber(value.y, precision)})`;
     if (Array.isArray(value)) return `(${value.map(v => formatForOutput(v, precision)).join(", ")})`;
+    if (typeof value === "object" && value !== null && value.__type === "dict") {
+      const entries = Object.entries(value.__data).map(([k,v]) => `"${k}": ${formatForOutput(v, precision)}`);
+      return `{${entries.join(", ")}}`;
+    }
     return String(value);
   }
+
 
   function appendLine(message, isError=false, precision=null) {
     const prefix = needsPrompt() ? CONSOLE_PROMPT : "";
@@ -2983,7 +3049,13 @@ const dictEnToNl = {
     if (Array.isArray(v)) {
       return v.map(deepCopyValue);
     }
+    
     if (isPoint(v)) return { __type: "point", x: v.x, y: v.y };
+    if (v.__type === "dict") {
+      const copy = { __type: "dict", __data: Object.create(null) };
+      for (const k of Object.keys(v.__data)) copy.__data[k] = deepCopyValue(v.__data[k]);
+      return copy;
+    }
           try { return JSON.parse(JSON.stringify(v)); } catch { return v; }
   }
 
@@ -3524,11 +3596,12 @@ function redrawAll(objects, context) {
     VOLUME: [["volume"]],
     FADE: [["fade"],["dissolvenza"]],
     OUT: [["out"],["uscita"],["uit"]],
+    HAS_KEY:    [["has","key"],["ha","chiave"],["heeft","sleutel"]],
+    KEYS:       [["keys"],["chiavi"],["sleutels"]],
     IS_PLAYING: [["is", "playing"], ["sta", "suonando"], ["is", "aan", "het", "afspelen"]]
   };
 
 
-  const EXEC_STOP = { type: "ExecutionStop" };
   function isLetterStart(ch) { return /[A-Za-z_àèéìòùÀÈÉÌÒÙ]/.test(ch); }
   function isLetterPart(ch) { return /[A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]/.test(ch); }
 
@@ -3629,10 +3702,10 @@ function redrawAll(objects, context) {
           if (ch === "\"") return this.readString();
 
           // punctuation
-          if ("(),;[]:".includes(ch)) {
+          if ("(),;[]:{}" .includes(ch)) {
             const line = this.line, col = this.col;
             this.nextChar();
-            const map = { "(": "LPAREN", ")": "RPAREN", ",": "COMMA", ";": "SEMI", "[": "LBRACK", "]": "RBRACK", ":": "COLON" };
+            const map = { "(": "LPAREN", ")": "RPAREN", ",": "COMMA", ";": "SEMI", "[": "LBRACK", "]": "RBRACK", ":": "COLON", "{": "LBRACE", "}": "RBRACE" };
             return this.makeToken(map[ch], ch, line, col);
           }
 
@@ -3681,9 +3754,8 @@ function redrawAll(objects, context) {
     consume(){ return this.tokens[this.pos++]; }
     matchType(type){ if (this.peek().type===type) return this.consume(); return null; }
 
-    isWord(tok, word) { return tok && tok.type==="IDENT" && tok.value.toLowerCase()===word; }
-
     // Match any of the provided phrase variants.
+    
     matchPhrase(variants) {
       // variants: array of arrays of words, e.g. [["as","long","as"],["fintanto"]]
       for (const seq of variants) {
@@ -3751,7 +3823,7 @@ function redrawAll(objects, context) {
     // Expression parsing (Pratt)
     isStopToken(stopSet, tok) {
       if (!tok) return true;
-      if (tok.type==="EOF" || tok.type==="NEWLINE" || tok.type==="SEMI" || tok.type==="RPAREN" || tok.type==="COMMA" || tok.type==="RBRACK") return true;
+      if (tok.type==="EOF" || tok.type==="NEWLINE" || tok.type==="SEMI" || tok.type==="RPAREN" || tok.type==="COMMA" || tok.type==="RBRACK" || tok.type==="RBRACE") return true;
       if (stopSet && tok.type==="IDENT" && stopSet.has(tok.value.toLowerCase())) return true;
       return false;
     }
@@ -3786,6 +3858,15 @@ function redrawAll(objects, context) {
       while (!this.eof()) {
         const tok=this.peek();
         if (this.isStopToken(stopSet, tok)) break;
+
+        // subscript: expr["chiave"]
+        if (tok.type === "LBRACK") {
+          this.consume();
+          const key = this.parseExpression(0, null);
+          if (!this.matchType("RBRACK")) this.throwParse("']' mancante.", tok.line);
+          left = { type: "Subscript", object: left, key, line: tok.line };
+          continue;
+        }
 
         // special: x of POINT / y of POINT
         const w = (tok.type==="IDENT") ? tok.value.toLowerCase() : "";
@@ -3853,6 +3934,22 @@ function redrawAll(objects, context) {
         }
       }
 
+      // dizionario: {} oppure {"chiave": valore, ...}
+      if (tok.type === "LBRACE") {
+        const lb = this.consume();
+        if (this.matchType("RBRACE")) return { type: "DictLiteral", entries: [], line: lb.line };
+        const entries = [];
+        while (true) {
+          const keyExpr = this.parseExpression(0, stopSet);
+          if (!this.matchType("COLON")) this.throwParse("Atteso ':' nel dizionario.", lb.line);
+          const valExpr = this.parseExpression(0, stopSet);
+          entries.push({ key: keyExpr, value: valExpr });
+          if (!this.matchType("COMMA")) break;
+        }
+        if (!this.matchType("RBRACE")) this.throwParse("'}' mancante nel dizionario.", lb.line);
+        return { type: "DictLiteral", entries, line: lb.line };
+      }
+
       // list(...) special
       if (this.matchKW("LIST")) {
         const lp=this.matchType("LPAREN");
@@ -3889,12 +3986,36 @@ function redrawAll(objects, context) {
       }
 
       // key <expr> is pressed
-      if (this.matchKW("KEY")) {
-        const keyExpr=this.parseExpression(0, new Set(["is","viene","pressed","premuto","vale","uguale","ingedrukt"]));
-        this.matchKW("IS"); 
-        if (!this.matchKW("PRESSED")) this.throwParse(uiStrings[lang].expectedPressed, tok.line);
-        return { type:"KeyPressed", keyExpr, line: tok.line };
-      }
+      {
+        const save = this.pos;
+        if (this.matchKW("KEY")) {
+          try {
+            const keyExpr = this.parseExpression(0, new Set(["is","viene","pressed","premuto","vale","uguale","ingedrukt"]));
+            this.matchKW("IS"); // Opzionale
+            if (this.matchKW("PRESSED")) {
+              return { type:"KeyPressed", keyExpr, line: tok.line };
+            }
+          } catch (e) {
+            // Se fallisce il parsing, ignoriamo l'errore e procediamo
+          }
+          this.pos = save; // Backtracking: 'key' è solo un nome di variabile
+        }
+      }
+
+      // has key K in D / ha chiave K in D / heeft sleutel K in D
+      if (this.matchKW("HAS_KEY")) {
+        const keyExpr = this.parseExpression(0, new Set(["in"]));
+        this.expectKW("IN", tok.line);
+        const dictExpr = this.parseExpression(0, stopSet);
+        return { type: "DictHas", key: keyExpr, dict: dictExpr, line: tok.line };
+      }
+
+      // keys of D / chiavi di D / sleutels van D
+      if (this.matchKW("KEYS")) {
+        this.expectKW("OF", tok.line);
+        const dictExpr = this.parseExpression(0, stopSet);
+        return { type: "DictKeys", dict: dictExpr, line: tok.line };
+      }
 
       // identifier or function call
       if (tok.type==="IDENT") {
@@ -4217,6 +4338,7 @@ function redrawAll(objects, context) {
         this.expectKW("OF", t.line);
         
         let targetExpr;
+
         if (this.matchKW("ITEM")) {
           const idxExpr = this.parseExpression(0, new Set(["of","di","van"]));
           this.expectKW("OF", t.line);
@@ -4433,6 +4555,15 @@ function redrawAll(objects, context) {
       if (this.matchKW("PUT")) {
         const rhs=this.parseExpression(0, new Set(["in"]));
         this.expectKW("IN", t.line);
+
+        // put val in D["chiave"]
+        if (this.peek().type === "IDENT" && this.peek(1) && this.peek(1).type === "LBRACK") {
+          const dictTok = this.consume();
+          this.consume(); // [
+          const keyExpr = this.parseExpression(0, null);
+          if (!this.matchType("RBRACK")) this.throwParse("']' mancante.", dictTok.line);
+          return { type: "DictPut", varNameUpper: dictTok.value.toUpperCase(), keyExpr, rhs, line: t.line };
+        }
         
         if (this.matchKW("ITEM")) {
           const idx=this.parseExpression(0, new Set(["of","di","van"]));
@@ -4523,7 +4654,17 @@ function redrawAll(objects, context) {
 
       // remove ...
       if (this.matchKW("REMOVE")) {
-        // remove first/last item from LIST
+        
+        // remove key K from D / rimuovi chiave K da D / verwijder sleutel K uit D
+        if (this.peek().type === "IDENT" && ["key","chiave","sleutel"].includes(this.peek().value.toLowerCase())) {
+          this.consume();
+          const keyExpr = this.parseExpression(0, new Set(["from","da","uit","van"]));
+          this.matchPhrase([["from"],["da"],["uit"],["van"]]);
+          const dictTok = this.parseIdentifier();
+          return { type: "DictRemove", varNameUpper: dictTok.value.toUpperCase(), keyExpr, line: t.line };
+        }
+
+        // remove first/last item from LIST
         if (this.matchKW("FIRST")) {
           this.expectKW("ITEM", t.line);
           this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
@@ -5182,6 +5323,10 @@ function builtin_split(args) {
   regBuiltin(["cast"], (a)=>builtin_cast(a));
   regBuiltin(["unicode"], (a)=>builtin_unicode(a));
   regBuiltin(["tock"], (a,line)=>builtin_tock(a,line));
+  regBuiltin(["mouse_x"], () => env.mouseX || 0);
+  regBuiltin(["mouse_y"], () => env.mouseY || 0);
+  regBuiltin(["mouse_pressed", "mouse_premuto", "mouse_ingedrukt"], () => !!env.mouseDown);
+  regBuiltin(["whichlanguage", "chelingua", "welketaal"], () => currentLang.toUpperCase());
 
 
   
@@ -5196,7 +5341,7 @@ function builtin_split(args) {
     "afkappen": "trunc", "afronden": "round", "willekeurig": "random", "splits": "split",
     "ontbind": "decomposition", "samenvoegen": "composition", "minwaarde": "valmin",
     "maxwaarde": "valmax", "minindex": "argmin", "maxindex": "argmax", "dobbelsteen": "dice",
-    "punt": "point", "indexvan": "indexof"
+    "punt": "point", "indexvan": "indexof", "chelingua": "whichlanguage", "welketaal": "whichlanguage"
   };
 
   function canonicalizeCalls(node) {
@@ -5755,6 +5900,37 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       return await def(rt, env, [sc[0]], args, sc);
     },
 
+    sizeOf: (v) => {
+      if (Array.isArray(v)) return v.length;
+      if (v && v.__type === "dict") return Object.keys(v.__data).length;
+      throw new Error("DIM_NOT_LIST_OR_DICT");
+    },
+    dictGet: (dict, key) => {
+      if (!dict || dict.__type !== "dict") throw new Error("NOT_A_DICT");
+      const k = String(key);
+      if (!(k in dict.__data)) throw new Error(`KEY_NOT_FOUND:${k}`);
+      const v = dict.__data[k];
+      return Array.isArray(v) ? markShared(v) : v;
+    },
+    dictSet: (sc, nameUpper, key, value) => {
+      const d = lookupVariable(sc, nameUpper, nameUpper);
+      if (!d || d.__type !== "dict") throw new Error("NOT_A_DICT");
+      d.__data[String(key)] = deepCopyValue(value);
+    },
+    dictHas: (dict, key) => {
+      if (!dict || dict.__type !== "dict") return false;
+      return String(key) in dict.__data;
+    },
+    dictKeys: (dict) => {
+      if (!dict || dict.__type !== "dict") return [];
+      return Object.keys(dict.__data);
+    },
+    dictRemove: (sc, nameUpper, key) => {
+      const d = lookupVariable(sc, nameUpper, nameUpper);
+      if (!d || d.__type !== "dict") throw new Error("NOT_A_DICT");
+      delete d.__data[String(key)];
+    },
+
     addOps: (a, b) => {
       if (typeof a !== "string" && typeof b !== "string") return Number(a) + Number(b);
       const p = env.precision;
@@ -5794,10 +5970,19 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
         return isAsync ? `(await rt.callUserFuncAsync("${node.name.toUpperCase()}", ${callArgs}, sc))` : `rt.callUserFuncSync("${node.name.toUpperCase()}", ${callArgs}, sc)`;
       }
       case "PointProp": return `(${compileExpr(node.object, isAsync)}).${node.prop}`;
-      case "Dimension": return `(${compileExpr(node.expr, isAsync)}).length`;
+      case "Dimension": return `rt.sizeOf(${compileExpr(node.expr, isAsync)})`;
       case "ItemOf": return `rt.getItem(${compileExpr(node.list, isAsync)}, ${compileExpr(node.index, isAsync)})`;
       case "KeyPressed": return `(!!env.keyState[String(${compileExpr(node.keyExpr, isAsync)}).toUpperCase()])`;
       case "IsPlaying": return `rt.isPlaying("${node.name.toUpperCase()}")`;
+      case "DictLiteral":
+        if (node.entries.length === 0) return `({__type:"dict",__data:Object.create(null)})`;
+        return `({__type:"dict",__data:Object.assign(Object.create(null),{${node.entries.map(e => `[String(${compileExpr(e.key,isAsync)})]:${compileExpr(e.value,isAsync)}`).join(",")}})})`;
+      case "Subscript":
+        return `rt.dictGet(${compileExpr(node.object,isAsync)}, ${compileExpr(node.key,isAsync)})`;
+      case "DictHas":
+        return `rt.dictHas(${compileExpr(node.dict,isAsync)}, ${compileExpr(node.key,isAsync)})`;
+      case "DictKeys":
+        return `rt.dictKeys(${compileExpr(node.dict,isAsync)})`;
       default: return "null";
     }
   }
@@ -5978,6 +6163,13 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
         else { const p = extractListPath(node.targetExpr, isAsync); code += `${indent}rt.makeAliasPath(sc, "${node.aliasName.toUpperCase()}", "${p.nameUpper}", [${p.path.join(", ")}]);\n`; }
         break;
 
+      case "DictPut":
+        code += `${indent}rt.dictSet(sc, "${node.varNameUpper}", ${compileExpr(node.keyExpr,isAsync)}, ${compileExpr(node.rhs,isAsync)});\n`;
+        break;
+      case "DictRemove":
+        code += `${indent}rt.dictRemove(sc, "${node.varNameUpper}", ${compileExpr(node.keyExpr,isAsync)});\n`;
+        break;
+
       case "ProcCall": {
         const callCode = `rt.${isAsync ? "callUserProcAsync" : "callUserProcSync"}("${node.name.toUpperCase()}", "${node.name}", [${node.args.map(a => `{val: ${compileExpr(a, isAsync)}, isVar: ${a.type === "Var"}, name: "${a.name || ""}"}`).join(", ")}], sc)`;
         code += `${indent}{ const __resProc = ${isAsync ? "await " : ""}${callCode};\n`;
@@ -6020,8 +6212,8 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
          else if (msg === "ITEM_NOT_A_LIST") rt.fail("itemNotAList", "?", __line);
          else if (msg.startsWith("LABEL_EXISTS:")) rt.fail("labelExists", msg.split(":")[1], __line);
          else if (msg.startsWith("LABEL_NOT_FOUND:")) rt.fail("labelNotFound", msg.split(":")[1], __line);
-         else if (msg.startsWith("SOUND_NOT_FOUND:")) rt.fail("genericFail", {msg: "Non trovo un suono chiamato '" + msg.split(":")[1] + "'"}, __line);
-         else if (msg === "SCALE_NOT_NUMBER") rt.fail("scaleNotNumber", null, __line);
+         else if (msg.startsWith("SOUND_NOT_FOUND:")) rt.fail("soundNotFound", msg.split(":")[1], __line);
+        else if (msg === "SCALE_NOT_NUMBER") rt.fail("scaleNotNumber", null, __line);
          else if (msg === "ROTATION_NOT_NUMBER") rt.fail("rotationNotNumber", null, __line);
          else if (msg === "BG_FILE_NOT_TEXT") rt.fail("backgroundFilenameNotText", null, __line);
          else if (msg === "BG_SCALE_NOT_NUMBER") rt.fail("backgroundScaleNotNumber", null, __line);
@@ -6033,10 +6225,17 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
          else if (msg === "GRAFFITI_SIZE_NOT_NUMBER") rt.fail("graffitiSizeNotNumber", null, __line);
          else if (msg === "GRAFFITI_CONTENT_NOT_STRING") rt.fail("graffitiContentNotString", null, __line);
          else if (msg === "SCI_POSITIVE") rt.fail("scientificPositive", null, __line);
+         else if (msg === "NOT_A_DICT") rt.fail("notADict", null, __line);
+         else if (msg === "DIM_NOT_LIST_OR_DICT") rt.fail("dimensionNeedsList", null, __line);
+         else if (msg.startsWith("KEY_NOT_FOUND:")) rt.fail("keyNotFound", msg.slice(14), __line);
          else if (msg === "infiniteLoop") rt.fail("infiniteLoop", null, __line);
          else if (msg.startsWith("INCLUDE_FETCH_FAIL:") || msg.startsWith("INCLUDE_PARSE_FAIL:")) {
-            const pts = msg.split(":");
-            rt.fail("genericFail", {msg: pts[0] === "INCLUDE_FETCH_FAIL" ? \`Impossibile caricare '\${pts[1]}': \${pts[2]}\` : \`Errore sintassi in '\${pts[1]}': \${pts[2]}\`}, __line);
+           const pts = msg.split(":");
+           if (pts[0] === "INCLUDE_FETCH_FAIL") {
+               rt.fail("includeFetchFail", { file: pts[1], err: pts[2] }, __line);
+           } else {
+               rt.fail("includeParseFail", { file: pts[1], err: pts[2] }, __line);
+           }
          }
          else rt.fail("genericFail", {msg: msg}, __line);
       }
@@ -6081,6 +6280,9 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       env.tickTime = null;
       env.__shadowWarnings = new Set();
       env.keyState = keyState;
+      env.mouseX = 0;
+      env.mouseY = 0;
+      env.mouseDown = false;
 
       env.varOriginalNames = {};
 
@@ -6304,8 +6506,9 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
   }
 
 gfxCanvas.addEventListener("pointerdown", (e) => {
+    if (env) env.mouseDown = true;
     if (isRunning) return; 
-    dragDistance = 0; 
+    dragDistance = 0;
 
     if (e.button === 2 || e.button === 1 || (e.button === 0 && e.shiftKey)) {
       isDraggingCanvas = true;
@@ -6327,6 +6530,13 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
   let lastMoveEvent = null;
 
   gfxCanvas.addEventListener("pointermove", (e) => {
+    // Traccia le coordinate World anche durante l'esecuzione del programma
+    if (env && currentTransform) {
+        const r = gfxCanvas.getBoundingClientRect();
+        env.mouseX = ((e.clientX - r.left) * gfxDpr - currentTransform.tx) / currentTransform.scale;
+        env.mouseY = (currentTransform.ty - (e.clientY - r.top) * gfxDpr) / currentTransform.scale;
+    }
+    
     if (isRunning) return;
     lastMoveEvent = e;
     
@@ -6458,6 +6668,7 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
 
 
   gfxCanvas.addEventListener("pointerup", (e) => {
+    if (env) env.mouseDown = false;
     isDraggingCanvas = false;
     try { gfxCanvas.releasePointerCapture(e.pointerId); } catch {}
 
