@@ -1,0 +1,22 @@
+# *****
+# Name: Tabellina
+# Category: Maths
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Chiede un numero all'utente e calcola la sua tabellina dal 1 al 12. Utilizza un
+# ciclo numerico per iterare il calcolo e concatena stringhe e numeri. Mostra il
+# risultato formattato direttamente nella console testuale.
+# *****
+
+chiedi Numero dicendo "Inserisci un numero per la sua tabellina:"
+cancella schermo
+scrivi "Ecco la tabellina del " + Numero + ":"; accapo
+scrivi "-------------------------"; accapo
+
+variabile I va da 1 a 12 ed esegui (
+    metti Numero * I in Risultato
+    scrivi Numero + " x " + I + " = " + Risultato; accapo
+)

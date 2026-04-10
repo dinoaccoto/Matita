@@ -1,0 +1,55 @@
+# *****
+# Name: Pi Estimation (Monte Carlo)
+# Category: Maths
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: A demonstration of the Monte Carlo method to estimate the value of Pi. Generates
+# random points in a square and counts how many fall within the inscribed circle.
+# The ratio between the inside points and total points approximates the area of
+# the circle, and thus Pi.
+# *****
+
+clear screen
+
+define function modulus(P) (
+    return squareroot((x of P)^2+(y of P)^2)
+)
+
+put 10000 in NumPoints
+put 0 in inCircle
+put (0,0,0) in black
+put (0,0,100) in blue
+put (100,0,0) in red
+
+put 2.5e-3 in Thick
+set color black
+line thickness Thick from (-0.5, -0.5) to (-0.5, 0.5)
+line thickness Thick from (-0.5, 0.5) to (0.5, 0.5)
+line thickness Thick from (0.5, 0.5) to (0.5, -0.5)
+line thickness Thick from (0.5, -0.5) to (-0.5, -0.5)
+
+index I goes from 1 to NumPoints and you do (
+    global inCircle
+    put random() - 0.5 in x
+    put random() - 0.5 in y
+    put point(x, y) in P
+
+    if modulus(P) < 0.5 then (
+       set color red
+       circle radius Thick at (x of P, y of P)
+       put inCircle + 1 in inCircle
+       
+    ) otherwise (
+       set color blue
+       circle radius Thick at (x of P, y of P)
+      )
+) 
+
+write "Points: " + NumPoints + " of which inside: " + inCircle
+newline
+write "Estimation of Pi: " + (inCircle / NumPoints) * 4
+
+frame graphics

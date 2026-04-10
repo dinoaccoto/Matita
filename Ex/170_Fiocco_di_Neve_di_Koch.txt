@@ -1,0 +1,96 @@
+# *****
+# Name: Fiocco di Neve di Koch
+# Category: Maths, Graphics
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Il fiocco di neve di Koch è una delle più celebri curve frattali. Questo
+# programma lo disegna usando la ricorsione: ogni linea retta viene divisa in
+# quattro segmenti. La profondità della ricorsione determina il livello di
+# dettaglio del frattale finale.
+# *****
+
+# Programma per disegnare il frattale "Fiocco di Neve" di Koch
+#
+# Definiamo il livello di dettaglio del frattale.
+# Un valore di 4 o 5 è un buon inizio.
+# Valori più alti (6+) possono essere molto lenti.
+metti 6 in livelloMassimo
+
+# Impostiamo lo spessore della linea e il colore
+metti 1 in spessoreLinea
+imposta colore (0, 40, 80) # Un blu scuro
+
+# Calcoliamo le costanti per la rotazione di 60 gradi (PI/3 radianti)
+# L'interprete usa Math.sin/cos, che richiedono radianti.
+metti PI / 3 in PGRECOTERZI
+metti cos(PGRECOTERZI) in cos60
+metti -sin(PGRECOTERZI) in sin60
+
+#
+# Questa è la procedura ricorsiva che disegna una curva di Koch
+# tra due punti (x1, y1) e (x2, y2).
+#
+definisci procedura disegnaKoch(livello, x1, y1, x2, y2) (
+    
+    # Caso Base: Se il livello è 0, disegna una linea retta.
+    se (livello == 0) allora (
+        linea spessore spessoreLinea da (x1, y1) a (x2, y2)
+    )
+    
+    # Caso Ricorsivo: Calcola i 4 segmenti e ripeti.
+    altrimenti (
+        # 1. Calcola il vettore dal punto 1 al punto 2
+        metti x2 - x1 in dx
+        metti y2 - y1 in dy
+        
+        # 2. Trova i punti A e B, che dividono la linea in 3 parti
+        metti x1 + dx / 3 in ax
+        metti y1 + dy / 3 in ay
+        
+        metti x1 + dx * 2 / 3 in bx
+        metti y1 + dy * 2 / 3 in by
+        
+        # 3. Calcola il punto C (la "punta") ruotando il segmento A->B
+        #    di 60 gradi attorno al punto A.
+        metti (dx / 3) * cos60 - (dy / 3) * sin60 in cx_rel
+        metti (dx / 3) * sin60 + (dy / 3) * cos60 in cy_rel
+        
+        metti ax + cx_rel in cx
+        metti ay + cy_rel in cy
+        
+        # 4. Chiama la procedura 4 volte per i nuovi segmenti
+        disegnaKoch(livello - 1, x1, y1, ax, ay)  # P1 -> A
+        disegnaKoch(livello - 1, ax, ay, cx, cy)  # A -> C
+        disegnaKoch(livello - 1, cx, cy, bx, by)  # C -> B
+        disegnaKoch(livello - 1, bx, by, x2, y2)  # B -> P2
+    )
+)
+
+# --- PROGRAMMA PRINCIPALE ---
+
+# Definiamo i 3 vertici di un grande triangolo equilatero
+# centrato nell'origine (0, 0).
+metti 1000 in raggio
+
+# Punto 1 (in alto)
+metti raggio * cos(PI / 2) in p1x
+metti raggio * sin(PI / 2) in p1y
+
+# Punto 2 (in basso a sinistra)
+metti raggio * cos(7 * PI / 6) in p2x
+metti raggio * sin(7 * PI / 6) in p2y
+
+# Punto 3 (in basso a destra)
+metti raggio * cos(11 * PI / 6) in p3x
+metti raggio * sin(11 * PI / 6) in p3y
+
+# Disegniamo il fiocco di neve chiamando la procedura
+# per ognuno dei 3 lati del triangolo.
+disegnaKoch(livelloMassimo, p1x, p1y, p2x, p2y)
+disegnaKoch(livelloMassimo, p2x, p2y, p3x, p3y)
+disegnaKoch(livelloMassimo, p3x, p3y, p1x, p1y)
+
+inquadra grafica

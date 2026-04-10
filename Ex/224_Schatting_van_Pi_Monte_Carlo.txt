@@ -1,0 +1,55 @@
+# *****
+# Name: Schatting van Pi (Monte Carlo)
+# Category: Maths
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Een demonstratie van de Monte Carlo-methode om de waarde van Pi te schatten.
+# Genereert willekeurige punten in een vierkant en telt hoeveel er in de
+# ingeschreven cirkel vallen. De verhouding tussen de binnenste punten en de
+# totale punten benadert de oppervlakte van de cirkel, en daarmee Pi.
+# *****
+
+wis scherm
+
+definieer functie modulus(P) (
+    geef wortel((x van P)^2+(y van P)^2) terug
+)
+
+zet 10000 in AantalPunten
+zet 0 in inCirkel
+zet (0,0,0) in zwart
+zet (0,0,100) in blauw
+zet (100,0,0) in rood
+
+zet 2.5e-3 in Dikte
+stel kleur in zwart
+lijn dikte Dikte van (-0.5, -0.5) tot (-0.5, 0.5)
+lijn dikte Dikte van (-0.5, 0.5) tot (0.5, 0.5)
+lijn dikte Dikte van (0.5, 0.5) tot (0.5, -0.5)
+lijn dikte Dikte van (0.5, -0.5) tot (-0.5, -0.5)
+
+teller I loopt van 1 tot AantalPunten en je doet (
+globaal inCirkel    
+zet willekeurig() - 0.5 in x
+    zet willekeurig() - 0.5 in y
+    zet punt(x, y) in P
+
+    als (modulus(P) < 0.5) dan (
+       stel kleur in rood
+       cirkel straal Dikte op (x van P, y van P)
+       zet inCirkel + 1 in inCirkel
+       
+    ) anders (
+       stel kleur in blauw
+       cirkel straal Dikte op (x van P, y van P)
+      )
+) 
+
+schrijf "Punten: " + AantalPunten + " waarvan binnen: " + inCirkel
+nieuwe regel
+schrijf "Schatting van Pi: " + (inCirkel / AantalPunten) * 4
+
+toon alles

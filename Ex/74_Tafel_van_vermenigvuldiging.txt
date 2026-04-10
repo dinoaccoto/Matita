@@ -1,0 +1,23 @@
+# *****
+# Name: Tafel van vermenigvuldiging
+# Category: Maths
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Vraagt de gebruiker om een getal en berekent de tafel van vermenigvuldiging van
+# 1 tot 12. Maakt gebruik van een numerieke lus om de berekening te herhalen en
+# voegt strings en getallen samen. Toont het geformatteerde resultaat rechtstreeks
+# in de tekstconsole.
+# *****
+
+vraag Getal met bericht "Voer een getal in voor zijn tafel:"
+wis scherm
+schrijf "Hier is de tafel van " + Getal + ":"; nieuwe regel
+schrijf "-------------------------"; nieuwe regel
+
+teller I loopt van 1 tot 12 en je doet (
+    zet Getal * I in Resultaat
+    schrijf Getal + " x " + I + " = " + Resultaat; nieuwe regel
+)

@@ -1,0 +1,224 @@
+# *****
+# Name: Particle Life
+# Category: Maths, Game
+# Program ver: 3.0
+# Date: 26-03-2026
+# Author: DA
+# Language: EN
+# Matita ver: 0.6
+# Description: Particle Life simulation 
+# *****
+
+
+clear screen
+clear graphics
+
+write "Initializing Particle Life ..."
+newline
+
+
+
+# ==================================================
+# --- CONFIGURATION CONSTANTS ---
+# ==================================================
+global NumParticles, NumColors, CanvasSize
+global ImpenetrableBorders
+global ParticleRadius, WallMin, WallMax, SpawnMin, SpawnMax
+global InteractionRadius, RepulsionRadius, MidRadius, HalfRange
+global ForceFactor, Friction, DelayMs
+global BgColorR, BgColorG, BgColorB
+global Color1R, Color1G, Color1B
+global Color2R, Color2G, Color2B
+global Color3R, Color3G, Color3B
+
+global I, J, XI, YI, CI, XJ, YJ, CJ
+global DX, DY, D, F, FX, FY, R_VAL, DIST_FACTOR, VXI, VYI
+global X_list, Y_list, VX_list, VY_list, Color_list
+
+global RulesDict, RuleKey
+global SpatialGrid, CellKey, TempList, GX, GY, offsetX, offsetY
+global NeighborKey, CellParticles, AbsDX, AbsDY
+
+# -- General Parameters --
+put 500 in NumParticles  # Aumentato drasticamente grazie all'ottimizzazione!
+put 3 in NumColors
+put 1200 in CanvasSize
+put false in ImpenetrableBorders
+
+# -- Physics & Ranges --
+put 80 in InteractionRadius
+put 30 in RepulsionRadius
+put 0.8 in ForceFactor
+put 0.8 in Friction
+put 0 in DelayMs
+
+put (InteractionRadius + RepulsionRadius) / 2 in MidRadius
+put (InteractionRadius - RepulsionRadius) / 2 in HalfRange
+
+# -- Visuals & Boundaries --
+put 3 in ParticleRadius
+put ParticleRadius + 1 in WallMin
+put CanvasSize - WallMin in WallMax
+put 10 in SpawnMin
+put CanvasSize - 10 in SpawnMax
+
+# -- Sci-Fi Colors --
+put 2 in BgColorR; put 3 in BgColorG; put 8 in BgColorB
+put 0 in Color1R; put 95 in Color1G; put 100 in Color1B
+put 100 in Color2R; put 10 in Color2G; put 80 in Color2B
+put 90 in Color3R; put 100 in Color3G; put 10 in Color3B
+
+# ==================================================
+# --- DICT OF RULES ---
+# ==================================================
+
+put {} in RulesDict
+put 0.2  in RulesDict["1_1"]; put 0.8  in RulesDict["1_2"]; put -0.5 in RulesDict["1_3"]
+put -0.5 in RulesDict["2_1"]; put 0.2  in RulesDict["2_2"]; put 0.8  in RulesDict["2_3"]
+put 0.8  in RulesDict["3_1"]; put -0.5 in RulesDict["3_2"]; put 0.2  in RulesDict["3_3"]
+
+put list() in X_list
+put list() in Y_list
+put list() in VX_list
+put list() in VY_list
+put list() in Color_list
+
+index I goes from 1 to NumParticles and you do (
+    add random(SpawnMin, SpawnMax) to X_list
+    add random(SpawnMin, SpawnMax) to Y_list
+    add 0 to VX_list
+    add 0 to VY_list
+    add dice(NumColors) to Color_list
+)
+
+write "Particles generated. Running optimized simulation..."
+newline
+write "Press 'x' to stop the simulation."
+newline
+
+# ==================================================
+# --- MAIN SIMULATION LOOP ---
+# ==================================================
+as long as (true) you do (
+    
+    if (key "x" is pressed) then (
+        write "Simulation stopped by user."
+        newline
+        stop
+    )
+
+    clear graphics
+    set color (BgColorR, BgColorG, BgColorB)
+    paint background
+
+    # ==================================================
+    # --- SPATIAL HASHING ---
+    # ==================================================
+    put {} in SpatialGrid
+    
+    index I goes from 1 to NumParticles and you do (
+        put trunc((item I of X_list) / InteractionRadius) in GX
+        put trunc((item I of Y_list) / InteractionRadius) in GY
+        put GX + "_" + GY in CellKey
+        
+        if (has key CellKey in SpatialGrid) then (
+            put SpatialGrid[CellKey] in TempList
+        ) otherwise (
+            put list() in TempList
+        )
+        
+        add I to TempList
+        put TempList in SpatialGrid[CellKey]
+    )
+
+    index I goes from 1 to NumParticles and you do (
+        put item I of X_list in XI
+        put item I of Y_list in YI
+        put item I of Color_list in CI
+
+        put 0 in FX
+        put 0 in FY
+        
+        put trunc(XI / InteractionRadius) in GX
+        put trunc(YI / InteractionRadius) in GY
+
+        index offsetX goes from -1 to 1 and you do (
+            index offsetY goes from -1 to 1 and you do (
+                put (GX + offsetX) + "_" + (GY + offsetY) in NeighborKey
+                
+                if (has key NeighborKey in SpatialGrid) then (
+                    put SpatialGrid[NeighborKey] in CellParticles
+                    
+                    for each J in CellParticles you do (
+                        if (I != J) then (
+                            put item J of X_list in XJ
+                            put item J of Y_list in YJ
+
+                            # Pre-filter (avoid squareroot if too far away)
+                            put XJ - XI in DX
+                            put abs(DX) in AbsDX
+                            if (AbsDX <= InteractionRadius) then (
+                                
+                                put YJ - YI in DY
+                                put abs(DY) in AbsDY
+                                if (AbsDY <= InteractionRadius) then (
+                                    
+                                    put squareroot(DX*DX + DY*DY) in D
+
+                                    if (D > 0 and D < InteractionRadius) then (
+                                        put item J of Color_list in CJ
+                                        put 0 in F
+                                        
+                                        if (D < RepulsionRadius) then (
+                                            put (D / RepulsionRadius) - 1 in F
+                                        ) otherwise (
+                                            # Caching of rules via Dict
+                                            put CI + "_" + CJ in RuleKey
+                                            put RulesDict[RuleKey] in R_VAL
+                                            
+                                            put abs(D - MidRadius) / HalfRange in DIST_FACTOR
+                                            put R_VAL * (1 - DIST_FACTOR) in F
+                                        )
+
+                                        put FX + (F * DX / D) in FX
+                                        put FY + (F * DY / D) in FY
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        put item I of VX_list in VXI
+        put item I of VY_list in VYI
+
+        put (VXI + FX * ForceFactor) * Friction in VXI
+        put (VYI + FY * ForceFactor) * Friction in VYI
+
+        put XI + VXI in XI
+        put YI + VYI in YI
+
+        if (ImpenetrableBorders is true) then (
+            if (XI < WallMin) then ( put WallMin in XI; put VXI * -1 in VXI )
+            if (XI > WallMax) then ( put WallMax in XI; put VXI * -1 in VXI )
+            if (YI < WallMin) then ( put WallMin in YI; put VYI * -1 in VYI )
+            if (YI > WallMax) then ( put WallMax in YI; put VYI * -1 in VYI )
+        )
+
+        put VXI in item I of VX_list
+        put VYI in item I of VY_list
+        put XI in item I of X_list
+        put YI in item I of Y_list
+
+        if (CI == 1) then ( set color (Color1R, Color1G, Color1B) ) 
+        if (CI == 2) then ( set color (Color2R, Color2G, Color2B) ) 
+        if (CI == 3) then ( set color (Color3R, Color3G, Color3B) ) 
+
+        circle radius ParticleRadius at point(XI, YI)
+    )
+
+    frame graphics
+    wait DelayMs ms
+)

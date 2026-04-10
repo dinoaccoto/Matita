@@ -1,0 +1,45 @@
+# *****
+# Name: Smiley
+# Category: Graphics, Geometry
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Construction of a drawing using geometric primitives like circles and arcs.
+# Overlays filled circles and hollow outlines to create the facial features. Uses
+# specific points to precisely position eyes and mouth.
+# *****
+
+# --- Smiley ---
+
+# Colors
+put (100, 90, 10) in Yellow
+put (0, 0, 0) in Black
+put (100, 100, 100) in White
+
+clear graphics
+
+# Face
+set color Yellow
+circle radius 120 at point(0, 0)
+
+# Face Outline
+set color Black
+circumference radius 120 thickness 8 at point(0, 0)
+
+# Eyes
+set color Black
+circle radius 12 at point(-40, 30)
+circle radius 12 at point(40, 30)
+
+# Catchlights in the eyes
+set color White
+circle radius 4 at point(-35, 35)
+circle radius 4 at point(45, 35)
+
+# Smile
+set color Black
+arc radius 60 thickness 8 from (-50, -25) to (50, -25)
+
+frame graphics

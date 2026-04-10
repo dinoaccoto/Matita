@@ -1,0 +1,138 @@
+# *****
+# Name: Game of Lifes
+# Category: Maths, Game
+# Program ver: 3.0
+# Date: 26-03-2026
+# Author: DA
+# Language: EN
+# Matita ver: 0.9
+# Description: The game evolves based on its initial state. 
+# The transition from one "generation" to the next is determined by the status of a cell's eight neighbors:
+# - Underpopulation: Any live cell with fewer than two live neighbors dies.
+# - Survival: Any live cell with two or three live neighbors lives on to the next generation.
+# - Overpopulation: Any live cell with more than three live neighbors dies.
+# - Reproduction: Any dead cell with exactly three live neighbors becomes a live cell.
+# Modify cells using the mouse and let the automata evolve.
+# *****
+
+
+
+clear screen
+clear graphics
+
+# --- Configuration ---
+put 10 in CellSize
+put {} in World
+put 0 in Generation
+put false in PrevMouseDown
+
+# Function to create a key for the dictionary
+define function MakeKey(x, y) (
+    return cast(x, "string") + "," + cast(y, "string")
+)
+
+# Function to check if a cell is alive
+define function IsAlive(grid, x, y) (
+    return has key MakeKey(x, y) in grid
+)
+
+# Initial Pattern: Glider
+#put 1 in World[MakeKey(10, 10)]
+#put 1 in World[MakeKey(11, 10)]
+#put 1 in World[MakeKey(12, 10)]
+#put 1 in World[MakeKey(12, 11)]
+#put 1 in World[MakeKey(11, 12)]
+
+# Initial Pattern: Small Exploder
+put 1 in World[MakeKey(0, 0)]
+put 1 in World[MakeKey(-1, 1)]
+put 1 in World[MakeKey(0, 1)]
+put 1 in World[MakeKey(1, 1)]
+put 1 in World[MakeKey(-1, 2)]
+put 1 in World[MakeKey(1, 2)]
+put 1 in World[MakeKey(0, 3)]
+
+as long as (true) you do (
+    clear graphics
+    
+    # --- MOUSE (TOGGLE CELLS) ---
+    put mouse_pressed() in MouseDown
+    
+    if (MouseDown is true and PrevMouseDown is false) then (
+        put trunc(mouse_x() / CellSize) in MX
+        put trunc(mouse_y() / CellSize) in MY
+        put MakeKey(MX, MY) in MK
+        
+        # Change status of a cell:
+        if (has key MK in World) then (
+            remove key MK from World
+        ) otherwise (
+            put 1 in World[MK]
+        )
+    )
+    
+    put MouseDown in PrevMouseDown
+    # ----------------------------------------
+
+    put {} in NextWorld
+    put {} in Candidates # Cells to check (alive + neighbors)
+    
+    # 1. Draw alive cells and find candidates for the next generation
+    for each key in keys of World you do (
+        put split(key, ",") in Pos
+        put cast(item 1 of Pos, "number") in CX
+        put cast(item 2 of Pos, "number") in CY
+        
+        # Draw the cell
+        set color (20, 80, 100)
+        rectangle from (CX*CellSize, CY*CellSize) to (CX*CellSize + CellSize - 1, CY*CellSize + CellSize - 1)
+        
+        # Add cell and its 8 neighbors to candidates
+        index DX goes from -1 to 1 and you do (
+            index DY goes from -1 to 1 and you do (
+                put MakeKey(CX + DX, CY + DY) in K
+                put 1 in Candidates[K]
+            )
+        )
+    )
+    
+    # 2. Apply Rules to candidates
+    for each key in keys of Candidates you do (
+        put split(key, ",") in Pos
+        put cast(item 1 of Pos, "number") in CX
+        put cast(item 2 of Pos, "number") in CY
+        
+        # Count neighbors
+        put 0 in Neighbors
+        index DX goes from -1 to 1 and you do (
+            index DY goes from -1 to 1 and you do (
+                if (DX != 0 or DY != 0) then (
+                    if (has key MakeKey(CX + DX, CY + DY) in World) then (
+                        put Neighbors + 1 in Neighbors
+                    )
+                )
+            )
+        )
+        
+        # Game of Life Rules
+        put has key key in World in AliveNow
+        if (AliveNow) then (
+            if (Neighbors == 2 or Neighbors == 3) then (
+                put 1 in NextWorld[key]
+            )
+        ) otherwise (
+            if (Neighbors == 3) then (
+                put 1 in NextWorld[key]
+            )
+        )
+    )
+    
+    put NextWorld in World
+    put Generation + 1 in Generation
+    
+    # Update display
+    write "Generation: " + Generation + " | Cells: " + dimension of World
+    newline
+    redraw
+    wait 50 ms
+)

@@ -1,0 +1,34 @@
+# *****
+# Name: Falling Speed
+# Category: Physics
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Calculates the impact speed of an object in free fall on Earth from a height H.
+# Uses scientific notation (e.g., 5.9e24) to handle large physical constants.
+# Compares the resulting speed with the speed of sound (Mach) and the escape
+# velocity.
+# *****
+
+clear screen
+put 5.9722e24 in EarthMass # kg
+put 6371e3 in EarthRadius # m
+put 6.6743e-11 in G # Gravitational constant
+
+get H saying "Fall height (m)? "
+
+put squareroot(2*EarthMass*G*(1/EarthRadius - 1/(EarthRadius+H))) in v
+digits 3
+write "Fall height: " + H; newline
+write "Impact speed: "; newline
+write "    " + v + " m/s"; newline
+write "    " + v*3.6 + " km/h"; newline; newline
+
+put 343 in c # speed of sound, sea level 15 degrees C
+write "Mach: " + v/c; newline
+
+put squareroot(2*G*EarthMass/EarthRadius) in EscapeVelocity
+
+write "Relative to escape velocity: " + v/EscapeVelocity*100 + "%"; newline

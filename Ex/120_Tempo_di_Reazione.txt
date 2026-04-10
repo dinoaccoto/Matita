@@ -1,0 +1,60 @@
+# *****
+# Name: Tempo di Reazione
+# Category: Game
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Misura i riflessi dell'utente calcolando il tempo tra un segnale visivo e la
+# pressione di un tasto. Utilizza i comandi tick e tock per il cronometraggio
+# preciso in millisecondi. Sfrutta un'attesa casuale per rendere il test
+# imprevedibile ed evitare anticipazioni.
+# *****
+
+cancella schermo
+scrivi " Misuriamo il tuo tempo di reazione ..."; accapo
+accapo
+scrivi "Quando compare la scritta 'VIA!', premi la BARRA SPAZIATRICE."
+accapo
+scrivi "Premi SPAZIO per iniziare..."
+
+# Aspetta che l'utente prema spazio per avviare il gioco
+fintanto (non (tasto "SPACE" viene premuto)) esegui (
+    aspetta 10 ms
+)
+
+# Aspetta che l'utente rilasci il tasto per evitare false partenze
+fintanto (tasto "SPACE" viene premuto) esegui (
+    aspetta 10 ms
+)
+
+cancella schermo
+scrivi "Pronti..."; accapo
+
+# Calcola un tempo casuale tra 2s e 5s
+metti casuale(2000, 5000) in AttesaRandom
+aspetta AttesaRandom ms
+
+
+cancella schermo
+scrivi "VIA!"
+tick # Parte il cronometro
+
+# Ciclo di attesa: gira finché la barra NON viene premuta
+fintanto (non (tasto "SPACE" viene premuto)) esegui (
+    aspetta 1 ms
+)
+
+# Appena il ciclo si rompe (tasto premuto), leggiamo il tempo con tock
+metti tock in TempoReazione
+
+accapo
+scrivi "Tempo di reazione: " + TempoReazione + " ms."; accapo
+
+accapo
+se (TempoReazione < 250) allora (
+    scrivi "Complimenti, riflessi fulminei!"
+) altrimenti (
+    scrivi "Puoi fare di meglio..."
+)

@@ -1,0 +1,95 @@
+# *****
+# Name: Koch Snowflake
+# Category: Maths, Graphics
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: The Koch snowflake is one of the most famous fractal curves. This program draws
+# it using recursion: each straight line is divided into four segments. The
+# recursion depth determines the level of detail of the final fractal.
+# *****
+
+# Program to draw the Koch snowflake fractal
+#
+# We define the level of detail for the fractal.
+# A value of 4 or 5 is a good start.
+# Higher values (6+) can be very slow.
+put 6 in maxLevel
+
+# We set line thickness and color
+put 1 in lineThick
+set color (0, 40, 80) # Dark blue
+
+# We calculate the constants for the 60-degree rotation (PI/3 radians)
+# The interpreter uses Math.sin/cos, which require radians.
+put pi / 3 in PITHIRD
+put cos(PITHIRD) in cos60
+put -sin(PITHIRD) in sin60
+
+#
+# This is the recursive procedure that draws a Koch curve
+# between two points (x1, y1) and (x2, y2).
+#
+define procedure drawKoch(level, x1, y1, x2, y2) (
+    
+    # Base case: if level is 0, draw a straight line.
+    if (level == 0) then (
+        line thickness lineThick from (x1, y1) to (x2, y2)
+    )
+    
+    # Recursive case: calculate the 4 segments and repeat.
+    otherwise (
+        # 1. Calculate the vector from point 1 to point 2
+        put x2 - x1 in dx
+        put y2 - y1 in dy
+        
+        # 2. Find points A and B, dividing the line into 3 parts
+        put x1 + dx / 3 in ax
+        put y1 + dy / 3 in ay
+        
+        put x1 + dx * 2 / 3 in bx
+        put y1 + dy * 2 / 3 in by
+        
+        # 3. Calculate point C (the "tip") by rotating segment A->B
+        #    60 degrees around point A.
+        put (dx / 3) * cos60 - (dy / 3) * sin60 in cx_rel
+        put (dx / 3) * sin60 + (dy / 3) * cos60 in cy_rel
+        
+        put ax + cx_rel in cx
+        put ay + cy_rel in cy
+        
+        # 4. Call the procedure 4 times for the new segments
+        drawKoch(level - 1, x1, y1, ax, ay)  # P1 -> A
+        drawKoch(level - 1, ax, ay, cx, cy)  # A -> C
+        drawKoch(level - 1, cx, cy, bx, by)  # C -> B
+        drawKoch(level - 1, bx, by, x2, y2)  # B -> P2
+    )
+)
+
+# --- MAIN PROGRAM ---
+
+# We define the 3 vertices of a large equilateral triangle
+# centered at the origin (0, 0).
+put 1000 in radius
+
+# Point 1 (top)
+put radius * cos(pi / 2) in p1x
+put radius * sin(pi / 2) in p1y
+
+# Point 2 (bottom left)
+put radius * cos(7 * pi / 6) in p2x
+put radius * sin(7 * pi / 6) in p2y
+
+# Point 3 (bottom right)
+put radius * cos(11 * pi / 6) in p3x
+put radius * sin(11 * pi / 6) in p3y
+
+# We draw the snowflake by calling the procedure
+# for each of the 3 sides of the triangle.
+drawKoch(maxLevel, p1x, p1y, p2x, p2y)
+drawKoch(maxLevel, p2x, p2y, p3x, p3y)
+drawKoch(maxLevel, p3x, p3y, p1x, p1y)
+
+frame graphics

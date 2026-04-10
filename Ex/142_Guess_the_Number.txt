@@ -1,0 +1,71 @@
+# *****
+# Name: Guess the Number
+# Category: Game, Maths
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: An example of textual input/write and complex conditional logic. The computer
+# uses binary search to guess the number the user is thinking of in just a few
+# steps. Processes user responses (Greater, Smaller, Correct) to narrow down the
+# range.
+# *****
+
+# The computer guesses the number (1..100) the user has in mind.
+
+clear screen
+get start saying "Think of an integer between 1 and 100.
+I will try to guess it as quickly as possible.
+Answer with:
+G = your number is Greater
+S = your number is Smaller
+C = Correct
+
+X = exit
+Press ENTER to start..."
+
+put 1 in Min
+put 100 in Max
+put 0 in Attempts
+
+as long as (true) you do (
+    global Min, Max, Attempts
+
+    put trunc((Min + Max) / 2) in Guess
+    put Attempts + 1 in Attempts
+
+    get Answer saying ("Guess: " + Guess + ". Is the number you thought of Greater (press G), Smaller (press S), or is it Correct (press C)? Press X to exit: ")
+
+    if (Answer equals "X") or (Answer equals "x") then (
+        write "Attempts made: " + Attempts; newline
+        stop
+    )
+
+    if (Answer equals "C") or (Answer equals "c") then (
+        newline
+        write "Guessed! The number was " + Guess + "."
+        newline
+        write "Attempts: " + Attempts; newline
+        stop
+    )
+
+    if (Answer equals "G") or (Answer equals "g") then (
+        put Guess + 1 in Min
+    ) otherwise (
+        if (Answer equals "S") or (Answer equals "s") then (
+            put Guess - 1 in Max
+        ) otherwise (
+            newline; write "Invalid answer. Use G, S, C, or X."
+            newline
+        )
+    )
+
+    if (Min > Max) then (
+        newline
+        write "Inconsistency in answers: no compatible number."
+        newline
+        write "Attempts made: " + Attempts; newline
+        stop
+    )
+)

@@ -1,0 +1,25 @@
+# *****
+# Name: Unicode Emoji
+# Category: Programming
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Prints a table of Emoji characters using standard Unicode codes. Iterates
+# through a range of integers and converts them into graphic symbols. Demonstrates
+# the use of the unicode() function to convert numeric codes to text.
+# *****
+
+clear screen
+write "--- Emoji UNICODE Table ---"; newline
+write "Symbol   |   Code"
+write "------------------"; newline
+
+put 128512 in Start # where we start the UNICODE code
+put 128591 in End # where we stop
+
+index N goes from Start to End and you do (
+    put unicode(N) in Smiley
+    write "   " + Smiley + "        |   " + N; newline
+)

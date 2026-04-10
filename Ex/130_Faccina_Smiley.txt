@@ -1,0 +1,45 @@
+# *****
+# Name: Faccina (Smiley)
+# Category: Graphics, Geometry
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Costruzione di un disegno utilizzando primitive geometriche come cerchi e archi.
+# Sovrappone cerchi pieni e circonferenze vuote per creare i dettagli del viso.
+# Utilizza punti specifici per posizionare accuratamente occhi e bocca.
+# *****
+
+# --- Faccina ---
+
+# Colori
+metti (100, 90, 10) in Giallo
+metti (0, 0, 0) in Nero
+metti (100, 100, 100) in Bianco
+
+cancella grafica
+
+# Faccia
+imposta colore Giallo
+cerchio raggio 120 in punto(0, 0)
+
+# Contorno faccia
+imposta colore Nero
+circonferenza raggio 120 spessore 8 in punto(0, 0)
+
+# Occhi
+imposta colore Nero
+cerchio raggio 12 in punto(-40, 30)
+cerchio raggio 12 in punto(40, 30)
+
+# Punti luce negli occhi
+imposta colore Bianco
+cerchio raggio 4 in punto(-35, 35)
+cerchio raggio 4 in punto(45, 35)
+
+# Sorriso
+imposta colore Nero
+arco raggio 60 spessore 8 da (-50, -25) a (50, -25)
+
+inquadra grafica

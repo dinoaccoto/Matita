@@ -1,0 +1,252 @@
+# *****
+# Name: Gioco: Raccogli e Sfuggi
+# Category: Game
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Un videogioco completo con motore fisico elementare. Controlla il cerchio blu
+# con le frecce per raccogliere il cibo ed evitare i nemici. Implementa vettori,
+# velocità, accelerazione inerziale e rilevamento delle collisioni.
+# *****
+
+# Raccogli e Sfuggi
+# Muovi il cerchio blu.
+# Raccogli le particelle di energia (quadrati azzurri).
+# Se un triangolo ti tocca, perdi una vita.
+# Inizi con 3 vite. Premi 'x' per uscire.
+
+# --- Impostazioni Iniziali ---
+
+# Variabili di stato globali
+metti 0 in X_POS
+metti 0 in Y_POS
+metti 5 in VELOCITA
+metti 0 in USCITA 
+metti 0 in PUNTEGGIO
+metti 0 in CIBO_X
+metti 0 in CIBO_Y
+metti 3 in VITE
+metti 0 in GAME_OVER
+
+# Costanti per le dimensioni
+metti 20 in GIOCATORE_RAGGIO
+metti 18 in TRI_RAGGIO # raggio effettivo più aderente al triangolo disegnato
+metti 15 in CIBO_SIZE
+metti 220 in AREA_GIOCO 
+
+# --- Variabili per la Fisica ---
+metti 10 in TRI_MASSA
+metti 20 in K_MOLLA
+metti 5 in C_SMORZATORE
+metti 50 in L_RIPOSO
+metti 0.030 in DT          # Delta Time (corrisponde a "aspetta 30 ms")
+
+# --- Liste per i Triangoli ---
+metti lista() in LISTA_TRI_X
+metti lista() in LISTA_TRI_Y
+metti lista() in LISTA_TRI_VX
+metti lista() in LISTA_TRI_VY
+
+# Imposta il colore di sfondo (bianco)
+imposta colore (100, 100, 100)
+dipingi sfondo
+
+# --- Definizione Procedure ---
+
+definisci procedura piazza_cibo () (
+    globale CIBO_X, CIBO_Y, AREA_GIOCO
+    metti casuale(-AREA_GIOCO, AREA_GIOCO) in CIBO_X
+    metti casuale(-AREA_GIOCO, AREA_GIOCO) in CIBO_Y
+)
+
+# Aggiunge un triangolo non sovrapposto al giocatore
+definisci procedura aggiungi_triangolo () (
+    globale LISTA_TRI_X, LISTA_TRI_Y, LISTA_TRI_VX, LISTA_TRI_VY
+    globale AREA_GIOCO, X_POS, Y_POS
+
+    metti casuale(-AREA_GIOCO, AREA_GIOCO) in TX
+    metti casuale(-AREA_GIOCO, AREA_GIOCO) in TY
+
+    metti TX - X_POS in DX
+    metti TY - Y_POS in DY
+    metti radice((DX*DX) + (DY*DY)) in D
+
+    se (D < 120) allora (
+        se (abs(DX) > abs(DY)) allora (
+            se (DX >= 0) allora ( metti AREA_GIOCO in TX ) altrimenti ( metti -AREA_GIOCO in TX )
+        ) altrimenti (
+            se (DY >= 0) allora ( metti AREA_GIOCO in TY ) altrimenti ( metti -AREA_GIOCO in TY )
+        )
+    )
+
+    aggiungi TX a LISTA_TRI_X
+    aggiungi TY a LISTA_TRI_Y
+    aggiungi 0 a LISTA_TRI_VX
+    aggiungi 0 a LISTA_TRI_VY
+
+    scrivi "Un nuovo triangolo rosso è apparso!"
+    accapo
+)
+
+definisci procedura aggiorna_gioco () (
+    globale X_POS, Y_POS, USCITA, VELOCITA, VITE, GAME_OVER
+    globale PUNTEGGIO, CIBO_X, CIBO_Y, CIBO_SIZE, GIOCATORE_RAGGIO, TRI_RAGGIO, AREA_GIOCO
+    globale TRI_MASSA, K_MOLLA, C_SMORZATORE, L_RIPOSO, DT
+    globale LISTA_TRI_X, LISTA_TRI_Y, LISTA_TRI_VX, LISTA_TRI_VY
+
+    # 1. Movimento Giocatore
+    se (tasto "UP" viene premuto) allora ( metti Y_POS + VELOCITA in Y_POS )
+    se (tasto "DOWN" viene premuto) allora ( metti Y_POS - VELOCITA in Y_POS )
+    se (tasto "LEFT" viene premuto) allora ( metti X_POS - VELOCITA in X_POS )
+    se (tasto "RIGHT" viene premuto) allora ( metti X_POS + VELOCITA in X_POS )
+    se (tasto "X" viene premuto) allora ( metti 1 in USCITA )
+
+    # --- 2. FISICA e COLLISIONI TRIANGOLI ---
+    metti dimensione di LISTA_TRI_X in NUM_TRIANGOLI
+
+    se (NUM_TRIANGOLI > 0) allora (
+        indice i va da 1 a NUM_TRIANGOLI ed esegui (
+            metti elemento i di LISTA_TRI_X in T_X
+            metti elemento i di LISTA_TRI_Y in T_Y
+            metti elemento i di LISTA_TRI_VX in T_VX
+            metti elemento i di LISTA_TRI_VY in T_VY
+
+            metti X_POS - T_X in VETTORE_X
+            metti Y_POS - T_Y in VETTORE_Y
+            metti radice((VETTORE_X * VETTORE_X) + (VETTORE_Y * VETTORE_Y)) in DISTANZA
+            metti 0 in ALLUNGAMENTO
+            se (DISTANZA > 0.1) allora ( metti DISTANZA - L_RIPOSO in ALLUNGAMENTO )
+            metti K_MOLLA * ALLUNGAMENTO in FORZA_MOLLA_MAG
+
+            metti 0 in DIR_X
+            metti 0 in DIR_Y
+            se (DISTANZA > 0) allora (
+                metti VETTORE_X / DISTANZA in DIR_X
+                metti VETTORE_Y / DISTANZA in DIR_Y
+            )
+
+            metti (FORZA_MOLLA_MAG * DIR_X) - (C_SMORZATORE * T_VX) in FORZA_TOT_X
+            metti (FORZA_MOLLA_MAG * DIR_Y) - (C_SMORZATORE * T_VY) in FORZA_TOT_Y
+            metti FORZA_TOT_X / TRI_MASSA in ACCEL_X
+            metti FORZA_TOT_Y / TRI_MASSA in ACCEL_Y
+            metti T_VX + (ACCEL_X * DT) in T_VX_NEW
+            metti T_VY + (ACCEL_Y * DT) in T_VY_NEW
+            metti T_X + (T_VX_NEW * DT) in T_X_NEW
+            metti T_Y + (T_VY_NEW * DT) in T_Y_NEW
+
+            metti T_X_NEW in elemento i di LISTA_TRI_X
+            metti T_Y_NEW in elemento i di LISTA_TRI_Y
+            metti T_VX_NEW in elemento i di LISTA_TRI_VX
+            metti T_VY_NEW in elemento i di LISTA_TRI_VY
+
+            # --- Collisione Giocatore-Triangolo ---
+            metti T_X_NEW - X_POS in DIST_TX
+            metti T_Y_NEW - Y_POS in DIST_TY
+            metti (DIST_TX * DIST_TX) + (DIST_TY * DIST_TY) in DIST_T_Q
+            metti GIOCATORE_RAGGIO + TRI_RAGGIO in R_TOT_T
+            metti R_TOT_T * R_TOT_T in R_TOT_T_Q
+
+            se (DIST_T_Q < R_TOT_T_Q) allora (
+                metti VITE - 1 in VITE
+                se (VITE <= 0) allora (
+                    metti 1 in GAME_OVER
+                ) altrimenti (
+                    scrivi "VITA PERSA! Vite rimaste: "
+                    scrivi VITE
+                    accapo
+                    metti 0 in X_POS
+                    metti 0 in Y_POS
+                    indice j va da 1 a NUM_TRIANGOLI ed esegui (
+                        metti casuale(-AREA_GIOCO, AREA_GIOCO) in elemento j di LISTA_TRI_X
+                        metti casuale(-AREA_GIOCO, AREA_GIOCO) in elemento j di LISTA_TRI_Y
+                        metti 0 in elemento j di LISTA_TRI_VX
+                        metti 0 in elemento j di LISTA_TRI_VY
+                    )
+                    aspetta 500 ms
+                )
+            )
+        )
+    )
+
+    # --- 3. Logica di Collisione Cibo ---
+    metti X_POS - CIBO_X in DIST_X
+    metti Y_POS - CIBO_Y in DIST_Y
+    metti (DIST_X * DIST_X) + (DIST_Y * DIST_Y) in DIST_QUADRATA
+    metti GIOCATORE_RAGGIO + (CIBO_SIZE / 2) in RAGGIO_TOTALE
+    metti RAGGIO_TOTALE * RAGGIO_TOTALE in RAGGIO_TOTALE_Q
+
+    se (DIST_QUADRATA < RAGGIO_TOTALE_Q) allora (
+        metti PUNTEGGIO + 1 in PUNTEGGIO
+        scrivi "Punteggio: "
+        scrivi PUNTEGGIO
+        accapo
+        piazza_cibo()
+        aggiungi_triangolo()
+    )
+
+    # --- 4. Aggiorna la grafica ---
+    metti dimensione di LISTA_TRI_X in NUM_TRIANGOLI
+    cancella grafica
+    imposta colore (100, 100, 100)
+    dipingi sfondo
+
+    # Disegna il Giocatore (Blu) per primo
+    imposta colore (0, 0, 100)
+    cerchio raggio GIOCATORE_RAGGIO in punto(X_POS, Y_POS)
+
+    # Disegna Cibo (Azzurro)
+    imposta colore (50, 80, 100)
+    metti CIBO_X - (CIBO_SIZE / 2) in CIBO_X1
+    metti CIBO_Y - (CIBO_SIZE / 2) in CIBO_Y1
+    metti CIBO_X + (CIBO_SIZE / 2) in CIBO_X2
+    metti CIBO_Y + (CIBO_SIZE / 2) in CIBO_Y2
+    rettangolo da punto(CIBO_X1, CIBO_Y1) a punto(CIBO_X2, CIBO_Y2)
+
+    # Disegna Triangoli e Molle sopra al giocatore
+    se (NUM_TRIANGOLI > 0) allora (
+        indice i va da 1 a NUM_TRIANGOLI ed esegui (
+            metti elemento i di LISTA_TRI_X in T_X
+            metti elemento i di LISTA_TRI_Y in T_Y
+
+            imposta colore (50, 50, 50)
+            linea spessore 2 da punto(X_POS, Y_POS) a punto(T_X, T_Y)
+
+            imposta colore (100, 0, 0)
+            triangolo con vertici punto(T_X, T_Y + 15), punto(T_X - 10, T_Y - 10), punto(T_X + 10, T_Y - 10)
+        )
+    )
+
+    # HUD
+    imposta colore (0, 0, 0)
+    graffiti grandezza 16 in punto(-AREA_GIOCO - 20, AREA_GIOCO + 20) "Punteggio: " + PUNTEGGIO
+    graffiti grandezza 16 in punto(-AREA_GIOCO - 20, AREA_GIOCO) "Vite: " + VITE
+
+    ridisegna
+)
+
+# --- Loop di Gioco Principale ---
+piazza_cibo()
+
+fintanto (USCITA vale 0 e GAME_OVER vale 0) esegui (
+    aggiorna_gioco()
+    aspetta 30 ms 
+)
+
+# --- Schermata Finale ---
+se (GAME_OVER vale 1) allora (
+    cancella grafica
+    imposta colore (100, 100, 100)
+    dipingi sfondo
+    imposta colore (100, 0, 0)
+    graffiti grandezza 40 in punto(0, 50) "GAME OVER"
+    imposta colore (0, 0, 0)
+    graffiti grandezza 20 in punto(0, -10) "Punteggio Finale: " + PUNTEGGIO
+    ridisegna
+) altrimenti (
+    scrivi "Gioco terminato! Punteggio finale: "
+    scrivi PUNTEGGIO
+    accapo
+)
+stop

@@ -1,0 +1,362 @@
+# *****
+# Name: Space Invaders (Simple)
+# Category: Game
+# Program ver: 2.0
+# Date: Jan 2026
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: A simplified version of the classic arcade game. Manages multiple sprites, enemy
+# swarm movement, and player input. Includes logic for projectiles, destructible
+# shields, and scoring.
+# *****
+
+# ------------------------------------------------------------------
+# --------------------    MATITA: SPACE INVADERS   -----------------   
+# ------------------------------------------------------------------
+
+# --- COLORS ---
+put (0, 0, 0) in Black
+put (20, 100, 30) in Green
+put (100, 100, 100) in White
+put (100, 20, 20) in Red
+put (100, 100, 20) in Yellow
+
+# --- SPRITES ---
+label (
+  set color Green
+  rectangle from (-20, -10) to (20, -6)
+  rectangle from (-15, -6) to (15, 0)
+  rectangle from (-5, 0) to (5, 8)
+) as PlayerShip
+
+label (
+  set color White
+  rectangle from (-12, -8) to (12, 8)
+  rectangle from (-8, 8) to (-4, 12)
+  rectangle from (4, 8) to (8, 12)
+  set color Black
+  rectangle from (-6, -2) to (-2, 2)
+  rectangle from (2, -2) to (6, 2)
+) as Alien1
+
+label (
+  set color White
+  rectangle from (-12, -8) to (12, 8)
+  rectangle from (-12, 4) to (-8, 8)
+  rectangle from (8, 4) to (12, 8)
+  set color Black
+  rectangle from (-6, -2) to (-2, 2)
+  rectangle from (2, -2) to (6, 2)
+) as Alien2
+
+label (
+  set color Yellow
+  rectangle from (-10, -2) to (10, 2)
+  rectangle from (-2, -10) to (2, 10)
+  set color White
+  rectangle from (-6, -6) to (6, 6)
+) as Explosion
+
+# --- CONFIGURATION ---
+put 300 in ScreenWidth
+put 240 in PlayerLevelY
+put -220 in PlayerY
+put 6 in PlayerSpeed
+put 9 in ProjectileSpeed
+put 4 in BombSpeed
+put 12 in AlienWidth
+put 8 in AlienHeight
+put 5 in ShieldBlockSize
+put 8 in ExplosionDuration
+
+# --- INITIAL STATE ---
+put 0 in Score
+put 3 in Lives
+put 0 in PlayerX
+put false in ProjectileActive
+put point(0, 0) in Projectile
+put list() in Aliens
+put -180 in SwarmX
+put 150 in SwarmY
+put 1 in SwarmDirection
+put 3 in SwarmStepX
+put -40 in SwarmStepY
+put 10 in SwarmDelay
+put SwarmDelay in CurrentDelay
+put 0 in SwarmTimer
+put 1 in AnimationFrame
+put 0 in AnimationTimer
+put list() in Bombs
+put 96 in BombChance
+put list() in Explosions
+put 0 in RedFlashTimer
+
+# Generate Aliens
+index row goes from 0 to 4 and you do (
+  index col goes from 0 to 10 and you do (
+    add point(col * 40, row * -35) to Aliens
+  )
+)
+put dimension of Aliens in TotalAliens
+
+# --- GENERATE SHIELDS ---
+put list() in ShieldBlocks
+put -170 in ShieldY
+put list(-210, -70, 70, 210) in ShieldPositions
+
+for each CenterX in ShieldPositions you do (
+  index row goes from 0 to 4 and you do (
+    index col goes from -5 to 5 and you do (
+      if not (row < 2 and col > -3 and col < 3) then (
+        add point(CenterX + col * ShieldBlockSize, ShieldY + row * ShieldBlockSize) to ShieldBlocks
+      )
+    )
+  )
+)
+
+put ShieldBlockSize / 2 in HalfBlock
+
+# Calculated constants
+put -ScreenWidth in ScreenLeft
+put ScreenWidth in ScreenRight
+put PlayerY - 10 in HitBoxPlayerBottom
+put PlayerY + 10 in HitBoxPlayerTop
+put ShieldY + 25 in TopBarrierY
+
+clear screen
+write "Matita Space Invaders"
+
+# --- GAME LOOP ---
+as long as Lives > 0 and dimension of Aliens > 0 you do (
+  global PlayerX, ProjectileActive, Projectile, SwarmTimer, SwarmX, SwarmY
+  global CurrentDelay, AnimationTimer, AnimationFrame, Lives, Score
+  global Aliens, Bombs, ShieldBlocks, Explosions, SwarmDirection, RedFlashTimer
+
+  # 1. GRAPHICS AND BACKGROUND
+  clear graphics
+  
+  # Manage Red Flash
+  if RedFlashTimer > 0 then (
+    set color Red
+    paint background
+    put RedFlashTimer - 1 in RedFlashTimer
+  ) otherwise (
+    set color Black
+    paint background
+  )
+
+  # Fix zoom (Base black rectangle)
+  set color Black
+  rectangle from (-320, -260) to (320, 260)
+
+  # Console write
+  clear screen
+  write "SCORE: "
+  write Score
+  write "    LIVES: "
+  write Lives
+
+  put dimension of Aliens in NumAliens
+
+  # 2. CONTROLS
+  if (key "LEFT" is pressed) and PlayerX > ScreenLeft then (
+    put PlayerX - PlayerSpeed in PlayerX
+  )
+  if (key "RIGHT" is pressed) and PlayerX < ScreenRight then (
+    put PlayerX + PlayerSpeed in PlayerX
+  )
+  if (key "SPACE" is pressed) and ProjectileActive equals false then (
+    put true in ProjectileActive
+    put point(PlayerX, PlayerY + 20) in Projectile
+  )
+
+  # 3. ALIEN LOGIC
+  put SwarmTimer + 1 in SwarmTimer
+  if SwarmTimer >= CurrentDelay then (
+    put 0 in SwarmTimer
+    put SwarmX + (SwarmStepX * SwarmDirection) in SwarmX
+    put AnimationTimer + 1 in AnimationTimer
+    if AnimationTimer > 1 then (
+      put 0 in AnimationTimer
+      if AnimationFrame equals 1 then ( put 2 in AnimationFrame ) otherwise ( put 1 in AnimationFrame )
+    )
+    
+    put false in HitWall
+    for each alien in Aliens you do (
+      put SwarmX + x of alien in AX
+      if (AX > ScreenRight and SwarmDirection equals 1) or (AX < ScreenLeft and SwarmDirection equals -1) then (
+        put true in HitWall
+      )
+    )
+    if HitWall equals true then (
+      put SwarmDirection * -1 in SwarmDirection
+      put SwarmY + SwarmStepY in SwarmY
+    )
+  )
+
+  if random(1, 100) > BombChance and NumAliens > 0 then (
+    put item random(1, NumAliens) of Aliens in ShootingAlien
+    add point(SwarmX + x of ShootingAlien, SwarmY + y of ShootingAlien) to Bombs
+  )
+
+  # 4. COLLISIONS
+  
+  # A. OWN Projectile vs SHIELDS
+  if ProjectileActive equals true then (
+    put list() in SurvivingBlocks
+    for each block in ShieldBlocks you do (
+      put true in KeepBlock
+      put x of block in SX
+      put y of block in SY
+      put x of Projectile in BX
+      if abs(BX - SX) < HalfBlock and (y of Projectile < SY + HalfBlock) and (y of Projectile + ProjectileSpeed >= SY - HalfBlock) then (
+        put false in KeepBlock
+        put false in ProjectileActive
+      )
+      if KeepBlock equals true then ( add block to SurvivingBlocks )
+    )
+    put SurvivingBlocks in ShieldBlocks
+  )
+
+  # B. OWN Projectile vs ALIENS
+  if ProjectileActive equals true then (
+    put y of Projectile + ProjectileSpeed in ProjectileNextY
+    put x of Projectile in BX
+    put list() in SurvivingAliens
+    for each alien in Aliens you do (
+      put true in KeepAlien
+      put SwarmX + x of alien in AX
+      put SwarmY + y of alien in AY
+      if abs(BX - AX) < AlienWidth and y of Projectile < AY + AlienHeight and ProjectileNextY >= AY - AlienHeight then (
+        put false in ProjectileActive
+        put false in KeepAlien
+        put Score + 10 in Score
+        put SwarmDelay * (dimension of Aliens / TotalAliens) in CurrentDelay
+        add (point(AX, AY), ExplosionDuration) to Explosions
+      )
+      if KeepAlien equals true then ( add alien to SurvivingAliens )
+    )
+    put SurvivingAliens in Aliens
+  )
+
+  # C. ENEMY Bombs vs PLAYER and SHIELDS
+  put list() in SurvivingBombs
+  for each bomb in Bombs you do (
+    put true in BombActive
+    put x of bomb in BX
+    put y of bomb in BY
+    put BY - BombSpeed in BombNextY
+
+    # Hits Player?
+    if abs(BX - PlayerX) < 20 and BY >= HitBoxPlayerBottom and BombNextY < HitBoxPlayerTop then (
+      put Lives - 1 in Lives
+      put false in BombActive
+      put 25 in RedFlashTimer
+      add (point(PlayerX, PlayerY), ExplosionDuration) to Explosions
+    )
+
+    # Hits Shields?
+    if BombActive equals true then (
+      put list() in SurvivingBlocks
+      for each block in ShieldBlocks you do (
+        put true in KeepBlock
+        put x of block in SX
+        put y of block in SY
+        # Shield Collision
+        if abs(BX - SX) < HalfBlock and BY >= (SY - HalfBlock) and BombNextY < SY + HalfBlock then (
+          put false in KeepBlock
+          put false in BombActive
+          add (point(SX, SY), 2) to Explosions
+        )
+        if KeepBlock equals true then ( add block to SurvivingBlocks )
+      )
+      put SurvivingBlocks in ShieldBlocks
+    )
+    
+    if BombActive equals true then ( add bomb to SurvivingBombs )
+  )
+  put SurvivingBombs in Bombs
+
+  # D. INVASION Check
+  for each alien in Aliens you do (
+    put SwarmY + y of alien in PosYAlien
+    if (PosYAlien < PlayerY - 10) then ( put 0 in Lives )
+  )
+
+  # 5. PHYSICS
+  if ProjectileActive equals true then (
+    set y of Projectile to (y of Projectile + ProjectileSpeed)
+    if y of Projectile > PlayerLevelY then ( put false in ProjectileActive )
+  )
+
+  put list() in ActiveBombs
+  for each bomb in Bombs you do (
+    set y of bomb to (y of bomb - BombSpeed)
+    if y of bomb > -PlayerLevelY then ( add bomb to ActiveBombs )
+  )
+  put ActiveBombs in Bombs
+  
+  put list() in ActiveExplosions
+  for each exp in Explosions you do (
+    put item 1 of exp in PosExp
+    put item 2 of exp in TimerExp
+    put TimerExp - 1 in TimerExp
+    if TimerExp > 0 then ( add (PosExp, TimerExp) to ActiveExplosions )
+  )
+  put ActiveExplosions in Explosions
+
+  # 6. DRAWING
+  if AnimationFrame equals 1 then (
+    for each alien in Aliens you do ( draw Alien1 at (point(SwarmX + x of alien, SwarmY + y of alien)) )
+  ) otherwise (
+    for each alien in Aliens you do ( draw Alien2 at (point(SwarmX + x of alien, SwarmY + y of alien)) )
+  )
+  
+  for each exp in Explosions you do ( draw Explosion at (item 1 of exp) )
+
+  draw PlayerShip at point(PlayerX, PlayerY)
+  
+  set color Green
+  for each block in ShieldBlocks you do (
+    put x of block - HalfBlock in x1
+    put y of block - HalfBlock in y1
+    put x of block + HalfBlock in x2
+    put y of block + HalfBlock in y2
+    rectangle from (x1, y1) to (x2, y2)
+  )
+
+  if ProjectileActive equals true then (
+    set color White
+    rectangle from (x of Projectile - 2, y of Projectile - 8) to (x of Projectile + 2, y of Projectile + 8)
+  )
+
+  set color Red
+  for each bomb in Bombs you do (
+    rectangle from (x of bomb - 2, y of bomb - 6) to (x of bomb + 2, y of bomb + 6)
+  )
+
+  # --- VISIBLE HUD (Drawn last) ---
+  set color White
+  graffiti size 12 at (-290, 230) "LIVES: " + Lives
+  graffiti size 12 at (-290, 210) "SCORE: " + Score
+
+  wait 8 ms
+  frame graphics
+)
+
+# --- GAME OVER SCREEN ---
+clear graphics
+set color Black
+paint background
+
+set color Red
+graffiti size 50 at (-130, 20) "GAME OVER"
+
+set color White
+graffiti size 25 at (-90, -40) "SCORE: " + Score
+
+clear screen
+write "GAME OVER"
+write "Final Score: "
+write Score

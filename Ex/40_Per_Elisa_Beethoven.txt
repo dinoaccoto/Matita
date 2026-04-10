@@ -1,0 +1,65 @@
+# *****
+# Name: Per Elisa (Beethoven)
+# Category: Music
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: LVB
+# Language: IT
+# Matita ver: 0.8
+# Description: (Musica) Per Elisa di Beethoven
+# *****
+
+
+
+# ==========================================
+# Per Elisa (L. van Beethoven)
+# ==========================================
+
+cancella schermo
+cancella grafica
+
+# Impostiamo uno sfondo notturno ed elegante
+imposta colore (5, 8, 15)
+dipingi sfondo
+
+# Scriviamo il titolo al centro
+imposta colore (90, 85, 80)
+graffiti grandezza 25 in (0, 40) "Per Elisa"
+imposta colore (60, 55, 60)
+graffiti grandezza 10 in (5, 15) "Ludwig van Beethoven"
+
+inquadra grafica
+ridisegna
+
+scrivi "Caricamento del carillon..."; accapo
+
+# Definiamo la melodia. 
+# Lo '0' funziona come "pausa" perché sin(0) annulla il suono
+suono Carillon (
+    note (
+        659.3:180, 622.3:180, 659.3:180, 622.3:180, 659.3:180, 493.9:180, 587.3:180, 523.3:180, 440.0:450,
+        0:150, 261.6:180, 329.6:180, 440.0:180, 493.9:450,
+        0:150, 329.6:180, 415.3:180, 493.9:180, 523.3:450,
+        0:150, 329.6:180,
+        659.3:180, 622.3:180, 659.3:180, 622.3:180, 659.3:180, 493.9:180, 587.3:180, 523.3:180, 440.0:450,
+        0:150, 261.6:180, 329.6:180, 440.0:180, 493.9:450,
+        0:150, 329.6:180, 523.3:180, 493.9:180, 440.0:800
+    )
+    onda triangle
+)
+
+scrivi "Riproduzione in corso..."; accapo
+suona Carillon
+
+# Creiamo un'animazione che accompagna la musica
+# generando luci a tempo con l'incedere delle note
+fintanto (sta suonando Carillon) esegui (
+    imposta colore (casuale(40, 80), casuale(40, 80), casuale(70, 100))
+    cerchio raggio casuale(1, 3) in (casuale(-50, 150), casuale(-40, 100))
+    ridisegna
+    
+    # Aspettiamo esattamente la durata di una croma veloce
+    aspetta 180 ms
+)
+
+scrivi "Brano terminato."

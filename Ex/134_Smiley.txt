@@ -1,0 +1,46 @@
+# *****
+# Name: Smiley
+# Category: Graphics, Geometry
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Constructie van een tekening met behulp van geometrische primitieven zoals
+# cirkels en bogen. Overlapt gevulde cirkels en holle omtrekken om de
+# gezichtsdetails te creëren. Maakt gebruik van specifieke punten om ogen en mond
+# nauwkeurig te positioneren.
+# *****
+
+# --- Smiley ---
+
+# Kleuren
+zet (100, 90, 10) in Geel
+zet (0, 0, 0) in Zwart
+zet (100, 100, 100) in Wit
+
+wis canvas
+
+# Gezicht
+stel kleur in Geel
+cirkel straal 120 op (0, 0)
+
+# Omtrek gezicht
+stel kleur in Zwart
+omtrek straal 120 dikte 8 op (0, 0)
+
+# Ogen
+stel kleur in Zwart
+cirkel straal 12 op (-40, 30)
+cirkel straal 12 op (40, 30)
+
+# Lichtpunten in de ogen
+stel kleur in Wit
+cirkel straal 4 op (-35, 35)
+cirkel straal 4 op (45, 35)
+
+# Glimlach
+stel kleur in Zwart
+boog straal 60 dikte 8 van (-50, -25) tot (50, -25)
+
+toon alles

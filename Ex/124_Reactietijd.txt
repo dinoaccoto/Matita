@@ -1,0 +1,60 @@
+# *****
+# Name: Reactietijd
+# Category: Game
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Meet de reflexen van de gebruiker door de tijd te bereken tussen een visueel
+# signaal en een toetsaanslag. Maakt gebruik van de commando's tick en tock voor
+# nauwkeurige timing in milliseconden. Maakt gebruik van een willekeurige
+# vertraging om de test onvoorspelbaar te maken en anticipatie te voorkomen.
+# *****
+
+wis scherm
+schrijf " We meten je reactietijd ..."; nieuwe regel
+nieuwe regel
+schrijf "Wanneer het woord 'START!' verschijnt, druk op de SPATIEBALK."
+nieuwe regel
+schrijf "Druk op SPATIE om te beginnen..."
+
+# Wacht tot de gebruiker op spatie drukt om het spel te starten
+zolang (niet (toets "SPACE" is ingedrukt)) je doet (
+    wacht 10 ms
+)
+
+# Wacht tot de gebruiker de toets loslaat om valse starts te voorkomen
+zolang (toets "SPACE" is ingedrukt) je doet (
+    wacht 10 ms
+)
+
+wis scherm
+schrijf "Klaar..."; nieuwe regel
+
+# Bereken een willekeurige tijd tussen 2s en 5s
+zet willekeurig(2000, 5000) in WillekeurigeWachttijd
+wacht WillekeurigeWachttijd ms
+
+
+wis scherm
+schrijf "START!"
+tick # Start de stopwatch
+
+# Wachtlus: draait zolang de balk NIET is ingedrukt
+zolang (niet (toets "SPACE" is ingedrukt)) je doet (
+    wacht 1 ms
+)
+
+# Zodra de lus breekt (toets ingedrukt), lezen we de tijd met tock
+zet tock in Reactietijd
+
+nieuwe regel
+schrijf "Reactietijd: " + Reactietijd + " ms."; nieuwe regel
+
+nieuwe regel
+als (Reactietijd < 250) dan (
+    schrijf "Gefeliciteerd, bliksemsnelle reflexen!"
+) anders (
+    schrijf "Je kunt beter doen..."
+)

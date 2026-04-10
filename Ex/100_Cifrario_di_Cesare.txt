@@ -1,0 +1,36 @@
+# *****
+# Name: Cifrario di Cesare
+# Category: Programming
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Implementa un antico algoritmo di crittografia a sostituzione semplice. Sposta
+# ogni lettera del testo di un numero fisso di posizioni determinato dalla chiave.
+# Utilizza l'operatore modulo (mod) per gestire il "giro" dell'alfabeto dalla Z
+# alla A.
+# *****
+
+chiedi testo dicendo "Scrivi il testo da cifrare (in minuscolo):"
+chiedi chiave dicendo "Inserisci la chiave (numero intero):"
+
+metti scomponi(testo) in listaCaratteri
+metti Unicode("a") in baseA
+
+cancella schermo
+scrivi "Testo Originale: " + testo; accapo
+scrivi "Testo Cifrato:    "
+
+per ogni lettera in listaCaratteri esegui (
+    metti Unicode(lettera) in codice
+    se (codice >= baseA e codice <= baseA + 25) allora (
+        metti codice - baseA in indice0
+        metti indice0 + chiave in indiceSpostato
+        metti indiceSpostato mod 26 in indiceNuovo
+        metti indiceNuovo + baseA in codiceCifrato
+        scrivi Unicode(codiceCifrato)
+    ) altrimenti (# Lasciamo uguale se non è una lettera (spazio, punto, ecc.):
+        scrivi lettera
+    )
+)

@@ -1,0 +1,151 @@
+# *****
+# Name: Frattale di Mandelbrot
+# Category: Maths, Graphics
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Rendering progressivo dell'insieme di Mandelbrot, un famoso frattale matematico.
+# Utilizza un algoritmo di "fuga" su numeri complessi mappati sulla griglia di
+# pixel. Il programma permette di esplorare diverse aree del frattale scommentando
+# le coordinate nella sezione di configurazione.
+# *****
+
+cancella grafica
+cancella schermo
+
+# ==========================================
+#     SELEZIONE DELLA DESTINAZIONE
+# ==========================================
+# Istruzioni: Scommenta (togli #) SOLO il blocco
+# della zona che vuoi visitare. Commenta gli altri.
+
+# --- 1. VISTA STANDARD (L'intero insieme) ---
+ metti -0.75 in CENTRO_X
+ metti 0.0   in CENTRO_Y
+ metti 140   in ZOOM
+ metti 80    in MAX_ITERAZIONI
+
+# --- 2. VALLE DEI CAVALLUCCI (Seahorse Valley) ---
+# metti -0.748 in CENTRO_X
+# metti 0.1    in CENTRO_Y
+# metti 3000   in ZOOM
+# metti 300    in MAX_ITERAZIONI
+
+# --- 3. IL SATELLITE (Mini Mandelbrot) ---
+# metti -1.7685 in CENTRO_X
+# metti 0.0005  in CENTRO_Y
+# metti 1000    in ZOOM
+# metti 200     in MAX_ITERAZIONI
+
+# --- 4. VALLE DEGLI ELEFANTI ---
+# metti 0.275 in CENTRO_X
+# metti 0.006 in CENTRO_Y
+# metti 2500  in ZOOM
+# metti 200   in MAX_ITERAZIONI
+
+# --- 5. SPIRALE PROFONDA (Deep Zoom) ---
+# metti -0.743643 in CENTRO_X
+# metti 0.131825  in CENTRO_Y
+# metti 40000     in ZOOM
+# metti 1200      in MAX_ITERAZIONI
+
+# ==========================================
+#           FINE CONFIGURAZIONE
+# ==========================================
+
+# --- Dimensioni Finestra (Alta Risoluzione) ---
+# Multipli di 32 per evitare blocchi residui
+metti 416 in SEMI_LARGHEZZA
+metti 320 in SEMI_ALTEZZA
+
+# Calcolo bordi di rendering
+metti -SEMI_LARGHEZZA in X_START
+metti  SEMI_LARGHEZZA in X_END
+metti -SEMI_ALTEZZA   in Y_START
+metti  SEMI_ALTEZZA   in Y_END
+
+# --- SETUP TELECAMERA ---
+# Fissiamo l'inquadratura sull'area massima prima di iniziare il calcolo
+rettangolo da (X_START, Y_START) a (X_END, Y_END)
+inquadra grafica
+cancella grafica
+
+# --- Logica Rendering Progressivo ---
+metti 32 in PASSO_CORRENTE
+metti 1  in PASSO_MINIMO
+metti 0  in MARGINE
+
+scrivi "Rendering centrato in (" + CENTRO_X + ", " + CENTRO_Y + ")"
+accapo
+
+fintanto (PASSO_CORRENTE >= PASSO_MINIMO) esegui (
+    
+    scrivi "Rifinitura dettaglio (Passo: " + PASSO_CORRENTE + ")..."
+    # Non andiamo accapo per pulizia console
+
+    # --- CICLO RIGHE (Y) ---
+    metti Y_START in Py
+    
+    fintanto (Py < Y_END) esegui (
+        
+        # --- CICLO COLONNE (X) ---
+        metti X_START in Px
+        
+        fintanto (Px < X_END) esegui (
+            
+            # 1. Mappatura Coordinate
+            metti (Px / ZOOM) + CENTRO_X in cx
+            metti (Py / ZOOM) + CENTRO_Y in cy
+            
+            # 2. Inizializzazione Mandelbrot
+            metti 0 in zx
+            metti 0 in zy
+            metti 0 in iter
+            metti 0 in raggioQ
+            
+            # 3. Ciclo di Fuga
+            fintanto ((raggioQ < 4) e (iter < MAX_ITERAZIONI)) esegui (
+                metti (zx * zx) - (zy * zy) + cx in tempX
+                metti (2 * zx * zy) + cy in zy
+                metti tempX in zx
+                metti (zx * zx) + (zy * zy) in raggioQ
+                metti iter + 1 in iter
+            )
+
+            # 4. Colorazione (CORRETTA 0-100)
+            se (iter == MAX_ITERAZIONI) allora (
+                imposta colore (0, 0, 0)
+            ) altrimenti (
+                # Palette sinusoidale adattata per Matita (0-100)
+                # 50 è il centro, 50 l'ampiezza. Risultato max 100.
+                metti 0.1 in freq 
+                metti 50 + 50 * sin(freq * iter + 0.0) in R
+                metti 50 + 50 * sin(freq * iter + 2.0) in G
+                metti 50 + 50 * sin(freq * iter + 4.0) in B
+                imposta colore (R, G, B)
+            )
+
+            # 5. Disegno Pixel
+            rettangolo da (Px, Py) a (Px + PASSO_CORRENTE + 1, Py + PASSO_CORRENTE + 1)
+
+            # Avanza Colonna
+            metti Px + PASSO_CORRENTE in Px
+        )
+        
+        # Aggiornamento schermo
+        ridisegna
+        aspetta 0 ms 
+        
+        # Avanza Riga
+        metti Py + PASSO_CORRENTE in Py
+    )
+
+    # Aumenta risoluzione
+    metti PASSO_CORRENTE / 2 in PASSO_CORRENTE
+)
+
+accapo
+scrivi "Immagine completata!"
+inquadra grafica

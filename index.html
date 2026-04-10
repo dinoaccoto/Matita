@@ -410,9 +410,102 @@
       color: var(--accent-color);
     }
 
+    /* --- SPLASH SCREEN --- */
+    #splash-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.85); /* var(--bg-app) con opacità */
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+    }
+    #splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .splash-content {
+      width: 100%;
+      max-width: 500px;
+      background: var(--bg-pane);
+      padding: 40px 30px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      animation: splash-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes splash-pop {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .splash-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent-color);
+      margin-bottom: 12px;
+      font-family: 'Roboto Mono', monospace;
+      letter-spacing: -1px;
+    }
+    .splash-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+    .splash-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+    .splash-meta a {
+      color: var(--accent-hover);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .splash-meta a:hover {
+      text-decoration: underline;
+    }
+    .splash-cta {
+      font-size: 0.9rem;
+      color: #fbbf24; /* Giallo caldo per la call to action */
+      background: rgba(251, 191, 36, 0.1);
+      padding: 10px 15px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
   </style>
+
+
 </head>
 <body>
+
+  <div id="splash-screen">
+    <div class="splash-content">
+      <div class="splash-title">Matita</div>
+      <div class="splash-subtitle">The fast, high-level, multilingual programming language</div>
+      <div class="splash-meta">
+        ver. 0.9.3<br>
+        Open-source (GPL-3.0)<br>
+        <a href="https://github.com/dinoaccoto/Matita" target="_blank">github.com/dinoaccoto/Matita</a><br>
+        © 2025-2026 Dino Accoto<br>
+        Contact: da AT matitacode.com
+      </div>
+      <div class="splash-cta">
+        ⛶ Toggle to Full Screen for the best experience
+      </div>
+    </div>
+  </div>
+
   <div class="split-container">
     <div class="pane" id="editor-pane">
       <div class="pane-header">
@@ -443,9 +536,17 @@
 
     <div class="gutter gutter-horizontal" id="splitGutter"></div>
     <div class="pane output-pane" id="output-pane">
+      <div class="pane-header" style="justify-content: flex-end;">
+        <button id="printOutputButton" aria-label="Print" title="Print" style="padding: 4px 8px; display: flex; align-items: center; justify-content: center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+        </button>
+      </div>
       <pre id="outputArea" aria-live="polite" aria-label="Output del programma"></pre>
     </div>
-  </div>
 
   <div id="canvasWindow" class="canvas-window" role="dialog" aria-label="Area grafica">
     <div id="canvasWindowHeader" class="canvas-window-header">
@@ -496,8 +597,8 @@ function initMatita() {
   const uiStrings = {
     it: {
       title: "Matita", run: "Esegui", open: "Apri", save: "Salva", graphics: "Grafica", savePng: "Salva PNG",
-      fullscreen: "Schermo Intero", 
-      exitFullscreen: "Vista normale",
+      fullscreen: "⛶ Schermo Intero", 
+      exitFullscreen: "⛶ Vista normale",
       download: "Download", help: "Aiuto", lineIndicatorPrefix: "Riga",
       placeholder: "Scrivi il tuo codice qui...", canvasReady: "Premi 'Esegui' per disegnare.",
       canvasResized: "Ridimensionato. Riesegui per ridisegnare.",
@@ -565,7 +666,8 @@ function initMatita() {
           "BACKGROUND": "sfondo", "SCALE": "scala", "AS": "come",
           "THICKNESS": "spessore", "RADIUS": "raggio", "ITEM": "elemento",
           "MS": "ms", "SAYING": "dicendo", "WITH": "con", "saying/with": "dicendo/con",
-          "VERTICES": "vertici", "GRAPHICS": "grafica", "SCREEN": "schermo", "FROM": "da"
+          "VERTICES": "vertici", "GRAPHICS": "grafica", "SCREEN": "schermo", "FROM": "da",
+          "REPEAT": "ripeti", "TIMES": "volte"
         };
         return `Attesa la parola chiave '${map[name] || name.toLowerCase()}'.`;
       },
@@ -602,11 +704,11 @@ function initMatita() {
 
     en: {
       title: "Matita", run: "Run", open: "Open", save: "Save", graphics: "Graphics", savePng: "Save PNG",
-      fullscreen: "Full Screen",
-      exitFullscreen: "Exit Full Screen",
+      fullscreen: "⛶ Full Screen",
+      exitFullscreen: "⛶ Exit Full Screen",
       download: "Download", help: "Help", lineIndicatorPrefix: "Line",
       placeholder: "Write your code here...", canvasReady: "Run code to draw.",
-      canvasResized: "Resized. Re-run to redraw.",
+      canvasResized: "Re-run to redraw.",
       greetingMorning: "Good morning", greetingAfternoon: "Good afternoon",
       greetingEvening: "Good evening", welcomeMessage: "Matita ready.",
       saveFilename: "matita_code.txt", downloadFilename: "matita.html",
@@ -700,7 +802,7 @@ function initMatita() {
     nl: {
       title: "Matita", run: "Uitvoeren", open: "Openen", save: "Opslaan",
       graphics: "Grafiek", savePng: "PNG opslaan",
-      fullscreen: "Volledig scherm", exitFullscreen: "Normaal scherm",
+      fullscreen: "⛶ Volledig scherm", exitFullscreen: "⛶ Normaal scherm",
       download: "Downloaden", help: "Help", lineIndicatorPrefix: "Regel",
       placeholder: "Schrijf je code hier...",
       canvasReady: "Voer code uit om te tekenen.",
@@ -771,9 +873,10 @@ function initMatita() {
           "THICKNESS": "dikte", "RADIUS": "straal", "ITEM": "element",
           "MS": "ms", "SAYING": "met bericht", "WITH": "met",
           "saying/with": "met", "VERTICES": "hoekpunten",
-          "GRAPHICS": "canvas / grafiek", "SCREEN": "scherm", "FROM": "van"
-        };
-        return `Verwacht sleutelwoord '${map[name] || name.toLowerCase()}'.`;
+          "GRAPHICS": "canvas / grafiek", "SCREEN": "scherm", "FROM": "van",
+          "REPEAT": "herhaal", "TIMES": "keer"
+        };
+        return `Verwacht sleutelwoord '${map[name] || name.toLowerCase()}'.`;
       },
       expectedIdent: "Verwacht een naam (variabele of functie).",
       expectedExpr: "Verwacht een expressie.",
@@ -809,6 +912,8 @@ function initMatita() {
   const outputArea = document.getElementById("outputArea");
   const runButton = document.getElementById("runButton");
   const stopButton = document.getElementById("stopButton");
+  const printOutputButton = document.getElementById("printOutputButton");
+
   const helpButton = document.getElementById("helpButton");
   const gfxCanvas = document.getElementById("stage");
   const canvasWindow = document.getElementById("canvasWindow");
@@ -1349,6 +1454,10 @@ const dictEnToNl = {
         const isplayingW = {en:"is playing", it:"sta suonando", nl:"is aan het afspelen"}[lang] || "is playing";
         return isplayingW + " " + node.name;
       }
+      case "SetLiteral":
+        return "set(" + node.items.map(n => serializeExpr(n, lang)).join(", ") + ")";
+      case "RecordProp":
+        return serializeExpr(node.object, lang) + "." + node.prop;
       default:
         return "/*?*/";
     }
@@ -1441,6 +1550,8 @@ const dictEnToNl = {
     tick_:    {en:"tick",              it:"tick",               nl:"tick"},
     digits_:  {en:"digits",            it:"decimali",           nl:"decimalen"},
     sci_:     {en:"scientific",        it:"scientifica",        nl:"wetenschappelijk"},
+    repeat_:  {en:"repeat",            it:"ripeti",             nl:"herhaal"},
+    times_:   {en:"times",             it:"volte",              nl:"keer"},
   };
 
   function serializeStmt(node, lang, indent) {
@@ -1453,6 +1564,12 @@ const dictEnToNl = {
 
       case "GlobalDecl":
         return K("global_") + " " + node.names.join(", ");
+
+      case "RecordDecl":
+        return "record " + node.name + "(" + node.keys.join(", ") + ")";
+
+      case "RecordSet":
+        return K("put") + " " + sx(node.rhs) + " " + K("in_") + " " + sx(node.target.object) + "." + node.target.prop;
 
       case "Define": {
         const kk = node.kind === "function" ? K("fn") : K("proc");
@@ -1478,7 +1595,14 @@ const dictEnToNl = {
 
       case "Digits":              return K("digits_") + " " + sx(node.prec);
       case "ScientificThreshold": return K("sci_")    + " " + sx(node.valExpr);
-      case "Output":              return K("write")   + " " + sx(node.expr);
+      case "Output":
+        let wStr = K("write");
+        if (node.width !== null && node.width !== undefined) {
+          wStr += ":" + node.width;
+          if (node.align !== "r") wStr += ":" + node.align;
+        }
+        return wStr + " " + sx(node.expr);
+
       case "Wait":                return K("wait")    + " " + sx(node.duration) + " " + K("ms");
 
       case "Get":
@@ -1542,6 +1666,9 @@ const dictEnToNl = {
         if (node.elseBlock) s += "\n" + indent + K("else_") + " " + sb(node.elseBlock);
         return s;
       }
+
+      case "Repeat":
+        return K("repeat_") + " " + sx(node.countExpr) + " " + K("times_") + " " + sb(node.block);
 
       case "While":
         return K("while_") + " (" + sx(node.cond) + ") " + K("you_do") + " " + sb(node.block);
@@ -1723,7 +1850,7 @@ const dictEnToNl = {
 
   infoButton.addEventListener("click", () => {
     fileDropdownMenu.style.display = "none";
-    alert("Matita ver. 0.5.0\n(c) 2025-2026 Dino Accoto");
+    alert("Matita ver. 0.9.3 (beta)\n(c) 2025-2026 Dino Accoto");
   });
 
   // Chiudi menu File al click sulle voci (le funzioni originali vengono comunque innescate grazie agli ID)
@@ -1777,7 +1904,6 @@ const dictEnToNl = {
     });
   });
 
-  const CONSOLE_PROMPT = ":) ";
 
   const editorContainer = document.getElementById("editorContainer");
   const highlightingContent = document.getElementById("highlighting-content");
@@ -1814,7 +1940,7 @@ const dictEnToNl = {
 
 
   const KEYWORDS_EN = [
-    "alias", "to", "inout", "define","function","procedure","global","return","stop", "keys", "has", "key",
+    "alias", "to", "inout", "define","function","procedure","global","return","stop", "keys", "has", "key", "set", "record",
     "sound", "play", "volume", "fade", "out", "noise", "sweep", "notes", "loop", "tempo", "filter", "wave", "attack", "decay", "duration",
     "suono", "suona", "ferma", "dissolvenza", "uscita", "rumore", "scivola", "note", "onda", "durata", "attacco", "decadimento", "rilascio", "sostieni", "filtro", "stona", "panorama",
     "geluid", "speel", "uit", "ruis", "noten", "golf", "duur", "herhaal",
@@ -1825,7 +1951,8 @@ const dictEnToNl = {
     "rotate","deg","place","it","at","scale","by","load","paint","background",
     "true","false","or","not","is","equals", "different", "digits", "mod","pi","infinity","nan",
     "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","pressed",
-    "split","decomposition","composition","unicode","indexof","tick","tock","null","import","label", "scientific"
+    "split","decomposition","composition","unicode","indexof","tick","tock","null","import","label", "scientific",
+    "repeat","times","ripeti","volte","keer"
   ];
 
   // Costruisce ALL_KEYWORDS unendo EN + tutte le traduzioni dei dict dinamicamente
@@ -1960,6 +2087,7 @@ const dictEnToNl = {
     { label: "if (...) then ( ... )", insert: "if (CONDITION) then (\n    \n)\n", detail: "Conditional block" },
 
     { label: "otherwise ( ... )", insert: "otherwise (\n    \n)\n", detail: "Else branch" },
+    { label: "repeat N times ( ... )", insert: "repeat 5 times (\n    \n)\n", detail: "Repeat loop (no index variable)" },
     { label: "as long as (...) you do ( ... )", insert: "as long as (CONDITION) you do (\n    \n)\n", detail: "While loop" },
     { label: "for each x in LIST you do ( ... )", insert: "for each x in LIST you do (\n    \n)\n", detail: "List loop" },
     { label: "index I goes from A to B and you do ( ... )", insert: "index I goes from START to END and you do (\n    \n)\n", detail: "For loop" },
@@ -2043,6 +2171,7 @@ const dictEnToNl = {
   const SUGGESTIONS_IT = [
         { label: "se (...) allora ( ... )", insert: "se (CONDIZIONE) allora (\n    \n)\n", detail: "Blocco condizionale" },
         { label: "altrimenti ( ... )", insert: "altrimenti (\n    \n)\n", detail: "Ramo else" },
+        { label: "ripeti N volte ( ... )", insert: "ripeti 5 volte (\n    \n)\n", detail: "Loop con contatore (senza variabile indice)" },
         { label: "fintanto (...) esegui ( ... )", insert: "fintanto (CONDIZIONE) esegui (\n    \n)\n", detail: "Loop while" },
         { label: "per ogni x in LISTA esegui ( ... )", insert: "per ogni x in LISTA esegui (\n    \n)\n", detail: "Loop su lista" },
         { label: "inserisci VAL in elemento N di LISTA", insert: "inserisci VALORE in elemento INDICE di LISTA\n", detail: "Inserisce elemento in posizione" },
@@ -2112,7 +2241,8 @@ const dictEnToNl = {
     const SUGGESTIONS_NL = [
       { label: "als (...) dan ( ... )", insert: "als (CONDITIE) dan (\n    \n)\n", detail: "Conditioneel blok" },
       { label: "anders ( ... )", insert: "anders (\n    \n)\n", detail: "Else-tak" },
-      { label: "zolang (...) herhaal je ( ... )", insert: "zolang (CONDITIE) herhaal je (\n    \n)\n", detail: "While-lus" },
+      { label: "herhaal N keer ( ... )", insert: "herhaal 5 keer (\n    \n)\n", detail: "Lus met teller (zonder indexvariabele)" },
+      { label: "zolang (...) herhaal je ( ... )", insert: "zolang (CONDITIE) herhaal je (\n    \n)\n", detail: "While-lus" },
       { label: "voor elke x in LIJST herhaal je ( ... )", insert: "voor elke x in LIJST herhaal je (\n    \n)\n", detail: "Lus over lijst" },
       { label: "teller I loopt van A tot B en je doet ( ... )", insert: "teller I loopt van BEGIN tot EINDE en je doet (\n    \n)\n", detail: "For-lus" },
       { label: "voeg VAL toe in element N van LIJST", insert: "voeg WAARDE toe in element INDEX van LIJST\n", detail: "Voegt in op positie" },
@@ -2947,11 +3077,7 @@ const dictEnToNl = {
   window.addEventListener("keydown", onKeydown, { passive: true });
   window.addEventListener("keyup", onKeyup, { passive: true });
 
-  // --- Console formatting ---
-  function needsPrompt() {
-    if (outputArea.childNodes.length === 0) return true;
-    return outputArea.textContent.endsWith("\n");
-  }
+  
   function clearScreen() { outputArea.textContent = ""; }
 
   function formatNumber(n, precision = null) {
@@ -3003,13 +3129,19 @@ const dictEnToNl = {
       const entries = Object.entries(value.__data).map(([k,v]) => `"${k}": ${formatForOutput(v, precision)}`);
       return `{${entries.join(", ")}}`;
     }
+    if (typeof value === "object" && value !== null && value.__type === "set") {
+      return `set(${value.__data.map(v => formatForOutput(v, precision)).join(", ")})`;
+    }
+    if (typeof value === "object" && value !== null && value.__type === "record") {
+      const entries = Object.entries(value.__data).map(([k,v]) => `${k}: ${formatForOutput(v, precision)}`);
+      return `record(${entries.join(", ")})`;
+    }
     return String(value);
   }
 
 
   function appendLine(message, isError=false, precision=null) {
-    const prefix = needsPrompt() ? CONSOLE_PROMPT : "";
-    const formatted = prefix + formatForOutput(message, precision) + "\n";
+    const formatted = formatForOutput(message, precision) + "\n";
     let node;
     if (isError) {
       node = document.createElement("span");
@@ -3023,8 +3155,7 @@ const dictEnToNl = {
   }
 
   function appendText(message, precision=null) {
-    const prefix = needsPrompt() ? CONSOLE_PROMPT : "";
-    const textNode = document.createTextNode(prefix + formatForOutput(message, precision));
+    const textNode = document.createTextNode(formatForOutput(message, precision));
     outputArea.appendChild(textNode);
     outputArea.scrollTop = outputArea.scrollHeight;
   }
@@ -3053,6 +3184,14 @@ const dictEnToNl = {
     if (isPoint(v)) return { __type: "point", x: v.x, y: v.y };
     if (v.__type === "dict") {
       const copy = { __type: "dict", __data: Object.create(null) };
+      for (const k of Object.keys(v.__data)) copy.__data[k] = deepCopyValue(v.__data[k]);
+      return copy;
+    }
+    if (v.__type === "set") {
+      return { __type: "set", __data: v.__data.map(deepCopyValue) };
+    }
+    if (v.__type === "record") {
+      const copy = { __type: "record", __data: Object.create(null) };
       for (const k of Object.keys(v.__data)) copy.__data[k] = deepCopyValue(v.__data[k]);
       return copy;
     }
@@ -3514,6 +3653,8 @@ function redrawAll(objects, context) {
 
   // Keywords/phrases (case-insensitive). Parser accepts either Italian or English forms.
   const KW = {
+    SET: [["set"]],
+    RECORD: [["record"]],
     DEFINE: [["define"],["definisci"],["definieer"]],
     FUNCTION: [["function"],["funzione"],["functie"]],
     PROCEDURE: [["procedure"],["procedura"]],
@@ -3598,7 +3739,9 @@ function redrawAll(objects, context) {
     OUT: [["out"],["uscita"],["uit"]],
     HAS_KEY:    [["has","key"],["ha","chiave"],["heeft","sleutel"]],
     KEYS:       [["keys"],["chiavi"],["sleutels"]],
-    IS_PLAYING: [["is", "playing"], ["sta", "suonando"], ["is", "aan", "het", "afspelen"]]
+    IS_PLAYING: [["is", "playing"], ["sta", "suonando"], ["is", "aan", "het", "afspelen"]],
+    REPEAT: [["repeat"],["ripeti"],["herhaal"]],
+    TIMES:  [["times"],["volte"],["keer"]]
   };
 
 
@@ -3720,9 +3863,15 @@ function redrawAll(objects, context) {
           }
 
           // number
-          if (/\d|\./.test(ch)) {
+          if (/\d/.test(ch) || (ch === "." && this.i < this.src.length && /\d/.test(this.src[this.i]))) {
             const t = this.readNumber();
             if (t) return t;
+          }
+          // dot for records
+          if (ch === ".") {
+            const line = this.line, col = this.col;
+            this.nextChar();
+            return this.makeToken("DOT", ".", line, col);
           }
 
           // identifier/keyword
@@ -3830,7 +3979,8 @@ function redrawAll(objects, context) {
 
     getOpPrecedence(tok) {
       if (!tok) return 0;
-      if (tok.type==="OP") {
+      if (tok.type==="DOT") return 9;
+      if (tok.type==="OP") {
         const op=tok.value;
         if (op==="^") return 7;
         if (op==="*" || op==="/" || op==="%") return 6;
@@ -3950,6 +4100,20 @@ function redrawAll(objects, context) {
         return { type: "DictLiteral", entries, line: lb.line };
       }
 
+      // set(...) special
+      if (this.matchKW("SET")) {
+        const lp = this.matchType("LPAREN");
+        if (!lp) this.throwParse(uiStrings[lang].expectedParenAfterKeyword, tok.line);
+        if (this.matchType("RPAREN")) return { type: "SetLiteral", items: [], line: lp.line };
+        const items = [];
+        while (true) {
+          items.push(this.parseExpression(0, stopSet));
+          if (!this.matchType("COMMA")) break;
+        }
+        if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, lp.line);
+        return { type: "SetLiteral", items, line: lp.line };
+      }
+
       // list(...) special
       if (this.matchKW("LIST")) {
         const lp=this.matchType("LPAREN");
@@ -4056,6 +4220,12 @@ function redrawAll(objects, context) {
 
     parseInfix(left, opPrec, stopSet) {
       const tok=this.peek();
+      if (tok.type==="DOT") {
+        this.consume();
+        const id = this.matchType("IDENT");
+        if (!id) this.throwParse("Atteso nome chiave dopo il punto.", tok.line);
+        return { type: "RecordProp", object: left, prop: id.value, line: left.line };
+      }
       if (tok.type==="OP") {
         const op=this.consume().value;
         const right=this.parseExpression(opPrec, stopSet);
@@ -4144,6 +4314,23 @@ function redrawAll(objects, context) {
         return { type:"GlobalDecl", names, line: t.line };
       }
 
+      // record decl
+      if (this.matchKW("RECORD")) {
+        const nameTok = this.parseIdentifier();
+        const lp = this.matchType("LPAREN");
+        if (!lp) this.throwParse("Attesa '(' dopo il nome del record.", t.line);
+        const keys = [];
+        if (this.peek().type !== "RPAREN") {
+          while (true) {
+            const k = this.parseIdentifier();
+            keys.push(k.value);
+            if (!this.matchType("COMMA")) break;
+          }
+        }
+        if (!this.matchType("RPAREN")) this.throwParse("Attesa ')' alla fine delle chiavi.", t.line);
+        return { type: "RecordDecl", name: nameTok.value, keys, line: t.line };
+      }
+
       // define function/procedure
       if (this.matchKW("DEFINE")) {
         const kindTok = this.matchKW("FUNCTION") || this.matchKW("PROCEDURE");
@@ -4224,8 +4411,30 @@ function redrawAll(objects, context) {
 
       // output/scrivi
       if (this.matchKW("OUTPUT")) {
-        const expr=this.parseExpression(0, null);
-        return { type:"Output", expr, line: t.line };
+        let width = null;
+        let align = "r"; // default: allineamento a destra
+        
+        // Controlla se c'è un modificatore di larghezza
+        if (this.peek().type === "COLON") {
+          this.consume(); // consuma il primo ":"
+          const wTok = this.matchType("NUMBER");
+          if (wTok) {
+            width = parseInt(wTok.value, 10);
+          }
+          
+          // Controlla se c'è un modificatore di allineamento
+          if (this.peek().type === "COLON") {
+            this.consume(); // consuma il secondo ":"
+            const aTok = this.matchType("IDENT");
+            if (aTok) {
+              const mod = aTok.value.toLowerCase();
+              if (mod === "c" || mod === "l" || mod === "r") align = mod;
+            }
+          }
+        }
+        
+        const expr = this.parseExpression(0, null);
+        return { type: "Output", expr, width, align, line: t.line };
       }
 
       if (this.matchKW("SOUND")) {
@@ -4259,8 +4468,8 @@ function redrawAll(objects, context) {
             params.notesExpr = notes;
           }
           else if (["wave", "onda", "golf"].includes(key)) {
-            params.wave = this.consume().value.toLowerCase();
-          }
+            params.wave = this.consume().value.toLowerCase().replace(/['"]/g, '');
+          }
           else if (["loop", "ripeti", "herhaal"].includes(key)) {
             const v = this.consume().value.toLowerCase();
             params.loop = (v === "true" || v === "vero" || v === "waar");
@@ -4541,70 +4750,62 @@ function redrawAll(objects, context) {
         const a=this.consume(); 
         this.consume(); // alias
         const targetExpr = this.parseExpression(0, null);
-        
-        // Se è una variabile semplice, mantengo la compatibilità con targetName
-        if (targetExpr.type === "Var") {
-             return { type:"Alias", aliasName:a.value, targetName:targetExpr.name, line: a.line };
-        }
-        
-        // Altrimenti salvo tutta l'espressione
         return { type:"Alias", aliasName:a.value, targetExpr: targetExpr, line: a.line };
       }
 
       // put statement:
       if (this.matchKW("PUT")) {
-        const rhs=this.parseExpression(0, new Set(["in"]));
+        const rhs = this.parseExpression(0, new Set(["in"]));
         this.expectKW("IN", t.line);
 
-        // put val in D["chiave"]
-        if (this.peek().type === "IDENT" && this.peek(1) && this.peek(1).type === "LBRACK") {
-          const dictTok = this.consume();
-          this.consume(); // [
-          const keyExpr = this.parseExpression(0, null);
-          if (!this.matchType("RBRACK")) this.throwParse("']' mancante.", dictTok.line);
-          return { type: "DictPut", varNameUpper: dictTok.value.toUpperCase(), keyExpr, rhs, line: t.line };
+        // 1. Caso speciale: assegnamento a una posizione in una lista (es. put X in item N of LIST)
+        if (this.matchKW("ITEM")) {
+          const idx = this.parseExpression(0, new Set(["of","di","van"]));
+          this.expectKW("OF", t.line);
+          const listExpr = this.parseExpression(0, null);
+          return { type:"PutItem", rhs, idx, listExpr, line: t.line };
+        }
+
+        // 2. Legge la destinazione (L-Value) elaborandola come una normale espressione
+        const targetExpr = this.parseExpression(0, null);
+
+        // 3. Smista in base al tipo strutturale riconosciuto dall'AST
+        if (targetExpr.type === "RecordProp") {
+            // Assegnamento a Record (es. B.ms)
+            return { type: "RecordSet", rhs, target: targetExpr, line: t.line };
         }
         
-        if (this.matchKW("ITEM")) {
-          const idx=this.parseExpression(0, new Set(["of","di","van"]));
-          this.expectKW("OF", t.line);
-          const listExpr=this.parseExpression(0, null);
-          return { type:"PutItem", rhs, idx, listExpr, line: t.line };
-        } else {
+        if (targetExpr.type === "Subscript") {
+            // Assegnamento a Dizionario (es. D["chiave"])
+            if (targetExpr.object.type === "Var") {
+                return { type: "DictPut", varNameUpper: targetExpr.object.nameUpper, keyExpr: targetExpr.key, rhs, line: t.line };
+            }
+        }
 
-          let varName = null;
-          let varNameUpper = null; // <-- AGGIUNTA DICHIARAZIONE QUI
-          let aliasExpr = null;
+        if (targetExpr.type === "Binary" && targetExpr.op === "alias") {
+            // Creazione alias (es. put ... in (X alias Y))
+            return { type:"PutVar", rhs, varName: targetExpr.left.name, varNameUpper: targetExpr.left.nameUpper, aliasExpr: targetExpr, line: t.line };
+        }
 
-          if (this.peek().type === "LPAREN") {
-              const expr = this.parseExpression(0, null); 
-              if (expr.type === "Binary" && expr.op === "alias") {
-                  aliasExpr = expr;
-                  varName = expr.left.name; 
-                  varNameUpper = varName.toUpperCase();
-              } else {
-                  this.throwParse(uiStrings[lang].expectedVarAfterIn, t.line);
-              }
-
-          } else {
-              const varTok = this.parseIdentifier();
-              varName = varTok.value;
-              varNameUpper = varName.toUpperCase();
-
-              // Multi-target: put VAL in A, B, C
-              const extraTargets = [];
-              while (this.matchType("COMMA")) {
+        if (targetExpr.type === "Var") {
+            // Assegnamento a variabile singola o a variabili multiple separate da virgola
+            const varName = targetExpr.name;
+            const varNameUpper = targetExpr.nameUpper;
+            
+            const extraTargets = [];
+            while (this.matchType("COMMA")) {
                 const nt = this.parseIdentifier();
                 extraTargets.push({ varName: nt.value, varNameUpper: nt.value.toUpperCase() });
-              }
-              if (extraTargets.length > 0) {
+            }
+            if (extraTargets.length > 0) {
                 const targets = [{ varName, varNameUpper }, ...extraTargets];
                 return { type:"PutVar", rhs, varName, varNameUpper, targets, aliasExpr: null, line: t.line };
-              }
             }
-
-            return { type:"PutVar", rhs, varName, varNameUpper, aliasExpr, line: t.line };
+            
+            return { type:"PutVar", rhs, varName, varNameUpper, aliasExpr: null, line: t.line };
         }
+        
+        this.throwParse("Destinazione non valida per 'put'. Usa una variabile o un record.", t.line);
       }
     
       // Verbi separabili NL: "voeg V toe [aan] L" (add) e "voeg V in [bij] element N van L" (insert)
@@ -4791,6 +4992,14 @@ function redrawAll(objects, context) {
         this.pos=save;
       }
 
+      // repeat N times (...) / ripeti N volte (...) / herhaal N keer (...)
+      if (this.matchKW("REPEAT")) {
+        const countExpr = this.parseExpression(0, new Set(["times","volte","keer"]));
+        this.expectKW("TIMES", t.line);
+        const block = this.parseBlock();
+        return { type: "Repeat", countExpr, block, line: t.line };
+      }
+
       // procedure call or unknown command: IDENT ...
       if (t.type==="IDENT") {
         const nameTok=this.consume();
@@ -4844,7 +5053,6 @@ function redrawAll(objects, context) {
     if (isGlobal) {
       const entry = scopeChain[0][upper];
       if (entry !== undefined) {
-        if (entry && entry.__isAlias) return entry;
         return { scope: scopeChain[0], name: upper, value: entry };
       }
       return null;
@@ -4853,7 +5061,6 @@ function redrawAll(objects, context) {
     for (let i = scopeChain.length - 1; i >= 0; i--) {
       const entry = scopeChain[i][upper];
       if (entry !== undefined) {
-        if (entry && entry.__isAlias) return entry;
         return { scope: scopeChain[i], name: upper, value: entry };
       }
     }
@@ -4886,11 +5093,10 @@ function redrawAll(objects, context) {
     }
 
     if (entry === undefined) return undefined;
-  if (entry === null || typeof entry !== "object") return entry;
-  if (entry.__isAlias) return lookupVariable([entry.targetScope], entry.targetName, entry.targetName);
-  if (entry.__isHardRef) return entry.value;
-  return entry;
-}
+    if (entry === null || typeof entry !== "object") return entry;
+    if (entry.__type === "alias") return entry.get();
+    return entry;
+  }
 
 function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
     const upper = precalculatedUpper || name.toUpperCase();
@@ -4909,7 +5115,7 @@ function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
 
   if (isGlobal) {
     const entry = scopeChain[0][upperName];
-    if (entry && entry.__isAlias) { assignVariable([entry.targetScope], entry.targetName, storedValue); return; }
+    if (entry && typeof entry === "object" && entry.__type === "alias") { entry.set(storedValue); return; }
     scopeChain[0][upperName] = storedValue;
     return;
   }
@@ -4918,7 +5124,7 @@ function assignVariable(scopeChain, name, value, precalculatedUpper = null) {
   for (let i = scopeChain.length - 1; i >= searchLimit; i--) {
     const entry = scopeChain[i][upperName];
     if (entry !== undefined) {
-      if (entry && entry.__isAlias) { assignVariable([entry.targetScope], entry.targetName, storedValue); return; }
+      if (entry && typeof entry === "object" && entry.__type === "alias") { entry.set(storedValue); return; }
       scopeChain[i][upperName] = storedValue;
       return;
     }
@@ -5378,16 +5584,6 @@ function builtin_split(args) {
     return node.__async;
   }
 
-  function extractListPath(node, isAsync) {
-    if (node.type === "Var") return { nameUpper: node.nameUpper, path: [] };
-    if (node.type === "ItemOf") {
-      const res = extractListPath(node.list, isAsync);
-      res.path.push(compileExpr(node.index, isAsync)); 
-      return res;
-    }
-    throw new Error("INVALID_ALIAS_DEST");
-  }
-
   function buildTransformedLabelObjects(defL) {
     const c = Math.cos(defL.rotation), s = Math.sin(defL.rotation), sc = defL.scale;
     const tp = (x, y) => ({
@@ -5639,6 +5835,23 @@ function builtin_split(args) {
     truthy: truthy, t: truthy, toInt: toInt, deepCopy: deepCopyValue,
     isPoint: isPoint, coordFromValue: coordFromValue, colorFromTuple: colorFromTuple,
     fail: fail, wait: sleep, write: (val) => appendText(val, env.precision),
+    writeFormatted: (val, width, align) => {
+      let str = formatForOutput(val, env.precision);
+      if (str.length < width) {
+        const diff = width - str.length;
+        if (align === 'l') {
+          str = str + " ".repeat(diff);
+        } else if (align === 'c') {
+          const leftPad = Math.floor(diff / 2);
+          str = " ".repeat(leftPad) + str + " ".repeat(diff - leftPad);
+        } else {
+          str = " ".repeat(diff) + str;
+        }
+      }
+      appendText(str, null); // la formattazione di precisione è già avvenuta
+    },
+
+
     addGfx: addGraphicObject, tock: () => builtin_tock([], 0),
     isPlaying: (nameU) => {
       return env.soundHandles[nameU] && env.soundHandles[nameU].length > 0;
@@ -5810,13 +6023,54 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       const executable = ast.__async ? new AsyncFunction('rt', 'env', 'sc', 'clearScreen', compileProgram(ast)) : new Function('rt', 'env', 'sc', 'clearScreen', compileProgram(ast));
       await executable(rt, env, sc, clearScreen);
     },
-    makeAliasSimple: (sc, aliasName, targetName) => {
-      const target = resolveVariable(sc, targetName, targetName);
-      if (!target) throw new Error(`VAR_NOT_FOUND:${targetName}`);
-      sc[sc.length - 1][aliasName] = { __isAlias: true, targetScope: target.__isAlias ? target.targetScope : target.scope, targetName: target.__isAlias ? target.targetName : target.name };
+    makeAliasInout: (targetScope, targetName, targetValue) => {
+      if (targetValue && typeof targetValue === "object" && targetValue.__type === "alias") return targetValue;
+      return { __type: "alias", get: () => rt.getVar([targetScope], targetName), set: (val) => rt.setVar([targetScope], targetName, val) };
     },
-    makeAliasPath: (sc, aliasName, baseName, indices) => {
-      sc[sc.length - 1][aliasName] = { __isHardRef: true, value: rt.resolveMutListPath(sc, baseName, indices) };
+    makeAliasVar: (sc, aliasName, targetNameUpper) => {
+      sc[sc.length - 1][aliasName] = {
+        __type: "alias",
+        get: () => rt.getVar(sc, targetNameUpper),
+        set: (val) => rt.setVar(sc, targetNameUpper, val)
+      };
+    },
+    makeAliasItem: (sc, aliasName, listFn, idxFn) => {
+      sc[sc.length - 1][aliasName] = {
+        __type: "alias",
+        get: () => rt.getItem(listFn(), idxFn()),
+        set: (val) => {
+          let lst = listFn(); const idx = idxFn();
+          const p = rt.toInt(idx) - 1;
+          if (p < 0 || p >= lst.length) throw new Error(`INDEX_OUT_OF_BOUNDS:${idx}`);
+          if (lst.__shared) { lst = ensureWritable(lst); }
+          lst[p] = rt.deepCopy(val);
+        }
+      };
+    },
+    makeAliasDict: (sc, aliasName, dictFn, keyFn) => {
+      sc[sc.length - 1][aliasName] = {
+        __type: "alias",
+        get: () => rt.dictGet(dictFn(), keyFn()),
+        set: (val) => {
+          const d = dictFn(); const k = String(keyFn());
+          if (!d || d.__type !== "dict") throw new Error("NOT_A_DICT");
+          d.__data[k] = rt.deepCopy(val);
+        }
+      };
+    },
+    makeAliasRecord: (sc, aliasName, recFn, prop) => {
+      sc[sc.length - 1][aliasName] = {
+        __type: "alias",
+        get: () => rt.recordGet(recFn(), prop),
+        set: (val) => rt.recordSet(recFn(), prop, val)
+      };
+    },
+    makeAliasPoint: (sc, aliasName, ptFn, prop) => {
+      sc[sc.length - 1][aliasName] = {
+        __type: "alias",
+        get: () => { const pt = ptFn(); if (!rt.isPoint(pt)) throw new Error("POINT_ONLY_SET"); return pt[prop]; },
+        set: (val) => rt.setPointProp(ptFn(), prop, val)
+      };
     },
     resolveMutListPath: (sc, varNameUpper, indices) => {
       const res = resolveVariable(sc, varNameUpper, varNameUpper);
@@ -5931,16 +6185,79 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       delete d.__data[String(key)];
     },
 
+    setEq: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+    createSet: (items) => {
+      const res = { __type: "set", __data: [] };
+      for (const item of items) { if (!res.__data.some(x => rt.setEq(x, item))) res.__data.push(item); }
+      return res;
+    },
+    setUnion: (a, b) => {
+      const res = { __type: "set", __data: [...a.__data] };
+      for (const item of b.__data) { if (!res.__data.some(x => rt.setEq(x, item))) res.__data.push(rt.deepCopy(item)); }
+      return res;
+    },
+    setIntersect: (a, b) => {
+      const res = { __type: "set", __data: [] };
+      for (const item of a.__data) { if (b.__data.some(x => rt.setEq(x, item))) res.__data.push(rt.deepCopy(item)); }
+      return res;
+    },
+    setDiff: (a, b) => {
+      const res = { __type: "set", __data: [] };
+      for (const item of a.__data) { if (!b.__data.some(x => rt.setEq(x, item))) res.__data.push(rt.deepCopy(item)); }
+      return res;
+    },
+    recordGet: (obj, prop) => {
+      if (obj && obj.__type === "record") {
+        if (!(prop in obj.__data)) throw new Error("RECORD_KEY_NOT_FOUND:" + prop);
+        return obj.__data[prop];
+      }
+      throw new Error("NOT_A_RECORD");
+    },
+    recordSet: (obj, prop, val) => {
+      if (obj && obj.__type === "record") {
+        if (!(prop in obj.__data)) throw new Error("RECORD_KEY_NOT_FOUND:" + prop);
+        obj.__data[prop] = rt.deepCopy(val);
+        return;
+      }
+      throw new Error("NOT_A_RECORD");
+    },
     addOps: (a, b) => {
+      if (a && a.__type === "set" && b && b.__type === "set") return rt.setUnion(a, b);
       if (typeof a !== "string" && typeof b !== "string") return Number(a) + Number(b);
       const p = env.precision;
       const sa = (p === null && typeof a === "string") ? a : formatForOutput(a, p);
       const sb = (p === null && typeof b === "string") ? b : formatForOutput(b, p);
       return sa + sb;
     },
+    mulOps: (a, b) => {
+      if (a && a.__type === "set" && b && b.__type === "set") return rt.setIntersect(a, b);
+      return Number(a) * Number(b);
+    },
+    subOps: (a, b) => {
+      if (a && a.__type === "set" && b && b.__type === "set") return rt.setDiff(a, b);
+      return Number(a) - Number(b);
+    },
   };
 
   // ===== FASE C: TRANSPILATORE (AST -> JS) =====
+
+function extractListPath(expr, isAsync) {
+  const path = [];
+  let curr = expr;
+  
+  // Srotola eventuali liste nidificate (es. item X of item Y of LISTA)
+  while (curr && curr.type === "ItemOf") {
+    path.unshift(compileExpr(curr.index, isAsync));
+    curr = curr.list;
+  }
+  
+  // La radice deve essere necessariamente una variabile
+  if (!curr || curr.type !== "Var") {
+    throw new Error("L'assegnazione a una lista richiede una variabile come destinazione base.");
+  }
+  
+  return { nameUpper: curr.nameUpper, path: path };
+}
   function compileExpr(node, isAsync) {
     if (!node) return "null";
     switch (node.type) {
@@ -5959,6 +6276,8 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
         if (["!==","!="].includes(node.op)) return `(!Object.is(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)}))`;
         if (node.op === "^") return `Math.pow(Number(${compileExpr(node.left, isAsync)}), Number(${compileExpr(node.right, isAsync)}))`;
         if (node.op === "+") return `rt.addOps(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)})`;
+        if (node.op === "*") return `rt.mulOps(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)})`;
+        if (node.op === "-") return `rt.subOps(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)})`;
         const op = node.op === "%" ? "%" : node.op;
         return `(Number(${compileExpr(node.left, isAsync)}) ${op} Number(${compileExpr(node.right, isAsync)}))`;
       }
@@ -5983,6 +6302,10 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
         return `rt.dictHas(${compileExpr(node.dict,isAsync)}, ${compileExpr(node.key,isAsync)})`;
       case "DictKeys":
         return `rt.dictKeys(${compileExpr(node.dict,isAsync)})`;
+      case "SetLiteral":
+        return `rt.createSet([${node.items.map(i => compileExpr(i, isAsync)).join(", ")}])`;
+      case "RecordProp":
+        return `rt.recordGet(${compileExpr(node.object, isAsync)}, "${node.prop}")`;
       default: return "null";
     }
   }
@@ -5992,6 +6315,24 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
     code += `${indent}if (env.__forceStop) return { type: "ExecutionStop" };\n`;
     
     switch (node.type) {
+      case "RecordDecl":
+        // Genera una funzione costruttore salvata con il nome del record
+        code += `${indent}env.functions["${node.name.toUpperCase()}"] = async function(rt, env, scChain, args, _callerSc) {\n`;
+        code += `${indent}  const rec = {__type: "record", __data: {${node.keys.map(k => `"${k}": null`).join(", ")}}};\n`;
+        // Permette di popolare subito i campi passando gli argomenti al costruttore
+        code += `${indent}  const keys = [${node.keys.map(k => `"${k}"`).join(", ")}];\n`;
+        code += `${indent}  for(let i = 0; i < Math.min(args.length, keys.length); i++) {\n`;
+        code += `${indent}    rec.__data[keys[i]] = rt.deepCopy(args[i].val);\n`;
+        code += `${indent}  }\n`;
+        code += `${indent}  return { __return: true, value: rec };\n`;
+        code += `${indent}};\n`;
+        // Lo rende disponibile anche come procedura per evitare crash se chiamato a vuoto
+        code += `${indent}env.procedures["${node.name.toUpperCase()}"] = env.functions["${node.name.toUpperCase()}"];\n`;
+        break;
+
+      case "RecordSet":
+        code += `${indent}rt.recordSet(${compileExpr(node.target.object, isAsync)}, "${node.target.prop}", ${compileExpr(node.rhs, isAsync)});\n`;
+        break;
       case "GlobalDecl":
         code += `${indent}sc[sc.length - 1].__globalVars ||= new Set();\n`;
         node.names.forEach(n => { code += `${indent}sc[sc.length - 1].__globalVars.add("${n.toUpperCase()}");\n`; });
@@ -6009,7 +6350,7 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
         node.params.forEach((p, i) => {
             code += `${indent}    if (${p.inout} && args[${i}].isVar) {\n`;
             code += `${indent}       const res = rt.resolveVar(_callerSc || scChain, args[${i}].name);\n`;
-            code += `${indent}       if (res) { localScope["${p.name.toUpperCase()}"] = { __isAlias: true, targetScope: res.__isAlias ? res.targetScope : res.scope, targetName: res.__isAlias ? res.targetName : res.name }; }\n`;
+            code += `${indent}       if (res) { localScope["${p.name.toUpperCase()}"] = rt.makeAliasInout(res.scope, res.name, res.value); }\n`;
             code += `${indent}       else { localScope["${p.name.toUpperCase()}"] = rt.deepCopy(args[${i}].val); }\n`;
             code += `${indent}    } else { localScope["${p.name.toUpperCase()}"] = rt.deepCopy(args[${i}].val); }\n`;
         });
@@ -6044,7 +6385,14 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       case "Digits": code += `${indent}env.precision = rt.getPrecision(${compileExpr(node.prec, isAsync)});\n`; break;
       case "ScientificThreshold": code += `${indent}rt.setSciThreshold(${compileExpr(node.valExpr, isAsync)});\n`; break;
       case "Newline": code += `${indent}rt.write("\\n");\n`; break;
-      case "Output": code += `${indent}rt.write(${compileExpr(node.expr, isAsync)});\n`; break;
+      case "Output":
+        if (node.width !== null && node.width !== undefined) {
+          code += `${indent}rt.writeFormatted(${compileExpr(node.expr, isAsync)}, ${node.width}, "${node.align}");\n`;
+        } else {
+          code += `${indent}rt.write(${compileExpr(node.expr, isAsync)});\n`;
+        }
+        break;
+
       case "Wait": code += `${indent}await rt.wait(${compileExpr(node.duration, isAsync)});\n`; break;
       case "Tick": code += `${indent}env.tickTime = performance.now();\n`; break;
       case "Redraw": code += `${indent}rt.redraw();\n`; break;
@@ -6068,8 +6416,15 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       case "LoadBackground": code += `${indent}await rt.loadBg(${compileExpr(node.filenameExpr, isAsync)}, ${compileExpr(node.scaleExpr, isAsync)});\n`; break;
       case "PutVar":
         if (node.aliasExpr) {
-          const p = extractListPath(node.aliasExpr, isAsync);
-          code += `${indent}rt.makeAliasPath(sc, "${node.varNameUpper}", "${p.nameUpper}", [${p.path.join(", ")}]);\n`;
+          const aliasName = node.varNameUpper;
+          const tExpr = node.aliasExpr.right;
+          if (tExpr.type === "Var") code += `${indent}rt.makeAliasVar(sc, "${aliasName}", "${tExpr.nameUpper}");\n`;
+          else if (tExpr.type === "ItemOf") code += `${indent}rt.makeAliasItem(sc, "${aliasName}", () => ${compileExpr(tExpr.list, isAsync)}, () => ${compileExpr(tExpr.index, isAsync)}); \n`;
+          else if (tExpr.type === "Subscript") code += `${indent}rt.makeAliasDict(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, () => ${compileExpr(tExpr.key, isAsync)}); \n`;
+          else if (tExpr.type === "RecordProp") code += `${indent}rt.makeAliasRecord(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, "${tExpr.prop}"); \n`;
+          else if (tExpr.type === "PointProp") code += `${indent}rt.makeAliasPoint(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, "${tExpr.prop}"); \n`;
+          else code += `${indent}throw new Error("INVALID_ALIAS_DEST");\n`;
+          code += `${indent}rt.setVar(sc, "${aliasName}", rt.maybeCopy(${compileExpr(node.rhs, isAsync)}));\n`;
         } else if (node.targets && node.targets.length > 1) {
           code += `${indent}{ const __putRhs = ${compileExpr(node.rhs, isAsync)};\n`;
           node.targets.forEach((tgt) => {
@@ -6100,6 +6455,21 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
 
         if (node.elseBlock) { code += `${indent}else {\n${compileBlock(node.elseBlock, indent + "  ", isAsync)}${indent}}\n`; }
         break;
+      case "Repeat":
+        code += `${indent}{\n${indent}  const __repeatCount = rt.toInt(${compileExpr(node.countExpr, isAsync)});\n`;
+        code += `${indent}  if (!Number.isFinite(__repeatCount)) throw new Error("REPEAT_NOT_NUMERIC");\n`;
+        code += `${indent}  const __loopScope = rt.makeScope(); sc.push(__loopScope);\n${indent}  try {\n`;
+        code += `${indent}    for (let __ri = 0; __ri < Math.max(0, __repeatCount); __ri++) {\n`;
+        code += `${indent}      __line = ${node.line};\n${indent}      if (env.__forceStop) return { type: "ExecutionStop" };\n`;
+        code += compileBlock(node.block, indent + "      ", isAsync);
+        if (isAsync) {
+          code += `${indent}      if ((++__chk & 255) === 0) { const now = performance.now(); if (now - __lastYield > 14) { await new Promise(r => { __yieldMC.port1.onmessage = r; __yieldMC.port2.postMessage(null); }); __lastYield = performance.now(); } if (now - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop"); }\n`;
+        } else {
+          code += `${indent}      if ((++__chk & 1023) === 0 && performance.now() - __t0 > ${MAX_LOOP_MS}) throw new Error("infiniteLoop");\n`;
+        }
+        code += `${indent}    }\n${indent}  } finally { sc.pop(); }\n${indent}}\n`;
+        break;
+
       case "While":
         code += `${indent}{\n${indent}  const __loopScope = rt.makeScope(); sc.push(__loopScope);\n${indent}  try {\n${indent}    while (true) {\n`;
         code += `${indent}      __line = ${node.line};\n${indent}      if (env.__forceStop) return { type: "ExecutionStop" };\n`;
@@ -6159,8 +6529,19 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       case "Draw": code += `${indent}rt.drawObj("${node.name.toUpperCase()}", ${compileExpr(node.posExpr, isAsync)});\n`; break;
       case "RotatePlace": code += `${indent}await rt.rotatePlaceObj("${node.name.toUpperCase()}", "${node.name}", ${compileExpr(node.angleExpr, isAsync)}, ${compileExpr(node.posExpr, isAsync)}, sc);\n`; break;
       case "Alias":
-        if (node.targetName) code += `${indent}rt.makeAliasSimple(sc, "${node.aliasName.toUpperCase()}", "${node.targetName.toUpperCase()}");\n`;
-        else { const p = extractListPath(node.targetExpr, isAsync); code += `${indent}rt.makeAliasPath(sc, "${node.aliasName.toUpperCase()}", "${p.nameUpper}", [${p.path.join(", ")}]);\n`; }
+        if (node.targetExpr.type === "Var") {
+            code += `${indent}rt.makeAliasVar(sc, "${node.aliasName.toUpperCase()}", "${node.targetExpr.nameUpper}");\n`;
+        } else if (node.targetExpr.type === "ItemOf") {
+            code += `${indent}rt.makeAliasItem(sc, "${node.aliasName.toUpperCase()}", () => ${compileExpr(node.targetExpr.list, isAsync)}, () => ${compileExpr(node.targetExpr.index, isAsync)}); \n`;
+        } else if (node.targetExpr.type === "Subscript") {
+            code += `${indent}rt.makeAliasDict(sc, "${node.aliasName.toUpperCase()}", () => ${compileExpr(node.targetExpr.object, isAsync)}, () => ${compileExpr(node.targetExpr.key, isAsync)}); \n`;
+        } else if (node.targetExpr.type === "RecordProp") {
+            code += `${indent}rt.makeAliasRecord(sc, "${node.aliasName.toUpperCase()}", () => ${compileExpr(node.targetExpr.object, isAsync)}, "${node.targetExpr.prop}"); \n`;
+        } else if (node.targetExpr.type === "PointProp") {
+            code += `${indent}rt.makeAliasPoint(sc, "${node.aliasName.toUpperCase()}", () => ${compileExpr(node.targetExpr.object, isAsync)}, "${node.targetExpr.prop}"); \n`;
+        } else {
+            code += `${indent}throw new Error("INVALID_ALIAS_DEST");\n`;
+        }
         break;
 
       case "DictPut":
@@ -6227,7 +6608,10 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
          else if (msg === "SCI_POSITIVE") rt.fail("scientificPositive", null, __line);
          else if (msg === "NOT_A_DICT") rt.fail("notADict", null, __line);
          else if (msg === "DIM_NOT_LIST_OR_DICT") rt.fail("dimensionNeedsList", null, __line);
+         else if (msg === "NOT_A_RECORD") rt.fail("genericFail", {msg: "Questa variabile non è un record."}, __line);
+         else if (msg.startsWith("RECORD_KEY_NOT_FOUND:")) rt.fail("genericFail", {msg: "Chiave record non trovata: " + msg.split(":")[1]}, __line);
          else if (msg.startsWith("KEY_NOT_FOUND:")) rt.fail("keyNotFound", msg.slice(14), __line);
+         else if (msg === "REPEAT_NOT_NUMERIC") rt.fail("shapeParamsNotNumeric", "repeat/ripeti/herhaal", __line);
          else if (msg === "infiniteLoop") rt.fail("infiniteLoop", null, __line);
          else if (msg.startsWith("INCLUDE_FETCH_FAIL:") || msg.startsWith("INCLUDE_PARSE_FAIL:")) {
            const pts = msg.split(":");
@@ -6507,8 +6891,16 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
 
 gfxCanvas.addEventListener("pointerdown", (e) => {
     if (env) env.mouseDown = true;
-    if (isRunning) return; 
     dragDistance = 0;
+    if (isRunning) {
+      if (e.button === 2 || e.button === 1 || (e.button === 0 && e.shiftKey)) {
+        isDraggingCanvas = true;
+        lastPanX = e.clientX;
+        lastPanY = e.clientY;
+        gfxCanvas.setPointerCapture(e.pointerId);
+      }
+      return;
+    }
 
     if (e.button === 2 || e.button === 1 || (e.button === 0 && e.shiftKey)) {
       isDraggingCanvas = true;
@@ -6537,7 +6929,16 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
         env.mouseY = (currentTransform.ty - (e.clientY - r.top) * gfxDpr) / currentTransform.scale;
     }
     
-    if (isRunning) return;
+    if (isRunning) {
+      if (isDraggingCanvas && ((e.buttons & 1) || (e.buttons & 4))) {
+        camera.tx += (e.clientX - lastPanX) * gfxDpr;
+        camera.ty += (e.clientY - lastPanY) * gfxDpr;
+      }
+      lastPanX = e.clientX;
+      lastPanY = e.clientY;
+      return;
+    }
+
     lastMoveEvent = e;
     
     // Gate: se stiamo già aspettando il prossimo frame, salta
@@ -6548,7 +6949,8 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
       rafPending = false;
       const e = lastMoveEvent;
 
-    // Se stiamo tenendo premuto per il long-press ma si muove troppo il mouse, lo annulliamo
+
+    // Se si sta  tenendo premuto per il long-press
     if (longPressTimer && e.buttons === 1 && !e.shiftKey && pointerDownEvent) {
       const dx = e.clientX - pointerDownEvent.clientX;
       const dy = e.clientY - pointerDownEvent.clientY;
@@ -6685,7 +7087,7 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
     }
   });
 
-  gfxCanvas.addEventListener("pointerleave", () => {
+    gfxCanvas.addEventListener("pointerleave", () => {
     clearTimeout(longPressTimer);
     longPressTimer = null;
     let changed = false;
@@ -6704,9 +7106,8 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
     lineIndicator.textContent = `${uiStrings[lang].lineIndicatorPrefix.toLowerCase()}: ${line}`;
   }
 
-  // Zoom IN-out centrato su puntatore del mouse
-  gfxCanvas.addEventListener("wheel", (e) => {
-    if (isRunning) return;
+    // Zoom IN-out centrato su puntatore del mouse
+    gfxCanvas.addEventListener("wheel", (e) => {
     e.preventDefault(); 
 
     const rect = gfxCanvas.getBoundingClientRect();
@@ -6757,6 +7158,44 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
 
   runButton.addEventListener("click", runProgram);
 
+  // Blocco di sicurezza: aggiunge l'evento solo se il pulsante esiste nel DOM
+  if (printOutputButton) {
+    printOutputButton.addEventListener("click", () => {
+      // Rimuovi un eventuale iframe di stampa precedente per pulizia
+      let oldIframe = document.getElementById("matitaPrintFrame");
+      if (oldIframe) {
+        oldIframe.remove();
+      }
+
+      // Crea un nuovo iframe invisibile
+      const printIframe = document.createElement("iframe");
+      printIframe.id = "matitaPrintFrame";
+      printIframe.style.position = "absolute";
+      printIframe.style.width = "0";
+      printIframe.style.height = "0";
+      printIframe.style.border = "none";
+      document.body.appendChild(printIframe);
+
+      // Scrivi il contenuto della console dentro l'iframe
+      const doc = printIframe.contentWindow.document;
+      doc.open();
+      doc.write('<html><head><title>Stampa Output - Matita</title>');
+      doc.write('<style>');
+      doc.write('body { font-family: "Roboto Mono", monospace; font-size: 12pt; white-space: pre-wrap; word-wrap: break-word; color: #000; background: #fff; padding: 20px; margin: 0; }');
+      doc.write('.error-message { font-weight: bold; border-left: 3px solid #000; padding-left: 8px; display: block; margin: 4px 0; }');
+      doc.write('</' + 'style></' + 'head><body>');
+      doc.write(outputArea.innerHTML);
+      doc.write('</' + 'body></' + 'html>');
+      doc.close();
+
+      // Lancia la stampa concentrandosi sull'iframe
+      setTimeout(() => {
+        printIframe.contentWindow.focus();
+        printIframe.contentWindow.print();
+      }, 250);
+    });
+  }
+
   stopButton.addEventListener("click", () => {
     if (isRunning) {
       env.__forceStop = true;
@@ -6775,8 +7214,8 @@ gfxCanvas.addEventListener("pointerdown", (e) => {
     });
 
   helpButton.addEventListener("click", () => {
-    const helpFiles = { it: "help_it.html", nl: "help_nl.html" };
-    const helpFile = helpFiles[currentLang] || "help_en.html";
+    const helpFiles = { it: "ResIT/help_it.html", nl: "ResNL/help_nl.html" };
+    const helpFile = helpFiles[currentLang] || "ResEN/help_en.html";
     window.open(helpFile, "_blank");
   });
 
@@ -7037,6 +7476,21 @@ function getExample(lang) {
   updateHighlighting(true);
   hideSuggestions();
   drawReadyScreen(uiStrings[lang].canvasReady);
+
+  // --- SPLASH SCREEN LOGIC ---
+  const splashScreen = document.getElementById("splash-screen");
+  if (splashScreen) {
+    // Scompare automaticamente dopo 7 secondi
+    const splashTimeout = setTimeout(() => {
+      splashScreen.classList.add("hidden");
+    }, 7000);
+
+    // Permette all'utente di chiuderlo prima cliccando ovunque
+    splashScreen.addEventListener("click", () => {
+      clearTimeout(splashTimeout);
+      splashScreen.classList.add("hidden");
+    });
+  }
 }
 
 // bootstrap

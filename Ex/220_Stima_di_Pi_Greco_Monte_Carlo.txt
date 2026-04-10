@@ -1,0 +1,55 @@
+# *****
+# Name: Stima di Pi Greco (Monte Carlo)
+# Category: Maths
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Una dimostrazione del metodo Monte Carlo per stimare il valore di Pi Greco.
+# Genera punti casuali in un quadrato e conta quanti cadono all'interno del
+# cerchio inscritto. Il rapporto tra i punti interni e quelli totali approssima
+# l'area del cerchio, e quindi Pi.
+# *****
+
+cancella schermo
+
+definisci funzione modulo(P) (
+    restituisci radice((x di P)^2+(y di P)^2)
+)
+
+metti 100000 in NumeroPunti
+metti 0 in inCerchio
+metti (0,0,0) in nero
+metti (0,0,100) in blu
+metti (100,0,0) in rosso
+
+metti 2.5e-3 in Spessore
+imposta colore nero
+linea spessore Spessore da (-0.5, -0.5) a (-0.5, 0.5)
+linea spessore Spessore da (-0.5, 0.5) a (0.5, 0.5)
+linea spessore Spessore da (0.5, 0.5) a (0.5, -0.5)
+linea spessore Spessore da (0.5, -0.5) a (-0.5, -0.5)
+
+indice I va da 1 a NumeroPunti ed esegui (
+    globale inCerchio
+    metti casuale() - 0.5 in x
+    metti casuale() - 0.5 in y
+    metti punto(x, y) in P
+
+    se modulo(P) < 0.5 allora (
+       imposta colore rosso
+       cerchio raggio Spessore in (x di P, y di P)
+       metti inCerchio + 1 in inCerchio
+       
+    ) altrimenti (
+        imposta colore blu
+        cerchio raggio Spessore in (x di P, y di P)
+      )
+) 
+
+scrivi "Punti: " + NumeroPunti + " di cui dentro: " + inCerchio
+accapo
+scrivi "Stima di Pi Greco: " + (inCerchio / NumeroPunti) * 4
+
+inquadra grafica

@@ -1,0 +1,71 @@
+# *****
+# Name: Pensa un Numero
+# Category: Game, Maths
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Un esempio di input/output testuale e logica condizionale complessa. Il computer
+# usa la ricerca binaria per indovinare il numero pensato dall'utente in pochi
+# passi. Gestisce le risposte dell'utente (Maggiore, Minore, Indovinato) per
+# restringere l'intervallo.
+# *****
+
+# Il computer indovina il numero (1..100) pensato dall'utente.
+
+cancella schermo
+chiedi avvia dicendo "Pensa ad un numero intero tra 1 e 100.\n \
+Proverò ad indovinarlo il più velocemente possibile. \n \
+Rispondi con: \n \
+G = il tuo numero è più Grande \n \
+P = il tuo numero è più Piccolo \n \
+I = ho Indovinato \n \
+\n \
+X = esci \n \
+Premi INVIO per iniziare..."
+
+metti 1 in Min
+metti 100 in Max
+metti 0 in Tentativi
+
+fintanto (vero) esegui (
+    globale Min, Max, Tentativi
+
+    metti tronca((Min + Max) / 2) in Proposta
+    metti Tentativi + 1 in Tentativi
+
+    chiedi Risposta dicendo ("Proposta: " + Proposta + ". Il numero che hai pensato è più Grande (premi G), più Piccolo (premi P) oppure ho Indovinato (premi I)? Premere X per uscire: ")
+
+    se (Risposta uguale a "X") o (Risposta uguale a "x") allora (
+        scrivi "Tentativi effettuati: " + Tentativi; accapo
+        stop
+    )
+
+    se (Risposta uguale a "I") o (Risposta uguale a "i") allora (
+        accapo
+        scrivi "Indovinato! Il numero era " + Proposta + "."
+        accapo
+        scrivi "Tentativi: " + Tentativi; accapo
+        stop
+    )
+
+    se (Risposta uguale a "G") o (Risposta uguale a "g") allora (
+        metti Proposta + 1 in Min
+    ) altrimenti (
+        se (Risposta uguale a "P") o (Risposta uguale a "p") allora (
+            metti Proposta - 1 in Max
+        ) altrimenti (
+            accapo; scrivi "Risposta non valida. Usare G, P, I oppure X."
+            accapo
+        )
+    )
+
+    se (Min > Max) allora (
+        accapo
+        scrivi "Incoerenza nelle risposte: non esiste un numero compatibile."
+        accapo
+        scrivi "Tentativi effettuati: " + Tentativi; accapo
+        stop
+    )
+)

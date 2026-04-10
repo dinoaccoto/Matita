@@ -1,0 +1,35 @@
+# *****
+# Name: Caesar Cipher
+# Category: Programming
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Implements an ancient cryptographic algorithm with simple substitution. Shifts
+# each letter of the text by a fixed number of positions, determined by the key.
+# Uses the modulo operator (mod) to handle wrapping the alphabet from Z to A.
+# *****
+
+get text saying "Enter the text to encrypt (in lowercase):"
+get shiftValue saying "Enter the key (integer):"
+
+put split(text) in charList
+put unicode("a") in baseA
+
+clear screen
+write "Original Text: " + text; newline
+write "Ciphertext:    "
+
+for each letter in charList you do (
+    put unicode(letter) in code
+    if (code >= baseA and code <= baseA+25) then (
+        put code - baseA in index0
+        put index0 + shiftValue in shiftedIndex
+        put shiftedIndex mod 26 in newIndex
+        put newIndex + baseA in cipherCode
+        write unicode(cipherCode)
+    ) otherwise (# Leave unchanged if not a letter (space, punctuation, etc.):
+        write letter
+    )
+)

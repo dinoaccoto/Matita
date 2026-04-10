@@ -1,0 +1,106 @@
+# *****
+# Name: Fractale Boom
+# Category: Graphics, Maths
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Een voorbeeld van recursie om een natuurlijke boom te tekenen. Inclusief
+# wiskundige functies (sinus, cosinus) om de vertakkingen te bereken. Gebruikt
+# willekeurige getallen om hoeken en lengtes te variëren, waardoor elke boom uniek
+# is.
+# *****
+
+# Fractale boom
+wis scherm
+wis canvas
+
+# Rechthoekig blad verankerd aan de "stengel" onderaan
+definieer procedure tekenBlad(centrum, basis_hoek) (
+    stel kleur in (willekeurig(30, 90), willekeurig(80, 100), willekeurig(10, 50))
+    
+    zet willekeurig(5, 9) in breedte
+    zet willekeurig(6, 12) in hoogte
+    
+    # Totale rotatie in radialen
+    zet (basis_hoek + willekeurig(-20, 20)) * pi / 180 in hoek_rad
+    zet cos(hoek_rad) in c
+    zet sin(hoek_rad) in s
+
+    # Lokale rechthoek verankerd onderaan
+    zet -breedte / 2 in x1_lok
+    zet 0 in y1_lok
+    zet breedte / 2 in x2_lok
+    zet hoogte in y2_lok
+
+    # Vier hoekpunten na rotatie + translatie
+    zet (x1_lok * c - y1_lok * s + x van centrum) in v1x
+    zet (x1_lok * s + y1_lok * c + y van centrum) in v1y
+    zet (x2_lok * c - y1_lok * s + x van centrum) in v2x
+    zet (x2_lok * s + y1_lok * c + y van centrum) in v2y
+    zet (x2_lok * c - y2_lok * s + x van centrum) in v3x
+    zet (x2_lok * s + y2_lok * c + y van centrum) in v3y
+    zet (x1_lok * c - y2_lok * s + x van centrum) in v4x
+    zet (x1_lok * s + y2_lok * c + y van centrum) in v4y
+
+    driehoek met hoekpunten punt(v1x, v1y), punt(v2x, v2y), punt(v3x, v3y)
+    driehoek met hoekpunten punt(v1x, v1y), punt(v4x, v4y), punt(v3x, v3y)
+    
+    # Korte stengel uitgelijnd met het blad
+    stel kleur in (50, 30, 15)
+    zet (0 * c - (-2) * s + x van centrum) in s2x
+    zet (0 * s + (-2) * c + y van centrum) in s2y
+    lijn dikte 1 van centrum tot punt(s2x, s2y)
+)
+
+# Recursieve tak; bladeren groeien aan de punt
+definieer procedure tekenTak(begin, takLengte, hoek, niveau) (
+    als (niveau > 0) dan (
+        zet (hoek * pi / 180) in hoek_rad
+        zet (x van begin + takLengte * cos(hoek_rad)) in eind_x
+        zet (y van begin + takLengte * sin(hoek_rad)) in eind_y
+        zet punt(eind_x, eind_y) in eind_punt
+
+        stel kleur in (40, 26, 13)
+        lijn dikte max(1, niveau / 2) van begin tot eind_punt
+        
+        zet (0.75 + willekeurig(-10, 5) / 100) in lengte_factor
+        zet willekeurig(-15, 15) in var1
+        zet willekeurig(-15, 15) in var2
+        
+        tekenTak(eind_punt, takLengte * lengte_factor, hoek - (25 + var1), niveau - 1)
+        tekenTak(eind_punt, takLengte * lengte_factor, hoek + (25 + var2), niveau - 1)
+    )
+    
+    als (niveau == 0) dan (
+        # Bladpunt naar voren verplaatst langs de tak en iets opzij
+        zet (hoek * pi / 180) in a
+        zet cos(a) in ca
+        zet sin(a) in sa
+        zet willekeurig(6, 12) in vooruit              # offset langs de tak
+        zet willekeurig(-3, 3) in zijkant                # zijdelingse offset
+        # loodrecht op de tak: (-sa, ca)
+        zet (x van begin + vooruit * ca + zijkant * (-sa)) in fx
+        zet (y van begin + vooruit * sa + zijkant * ca) in fy
+        zet punt(fx, fy) in p_blad
+        
+        # 2-4 bladeren per top, met kleine variaties
+        zet willekeurig(2, 4) in n
+        teller i loopt van 1 tot n en je doet (
+            zet hoek + willekeurig(-15, 15) in a_lok
+            # micro-verschuiving om overlapping te voorkomen
+            zet fx + willekeurig(-2, 2) in lx
+            zet fy + willekeurig(-2, 2) in ly
+            tekenBlad(punt(lx, ly), a_lok)
+        )
+    )
+)
+
+# Start
+schrijf "Ik teken een fractale boom met natuurlijke bladeren..."
+zet punt(0, -220) in startpunt
+tekenTak(startpunt, 90, 90, 9)
+
+toon alles
+schrijf "Klaar! Voer opnieuw uit voor variatie."

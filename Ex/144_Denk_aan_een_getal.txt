@@ -1,0 +1,71 @@
+# *****
+# Name: Denk aan een getal
+# Category: Game, Maths
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Een voorbeeld van tekstuele input/output en complexe voorwaardelijke logica. De
+# computer gebruikt binair zoeken om het getal te raden dat de gebruiker in
+# gedachten heeft in slechts een paar stappen. Verwerkt de antwoorden van de
+# gebruiker (Groter, Kleiner, Juist) om het bereik te verkleinen.
+# *****
+
+# De computer raadt het getal (1..100) dat de gebruiker in gedachten heeft.
+
+wis scherm
+vraag start met bericht "Denk aan een geheel getal tussen 1 en 100.
+Ik zal proberen het zo snel mogelijk te raden.
+Antwoord met:
+G = je getal is Groter
+K = je getal is Kleiner
+J = ik heb het Juist
+
+X = afsluiten
+Druk op ENTER om te beginnen..."
+
+zet 1 in Min
+zet 100 in Max
+zet 0 in Pogingen
+
+zolang (waar) je doet (
+    globaal Min, Max, Pogingen
+
+    zet afkappen((Min + Max) / 2) in Voorstel
+    zet Pogingen + 1 in Pogingen
+
+    vraag Antwoord met bericht ("Voorstel: " + Voorstel + ". Is het getal dat je in gedachten had Groter (druk op G), Kleiner (druk op K) of heb ik het Juist (druk op J)? Druk op X om af te sluiten: ")
+
+    als (Antwoord gelijk "X") of (Antwoord gelijk "x") dan (
+        schrijf "Gedane pogingen: " + Pogingen; nieuwe regel
+        stop
+    )
+
+    als (Antwoord gelijk "J") of (Antwoord gelijk "j") dan (
+        nieuwe regel
+        schrijf "Geraden! Het getal was " + Voorstel + "."
+        nieuwe regel
+        schrijf "Pogingen: " + Pogingen; nieuwe regel
+        stop
+    )
+
+    als (Antwoord gelijk "G") of (Antwoord gelijk "g") dan (
+        zet Voorstel + 1 in Min
+    ) anders (
+        als (Antwoord gelijk "K") of (Antwoord gelijk "k") dan (
+            zet Voorstel - 1 in Max
+        ) anders (
+            nieuwe regel; schrijf "Ongeldig antwoord. Gebruik G, K, J of X."
+            nieuwe regel
+        )
+    )
+
+    als (Min > Max) dan (
+        nieuwe regel
+        schrijf "Inconsistentie in antwoorden: er is geen compatibel getal."
+        nieuwe regel
+        schrijf "Gedane pogingen: " + Pogingen; nieuwe regel
+        stop
+    )
+)

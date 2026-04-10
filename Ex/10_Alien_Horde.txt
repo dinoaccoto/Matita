@@ -1,0 +1,554 @@
+# *****
+# Name: Alien Horde
+# Category: Game
+# Program ver: 5.0
+# Author: DA
+# Language: EN
+# Matita ver: 0.8
+# Description: Stop a horde of alien probes from reaching Earth.
+# *****
+
+# --- GLOBALS ---
+global Score, Lives, DamageFlash, EscapeFlash
+global ScrollSpeed, SpawnTimer, Cooldown
+global PlayerVX, PlayerVY, PlayerX, TriangleY
+global EngineOn, FacingDir, Running
+
+# --- INITIALIZATION ---
+put list() in Asteroids
+put list() in Projectiles
+
+put 600 in CanvasW
+put 600 in CanvasH
+put 30 in HudH
+
+put 0 in Score
+put 3 in Lives
+put 0 in DamageFlash
+put 0 in EscapeFlash
+
+
+# =============================================
+# --- SOUNDS ---
+# =============================================
+
+sound BGM (
+    notes (220, 262, 330, 262, 220, 196, 220, 330)
+    tempo 150
+    wave square
+    loop true
+)
+
+sound Laser (
+    sweep from 1200 to 400 hz
+    duration 120 ms
+    wave sawtooth
+)
+
+sound Boom (
+    noise duration 200 ms
+    attack 5 ms
+    decay 150 ms
+    filter 800 hz
+)
+
+sound Crash (
+    noise duration 600 ms
+    attack 10 ms
+    decay 500 ms
+    filter 400 hz
+)
+
+sound Miss (
+    sweep from 300 to 150 hz
+    duration 300 ms
+    wave triangle
+)
+
+sound GameOverSnd (
+    notes (150, 140, 130, 120, 100)
+    tempo 80
+    wave sawtooth
+)
+
+
+# =============================================
+# --- GRAPHIC LABELS ---
+# =============================================
+
+# 1. Background
+label (
+    set color (5, 2, 16)
+    circle radius 200 at (80, 500)
+    set color (4, 1, 13)
+    circle radius 170 at (540, 80)
+    set color (3, 4, 15)
+    circle radius 140 at (300, 300)
+    set color (4, 2, 10)
+    circle radius 120 at (150, 120)
+    set color (3, 3, 13)
+    circle radius 110 at (480, 430)
+
+    index S goes from 1 to 120 and you do (
+        put random(1, 4) in SB
+        put random(0, 600) in SX
+        put random(0, 600) in SY
+        
+        if (SB >= 4) then (
+            set color (95, 95, 100)
+            circle radius 2 at (SX, SY)
+        ) otherwise (
+            if (SB >= 2) then (
+                set color (58, 58, 76)
+                circle radius 1 at (SX, SY)
+            ) otherwise (
+                set color (33, 33, 48)
+                circle radius 1 at (SX, SY)
+            )
+        )
+    )
+) as SPACE_BG
+
+# 2. Propulsion flames
+label (
+    set color (100, 50, 5)
+    triangle with vertices (2, 15), (2, -15), (-24, 0)
+    set color (100, 72, 22)
+    triangle with vertices (2, 9), (2, -9), (-15, 0)
+    set color (100, 96, 60)
+    triangle with vertices (2, 5), (2, -5), (-8, 0)
+) as FLAME_RIGHT
+
+label (
+    set color (100, 50, 5)
+    triangle with vertices (-2, 15), (-2, -15), (24, 0)
+    set color (100, 72, 22)
+    triangle with vertices (-2, 9), (-2, -9), (15, 0)
+    set color (100, 96, 60)
+    triangle with vertices (-2, 5), (-2, -5), (8, 0)
+) as FLAME_LEFT
+
+# 3. Starship
+label (
+    set color (12, 34, 68)
+    triangle with vertices (2, -21), (26, -5), (2, -5)
+    set color (18, 52, 90)
+    line thickness 1 from (2, -21) to (26, -5)
+    set color (12, 34, 68)
+    triangle with vertices (2, 21), (26, 5), (2, 5)
+    set color (18, 52, 90)
+    line thickness 1 from (2, 21) to (26, 5)
+    set color (16, 46, 88)
+    triangle with vertices (2, 12), (2, -12), (30, 0)
+    set color (30, 70, 100)
+    triangle with vertices (12, 5), (12, -5), (27, 0)
+    set color (35, 88, 100)
+    circle radius 5 at (21, 0)
+    set color (72, 100, 100)
+    circle radius 2 at (22, 2)
+) as SHIP_RIGHT
+
+label (
+    set color (12, 34, 68)
+    triangle with vertices (-2, -21), (-26, -5), (-2, -5)
+    set color (18, 52, 90)
+    line thickness 1 from (-2, -21) to (-26, -5)
+    set color (12, 34, 68)
+    triangle with vertices (-2, 21), (-26, 5), (-2, 5)
+    set color (18, 52, 90)
+    line thickness 1 from (-2, 21) to (-26, 5)
+    set color (16, 46, 88)
+    triangle with vertices (-2, 12), (-2, -12), (-30, 0)
+    set color (30, 70, 100)
+    triangle with vertices (-12, 5), (-12, -5), (-27, 0)
+    set color (35, 88, 100)
+    circle radius 5 at (-21, 0)
+    set color (72, 100, 100)
+    circle radius 2 at (-22, 2)
+) as SHIP_LEFT
+
+# 4. Projectiles
+label (
+    set color (0, 28, 22)
+    rectangle from (-26, -1) to (-6, 1)
+    set color (0, 65, 52)
+    rectangle from (-12, -2) to (-2, 2)
+    set color (0, 100, 80)
+    circle radius 4 at (0, 0)
+    set color (65, 100, 100)
+    circle radius 2 at (0, 0)
+) as PROJ_RIGHT
+
+label (
+    set color (0, 28, 22)
+    rectangle from (26, -1) to (6, 1)
+    set color (0, 65, 52)
+    rectangle from (12, -2) to (2, 2)
+    set color (0, 100, 80)
+    circle radius 4 at (0, 0)
+    set color (65, 100, 100)
+    circle radius 2 at (0, 0)
+) as PROJ_LEFT
+
+# 5. Game Over Panel
+label (
+    set color (8, 2, 2)
+    rectangle from (100, 200) to (500, 390)
+    set color (72, 12, 12)
+    line thickness 2 from (100, 200) to (500, 200)
+    line thickness 2 from (100, 390) to (500, 390)
+    line thickness 2 from (100, 200) to (100, 390)
+    line thickness 2 from (500, 200) to (500, 390)
+    set color (100, 15, 15)
+    graffiti size 46 at (300, 338) "GAME OVER"
+    set color (55, 55, 78)
+    graffiti size 14 at (300, 238) "Press F5 to play again"
+) as GAMEOVER_PANEL
+
+
+# =============================================
+# --- CAMERA AND GAME LOGICS ---
+# =============================================
+
+clear graphics
+set color (2, 1, 8)
+rectangle from (0, 0) to (CanvasW, CanvasH)
+frame graphics
+
+put 2 in ScrollSpeed
+put 0 in SpawnTimer
+
+put 30 in PlayerX
+put CanvasH / 2 in TriangleY
+put 21 in TriHalfBase
+put 30 in TriHeight
+
+put 0 in PlayerVX
+put 0 in PlayerVY
+put 2 in TriAcc
+put 0.85 in Friction
+put 1 in FacingDir
+put false in EngineOn
+
+put 25 in ProjSpeed
+put 4 in ProjR
+put 0 in Cooldown
+put 15 in CooldownMax
+
+# --- MAIN LOOP ---
+put true in Running
+
+play BGM
+volume BGM 30
+
+as long as (Running is true) you do (
+    clear graphics
+
+    # == BACKGROUND ==
+    if (DamageFlash > 0) then (
+        set color (80, 0, 0)
+        paint background
+        put DamageFlash - 1 in DamageFlash
+    ) otherwise (
+        if (EscapeFlash > 0) then (
+            set color (90, 45, 0)
+            paint background
+            put EscapeFlash - 1 in EscapeFlash
+        ) otherwise (
+            set color (2, 1, 8)
+            paint background
+        )
+    )
+
+    draw SPACE_BG at (0, 0)
+
+    # == SPAWN ASTEROIDS (DICT) ==
+    if (SpawnTimer <= 0) then (
+        put random(8, 28) in NewR
+        put {"x": CanvasW + NewR, "y": random(NewR + 4, CanvasH - HudH - NewR - 4), "r": NewR, "v": random(-2, 2)} in Ast
+        add Ast to Asteroids
+        put random(12, 30) in SpawnTimer
+    ) otherwise (
+        put SpawnTimer - 1 in SpawnTimer
+    )
+
+    # == PLAYER INPUT ==
+    if (Cooldown > 0) then (put Cooldown - 1 in Cooldown)
+
+    put false in EngineOn
+
+    if (key "UP" is pressed) then (
+        put PlayerVY + TriAcc in PlayerVY
+        put true in EngineOn
+    )
+    if (key "DOWN" is pressed) then (
+        put PlayerVY - TriAcc in PlayerVY
+        put true in EngineOn
+    )
+    if (key "RIGHT" is pressed) then (
+        put PlayerVX + TriAcc in PlayerVX
+        put 1 in FacingDir
+        put true in EngineOn
+    )
+    if (key "LEFT" is pressed) then (
+        put PlayerVX - TriAcc in PlayerVX
+        put -1 in FacingDir
+        put true in EngineOn
+    )
+
+    put PlayerVY * Friction in PlayerVY
+    put PlayerVX * Friction in PlayerVX
+    put TriangleY + PlayerVY in TriangleY
+    put PlayerX + PlayerVX in PlayerX
+
+    put PlayerX + TriHeight in NoseX
+    put TriangleY + TriHalfBase in ShipTop
+    put TriangleY - TriHalfBase in ShipBot
+
+    # == SPAWN PROJECTILES (DICT) ==
+    if (key "SPACE" is pressed) then (
+        if (Cooldown is 0) then (
+            if (FacingDir is 1) then (
+                put {"x": NoseX, "y": TriangleY, "vx": ProjSpeed} in Proj
+            ) otherwise (
+                put {"x": PlayerX, "y": TriangleY, "vx": -ProjSpeed} in Proj
+            )
+            add Proj to Projectiles
+            put CooldownMax in Cooldown
+            play Laser
+        )
+    )
+
+    # == PLAYER LIMITS ==
+    put CanvasH - HudH in PlayAreaTop
+    if (ShipTop > PlayAreaTop) then (
+        put PlayAreaTop - TriHalfBase in TriangleY
+        put 0 in PlayerVY
+    )
+    if (ShipBot < 0) then (
+        put TriHalfBase in TriangleY
+        put 0 in PlayerVY
+    )
+    if (PlayerX < -16) then (
+        put -16 in PlayerX
+        put 0 in PlayerVX
+    )
+    if (NoseX > CanvasW) then (
+        put CanvasW - TriHeight in PlayerX
+        put 0 in PlayerVX
+    )
+
+    # == MGT OF PROJECTILES, COLLISIONS ==
+    put dimension of Projectiles in NumProj
+    if (NumProj > 0) then (
+        index P goes from NumProj to 1 and you do (
+            if (P <= dimension of Projectiles) then (
+                put item P of Projectiles in Proj
+                put Proj["x"] + Proj["vx"] in PX
+                put PX in Proj["x"] 
+                
+                put false in Hit
+                put false in OutOfBounds
+
+                if (PX > CanvasW) then (put true in OutOfBounds)
+                if (PX < 0) then (put true in OutOfBounds)
+
+                if (OutOfBounds equals true) then (
+                    remove item P from Projectiles
+                ) otherwise (
+                    put dimension of Asteroids in NumBalls
+                    if (NumBalls > 0) then (
+                        index B goes from NumBalls to 1 and you do (
+                            if (Hit equals false and B <= dimension of Asteroids) then (
+                                put item B of Asteroids in Ast
+                                
+                                put PX - Ast["x"] in DX
+                                put Proj["y"] - Ast["y"] in DY
+                                put DX * DX + DY * DY in DistSq
+                                put ProjR + Ast["r"] in SumR
+                                put SumR * SumR in MinDistSq
+                                
+                                if (DistSq <= MinDistSq) then (
+                                    put true in Hit
+                                    put Score + 1 in Score
+                                    put ScrollSpeed * 1.008 in ScrollSpeed
+                                    if (ScrollSpeed > 12) then (
+                                        put 12 in ScrollSpeed
+                                    )
+                                    remove item B from Asteroids
+                                    play Boom
+                                )
+                            )
+                        )
+                    )
+
+                    if (Hit equals true) then (
+                        remove item P from Projectiles
+                    ) otherwise (
+                        # Salva la nuova X nel proiettile
+                        put Proj in item P of Projectiles
+                        
+                        if (Proj["vx"] > 0) then (
+                            draw PROJ_RIGHT at (PX, Proj["y"])
+                        ) otherwise (
+                            draw PROJ_LEFT at (PX, Proj["y"])
+                        )
+                    )
+                )
+            )
+        )
+    )
+
+    # == DRAW STARSHIP ==
+    if (FacingDir is 1) then (
+        if (EngineOn is true) then (
+            draw FLAME_RIGHT at (PlayerX, TriangleY)
+        )
+        draw SHIP_RIGHT at (PlayerX, TriangleY)
+    ) otherwise (
+        if (EngineOn is true) then (
+            draw FLAME_LEFT at (NoseX, TriangleY)
+        )
+        draw SHIP_LEFT at (NoseX, TriangleY)
+    )
+
+    # == MGT ASTEROIDS (UPDATE E DRAW) ==
+    put dimension of Asteroids in NumBalls
+    if (NumBalls > 0) then (
+        index B goes from NumBalls to 1 and you do (
+            if (B <= dimension of Asteroids) then (
+                put item B of Asteroids in Ast
+                
+                put Ast["y"] + Ast["v"] in NewY
+                put Ast["x"] - ScrollSpeed in NewX
+
+                if (NewY - Ast["r"] <= 0) then (
+                    put Ast["r"] in NewY
+                    put abs(Ast["v"]) in Ast["v"]
+                ) otherwise (
+                    if (NewY + Ast["r"] >= PlayAreaTop) then (
+                        put PlayAreaTop - Ast["r"] in NewY
+                        put -1 * abs(Ast["v"]) in Ast["v"]
+                    )
+                )
+
+                put false in BallRemoved
+                put false in HitPlayer
+
+                # Collisions
+                if (FacingDir is 1) then (
+                    if (NewX - Ast["r"] <= NoseX) then (
+                        if (NewX + Ast["r"] >= PlayerX) then (
+                            if (NewY + Ast["r"] >= ShipBot) then (
+                                if (NewY - Ast["r"] <= ShipTop) then (
+                                    put true in HitPlayer
+                                )
+                            )
+                        )
+                    )
+                ) otherwise (
+                    if (NewX - Ast["r"] <= PlayerX) then (
+                        if (NewX + Ast["r"] >= NoseX) then (
+                            if (NewY + Ast["r"] >= ShipBot) then (
+                                if (NewY - Ast["r"] <= ShipTop) then (
+                                    put true in HitPlayer
+                                )
+                            )
+                        )
+                    )
+                )
+
+                if (HitPlayer is true) then (
+                    put Lives - 1 in Lives
+                    put true in BallRemoved
+                    put 5 in DamageFlash
+                    play Crash
+                    if (Lives <= 0) then (put false in Running)
+                ) otherwise (
+                    if (NewX + Ast["r"] < 0) then (
+                        put Score - 1 in Score
+                        put true in BallRemoved
+                        put 5 in EscapeFlash
+                        play Miss
+                    )
+                )
+
+                if (BallRemoved is true) then (
+                    remove item B from Asteroids
+                ) otherwise (
+                    
+                    put NewX in Ast["x"]
+                    put NewY in Ast["y"]
+                    put Ast in item B of Asteroids
+
+                    put Ast["r"] - 3 in Rm3
+                    put Ast["r"] - 6 in Rm6
+                    put Ast["r"] - 2 in Rm2
+                    put Ast["r"] - 1 in Rm1
+                    put Ast["r"] / 3 in R3
+                    put NewX - R3 in HX
+                    put NewY + R3 in HY
+
+                    if (Ast["r"] > 20) then (
+                        set color (50, 25, 8)
+                        circle radius Ast["r"] at (NewX, NewY)
+                        set color (63, 36, 12)
+                        circle radius Rm3 at (NewX, NewY)
+                        set color (75, 48, 20)
+                        circle radius Rm6 at (NewX, NewY)
+                        set color (38, 17, 4)
+                        circumference radius Ast["r"] thickness 2 at (NewX, NewY)
+                    ) otherwise (
+                        if (Ast["r"] > 12) then (
+                            set color (60, 30, 10)
+                            circle radius Ast["r"] at (NewX, NewY)
+                            set color (76, 46, 16)
+                            circle radius Rm2 at (NewX, NewY)
+                            set color (46, 20, 5)
+                            circumference radius Ast["r"] thickness 2 at (NewX, NewY)
+                        ) otherwise (
+                            set color (70, 42, 14)
+                            circle radius Ast["r"] at (NewX, NewY)
+                            set color (86, 58, 22)
+                            circle radius Rm1 at (NewX, NewY)
+                        )
+                    )
+                    set color (92, 82, 72)
+                    circle radius 2 at (HX, HY)
+                )
+            )
+        )
+    )
+
+    # == HUD OVERLAY ==
+    set color (2, 2, 12)
+    rectangle from (0, CanvasH - HudH) to (CanvasW, CanvasH)
+    set color (0, 52, 72)
+    line thickness 1 from (0, CanvasH - HudH) to (CanvasW, CanvasH - HudH)
+    
+    put CanvasH - 14 in HudY
+    set color (0, 100, 72)
+    graffiti size 18 at (CanvasW / 2, HudY) "SCORE: " + Score
+    set color (100, 22, 22)
+    graffiti size 18 at (80, HudY) "LIVES: " + Lives
+    set color (50, 50, 85)
+    graffiti size 13 at (CanvasW - 52, HudY) "SPD " + trunc(ScrollSpeed)
+
+    redraw
+    wait 20 ms
+)
+
+# == GAME OVER SCREEN ==
+stop BGM
+play GameOverSnd
+
+set color (2, 1, 8)
+paint background
+
+draw SPACE_BG at (0, 0)
+draw GAMEOVER_PANEL at (0, 0)
+
+set color (0, 100, 70)
+graffiti size 26 at (CanvasW / 2, CanvasH / 2 - 10) "FINAL SCORE: " + Score
+
+redraw

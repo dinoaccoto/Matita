@@ -1,0 +1,34 @@
+# *****
+# Name: Valsnelheid
+# Category: Physics
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Berekent de inslagsnelheid van een object in vrije val op aarde vanaf een hoogte
+# H. Maakt gebruik van wetenschappelijke notatie (bijv. 5.9e24) om grote fysieke
+# constanten te verwerken. Vergelijkt het verkregen resultaat met de
+# geluidssnelheid (Mach) en de ontsnappingssnelheid.
+# *****
+
+wis scherm
+zet 5.9722e24 in MassaAarde # kg
+zet 6371e3 in StraalAarde # m
+zet 6.6743e-11 in G # Constante van Cavendish
+
+vraag H met bericht "Valhoogte (m)? "
+
+zet wortel(2*MassaAarde*G*(1/StraalAarde - 1/(StraalAarde+H))) in v
+decimalen 3
+schrijf "Valhoogte: " + H; nieuwe regel
+schrijf "Valsnelheid: "; nieuwe regel
+schrijf "    " + v + " m/s"; nieuwe regel
+schrijf "    " + v*3.6 + " km/h"; nieuwe regel; nieuwe regel
+
+zet 343 in c # geluidssnelheid, zeeniveau 15 graden C
+schrijf "Mach: " + v/c; nieuwe regel
+
+zet wortel(2*G*MassaAarde/StraalAarde) in Ontsnappingssnelheid
+
+schrijf "Ten opzichte van ontsnappingssnelheid: " + v/Ontsnappingssnelheid*100 + "%"; nieuwe regel

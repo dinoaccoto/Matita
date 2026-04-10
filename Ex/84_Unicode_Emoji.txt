@@ -1,0 +1,26 @@
+# *****
+# Name: Unicode Emoji
+# Category: Programming
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Drukt een tabel met Emoji-karakters af met behulp van standaard Unicode-codes.
+# Het doorloopt een bereik van gehele getallen en zet ze om in grafische symbolen.
+# Demonstreert het gebruik van de functie unicode() om numerieke codes om te
+# zetten in tekst.
+# *****
+
+wis scherm
+schrijf "--- Emoji UNICODE Tabel ---"; nieuwe regel
+schrijf "Symbool   |   Code"
+schrijf "------------------"; nieuwe regel
+
+zet 128512 in Begin # waar we de UNICODE-code beginnen
+zet 128591 in Einde # waar we stoppen
+
+teller N loopt van Begin tot Einde en je doet (
+    zet unicode(N) in Smiley
+    schrijf "   " + Smiley + "        |   " + N; nieuwe regel
+)

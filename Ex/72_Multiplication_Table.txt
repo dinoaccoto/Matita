@@ -1,0 +1,22 @@
+# *****
+# Name: Multiplication Table
+# Category: Maths
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Asks the user for a number and calculates its multiplication table from 1 to 12.
+# Uses a numerical loop to repeat the calculation and concatenates strings and
+# numbers. Displays the formatted result directly in the text console.
+# *****
+
+get Number saying "Enter a number for its table:"
+clear screen
+write "Here is the table of " + Number + ":"; newline
+write "-------------------------"; newline
+
+index I goes from 1 to 12 and you do (
+    put Number * I in Result
+    write Number + " x " + I + " = " + Result; newline
+)

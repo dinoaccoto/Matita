@@ -1,0 +1,363 @@
+# *****
+# Name: Space Invaders (Simpel)
+# Category: Game
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Een complete versie van de klassieke arcade game, volledig gelokaliseerd.
+# Beheert meerdere sprites, zwermbeweging van vijanden en spelerinvoer. Inclusief
+# logica voor projectielen, vernietigbare schilden en score.
+# *****
+
+# ------------------------------------------------------------------
+# --------------------    MATITA: SPACE INVADERS   -----------------   
+# ------------------------------------------------------------------
+
+# --- KLEUREN ---
+zet (0, 0, 0) in Zwart
+zet (20, 100, 30) in Groen
+zet (100, 100, 100) in Wit
+zet (100, 20, 20) in Rood
+zet (100, 100, 20) in Geel
+
+# --- SPRITES ---
+label (
+  stel kleur in Groen
+  rechthoek van (-20, -10) tot (20, -6)
+  rechthoek van (-15, -6) tot (15, 0)
+  rechthoek van (-5, 0) tot (5, 8)
+) als Spelerschip
+
+label (
+  stel kleur in Wit
+  rechthoek van (-12, -8) tot (12, 8)
+  rechthoek van (-8, 8) tot (-4, 12)
+  rechthoek van (4, 8) tot (8, 12)
+  stel kleur in Zwart
+  rechthoek van (-6, -2) tot (-2, 2)
+  rechthoek van (2, -2) tot (6, 2)
+) als Alien1
+
+label (
+  stel kleur in Wit
+  rechthoek van (-12, -8) tot (12, 8)
+  rechthoek van (-12, 4) tot (-8, 8)
+  rechthoek van (8, 4) tot (12, 8)
+  stel kleur in Zwart
+  rechthoek van (-6, -2) tot (-2, 2)
+  rechthoek van (2, -2) tot (6, 2)
+) als Alien2
+
+label (
+  stel kleur in Geel
+  rechthoek van (-10, -2) tot (10, 2)
+  rechthoek van (-2, -10) tot (2, 10)
+  stel kleur in Wit
+  rechthoek van (-6, -6) tot (6, 6)
+) als Explosie
+
+# --- CONFIGURATIE ---
+zet 300 in SchermBreedte
+zet 240 in SpelerNiveauY
+zet -220 in SpelerY
+zet 6 in Spelersnelheid
+zet 9 in Projectielsnelheid
+zet 4 in Bomsnelheid
+zet 12 in AlienBreedte
+zet 8 in AlienHoogte
+zet 5 in SchildBlokGrootte
+zet 8 in ExplosieDuur
+
+# --- BEGINSTATUS ---
+zet 0 in Score
+zet 3 in Levens
+zet 0 in SpelerX
+zet onwaar in ProjectielActief
+zet punt(0, 0) in Projectiel
+zet lijst() in Aliens
+zet -180 in ZwermX
+zet 150 in ZwermY
+zet 1 in ZwermRichting
+zet 3 in ZwermStapX
+zet -40 in ZwermStapY
+zet 10 in ZwermVertraging
+zet ZwermVertraging in VertragingHuidig
+zet 0 in ZwermTimer
+zet 1 in AnimatieFrame
+zet 0 in AnimatieTimer
+zet lijst() in Bommen
+zet 96 in BomKans
+zet lijst() in Explosies
+zet 0 in RodeFlashTimer
+
+# Aliens Genereren
+teller rij loopt van 0 tot 4 en je doet (
+  teller col loopt van 0 tot 10 en je doet (
+    voeg punt(col * 40, rij * -35) toe aan Aliens
+  )
+)
+zet lengte van Aliens in TotaalAliens
+
+# --- SCHILDEN GENEREREN ---
+zet lijst() in SchildBlokken
+zet -170 in SchildY
+zet lijst(-210, -70, 70, 210) in SchildPosities
+
+voor elk CentrumX in SchildPosities je doet (
+  teller rij loopt van 0 tot 4 en je doet (
+    teller col loopt van -5 tot 5 en je doet (
+      als niet (rij < 2 en col > -3 en col < 3) dan (
+        voeg punt(CentrumX + col * SchildBlokGrootte, SchildY + rij * SchildBlokGrootte) toe aan SchildBlokken
+      )
+    )
+  )
+)
+
+zet SchildBlokGrootte / 2 in HalveBlok
+
+# Berekende constanten
+zet -SchermBreedte in SchermLinks
+zet SchermBreedte in SchermRechts
+zet SpelerY - 10 in HitBoxSpelerOnder
+zet SpelerY + 10 in HitBoxSpelerBoven
+zet SchildY + 25 in TopBarriereY
+
+wis scherm
+schrijf "Matita Space Invaders"
+
+# --- SPEELLUS ---
+zolang (Levens > 0 en lengte van Aliens > 0) je doet (
+  globaal SpelerX, ProjectielActief, Projectiel, ZwermTimer, ZwermX, ZwermY
+  globaal VertragingHuidig, AnimatieTimer, AnimatieFrame, Levens, Score
+  globaal Aliens, Bommen, SchildBlokken, Explosies, ZwermRichting, RodeFlashTimer
+
+  # 1. GRAFIEK EN ACHTERGROND
+  wis canvas
+  
+  # Beheer Rode Flash
+  als (RodeFlashTimer > 0) dan (
+    stel kleur in Rood
+    vul achtergrond in
+    zet RodeFlashTimer - 1 in RodeFlashTimer
+  ) anders (
+    stel kleur in Zwart
+    vul achtergrond in
+  )
+
+  # Fix zoom (Basis zwarte rechthoek)
+  stel kleur in Zwart
+  rechthoek van (-320, -260) tot (320, 260)
+
+  # Console Output
+  wis scherm
+  schrijf "SCORE: "
+  schrijf Score
+  schrijf "    LEVENS: "
+  schrijf Levens
+
+  zet lengte van Aliens in NumAliens
+
+  # 2. BESTURING
+  als (toets "LEFT" is ingedrukt en SpelerX > SchermLinks) dan (
+    zet SpelerX - Spelersnelheid in SpelerX
+  )
+  als (toets "RIGHT" is ingedrukt en SpelerX < SchermRechts) dan (
+    zet SpelerX + Spelersnelheid in SpelerX
+  )
+  als (toets "SPACE" is ingedrukt en ProjectielActief is onwaar) dan (
+    zet waar in ProjectielActief
+    zet punt(SpelerX, SpelerY + 20) in Projectiel
+  )
+  als (toets "X" is ingedrukt) dan ( stop )
+
+  # 3. ALIENLOGICA
+  zet ZwermTimer + 1 in ZwermTimer
+  als (ZwermTimer >= VertragingHuidig) dan (
+    zet 0 in ZwermTimer
+    zet ZwermX + (ZwermStapX * ZwermRichting) in ZwermX
+    zet AnimatieTimer + 1 in AnimatieTimer
+    als (AnimatieTimer > 1) dan (
+      zet 0 in AnimatieTimer
+      als (AnimatieFrame gelijk 1) dan ( zet 2 in AnimatieFrame ) anders ( zet 1 in AnimatieFrame )
+    )
+    
+    zet onwaar in MuurGeraakt
+    voor elk alien in Aliens je doet (
+      zet ZwermX + x van alien in AX
+      als ((AX > SchermRechts en ZwermRichting gelijk 1) of (AX < SchermLinks en ZwermRichting gelijk -1)) dan (
+        zet waar in MuurGeraakt
+      )
+    )
+    als (MuurGeraakt is waar) dan (
+      zet ZwermRichting * -1 in ZwermRichting
+      zet ZwermY + ZwermStapY in ZwermY
+    )
+  )
+
+  als (willekeurig(1, 100) > BomKans en NumAliens > 0) dan (
+    zet element willekeurig(1, NumAliens) van Aliens in SchietendeAlien
+    voeg punt(ZwermX + x van SchietendeAlien, ZwermY + y van SchietendeAlien) toe aan Bommen
+  )
+
+  # 4. BOTSINGEN
+  
+  # A. EIGEN Projectiel vs SCHILDEN
+  als (ProjectielActief is waar) dan (
+    zet lijst() in OverlevendeBlokken
+    voor elk blok in SchildBlokken je doet (
+      zet waar in BewaarBlok
+      zet x van blok in SX
+      zet y van blok in SY
+      zet x van Projectiel in BX
+      als (abs(BX - SX) < HalveBlok en (y van Projectiel < SY + HalveBlok) en (y van Projectiel + Projectielsnelheid >= SY - HalveBlok)) dan (
+        zet onwaar in BewaarBlok
+        zet onwaar in ProjectielActief
+      )
+      als (BewaarBlok is waar) dan ( voeg blok toe aan OverlevendeBlokken )
+    )
+    zet OverlevendeBlokken in SchildBlokken
+  )
+
+  # B. EIGEN Projectiel vs ALIENS
+  als (ProjectielActief is waar) dan (
+    zet y van Projectiel + Projectielsnelheid in ProjectielNextY
+    zet x van Projectiel in BX
+    zet lijst() in OverlevendeAliens
+    voor elk alien in Aliens je doet (
+      zet waar in BewaarAlien
+      zet ZwermX + x van alien in AX
+      zet ZwermY + y van alien in AY
+      als (abs(BX - AX) < AlienBreedte en y van Projectiel < AY + AlienHoogte en ProjectielNextY >= AY - AlienHoogte) dan (
+        zet onwaar in ProjectielActief
+        zet onwaar in BewaarAlien
+        zet Score + 10 in Score
+        zet ZwermVertraging * (lengte van Aliens / TotaalAliens) in VertragingHuidig
+        voeg (punt(AX, AY), ExplosieDuur) toe aan Explosies
+      )
+      als (BewaarAlien is waar) dan ( voeg alien toe aan OverlevendeAliens )
+    )
+    zet OverlevendeAliens in Aliens
+  )
+
+  # C. VIJANDIGE Bommen vs SPELER en SCHILDEN
+  zet lijst() in OverlevendeBommen
+  voor elk bom in Bommen je doet (
+    zet waar in BomActief
+    zet x van bom in BX
+    zet y van bom in BY
+    zet BY - Bomsnelheid in BomNextY
+
+    # Raakt Speler?
+    als (abs(BX - SpelerX) < 20 en BY >= HitBoxSpelerOnder en BomNextY < HitBoxSpelerBoven) dan (
+      zet Levens - 1 in Levens
+      zet onwaar in BomActief
+      zet 25 in RodeFlashTimer
+      voeg (punt(SpelerX, SpelerY), ExplosieDuur) toe aan Explosies
+    )
+
+    # Raakt Schilden?
+    als (BomActief is waar) dan (
+      zet lijst() in OverlevendeBlokken
+      voor elk blok in SchildBlokken je doet (
+        zet waar in BewaarBlok
+        zet x van blok in SX
+        zet y van blok in SY
+        # Botsing Schild
+        als (abs(BX - SX) < HalveBlok en BY >= (SY - HalveBlok) en BomNextY < SY + HalveBlok) dan (
+          zet onwaar in BewaarBlok
+          zet onwaar in BomActief
+          voeg (punt(SX, SY), 2) toe aan Explosies
+        )
+        als (BewaarBlok is waar) dan ( voeg blok toe aan OverlevendeBlokken )
+      )
+      zet OverlevendeBlokken in SchildBlokken
+    )
+    
+    als (BomActief is waar) dan ( voeg bom toe aan OverlevendeBommen )
+  )
+  zet OverlevendeBommen in Bommen
+
+  # D. Controle INVASIE
+  voor elk alien in Aliens je doet (
+    zet ZwermY + y van alien in PosYAlien
+    als (PosYAlien < SpelerY - 10) dan ( zet 0 in Levens )
+  )
+
+  # 5. FYSICA
+  als (ProjectielActief is waar) dan (
+    stel y van Projectiel in op (y van Projectiel + Projectielsnelheid)
+    als (y van Projectiel > SpelerNiveauY) dan ( zet onwaar in ProjectielActief )
+  )
+
+  zet lijst() in ActieveBommen
+  voor elk bom in Bommen je doet (
+    stel y van bom in op (y van bom - Bomsnelheid)
+    als (y van bom > -SpelerNiveauY) dan ( voeg bom toe aan ActieveBommen )
+  )
+  zet ActieveBommen in Bommen
+  
+  zet lijst() in ActieveExplosies
+  voor elk exp in Explosies je doet (
+    zet element 1 van exp in PosExp
+    zet element 2 van exp in TimerExp
+    zet TimerExp - 1 in TimerExp
+    als (TimerExp > 0) dan ( voeg (PosExp, TimerExp) toe aan ActieveExplosies )
+  )
+  zet ActieveExplosies in Explosies
+
+  # 6. TEKENEN
+  als (AnimatieFrame gelijk 1) dan (
+    voor elk alien in Aliens je doet ( teken Alien1 op (ZwermX + x van alien, ZwermY + y van alien) )
+  ) anders (
+    voor elk alien in Aliens je doet ( teken Alien2 op (ZwermX + x van alien, ZwermY + y van alien) )
+  )
+  
+  voor elk exp in Explosies je doet ( teken Explosie op (element 1 van exp) )
+
+  teken Spelerschip op (SpelerX, SpelerY)
+  
+  stel kleur in Groen
+  voor elk blok in SchildBlokken je doet (
+    zet x van blok - HalveBlok in x1
+    zet y van blok - HalveBlok in y1
+    zet x van blok + HalveBlok in x2
+    zet y van blok + HalveBlok in y2
+    rechthoek van (x1, y1) tot (x2, y2)
+  )
+
+  als (ProjectielActief is waar) dan (
+    stel kleur in Wit
+    rechthoek van (x van Projectiel - 2, y van Projectiel - 8) tot (x van Projectiel + 2, y van Projectiel + 8)
+  )
+
+  stel kleur in Rood
+  voor elk bom in Bommen je doet (
+    rechthoek van (x van bom - 2, y van bom - 6) tot (x van bom + 2, y van bom + 6)
+  )
+
+  # --- ZICHTBARE HUD (Als laatste getekend) ---
+  stel kleur in Wit
+  graffiti grootte 12 op (-290, 230) "LEVENS: " + Levens
+  graffiti grootte 12 op (-290, 210) "SCORE: " + Score
+
+  wacht 8 ms
+  teken opnieuw
+)
+
+# --- SCHERM SPEL EINDE ---
+wis canvas
+stel kleur in Zwart
+vul achtergrond in
+
+stel kleur in Rood
+graffiti grootte 50 op (-130, 20) "GAME OVER"
+
+stel kleur in Wit
+graffiti grootte 25 op (-90, -40) "SCORE: " + Score
+
+wis scherm
+schrijf "SPEL AFGELOPEN"
+schrijf "Eindscore: "
+schrijf Score

@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Matita v0.9.3 - Gebruikershandleiding</title>
+    <meta name="author" content="Dino Accoto" />
+    <meta name="description" content="Een complete handleiding voor het programmeren met Matita v0.9.3." />
+    <meta name="subject" content="Gebruikershandleiding voor programmeren met Matita (Nederlandse syntaxis)" />
+    <meta name="keywords" content="programmeren, grafiek, Matita, lussen, variabelen, interactiviteit, lijsten, woordenboeken, records, audio, alias, inout, null, procedures, functies, scope, globaal, labels, dimensie, nieuwe regel, schrijf, cast, unicode" />
+    <style>
+        :root {
+            --PrimaryBlue: #007BFF;
+            --White: #fff;
+            --DarkText: #212529;
+            --CodeBackground: #1e293b;
+            --CodeText: #f8fafc;
+            --PaperW: 900px;
+        }
+        html, body { margin:0; padding:0; background:#fff; color:var(--DarkText);
+            font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+            line-height:1.7; }
+        header { position:sticky; top:0; background:white; border-bottom:1px solid #e5e7eb; z-index:10; }
+        header .bar { max-width:var(--PaperW); margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:10px 16px; }
+        header .left { font-weight:700; color:var(--PrimaryBlue); }
+        header .right { color:#6b7280; }
+        main { max-width:var(--PaperW); margin:0 auto; padding:16px; }
+        h1,h2,h3,h4 { line-height:1.25; }
+        h1 { font-size:2.2rem; margin:24px 0 8px; }
+        h2 { font-size:1.7rem; margin:24px 0 8px; border-bottom:2px solid #f3f4f6; padding-bottom:6px; }
+        h3 { font-size:1.2rem; margin:18px 0 6px; }
+        h4 { font-size:1.05rem; margin:16px 0 4px; }
+        .title { display:flex; flex-direction:column; align-items:center; text-align:center; border:1px solid #e5e7eb; border-radius:12px; padding:24px; }
+        .title img { max-width:45%; height:auto; border-radius:8px; }
+        .toc { background:var(--White); border:1px solid #e5e7eb; border-radius:12px; padding:16px; }
+        .toc ol { padding-left:20px; }
+        .toc a { color:var(--PrimaryBlue); text-decoration:none; }
+        .toc a:hover { text-decoration:underline; }
+        code,.code { font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
+        pre { background:var(--CodeBackground); padding:12px 14px; border-radius:10px; overflow:auto; border:1px solid #475569; margin-bottom:4px; }
+        pre code { font-size:0.95rem; color:var(--CodeText); }
+        code:not(pre code) { color:#0369a1; background-color:#f1f5f9; padding:2px 5px; border-radius:4px; font-size:0.9em; border:1px solid #e2e8f0; }
+        .kw { color:#38bdf8; font-weight:600; }
+        .str { color:#fbbf24; }
+        .num { color:#a78bfa; }
+        .com { color:rgba(148,163,184,0.85); font-style:italic; }
+        figure { margin:16px 0; text-align:center; }
+        figcaption { font-size:.9rem; color:#6b7280; margin-top:6px; }
+        .note { background:#fff8e1; border:1px solid #ffe082; padding:10px 12px; border-radius:8px; margin:8px 0; }
+        table { border-collapse:collapse; width:100%; margin:8px 0; }
+        th,td { border:1px solid #e5e7eb; padding:8px; vertical-align:top; text-align:left; }
+        th { background:#f3f4f6; }
+        tr:nth-child(even) { background-color:#f9fafb; }
+        .kbd { display:inline-block; padding:2px 6px; border:1px solid #cbd5e1; border-bottom-width:2px; border-radius:6px; background:#fff; font-family:inherit; }
+        .pagebreak { height:1px; background:#e5e7eb; margin:32px 0; }
+        .top-links { text-align:center; margin-bottom:30px; font-weight:500; font-size:1.5rem; }
+        .top-links a { text-decoration:none; color:var(--PrimaryBlue); }
+        .top-links a:hover { text-decoration:underline; }
+        .separator { margin:0 10px; color:#cbd5e1; }
+        .error-tag { color:#dc2626; font-weight:bold; }
+        .warn-tag  { color:#d97706; font-weight:bold; }
+        pre.has-output { border-radius:10px 10px 0 0; margin-bottom:0; }
+        .output-block { background:#010d1f; color:#38bdf8;
+            font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+            font-size:0.9rem; line-height:1.5; padding:6px 14px 10px;
+            border:1px solid #334155; border-top:1px dashed #2d4a6e;
+            border-radius:0 0 10px 10px; margin-bottom:14px; white-space:pre; }
+        .output-block .out-label { display:block; font-size:0.68rem; color:#475569;
+            text-transform:uppercase; letter-spacing:0.08em; margin-bottom:3px; white-space:normal; font-style:normal; }
+        .canvas-output { background:#f0fdf4; border:1px solid #86efac; border-radius:8px;
+            padding:8px 12px; font-size:0.9rem; color:#166534; margin-bottom:14px; }
+        .canvas-output::before { content:"Canvas: "; font-weight:600; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="bar">
+        <div class="left">Matita v0.9.3</div>
+        <div class="right">Gebruikershandleiding</div>
+    </div>
+</header>
+<main>
+    <div class="top-links">
+        <a href="storiaNL.html" target="_blank" rel="noopener">Motivatie</a>
+        <span class="separator">&mdash;</span>
+        <a href="infoNL.html" target="_blank" rel="noopener">Kenmerken</a>
+        <span class="separator">&mdash;</span>
+        <a href="../Ex/examples.php" target="_blank" rel="noopener">Voorbeeldprogramma's</a>
+    </div>
+
+    <section class="title" id="top">
+        <h1><strong>Programmeren in Matita</strong></h1>
+        <figure><img src="../graphics/matita.png" alt="Logo van Matita" /></figure>
+    </section>
+
+    <nav class="toc" aria-label="Inhoudsopgave">
+        <strong>Inhoudsopgave</strong>
+        <ol>
+            <li><strong>Deel Een: Basisprincipes</strong>
+                <ol>
+                    <li><a href="#intro">Basis van de taal en de IDE</a></li>
+                    <li><a href="#output">Eerste commando's</a></li>
+                    <li><a href="#variables">Variabelen en invoer</a></li>
+                    <li><a href="#math">Wiskunde en expressies</a></li>
+                    <li><a href="#lists">Lijsten</a></li>
+                    <li><a href="#dictionaries">Woordenboeken, Records en Sets</a></li>
+                    <li><a href="#logic">Besturingsstroom</a></li>
+                    <li><a href="#manipulation">Tekst- en datamanipulatie</a></li>
+                    <li><a href="#procedures-functions">Procedures en functies</a></li>
+                    <li><a href="#memory">Scope, alias en geheugen</a></li>
+                </ol>
+            </li>
+            <li><strong>Deel Twee: Grafiek en Interactiviteit</strong>
+                <ol>
+                    <li><a href="#coordinates">Coördinaten en punten</a></li>
+                    <li><a href="#colors">Kleuren en achtergronden</a></li>
+                    <li><a href="#shapes">Basisvormen</a></li>
+                    <li><a href="#graffiti">Graffiti (Tekst)</a></li>
+                    <li><a href="#redraw">Teken opnieuw</a></li>
+                    <li><a href="#frame">Toon alles</a></li>
+                    <li><a href="#animations">Animaties</a></li>
+                    <li><a href="#input">Toetsenbord- en Muisinteractie</a></li>
+                    <li><a href="#labels">Labels</a></li>
+                    <li><a href="#transformations">Transformaties</a></li>
+                    <li><a href="#images">Afbeeldingen en externe code</a></li>
+                    <li><a href="#audio">Audio en Geluiden</a></li>
+                    <li><a href="#canvas-interaction">Interactie met het canvas</a></li>
+                    <li><a href="#project">Geleide oefening</a></li>
+                </ol>
+            </li>
+            <li><a href="#ref">Bijlage A: Snelle referentie</a></li>
+            <li><a href="#troubleshoot">Bijlage B: Veelvoorkomende fouten</a></li>
+        </ol>
+    </nav>
+
+    <div class="pagebreak"></div>
+    <h1>Deel Een: Basisprincipes</h1>
+
+    <section id="intro">
+        <h2>Basis van de taal en de IDE</h2>
+        <p>Programmeren is een geordende reeks instructies schrijven die de computer één voor één uitvoert om specifieke taken te volbrengen. In Matita gebeurt dat via een heldere, educatieve taal met commando's voor tekstuitvoer, grafiek, lussen, functies en interactie. In tegenstelling tot natuurlijke taal, vereist communicatie met een computer het gebruik van een precieze <strong>formele taal</strong>.</p>
+        <p>De geschreven code heet <strong>broncode</strong> en beschrijft een <strong>algoritme</strong>: een procedure die invoer omzet in uitvoer.</p>
+        
+        <h3>De onderdelen van de omgeving (IDE)</h3>
+        <p>Een "Integrated Development Environment" (IDE) bestaat uit alle hulpmiddelen die nodig zijn om een programma te schrijven, uit te voeren, te debuggen en de resultaten te bekijken.</p>
+        <ul>
+            <li><strong>Editor</strong>: hier schrijft u de broncode.</li>
+            <li><strong>Console</strong>: hier verschijnen tekst en diagnostische meldingen.</li>
+            <li><strong>Canvas (Grafiek)</strong>: hier worden tekeningen en animaties weergegeven.</li>
+        </ul>
+        
+        <h3>Belangrijkste knoppen bovenaan de editor</h3>
+        <ul>
+            <li><strong>Openen / Opslaan</strong>: broncode laden en opslaan als <code>.txt</code> bestanden.</li>
+            <li><strong>Grafiek</strong>: toont of verbergt het canvasvenster.</li>
+            <li><strong>Uitvoeren</strong>: start de interpretatie van de code.</li>
+            <li><strong>Stop</strong>: breekt een lopend programma af.</li>
+            <li><strong>Download</strong>: slaat de volledige omgeving op als één HTML-bestand. Hierdoor kunt u lokaal werken zonder internet, wat ook het laden van lokale afbeeldingen mogelijk maakt.</li>
+            <li><strong>EN / IT / NL</strong>: vertaalt de interface en de editorcode naar een andere taal, waarbij strings en opmerkingen intact blijven.</li>
+            <li><strong>Help</strong>: opent deze handleiding in een nieuw venster.</li>
+        </ul>
+        
+        <h3>Sneltoetsen</h3>
+        <ul>
+            <li><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span>: programma direct uitvoeren.</li>
+            <li><span class="kbd">Ctrl</span> + <span class="kbd">Spatie</span>: suggestievenster openen (IntelliSense).</li>
+            <li><span class="kbd">Tab</span>: geselecteerde suggestie invoegen of code inspringen.</li>
+            <li><span class="kbd">Esc</span>: suggestievenster of actieve canvasmodus sluiten.</li>
+        </ul>
+        <div class="note"><strong>Let op.</strong> Matita voert code sequentieel uit van boven naar beneden. Een procedure of functie moet daarom <em>vóór</em> het eerste aanroepen zijn gedefinieerd.</div>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="output">
+        <h2>Eerste commando's: <code>schrijf</code> en <code>wis</code></h2>
+        <h3><code>schrijf</code></h3>
+        <p>Met <code>schrijf</code> toont u tekst of een berekende waarde in de console. De console toont als promptteken aan het begin van elke nieuwe uitvoeregel.</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="str">"Hallo wereld"</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Hallo wereld</div>
+
+        <p>Zonder expliciet regeleinde verschijnt de uitvoer van opeenvolgende <code>schrijf</code>-instructies aaneengesloten:</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="str">"A"</span>
+<span class="kw">schrijf</span> <span class="str">"B"</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> AB</div>
+
+        <h3><code>nieuwe regel</code></h3>
+        <p>Met <code>nieuwe regel</code> dwingt u een regeleinde af. De volgende uitvoer begint dan op een nieuwe regel.</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="str">"A"</span>
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"B"</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> A
+ B</div>
+
+        <p>Hetzelfde effect is bereikbaar met het escapeteken <code>\n</code> in een string:</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="str">"A\nB"</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> A
+ B</div>
+
+        <h3><code>wis scherm</code></h3>
+        <p>Met <code>wis scherm</code> verwijdert u alle eerdere console-uitvoer.</p>
+        <pre class="has-output"><code><span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Nieuwe sessie gestart."</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Nieuwe sessie gestart.</div>
+
+        <h3>Strings samenvoegen</h3>
+        <p>De operator <code>+</code> plakt tekstfragmenten aan elkaar:</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="str">"Hallo "</span> + <span class="str">"wereld"</span> + <span class="str">"."</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Hallo wereld.</div>
+
+        <h4>Opmaak en Uitlijning</h4>
+        <p>Het commando <code>schrijf</code> kan worden uitgebreid om de uitvoer in kolommen op te maken, een erg handige functie voor het maken van nette tabellen. Door een dubbele punt <code>:</code> en een getal toe te voegen, reserveert u een exact aantal spaties voor de tekst. U kunt een tweede modificator toevoegen voor de uitlijning: <code>c</code> voor centreren, <code>l</code> voor links uitlijnen en <code>r</code> voor rechts uitlijnen.</p>
+        <ul>
+            <li><code>schrijf:10</code>: Reserveert 10 spaties en lijnt rechts uit (standaardgedrag).</li>
+            <li><code>schrijf:10:c</code>: Reserveert 10 spaties en centreert de tekst.</li>
+            <li><code>schrijf:10:l</code>: Reserveert 10 spaties en lijnt links uit.</li>
+        </ul>
+        <pre class="has-output"><code><span class="kw">schrijf:10:l</span> <span class="str">"Naam"</span>; <span class="kw">schrijf:6:r</span> <span class="str">"Score"</span>; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf:10:l</span> <span class="str">"Alex"</span>; <span class="kw">schrijf:6:r</span> <span class="num">8.5</span>; <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf:10:l</span> <span class="str">"Maria"</span>; <span class="kw">schrijf:6:r</span> <span class="num">10</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Naam         Score
+Alex           8.5
+Maria           10</div>
+
+        <h3>Opmerkingen</h3>
+        <p>Alles na <code>#</code> op dezelfde regel wordt door de interpreter genegeerd:</p>
+        <pre class="has-output"><code><span class="com"># Dit is een opmerking</span>
+<span class="kw">zet</span> <span class="num">31</span> <span class="kw">in</span> DagenMaart <span class="com"># aantal dagen in maart</span>
+<span class="kw">schrijf</span> <span class="str">"Maart heeft "</span> + DagenMaart + <span class="str">" dagen."</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Maart heeft 31 dagen.</div>
+        
+        <div class="note">
+            <strong>Syntaxisaccentuering en suggesties</strong><br>
+            De Matita IDE gebruikt een kleurcode om de verschillende syntactische elementen te markeren. Bovendien biedt het suggesties (IntelliSense) om constructies makkelijker te gebruiken.
+        </div>
+
+        <h3>Meerdere instructies op één regel</h3>
+        <p>Met een puntkomma <code>;</code> zet u meerdere instructies op dezelfde regel:</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="str">"Hallo"</span>; <span class="kw">nieuwe regel</span>; <span class="kw">schrijf</span> <span class="str">"wereld"</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Hallo
+ wereld</div>
+
+        <h3>Een instructie over meerdere regels</h3>
+        <p>Met een backslash <code>\</code> aan het einde van een regel verdeelt u één instructie over meerdere regels:</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> \
+<span class="str">"Dit is één instructie op twee regels."</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Dit is één instructie op twee regels.</div>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="variables">
+        <h2>Variabelen en invoer</h2>
+        <p>Een variabele is een naam (label) die verwijst naar een geheugengebied bedoeld om een waarde (getal, tekst of complexe datastructuur) in op te slaan. Door variabelen te gebruiken kunt u programma's schrijven die met dynamische gegevens werken.</p>
+        
+        <p>In Matita maakt of overschrijft u een variabele (toewijzing) met <code>zet ... in Naam</code>.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">5</span> <span class="kw">in</span> A
+<span class="kw">zet</span> <span class="str">"Informatica"</span> <span class="kw">in</span> Vak
+<span class="kw">schrijf</span> <span class="str">"A = "</span> + A
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> Vak</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> A = 5
+ Informatica</div>
+
+        <p>Variabelenamen zijn <strong>hoofdletterongevoelig</strong>: <code>Naam</code>, <code>NAAM</code> en <code>naam</code> verwijzen naar dezelfde locatie. Een naam moet beginnen met een letter; daarna mogen letters, cijfers en <code>_</code> volgen. Speciale tekens zijn niet toegestaan.</p>
+
+        <h3>Een variabele bijwerken</h3>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">100</span> <span class="kw">in</span> Gezondheid
+<span class="kw">zet</span> Gezondheid - <span class="num">15</span> <span class="kw">in</span> Gezondheid <span class="com"># De speler krijgt 15 schade</span>
+<span class="kw">schrijf</span> <span class="str">"Nieuwe gezondheid: "</span> + Gezondheid</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Nieuwe gezondheid: 85</div>
+
+        <h3>Gebruikersinvoer met <code>vraag</code></h3>
+        <p>Met <code>vraag VAR met bericht "..."</code> opent u een dialoogvenster (prompt). De invoer van de gebruiker wordt in de opgegeven variabele opgeslagen.</p>
+        <pre class="has-output"><code><span class="kw">vraag</span> Naam <span class="kw">met bericht</span> <span class="str">"Hoe heet je?"</span>
+<span class="kw">schrijf</span> <span class="str">"Geregistreerde naam: "</span> + Naam + <span class="str">". Procedure gestart."</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer (als de gebruiker "Lisa" invoert)</span> Geregistreerde naam: Lisa. Procedure gestart.</div>
+        <div class="note">Als de gebruiker een getal invoert (bijv. <code>42</code>), slaat Matita de waarde automatisch op als getal. Andere invoer wordt als tekst opgeslagen.</div>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="math">
+        <h2>Wiskunde en expressies</h2>
+        
+        <h3>Rekenkundige operatoren</h3>
+        <p>Expressies kunnen direct aan variabelen worden toegewezen. Matita ondersteunt <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code> (machtsverheffing) en <code>modulo</code> (rest bij deling).</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">10</span> <span class="kw">in</span> A
+<span class="kw">zet</span> <span class="num">3</span> <span class="kw">in</span> B
+<span class="kw">schrijf</span> A + B
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> A * B
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> A <span class="kw">modulo</span> B
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> A ^ B</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 13
+ 30
+ 1
+ 1000</div>
+
+        <h3>Booleaanse waarden, Logica en Vergelijkingen</h3>
+        <p>Een expressie combineert operanden en operatoren. Het resultaat kan als logische voorwaarde worden gebruikt.</p>
+        <ul>
+            <li><strong>Booleans</strong>: <code>waar</code>, <code>onwaar</code></li>
+            <li><strong>Logica</strong>: <code>en</code>, <code>of</code>, <code>niet</code></li>
+            <li><strong>Gelijkheid</strong>: <code>is</code> of <code>gelijk</code></li>
+            <li><strong>Ongelijkheid</strong>: <code>verschillend van</code> (Let op: de vorige spelfout is gecorrigeerd in v0.9.3, maar `!=` mag ook).</li>
+            <li><strong>Vergelijkingen</strong>: <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></li>
+            <li><strong>Negatie (unair)</strong>: <code>-X</code></li>
+        </ul>
+        <pre class="has-output"><code><span class="kw">schrijf</span> (<span class="num">5</span> <span class="kw">is</span> <span class="num">5</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> (<span class="num">5</span> <span class="kw">verschillend van</span> <span class="num">7</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> ((<span class="num">5</span> &gt; <span class="num">2</span>) <span class="kw">en</span> (<span class="num">8</span> &lt; <span class="num">10</span>))</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> true
+ true
+ true</div>
+
+        <h3>Constanten en functies</h3>
+        <p>Beschikbare constanten zijn o.a. <code>pi</code>, <code>oneindig</code> en <code>nan</code>. Ingebouwde functies zijn o.a. <code>abs</code>, <code>sin</code>, <code>cos</code>, <code>wortel</code>, <code>afronden</code>, <code>afkappen</code>, <code>ceil</code>.</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="kw">wortel</span>(<span class="num">9</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">afronden</span>(<span class="num">3.6</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">afkappen</span>(<span class="num">3.6</span>) <span class="com"># Kapt de decimalen weg</span>
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">ceil</span>(<span class="num">3.1</span>) <span class="com"># Rondt af naar boven</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 3
+ 4
+ 3
+ 4</div>
+
+        <h3>Punten met <code>punt(x, y)</code></h3>
+        <p>Naast enkele getallen ondersteunt Matita cartesische coördinaten via het <strong>punt</strong> object. Dit is essentieel voor grafische toepassingen.</p>
+        <ul>
+            <li><code>punt(x, y)</code>: Maakt een punt.</li>
+            <li><code>x van P</code> / <code>y van P</code>: Toegang tot de individuele coördinaten.</li>
+        </ul>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="kw">punt</span>(<span class="num">10</span>, <span class="num">50</span>) <span class="kw">in</span> P1
+<span class="kw">zet</span> <span class="kw">punt</span>(<span class="num">20</span>, <span class="num">50</span>) <span class="kw">in</span> P2
+<span class="com"># Afstand (vereenvoudigd, alleen X-as)</span>
+<span class="kw">zet</span> (<span class="kw">x van</span> P2) - (<span class="kw">x van</span> P1) <span class="kw">in</span> Afstand
+<span class="kw">schrijf</span> <span class="str">"Horizontale afstand: "</span> + Afstand</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Horizontale afstand: 10</div>
+
+        <h3>Willekeurige waarden</h3>
+        <p>Willekeurige getallen genereren is essentieel voor spellen. Matita biedt <code>willekeurig</code> en <code>dobbelsteen</code>:</p>
+        <pre><code><span class="kw">zet</span> <span class="kw">willekeurig</span>() <span class="kw">in</span> A       <span class="com"># Getal tussen 0.0 en 1.0</span>
+<span class="kw">zet</span> <span class="kw">willekeurig</span>(<span class="num">100</span>) <span class="kw">in</span> B    <span class="com"># Getal tussen 0.0 en 100.0</span>
+<span class="kw">zet</span> <span class="kw">willekeurig</span>(<span class="num">10</span>, <span class="num">20</span>) <span class="kw">in</span> C <span class="com"># Getal tussen 10.0 en 20.0</span>
+<span class="kw">zet</span> <span class="kw">dobbelsteen</span>(<span class="num">6</span>) <span class="kw">in</span> Worp   <span class="com"># Geheel getal van 1 t/m 6</span></code></pre>
+        <p><em>De uitvoer verschilt bij elke uitvoering.</em></p>
+
+        <h3>Weergaveprecisie met <code>decimalen</code></h3>
+        <p>Beïnvloedt de weergave van het aantal decimale cijfers in de console (niet de interne waarde).</p>
+        <pre class="has-output"><code><span class="kw">decimalen</span> <span class="num">2</span>
+<span class="kw">schrijf</span> <span class="num">10</span> / <span class="num">3</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 3.33</div>
+
+        <h3>Wetenschappelijke notatie met <code>wetenschappelijk</code></h3>
+        <p>Met <code>wetenschappelijk N</code> stelt u de drempelwaarde in waarboven grote getallen in de vorm "<code>getal e exponent</code>" verschijnen (standaard 1e6).</p>
+        <pre class="has-output"><code><span class="kw">wetenschappelijk</span> <span class="num">100</span>
+<span class="kw">decimalen</span> <span class="num">4</span>
+<span class="kw">schrijf</span> <span class="num">150</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 1.5000e2</div>
+
+        <h3>Prioriteit van operatoren (van laag naar hoog)</h3>
+        <ol>
+            <li><code>of</code></li>
+            <li><code>en</code></li>
+            <li>Vergelijkingen: <code>is</code>, <code>verschillend van</code>, <code>&lt;</code>, <code>&gt;</code>, etc.</li>
+            <li><code>+</code>, <code>-</code></li>
+            <li><code>*</code>, <code>/</code>, <code>modulo</code></li>
+            <li><code>^</code></li>
+            <li>Eigenschapstoegang: bijv. <code>x van P</code>, <code>element 2 van L</code></li>
+        </ol>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="lists">
+        <h2>Lijsten</h2>
+        <p>Een lijst is de fundamentele geordende verzameling in Matita. Lijsten zijn dynamisch en mogen gemengde inhoud bevatten: getallen, tekst, andere lijsten en punten.</p>
+
+        <h3>Lijsten maken</h3>
+        <p>U maakt een lijst met haakjes of het sleutelwoord <code>lijst</code>.</p>
+        <pre><code><span class="kw">zet</span> (<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>) <span class="kw">in</span> MijnLijst
+<span class="kw">zet</span> <span class="kw">lijst</span>(<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>) <span class="kw">in</span> NogEenLijst
+<span class="kw">zet</span> <span class="kw">lijst</span>() <span class="kw">in</span> LegeLijst</code></pre>
+
+        <h3>Een element lezen</h3>
+        <p>Indexering is <strong>1-gebaseerd</strong>: het eerste element heeft index&nbsp;1.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>) <span class="kw">in</span> Letters
+<span class="kw">schrijf</span> <span class="kw">element</span> <span class="num">2</span> <span class="kw">van</span> Letters</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> B</div>
+
+        <h3>Een element zoeken</h3>
+        <p><code>indexvan(LIJST, WAARDE)</code> geeft de 1-gebaseerde positie van het eerste overeenkomende element terug, of <code>0</code> als het niet gevonden wordt.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="str">"appel"</span>, <span class="str">"peer"</span>, <span class="str">"banaan"</span>) <span class="kw">in</span> Fruit
+<span class="kw">schrijf</span> <span class="kw">indexvan</span>(Fruit, <span class="str">"peer"</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 2</div>
+
+        <h3>De lengte van een lijst</h3>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="str">"rood"</span>, <span class="str">"groen"</span>, <span class="str">"blauw"</span>) <span class="kw">in</span> Kleuren
+<span class="kw">schrijf</span> <span class="kw">lengte</span> <span class="kw">van</span> Kleuren</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 3</div>
+
+        <h3>Minimum, maximum en hun indexen</h3>
+        <p>Matita biedt functies om uitersten in numerieke lijsten te vinden. Voor "hybride" lijsten (die bijvoorbeeld ook tekst bevatten) gebruikt u de functies die niet-numerieke waarden negeren.</p>
+        <ul>
+            <li><code>min(L)</code> / <code>max(L)</code>: Eenvoudig minimum en maximum.</li>
+            <li><code>minwaarde(L)</code> / <code>maxwaarde(L)</code>: Negeren niet-numerieke waarden (handig voor data-analyse).</li>
+            <li><code>minindex(L)</code> / <code>maxindex(L)</code>: Retourneren de positie (1-gebaseerd) van de uitersten.</li>
+        </ul>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="num">12</span>, <span class="num">7</span>, <span class="num">25</span>, <span class="num">19</span>) <span class="kw">in</span> Data
+<span class="kw">schrijf</span> <span class="kw">min</span>(Data); <span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">maxindex</span>(Data)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 7
+ 3</div>
+
+        <h3>Lijsten Wijzigen</h3>
+        <p><strong>Aan het einde toevoegen:</strong> <code>voeg WAARDE toe aan LIJST</code></p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="num">1</span>, <span class="num">2</span>) <span class="kw">in</span> Getallen
+<span class="kw">voeg</span> <span class="num">3</span> <span class="kw">toe aan</span> Getallen
+<span class="kw">schrijf</span> Getallen</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> (1, 2, 3)</div>
+
+        <p><strong>Invoegen op positie N:</strong> <code>voeg WAARDE toe in element N van LIJST</code>. Rest schuift op.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="str">"A"</span>, <span class="str">"C"</span>) <span class="kw">in</span> Letters
+<span class="kw">voeg</span> <span class="str">"B"</span> <span class="kw">toe in element</span> <span class="num">2</span> <span class="kw">van</span> Letters
+<span class="kw">schrijf</span> Letters</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> (A, B, C)</div>
+
+        <p><strong>Vervangen:</strong> Overschrijft een waarde via toewijzing.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>) <span class="kw">in</span> Gegevens
+<span class="kw">zet</span> <span class="num">99</span> <span class="kw">in</span> <span class="kw">element</span> <span class="num">2</span> <span class="kw">van</span> Gegevens
+<span class="kw">schrijf</span> Gegevens</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> (10, 99, 30)</div>
+
+        <p><strong>Verwijderen:</strong></p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>, <span class="str">"D"</span>) <span class="kw">in</span> Letters
+<span class="kw">verwijder</span> <span class="kw">eerste element</span> <span class="kw">uit</span> Letters
+<span class="kw">verwijder</span> <span class="kw">laatste element</span> <span class="kw">uit</span> Letters
+<span class="kw">verwijder</span> <span class="kw">element</span> <span class="num">2</span> <span class="kw">uit</span> Letters
+<span class="kw">schrijf</span> Letters</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> (B)</div>
+
+        <h3>Itereren over een lijst</h3>
+        <p>Met <code>voor elke X in LIJST herhaal je (...)</code> doorloopt u alle elementen. De lusvariabele ontvangt telkens een <em>kopie</em> van het huidige element.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> Getallen
+<span class="kw">voor elke</span> N <span class="kw">in</span> Getallen <span class="kw">herhaal je</span> (
+  <span class="kw">schrijf</span> N * <span class="num">2</span>
+  <span class="kw">nieuwe regel</span>
+)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 2
+ 4
+ 6</div>
+    </section>
+
+    <div class="pagebreak"></div>
+    
+    <section id="dictionaries">
+        <h2>Woordenboeken, Records en Sets</h2>
+        <p>Naast lijsten biedt Matita meer complexe datastructuren: <strong>Woordenboeken</strong>, <strong>Records</strong> en <strong>Sets</strong>.</p>
+
+        <h3>Woordenboeken</h3>
+        <p>Met Woordenboeken (maps) koppelt u waarden aan trefwoorden (strings) in plaats van aan een numerieke index. Gemaakt met accolades <code>{}</code>.</p>
+        <pre><code><span class="com"># Een leeg woordenboek maken</span>
+<span class="kw">zet</span> {} <span class="kw">in</span> Speler
+
+<span class="com"># Een gevuld woordenboek maken</span>
+<span class="kw">zet</span> {<span class="str">"naam"</span>: <span class="str">"Alex"</span>, <span class="str">"levens"</span>: <span class="num">3</span>} <span class="kw">in</span> Speler</code></pre>
+
+        <p>Toegang via vierkante haken <code>[]</code>:</p>
+        <pre><code><span class="kw">schrijf</span> Speler[<span class="str">"naam"</span>] <span class="com"># Uitvoer: Alex</span>
+<span class="kw">nieuwe regel</span>
+<span class="com"># Updaten of nieuwe sleutel toevoegen</span>
+<span class="kw">zet</span> <span class="num">4</span> <span class="kw">in</span> Speler[<span class="str">"levens"</span>]
+<span class="kw">zet</span> <span class="num">1500</span> <span class="kw">in</span> Speler[<span class="str">"score"</span>]</code></pre>
+
+        <p>Handige commando's voor woordenboeken:</p>
+        <ul>
+            <li><code>heeft sleutel "K" in D</code>: <code>waar</code> als de sleutel bestaat.</li>
+            <li><code>sleutels van D</code>: Geeft een lijst van alle sleutels.</li>
+            <li><code>lengte van D</code>: Aantal sleutel-waarde paren.</li>
+            <li><code>verwijder sleutel "K" uit D</code>: Verwijdert het sleutel-waarde paar.</li>
+        </ul>
+        <pre><code><span class="kw">als</span> (<span class="kw">heeft sleutel</span> <span class="str">"score"</span> <span class="kw">in</span> Speler) <span class="kw">dan</span> (
+  <span class="kw">schrijf</span> <span class="str">"De speler heeft een score!"</span>
+  <span class="kw">verwijder sleutel</span> <span class="str">"score"</span> <span class="kw">uit</span> Speler
+)</code></pre>
+
+        <h3>Records</h3>
+        <p><strong>Records</strong> bieden een manier om eigen datatypes met benoemde velden te definiëren. In tegenstelling tot woordenboeken, definieert u de velden vooraf. U roept ze aan met de punt-notatie <code>.</code>.</p>
+        <pre><code><span class="com"># De structuur definiëren</span>
+<span class="kw">record</span> Persoon(naam, leeftijd, stad)
+
+<span class="com"># Een instantie maken (een 'kopie')</span>
+<span class="kw">zet</span> Persoon(<span class="str">"Julia"</span>, <span class="num">28</span>, <span class="str">"Rome"</span>) <span class="kw">in</span> Gebruiker1
+
+<span class="com"># Velden lezen en schrijven</span>
+<span class="kw">schrijf</span> Gebruiker1.naam + <span class="str">" is "</span> + Gebruiker1.leeftijd + <span class="str">" jaar oud."</span>
+<span class="kw">zet</span> <span class="num">29</span> <span class="kw">in</span> Gebruiker1.leeftijd</code></pre>
+
+        <h3>Sets (Verzamelingen)</h3>
+        <p>Sets zijn ongeordende verzamelingen die <strong>geen duplicaten</strong> bevatten.</p>
+        <p>Dit is nuttig voor verzamelingenvergelijkingen (met overbelaste operators `+`, `-`, `*`).</p>
+        <pre><code><span class="kw">zet</span> <span class="kw">set</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> S1
+<span class="kw">schrijf</span> S1 <span class="com"># Uitvoer: set(1, 2, 3)</span></code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="logic">
+        <h2>Besturingsstroom</h2>
+        
+        <h3>Voorwaarden met <code>als</code>, <code>dan</code>, <code>anders als</code> en <code>anders</code></h3>
+        <p>Voer code voorwaardelijk uit op basis van logische vergelijkingen.</p>
+        <pre class="has-output"><code><span class="kw">vraag</span> Leeftijd <span class="kw">met bericht</span> <span class="str">"Hoe oud ben je?"</span>
+
+<span class="kw">als</span> (Leeftijd &gt;= <span class="num">18</span>) <span class="kw">dan</span> (
+  <span class="kw">schrijf</span> <span class="str">"Je bent volwassen."</span>
+) <span class="kw">anders als</span> (Leeftijd &gt; <span class="num">12</span>) <span class="kw">dan</span> (
+  <span class="kw">schrijf</span> <span class="str">"Je bent een tiener."</span>
+) <span class="kw">anders</span> (
+  <span class="kw">schrijf</span> <span class="str">"Je bent een kind."</span>
+)</code></pre>
+
+        <h3>Lussen</h3>
+
+        <h4>Simpele herhaling: <code>herhaal N keer</code></h4>
+        <p>Wanneer u code een X aantal keer wilt uitvoeren zonder dat u een variabele-index nodig hebt.</p>
+        <pre><code><span class="kw">herhaal</span> <span class="num">3</span> <span class="kw">keer</span> (
+  <span class="kw">schrijf</span> <span class="str">"Hoera!"</span>; <span class="kw">nieuwe regel</span>
+)</code></pre>
+
+        <h4>Tellerlus: <code>loopt van ... tot</code></h4>
+        <p>Vorm: <code>teller I loopt van A tot B en je doet (...)</code>. De teller loopt ook achteruit wanneer B kleiner is dan A.</p>
+        <pre class="has-output"><code><span class="kw">teller</span> I <span class="kw">loopt van</span> <span class="num">1</span> <span class="kw">tot</span> <span class="num">5</span> <span class="kw">en je doet</span> (
+  <span class="kw">schrijf</span> <span class="str">"Iteratie "</span> + I
+  <span class="kw">nieuwe regel</span>
+)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Iteratie 1
+ Iteratie 2
+ Iteratie 3
+ Iteratie 4
+ Iteratie 5</div>
+
+        <h4>While-lus: <code>zolang</code></h4>
+        <p>Vorm: <code>zolang (CONDITIE) herhaal je (...)</code>. Geschikt voor lussen met een onbekend aantal iteraties.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">3</span> <span class="kw">in</span> T
+<span class="kw">globaal</span> T
+<span class="kw">zolang</span> (T &gt; <span class="num">0</span>) <span class="kw">herhaal je</span> (
+  <span class="kw">schrijf</span> T
+  <span class="kw">nieuwe regel</span>
+  <span class="kw">zet</span> T - <span class="num">1</span> <span class="kw">in</span> T
+  <span class="kw">wacht</span> <span class="num">1000</span> <span class="kw">ms</span>
+)
+<span class="kw">schrijf</span> <span class="str">"Start."</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 3
+ 2
+ 1
+ Start.</div>
+        <div class="note">Variabelen die binnen een lus worden gewijzigd zijn standaard <em>lokaal</em> voor dat blok. Het sleutelwoord <code>globaal</code> zorgt ervoor dat de globale variabele wordt bijgewerkt. Zie ook de sectie <a href="#memory">Scope, alias en geheugen</a>.</div>
+
+        <h3>Programma beëindigen met <code>stop</code></h3>
+        <p>Onderbreekt het programma onmiddellijk.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Levens
+<span class="kw">als</span> (Levens <span class="kw">is</span> <span class="num">0</span>) <span class="kw">dan</span> (
+  <span class="kw">schrijf</span> <span class="str">"Game over"</span>
+  <span class="kw">stop</span>
+)
+<span class="kw">schrijf</span> <span class="str">"Dit wordt nooit bereikt."</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Game over</div>
+
+        <section id="timing">
+            <h3>Tijdbeheer</h3>
+            <h4><code>wacht N ms</code></h4>
+            <p>Onderbreekt de uitvoering (pauze) voor N milliseconden. Cruciaal bij animaties.</p>
+            <pre><code><span class="kw">wacht</span> <span class="num">250</span> <span class="kw">ms</span></code></pre>
+
+            <h4><code>tick</code> en <code>tock</code></h4>
+            <p><code>tick</code> start een stopwatch (of reset hem); <code>tock</code> geeft het aantal verstreken milliseconden terug sinds de laatste tick.</p>
+            <pre class="has-output"><code><span class="kw">tick</span>
+<span class="kw">wacht</span> <span class="num">1000</span> <span class="kw">ms</span>
+<span class="kw">schrijf</span> <span class="str">"Verstreken: "</span> + tock + <span class="str">" ms"</span></code></pre>
+            <div class="output-block"><span class="out-label">Uitvoer (bij benadering)</span> Verstreken: 1002.4 ms</div>
+            <div class="note"><code>tock</code> kan alleen worden gebruikt nadat <code>tick</code> minstens eenmaal is uitgevoerd.</div>
+        </section>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="manipulation">
+        <h2>Tekst- en datamanipulatie</h2>
+        
+        <h3><code>splits</code></h3>
+        <p><code>splits(tekst, scheidingsteken)</code> verdeelt een string in afzonderlijke elementen in een lijst. Als u geen scheidingsteken opgeeft, wordt elk afzonderlijk karakter gesplitst.</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="kw">splits</span>(<span class="str">"Hallo"</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">splits</span>(<span class="str">"rood,groen,blauw"</span>, <span class="str">","</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> (H, a, l, l, o)
+ (rood, groen, blauw)</div>
+
+        <h3><code>ontbind</code></h3>
+        <p><code>ontbind</code> biedt uitgebreidere ontleding afhankelijk van het opgegeven type. Zonder tweede argument worden tekens afgesplitst; met <code>"digits"</code> worden cijfers gesplitst, met <code>"words"</code> worden woorden gesplitst.</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="kw">ontbind</span>(<span class="str">"Matita is leuk"</span>, <span class="str">"words"</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">ontbind</span>(<span class="num">123.45</span>, <span class="str">"digits"</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> (Matita, is, leuk)
+ (1, 2, 3, ., 4, 5)</div>
+
+        <h3><code>samenvoegen</code></h3>
+        <p><code>samenvoegen(lijst, type)</code> combineert de elementen van een lijst tot één enkele waarde. Zonder type-argument geeft het tekst terug; met <code>"number"</code> of <code>"numeriek"</code> converteert het naar een getal.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="str">"Z"</span>, <span class="str">"e"</span>, <span class="str">"e"</span>) <span class="kw">in</span> Letters
+<span class="kw">schrijf</span> <span class="kw">samenvoegen</span>(Letters, <span class="str">"tekst"</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">zet</span> (<span class="num">3</span>, <span class="str">"."</span>, <span class="num">1</span>, <span class="num">4</span>) <span class="kw">in</span> Cijfers
+<span class="kw">schrijf</span> <span class="kw">samenvoegen</span>(Cijfers, <span class="str">"number"</span>) * <span class="num">2</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Zee
+ 6.28</div>
+
+        <h3><code>type</code> en <code>numeriek</code></h3>
+        <p>Dit controleert het datatype dynamisch.</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="kw">type</span>(<span class="num">42</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">numeriek</span>(<span class="num">42</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">type</span>(<span class="str">"Hallo"</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">numeriek</span>(<span class="str">"Hallo"</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> number
+ true
+ string
+ false</div>
+
+        <h3><code>cast</code></h3>
+        <p>Converteert expliciet een datatype (bijv. tekst naar een getal, of vice versa).</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="str">"10"</span> <span class="kw">in</span> S
+<span class="kw">zet</span> <span class="kw">cast</span>(S, <span class="str">"number"</span>) + <span class="num">5</span> <span class="kw">in</span> T
+<span class="kw">schrijf</span> T
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">cast</span>(T, <span class="str">"string"</span>) + <span class="str">" punten"</span></code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 15
+ 15 punten</div>
+
+        <h3><code>unicode</code></h3>
+        <p>Unicode koppelt elk karakter of symbool op een computer aan een getal. Met een getal als argument geeft <code>unicode</code> het bijbehorende teken terug. Met een teken als argument geeft het het Unicode-codepunt terug.</p>
+        <pre class="has-output"><code><span class="kw">schrijf</span> <span class="str">"Naar de ruimte: "</span> + <span class="kw">unicode</span>(<span class="num">128640</span>)
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="str">"Code van een smiley: "</span> + <span class="kw">unicode</span>(<span class="str">"&#x1F642;"</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Naar de ruimte: &#x1F680;
+ Code van een smiley: 128578</div>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="procedures-functions">
+        <h2>Procedures en functies</h2>
+        <p>Matita ondersteunt modulaire programmering met op maat gemaakte commando's. Let op dat procedures en functies altijd <strong>gedefinieerd moeten zijn voordat</strong> ze voor het eerst in de code worden aangeroepen.</p>
+
+        <h3>Procedure definiëren</h3>
+        <p>Een procedure bundelt herbruikbare code en voert acties uit zonder een resultaatwaarde terug te geven.</p>
+        <pre class="has-output"><code><span class="kw">definieer</span> <span class="kw">procedure</span> Begroet(Naam) (
+  <span class="kw">schrijf</span> <span class="str">"Hallo, "</span> + Naam
+  <span class="kw">nieuwe regel</span>
+)
+Begroet(<span class="str">"Alex"</span>)
+Begroet(<span class="str">"Maria"</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Hallo, Alex
+ Hallo, Maria</div>
+
+        <h3>Functie definiëren</h3>
+        <p>Een functie voert code uit én geeft een berekende waarde terug via het sleutelwoord <code>geef ... terug</code>.</p>
+        <pre class="has-output"><code><span class="kw">definieer</span> <span class="kw">functie</span> Verdubbel(Getal) (
+  <span class="kw">geef</span> Getal * <span class="num">2</span> <span class="kw">terug</span>
+)
+<span class="kw">schrijf</span> Verdubbel(<span class="num">7</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 14</div>
+
+        <h3>Procedure-aanroep met <code>met (...)</code></h3>
+        <p>Naast <code>Naam(...)</code> accepteert de interpreter ook <code>Naam met (...)</code> voor procedures, voor een meer natuurlijke zinsbouw.</p>
+        <pre class="has-output"><code><span class="kw">definieer</span> <span class="kw">procedure</span> Meld(Tekst) (
+  <span class="kw">schrijf</span> Tekst
+  <span class="kw">nieuwe regel</span>
+)
+Meld <span class="kw">met</span> (<span class="str">"Testbericht"</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Testbericht</div>
+
+        <h3>Recursie</h3>
+        <p>Functies en procedures kunnen zichzelf weer aanroepen. Zorg altijd voor een basisgeval (stoppunt) om de gevreesde 'Stack Overflow' fout (recursielimiet) te voorkomen.</p>
+        <pre class="has-output"><code><span class="kw">definieer</span> <span class="kw">functie</span> Faculteit(N) (
+  <span class="kw">als</span> (N <span class="kw">is</span> <span class="num">0</span>) <span class="kw">dan</span> (
+    <span class="kw">geef</span> <span class="num">1</span> <span class="kw">terug</span>
+  ) <span class="kw">anders</span> (
+    <span class="kw">geef</span> N * Faculteit(N - <span class="num">1</span>) <span class="kw">terug</span>
+  )
+)
+<span class="kw">schrijf</span> Faculteit(<span class="num">5</span>)</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 120</div>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="memory">
+        <h2>Scope, alias en geheugen</h2>
+        
+        <h3>Lokale en globale scope</h3>
+        <p>Variabelen die in de hoofdcode worden gedefinieerd zijn globaal. Variabelen die binnen een blok voor het eerst worden aangemaakt zijn <em>lokaal</em>. Wanneer een lokale naam overeenkomt met een globale naam treedt <em>shadowing</em> op; Matita toont dan een waarschuwing.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">100</span> <span class="kw">in</span> Punten
+<span class="kw">definieer</span> <span class="kw">procedure</span> GeefBonus() (
+  <span class="kw">zet</span> <span class="num">200</span> <span class="kw">in</span> Punten  <span class="com"># lokale variabele die de globale verbergt</span>
+  <span class="kw">schrijf</span> <span class="str">"In procedure: "</span> + Punten
+  <span class="kw">nieuwe regel</span>
+)
+GeefBonus()
+<span class="kw">schrijf</span> <span class="str">"Globaal: "</span> + Punten</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Waarschuwing: lokale variabele 'Punten' verbergt een globale variabele met dezelfde naam.
+ In procedure: 200
+ Globaal: 100</div>
+
+        <h3><code>globaal</code></h3>
+        <p>Met de declaratie <code>globaal</code> geeft u aan dat een naam binnen een codeblok verwijst naar de originele globale variabele en niet naar een nieuwe lokale kopie.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">1</span> <span class="kw">in</span> Getal
+<span class="kw">globaal</span> Getal
+<span class="kw">zolang</span> (Getal &lt; <span class="num">4</span>) <span class="kw">herhaal je</span> (
+  <span class="kw">zet</span> Getal + <span class="num">1</span> <span class="kw">in</span> Getal
+)
+<span class="kw">schrijf</span> Getal</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 4</div>
+
+        <h3>Value semantics (Pass-by-value)</h3>
+        <p>In Matita resulteert een toewijzing in een kopie van de <em>waarde</em>. Voor complexe data zoals lijsten en punten betekent dat een volledige diepe kopie (Deep Copy), wat manipulatie veel veiliger maakt.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> A
+<span class="kw">zet</span> A <span class="kw">in</span> B
+<span class="kw">zet</span> <span class="num">99</span> <span class="kw">in</span> <span class="kw">element</span> <span class="num">1</span> <span class="kw">van</span> B
+<span class="kw">schrijf</span> A
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> B</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> (1, 2, 3)
+ (99, 2, 3)</div>
+
+        <h3>Toegang door verwijzing (Reference) met <code>alias</code> en <code>inout</code></h3>
+        <p>Met <code>alias</code> laat u in Matita expliciet twee namen naar exact hetzelfde geheugenadres verwijzen.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="num">4</span> <span class="kw">in</span> A
+B <span class="kw">alias</span> A
+<span class="kw">zet</span> <span class="num">56</span> <span class="kw">in</span> B
+<span class="kw">schrijf</span> <span class="str">"A: "</span> + A + <span class="str">"; B: "</span> + B</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> A: 56; B: 56</div>
+
+        <p>Binnen procedures heet dit <code>inout</code>:</p>
+        <pre class="has-output"><code><span class="kw">definieer</span> <span class="kw">procedure</span> Verhoog(<span class="kw">inout</span> X) (
+  <span class="kw">zet</span> X + <span class="num">1</span> <span class="kw">in</span> X
+)
+<span class="kw">zet</span> <span class="num">10</span> <span class="kw">in</span> Teller
+Verhoog(Teller)
+<span class="kw">schrijf</span> Teller</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 11</div>
+
+        <h3>Geheugen vrijmaken met <code>null</code></h3>
+        <p>Wanneer u een zeer zware datastructuur niet langer nodig heeft, kunt u <code>null</code> in de variabele zetten om het geheugen vrij te geven.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> null <span class="kw">in</span> ZwareAfbeelding
+<span class="kw">schrijf</span> ZwareAfbeelding</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> null</div>
+    </section>
+
+    <div class="pagebreak"></div>
+    <h1>Deel Twee: Grafiek en Interactiviteit</h1>
+
+    <section id="coordinates">
+        <h2>Coördinaten en punten</h2>
+        <p>Het canvas gebruikt een cartesisch assenstelsel met de oorsprong <code>(0, 0)</code> exact in het midden. Positieve <code>x</code> wijst naar rechts, negatieve <code>x</code> naar links. Positieve <code>y</code> wijst omhoog, negatieve <code>y</code> omlaag.</p>
+        <figure>
+            <svg viewBox="0 0 700 360" width="100%" role="img" aria-label="Cartesisch assenstelsel">
+                <rect x="0" y="0" width="700" height="360" rx="14" fill="#f8fafc" stroke="#e5e7eb"/>
+                <line x1="40" y1="180" x2="660" y2="180" stroke="#94a3b8" stroke-width="2"/>
+                <line x1="350" y1="30" x2="350" y2="330" stroke="#94a3b8" stroke-width="2"/>
+                <polygon points="660,180 648,174 648,186" fill="#94a3b8"/>
+                <polygon points="350,30 344,42 356,42" fill="#94a3b8"/>
+                <circle cx="500" cy="110" r="6" fill="#0f6fff"/>
+                <line x1="500" y1="110" x2="500" y2="180" stroke="#60a5fa" stroke-dasharray="6 5" stroke-width="2"/>
+                <line x1="500" y1="110" x2="350" y2="110" stroke="#60a5fa" stroke-dasharray="6 5" stroke-width="2"/>
+                <text x="667" y="172" font-size="18" fill="#475569">x</text>
+                <text x="362" y="42" font-size="18" fill="#475569">y</text>
+                <text x="507" y="104" font-size="16" fill="#0f6fff">(150, 70)</text>
+                <text x="358" y="198" font-size="15" fill="#475569">(0,0)</text>
+            </svg>
+            <figcaption>Cartesisch assenstelsel van het Matita canvas.</figcaption>
+        </figure>
+        <p>Een coördinaat kunt u opgeven als een lijst van twee getallen of via het <code>punt(x, y)</code>-object.</p>
+        <pre class="has-output"><code><span class="kw">zet</span> <span class="kw">punt</span>(<span class="num">10</span>, <span class="num">44</span>) <span class="kw">in</span> MijnPunt
+<span class="kw">schrijf</span> <span class="kw">x</span> <span class="kw">van</span> MijnPunt
+<span class="kw">nieuwe regel</span>
+<span class="kw">schrijf</span> <span class="kw">y</span> <span class="kw">van</span> MijnPunt</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> 10
+ 44</div>
+
+        <p>Gebruik <code>stel ... van ... in op ...</code> om een as van een punt rechtstreeks bij te werken:</p>
+        <pre class="has-output"><code><span class="kw">stel</span> <span class="kw">y</span> <span class="kw">van</span> MijnPunt <span class="kw">in op</span> ((<span class="kw">y</span> <span class="kw">van</span> MijnPunt) - <span class="num">10</span>)
+<span class="kw">schrijf</span> MijnPunt</code></pre>
+        <div class="output-block"><span class="out-label">Uitvoer</span> Point(10, 34)</div>
+    </section>
+
+    <section id="colors">
+        <h2>Kleuren en achtergronden</h2>
+        <p>Matita gebruikt de RGB-kleurenruimte. U definieert een kleur als een lijst van percentages <code>(Rood, Groen, Blauw)</code>, waarbij elke waarde van 0 tot 100 loopt.</p>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">68</span>, <span class="num">85</span>, <span class="num">90</span>) <span class="com"># Een hemelsblauwe tint</span>
+<span class="kw">vul achtergrond in</span></code></pre>
+        <div class="canvas-output">Het canvas krijgt een lichtblauwe achtergrondkleur.</div>
+
+        <p>Met <code>wis canvas</code> verwijdert u in één keer alle getekende objecten uit het geheugen. Gebruik dit in animaties vóór het renderen van het volgende beeld.</p>
+        <pre><code><span class="kw">wis canvas</span></code></pre>
+
+        <p>U kunt een afbeelding inladen om deze vast als achtergrond te gebruiken. Als u de afbeelding op de helft van haar natuurlijke grootte wilt laden, gebruikt u een schaalfactor van 0.5.</p>
+        <pre><code><span class="kw">laad</span> <span class="str">"gras.png"</span> <span class="kw">met schaal</span> <span class="num">0.5</span> <span class="kw">als achtergrond</span>
+<span class="kw">vul achtergrond in</span></code></pre>
+        <div class="canvas-output">De afbeelding "gras.png" wordt als achtergrond getekend.</div>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="shapes">
+        <h2>Basisvormen Tekenen</h2>
+        
+        <h3>Cirkel</h3>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">87</span>, <span class="num">0</span>)
+<span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">60</span> <span class="kw">op</span> (<span class="num">120</span>, <span class="num">80</span>)</code></pre>
+        <div class="canvas-output">Een massieve gele cirkel (gevulde schijf) gecentreerd op coördinaat (120, 80).</div>
+
+        <h3>Omtrek (Cirkelrand)</h3>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+<span class="kw">omtrek</span> <span class="kw">straal</span> <span class="num">25</span> <span class="kw">dikte</span> <span class="num">4</span> <span class="kw">op</span> (<span class="num">-200</span>, <span class="num">-50</span>)</code></pre>
+        <div class="canvas-output">Een holle zwarte cirkel met de opgegeven lijndikte.</div>
+
+        <h3>Rechthoek</h3>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">16</span>, <span class="num">65</span>, <span class="num">27</span>)
+<span class="kw">rechthoek</span> <span class="kw">van</span> (<span class="num">-200</span>, <span class="num">-100</span>) <span class="kw">tot</span> (<span class="num">200</span>, <span class="num">100</span>)</code></pre>
+        <div class="canvas-output">Een gevulde groene rechthoek van punt (-200, -100) linksonder naar punt (200, 100) rechtsboven.</div>
+
+        <h3>Lijn</h3>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
+<span class="kw">lijn</span> <span class="kw">dikte</span> <span class="num">2</span> <span class="kw">van</span> (<span class="num">-200</span>, <span class="num">-75</span>) <span class="kw">tot</span> (<span class="num">-200</span>, <span class="num">-160</span>)</code></pre>
+        <div class="canvas-output">Een lijnsegment.</div>
+
+        <h3>Driehoek</h3>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">50</span>, <span class="num">100</span>)
+<span class="kw">driehoek</span> <span class="kw">met hoekpunten</span> (<span class="num">0</span>, <span class="num">50</span>), (<span class="num">-50</span>, <span class="num">-50</span>), (<span class="num">50</span>, <span class="num">-50</span>)</code></pre>
+        <div class="canvas-output">Een gevulde blauwe driehoek die de 3 punten in de ruimte verbindt.</div>
+
+        <h3>Boog</h3>
+        <p>Aangezien in de wiskunde geldt dat er maximaal twee snijdende cirkels bestaan met straal R die tevens door twee punten P1 en P2 in een plat vlak lopen, past Matita een conventie toe: het tekent de boog die <em>tegen de klok in draait</em> van P1 naar P2.</p>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
+<span class="kw">boog</span> <span class="kw">straal</span> <span class="num">240</span> <span class="kw">dikte</span> <span class="num">12</span> <span class="kw">van</span> (<span class="num">-220</span>, <span class="num">-160</span>) <span class="kw">tot</span> (<span class="num">220</span>, <span class="num">-160</span>)</code></pre>
+        <div class="canvas-output">Een rode boog.</div>
+
+        <h3>Samengesteld voorbeeld: Landschap in Code</h3>
+        <pre><code><span class="kw">wis canvas</span>
+<span class="kw">zet</span> <span class="num">15</span> <span class="kw">in</span> D
+<span class="kw">zet</span> <span class="num">260</span> <span class="kw">in</span> R
+<span class="kw">zet</span> <span class="num">-160</span> <span class="kw">in</span> Y
+
+<span class="com"># Lucht en Achtergrond</span>
+<span class="kw">stel kleur in</span> (<span class="num">68</span>, <span class="num">85</span>, <span class="num">90</span>)
+<span class="kw">vul achtergrond in</span>
+
+<span class="com"># Gras</span>
+<span class="kw">stel kleur in</span> (<span class="num">16</span>, <span class="num">65</span>, <span class="num">27</span>)
+<span class="kw">rechthoek</span> <span class="kw">van</span> (<span class="num">-360</span>, <span class="num">-250</span>) <span class="kw">tot</span> (<span class="num">360</span>, Y)
+
+<span class="com"># Zon</span>
+<span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">87</span>, <span class="num">0</span>)
+<span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">70</span> <span class="kw">op</span> (<span class="num">250</span>, <span class="num">180</span>)
+
+<span class="com"># Regenboog (Meerdere bogen die steeds kleiner worden)</span>
+<span class="kw">stel kleur in</span> (<span class="num">90</span>, <span class="num">0</span>, <span class="num">0</span>)
+<span class="kw">boog</span> <span class="kw">straal</span> R <span class="kw">dikte</span> D <span class="kw">van</span> (R, Y) <span class="kw">tot</span> (-R, Y)
+<span class="kw">zet</span> R - D <span class="kw">in</span> R
+
+<span class="kw">stel kleur in</span> (<span class="num">90</span>, <span class="num">50</span>, <span class="num">0</span>)
+<span class="kw">boog</span> <span class="kw">straal</span> R <span class="kw">dikte</span> D <span class="kw">van</span> (R, Y) <span class="kw">tot</span> (-R, Y)
+<span class="kw">zet</span> R - D <span class="kw">in</span> R
+
+<span class="kw">stel kleur in</span> (<span class="num">90</span>, <span class="num">90</span>, <span class="num">0</span>)
+<span class="kw">boog</span> <span class="kw">straal</span> R <span class="kw">dikte</span> D <span class="kw">van</span> (R, Y) <span class="kw">tot</span> (-R, Y)
+<span class="kw">zet</span> R - D <span class="kw">in</span> R
+
+<span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">70</span>, <span class="num">0</span>)
+<span class="kw">boog</span> <span class="kw">straal</span> R <span class="kw">dikte</span> D <span class="kw">van</span> (R, Y) <span class="kw">tot</span> (-R, Y)
+<span class="kw">zet</span> R - D <span class="kw">in</span> R
+
+<span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">90</span>)
+<span class="kw">boog</span> <span class="kw">straal</span> R <span class="kw">dikte</span> D <span class="kw">van</span> (R, Y) <span class="kw">tot</span> (-R, Y)
+<span class="kw">zet</span> R - D <span class="kw">in</span> R
+
+<span class="kw">stel kleur in</span> (<span class="num">40</span>, <span class="num">0</span>, <span class="num">70</span>)
+<span class="kw">boog</span> <span class="kw">straal</span> R <span class="kw">dikte</span> D <span class="kw">van</span> (R, Y) <span class="kw">tot</span> (-R, Y)
+
+<span class="com"># Een paarse ballonnetje</span>
+<span class="kw">stel kleur in</span> (<span class="num">80</span>, <span class="num">0</span>, <span class="num">90</span>)
+<span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">25</span> <span class="kw">op</span> (<span class="num">-100</span>, <span class="num">-50</span>)
+<span class="kw">lijn</span> <span class="kw">dikte</span> <span class="num">2</span> <span class="kw">van</span> (<span class="num">-100</span>, <span class="num">-75</span>) <span class="kw">tot</span> (<span class="num">-100</span>, Y)
+<span class="kw">toon alles</span></code></pre>
+        <div class="canvas-output">Een landschap met regenboog in de ingestelde kleuren.</div>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="graffiti">
+        <h2>Graffiti (Tekst op Grafiek)</h2>
+        <p>Met de <code>graffiti</code> instructie kunt u teksten weergeven op het canvas.</p>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">10</span>, <span class="num">10</span>, <span class="num">10</span>)
+<span class="kw">graffiti</span> <span class="kw">grootte</span> <span class="num">30</span> <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="str">"Midden"</span></code></pre>
+        <div class="canvas-output">Het woord "Midden" in zwarte letters is op (0,0) te zien.</div>
+    </section>
+
+    <section id="redraw">
+        <h2>Teken opnieuw</h2>
+        <p>Het <code>teken opnieuw</code> commando synchroniseert de weergave met de grafische elementen die de applicatie in het geheugen heeft. Na verplaatsingen of kleuren is het noodzakelijk in animatielussen dit commando aan te roepen, behalve als <code>wacht N ms</code> al in de lus zit; dat triggert de weergave ook automatisch.</p>
+        <pre><code><span class="kw">teken opnieuw</span></code></pre>
+    </section>
+
+    <section id="frame">
+        <h2>Toon alles (Auto-framing Camera)</h2>
+        <p><code>toon alles</code> is een hulpmiddel dat onmiddellijk zoomt en de canvas camera verschuift zodat elk getekend object op het scherm past. Handig wanneer u buiten het standaard vensterbereik hebt getekend.</p>
+        <pre><code><span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
+<span class="com"># We tekenen heel ver weg...</span>
+<span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">500</span> <span class="kw">op</span> (<span class="num">2000</span>, <span class="num">2000</span>)
+<span class="com"># Nu dwingen we de camera alles zichtbaar te maken.</span>
+<span class="kw">toon alles</span></code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="animations">
+        <h2>Animaties Maken</h2>
+        <p>Animatie berust in Matita op hetzelfde mechanisme als in de bioscoop: teken razendsnel na elkaar het beeld net een beetje anders. Een structuur in code hiervoor is:</p>
+        <ol>
+            <li>Een oneindige lus maken (zoals <code>zolang (waar) herhaal je</code>).</li>
+            <li>In elke stap de canvas wissen (<code>wis canvas</code>).</li>
+            <li>Een positie updaten (bijv. van een puntvariabele).</li>
+            <li>Het object tekenen op die bijgewerkte positie.</li>
+            <li>Een frame-delay instellen (met <code>wacht 16 ms</code> behaalt u ~60 FPS (Frames Per Second)).</li>
+            <li>Het <code>teken opnieuw</code> commando uitvoeren, al regelt de wacht-functie dit in de meeste browseromgevingen voor u.</li>
+        </ol>
+        <pre><code><span class="kw">zet</span> <span class="num">-150</span> <span class="kw">in</span> X
+<span class="kw">globaal</span> X
+<span class="kw">zolang</span> (X &lt; <span class="num">150</span>) <span class="kw">herhaal je</span> (
+  <span class="kw">zet</span> X + <span class="num">2</span> <span class="kw">in</span> X
+  <span class="kw">wis canvas</span>
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">20</span> <span class="kw">op</span> <span class="kw">punt</span>(X, <span class="num">0</span>)
+  <span class="kw">teken opnieuw</span>
+  <span class="kw">wacht</span> <span class="num">16</span> <span class="kw">ms</span>
+)</code></pre>
+        <div class="canvas-output">Een roze cirkel vliegt de horizon langs.</div>
+    </section>
+
+    <section id="input">
+        <h2>Toetsenbord- en Muisinteractie</h2>
+        
+        <h3>Toetsenbord</h3>
+        <p>In spellen reageert Matita op live toetsaanslagen via <code>toets "NAAM" is ingedrukt</code>. Geldige namen zijn de pijltjes (<code>"UP"</code>, <code>"DOWN"</code>, <code>"LEFT"</code>, <code>"RIGHT"</code>), de spatiebalk (<code>"SPACE"</code>), etcetera, plus elke fysieke letter (<code>"a"</code> of <code>"Z"</code>).</p>
+        
+        <h3>Muis</h3>
+        <p>Voor muisbesturing biedt de Matita bibliotheek speciale systeemfuncties:</p>
+        <ul>
+            <li><code>mouse_x()</code> / <code>mouse_y()</code>: Geven aan waar de aanwijzer over de virtuele wereld van de grafiek beweegt (ook tijdens zoomen en pannen van de camera).</li>
+            <li><code>mouse_ingedrukt()</code>: Geeft een booleaanse status af of een gebruiker in het canvasgebied klikt en vasthoudt.</li>
+        </ul>
+
+        <p>Voorbeeld Spelerbediening met pijltoetsen:</p>
+        <pre><code><span class="kw">zet</span> <span class="kw">punt</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> SpelerPos
+<span class="kw">zet</span> <span class="num">300</span> <span class="kw">in</span> Limiet
+
+<span class="kw">zolang</span> (<span class="kw">waar</span>) <span class="kw">herhaal je</span> (
+  <span class="kw">globaal</span> SpelerPos
+
+  <span class="com"># As y-as bediening</span>
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"UP"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">y</span> <span class="kw">van</span> SpelerPos <span class="kw">in op</span> ((<span class="kw">y</span> <span class="kw">van</span> SpelerPos) + <span class="num">5</span>)
+  )
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"DOWN"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">y</span> <span class="kw">van</span> SpelerPos <span class="kw">in op</span> ((<span class="kw">y</span> <span class="kw">van</span> SpelerPos) - <span class="num">5</span>)
+  )
+  
+  <span class="com"># As x-as bediening</span>
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"RIGHT"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">x</span> <span class="kw">van</span> SpelerPos <span class="kw">in op</span> ((<span class="kw">x</span> <span class="kw">van</span> SpelerPos) + <span class="num">5</span>)
+  )
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"LEFT"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">x</span> <span class="kw">van</span> SpelerPos <span class="kw">in op</span> ((<span class="kw">x</span> <span class="kw">van</span> SpelerPos) - <span class="num">5</span>)
+  )
+  
+  <span class="com"># Een snelle 'kill switch' (afsluiten lus)</span>
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"x"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stop</span>
+  )
+
+  <span class="com"># Tekenen</span>
+  <span class="kw">wis canvas</span>
+  <span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">100</span>, <span class="num">100</span>)
+  <span class="kw">rechthoek</span> <span class="kw">van</span> (-Limiet, -Limiet) <span class="kw">tot</span> (Limiet, Limiet)
+  
+  <span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">50</span>, <span class="num">100</span>)
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">20</span> <span class="kw">op</span> SpelerPos
+  
+  <span class="kw">teken opnieuw</span>
+  <span class="kw">wacht</span> <span class="num">16</span> <span class="kw">ms</span>
+)</code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="labels">
+        <h2>Labels (Gestructureerde Objecten)</h2>
+        <p>In plaats van objecten die uit meerdere onderdelen bestaan (zoals een poppetje of huisje) constant regel voor regel in loops op te bouwen, introduceert Matita grafische componenten, vergelijkbaar met sprites in videogames. Hiervoor declareert u een <code>label</code> block.</p>
+        <p>Vervolgens is uw object beschikbaar om direct te <code>teken</code>en op het doek.</p>
+        <pre><code><span class="kw">label</span> (
+  <span class="com"># Lichaam van sneeuwpop</span>
+  <span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="com"># Wit</span>
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">30</span> <span class="kw">op</span> (<span class="num">0</span>, <span class="num">0</span>)
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">20</span> <span class="kw">op</span> (<span class="num">0</span>, <span class="num">45</span>)
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">15</span> <span class="kw">op</span> (<span class="num">0</span>, <span class="num">75</span>)
+  
+  <span class="com"># Details - Ogen en Knopen</span>
+  <span class="kw">stel kleur in</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="com"># Zwart</span>
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">2</span> <span class="kw">op</span> (<span class="num">-5</span>, <span class="num">78</span>)
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">2</span> <span class="kw">op</span> (<span class="num">5</span>, <span class="num">78</span>)
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">2</span> <span class="kw">op</span> (<span class="num">0</span>, <span class="num">50</span>)
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">2</span> <span class="kw">op</span> (<span class="num">0</span>, <span class="num">40</span>)
+
+  <span class="com"># Een wortel-neus</span>
+  <span class="kw">stel kleur in</span> (<span class="num">100</span>, <span class="num">60</span>, <span class="num">0</span>) <span class="com"># Oranje</span>
+  <span class="kw">driehoek</span> <span class="kw">met hoekpunten</span> (<span class="num">0</span>, <span class="num">75</span>), (<span class="num">0</span>, <span class="num">73</span>), (<span class="num">8</span>, <span class="num">74</span>)
+) <span class="kw">als</span> Sneeuwpop
+
+<span class="com"># Instantiatie:</span>
+<span class="kw">stel kleur in</span> (<span class="num">50</span>, <span class="num">50</span>, <span class="num">50</span>)
+<span class="kw">vul achtergrond in</span>
+<span class="kw">teken</span> Sneeuwpop <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">150</span>, <span class="num">0</span>)
+<span class="kw">teken</span> Sneeuwpop <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">-100</span>, <span class="num">0</span>)</code></pre>
+        <div class="canvas-output">Twee volwaardige en identieke sneeuwpoppen op verschillende coördinaten getekend.</div>
+    </section>
+
+    <section id="transformations">
+        <h2>Transformaties van Labels</h2>
+        <p>Elk Label object en ook Geïmporteerde Afbeeldingen, kunnen een manipulatie van schaling en rotatie ondergaan.</p>
+
+        <h3>Schaal</h3>
+        <p>De groottefactor <code>schaal NAAM met FACTOR</code> werkt multiplicatief (permanent in het geheugen) op uw ontwerp.</p>
+        <pre><code><span class="kw">schaal</span> Sneeuwpop <span class="kw">met</span> <span class="num">0.5</span>
+<span class="kw">teken</span> Sneeuwpop <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">0</span>, <span class="num">100</span>)</code></pre>
+        <div class="canvas-output">Een kortere pop op (0,100).</div>
+
+        <h3>Rotatie</h3>
+        <p>Het <code>draai NAAM met HOEK graden en plaats het op POSITIE</code> commando plaatst de geroteerde variant op een gewenste hoek op het canvas. Tegen de klok in geldt voor positieve graden, met een centrumas in (0,0) dat vertaald wordt naar het gewenste eindpunt.</p>
+        <pre><code><span class="kw">draai</span> Sneeuwpop <span class="kw">met</span> <span class="num">45</span> <span class="kw">graden en plaats het op</span> (<span class="num">300</span>, <span class="num">-300</span>)</code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
+    <section id="images">
+        <h2>Afbeeldingen en externe code inladen</h2>
+        
+        <h3>Afbeeldingen Importeren via een bestandsmap</h3>
+        <p>Door Matita in de lokale HTML te runnen in een bestandsmap of netwerkomgeving kunt u eigen afbeeldingsbestanden als texture of sprites oproepen, waarna u die kunt manipuleren net als Labels.</p>
+        <pre><code><span class="kw">importeer</span> <span class="str">"kat.png"</span> <span class="kw">als</span> Kat
+<span class="kw">teken</span> Kat <span class="kw">op</span> (<span class="num">0</span>, <span class="num">0</span>)
+<span class="kw">schaal</span> Kat <span class="kw">met</span> <span class="num">0.5</span>
+<span class="kw">draai</span> Kat <span class="kw">met</span> <span class="num">15</span> <span class="kw">graden en plaats het op</span> (<span class="num">-120</span>, <span class="num">-60</span>)</code></pre>
+
+        <h3>Afbeeldingen als Achtergrondkleed</h3>
+        <pre><code><span class="kw">laad</span> <span class="str">"gras.png"</span> <span class="kw">met schaal</span> <span class="num">0.5</span> <span class="kw">als achtergrond</span>
+<span class="kw">vul achtergrond in</span></code></pre>
+
+        <h3>Uw bibliotheken opsplitsen met externe code</h3>
+        <p>Gebruikers die lijvige programma's hanteren of hergebruik willen optimaliseren in meerdere bestanden, kunnen met de declaratie <code>importeer</code>, gevolgd door een <code>.txt</code> URI, het tweede bestand dynamisch op de regel inladen vóór het runnen door de IDE compiler.</p>
+        <pre><code><span class="kw">importeer</span> <span class="str">"mijn_bibliotheek.txt"</span>
+<span class="com"># Alle code, procedure- en functiedefinities zijn nu lokaal beschikbaar</span></code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
+    <section id="audio">
+        <h2>Audio en Geluiden (Synthesizer Engine)</h2>
+        <p>Matita integreert een uitgebreide audio API synthese-engine (een zogenaamde ADSR Synthesizer). Daarmee bepaalt de gebruiker op fysieke wijze frequenties en wave patterns voor muziek, beeps of ruiseffecten direct via instructie.</p>
+
+        <h3>Definiëren en Afspelen</h3>
+        <p>Elk geluid moet met het <code>geluid NAAM</code> instructieblok gedefinieerd en afgebakend worden. Daarna bestuurt de instructie <code>play</code> de geluidskaart.</p>
+        <pre><code><span class="com"># Een korte 'beep' opzetten door middel van een frequentie daling</span>
+<span class="kw">geluid</span> Beep (
+  <span class="kw">sweep van</span> <span class="num">800</span> <span class="kw">tot</span> <span class="num">200</span> <span class="kw">hz</span>
+  <span class="kw">golf</span> <span class="str">"sine"</span> <span class="com"># Golfvorm opties: "sine", "square", "sawtooth", "triangle"</span>
+  <span class="kw">duur</span> <span class="num">300</span> <span class="kw">ms</span>
+)
+
+<span class="com"># Een ruiseffect (ideale methode voor het emuleren van schade in spelletjes)</span>
+<span class="kw">geluid</span> Explosie (
+  <span class="kw">ruis</span>
+  <span class="kw">duur</span> <span class="num">500</span> <span class="kw">ms</span>
+  <span class="kw">decay</span> <span class="num">400</span> <span class="kw">ms</span> <span class="com"># Of in Matita-Nederlands vertaald via het woordenboek indien toegepast</span>
+)
+
+<span class="com"># Muziek programmeren (Een lijst met Frequenties gelinkt aan Tijd en Duratie)</span>
+<span class="kw">geluid</span> Melodie (
+  <span class="kw">noten</span> (<span class="num">440</span>:<span class="num">200</span>, <span class="num">523</span>:<span class="num">400</span>, <span class="num">659</span>:<span class="num">600</span>) <span class="com"># De syntaxis: Frequentie : Milliseconden Duur</span>
+  <span class="kw">golf</span> <span class="str">"square"</span>
+)
+
+<span class="com"># Afspeelmechanisme</span>
+<span class="kw">play</span> Beep
+<span class="kw">wacht</span> <span class="num">500</span> <span class="kw">ms</span>
+<span class="kw">play</span> Explosie</code></pre>
+
+        <h3>Controlestroom en Loops in de Audio Mixer</h3>
+        <p>Voeg een interne parameter <code>herhaal waar</code> toe aan de definitie om Matita te dwingen onbeperkt door te blijven sturen naar de speakers. Gebruik functies als <code>stop</code> en <code>fade</code> in de runtime om dit geluidsspoor in te tomen of te verbergen.</p>
+        <ul>
+            <li><code>play NAAM</code>: Zendt het kanaal met de configuratie direct uit.</li>
+            <li><code>stop NAAM</code>: Blokkeert de golf-oscillator terstond.</li>
+            <li><code>volume NAAM NIVEAU</code>: Past in de loop van de mix de output op een schaal tussen de (0 en 100) aan.</li>
+            <li><code>fade NAAM uit DUUR ms</code>: Vermindert soepel de versterkerwaarde tot nul, gedurende DUUR ms. (gebruik "<code>in</code>" of het Matita alternatief "<code>uit</code>" voor de respectieve in- en uitfade richting.)</li>
+            <li><code>is aan het afspelen NAAM</code>: Geeft in de bool-logica <code>waar</code> indien Matita geluidsgolven blijft overbrengen van die geluidsnaam, uiterst accuraat om synchronisatie bugs te voorkomen.</li>
+        </ul>
+
+        <pre><code><span class="kw">geluid</span> Motor (
+  <span class="kw">ruis</span>
+  <span class="kw">herhaal</span> <span class="kw">waar</span>
+)
+
+<span class="kw">play</span> Motor
+<span class="kw">volume</span> Motor <span class="num">20</span>
+<span class="kw">wacht</span> <span class="num">3000</span> <span class="kw">ms</span>
+<span class="kw">fade</span> Motor <span class="kw">uit</span> <span class="num">1500</span> <span class="kw">ms</span></code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="canvas-interaction">
+        <h2>Interactie met het canvas Tools</h2>
+        <p>Het Matita canvas-venster reikt verder dan output presentatie; het bezit interactieve functionaliteit ten behoeven van productiviteit.</p>
+
+        <h3>Pan en Zoom</h3>
+        <ul>
+            <li><strong>Pannen</strong>: Sleep met de rechtermuisknop, middelste muisknop of <code>Shift</code> + linkermuisknop om door grote virtuele vlakken met tekening en canvas uitlopers heen te 'glijden'.</li>
+            <li><strong>Zoomen</strong>: Draai aan uw muiswiel. Matita fixeert het midden en uw scherm coördinaten direct onder uw pijlaanwijzer, zodat exact en vloeiend inzoomen mogelijk wordt.</li>
+        </ul>
+
+        <h3>Ortho Lijnen, As-Rotaties en Snap Functionaliteiten</h3>
+        <p>Een extra werkbalk over de breedte van het canvas-paneel levert tekenhulp equivalent met Computer-Aided Design (CAD) middelen:</p>
+        <ul>
+            <li><strong>Snap Magneet (🧲)</strong>: Het magneetje trekt de cursortracer direct op en over middens en knooppunten van geometrisch gepresenteerde elementen zoals polygonen, lijnen en afmetingen.</li>
+            <li><strong>Orthogonale Projectie As (⟂) en Alpha Hoek (α)</strong>: Ortho tolereert een enkele eerste-klik ter definitie van het richtingsnulpunt, waarna het muisdraadkruis de richtlijnen puur parallel in Y- of X-as dwingt ter illustratie. Druk het Alpha-paneel en toets graden in het invoerveldje (bijv. 45) om het volledige raster over uw wens uit te lokken voor tekenhulp (diagonalen) in perspectief of designwerk.</li>
+            <li><strong>Sla op naar Afbeelding (PNG)</strong>: Vertaal de render in geheugen pijlsnel in 1 download PNG output bestand.</li>
+            <li><strong>Frame Resizer (⛶)</strong>: Corrigeert resolutie, schaalt perfect en toont ieder onafhankelijk verborgen canvas-label in één vol oog opslag zonder te vergroten of verkleinen en voorkomt uren zoek en testwerk.</li>
+        </ul>
+
+        <h3>Coördinaten Plakfunctie vanuit UI</h3>
+        <p>Om lang en eentonig uittypen van XY lijsten of code in de Editor uit de wereld te halen en uw grafiek direct naar code te projecteren, ondersteunt Matita 'Long-Click-Extraction'. Bij langere aanhouding van een muisklik (ongeveer een halve seconde of meer) leest het script on the fly de X en de Y-as in en transporteert en injecteert die <code>(x, y)</code> float weergave direct en accuraat achter in het codegedeelte van uw IDE editor in focus.<br><br>Echter nog interessanter: Als u deze long-click functionaliteit kruist met de geopende magneet (Snap functie), en de Matita Engine detecteert dat de geplaatste globale code al verbonden staat op dit actieve coordinaat? Matita plakt de letterlijke parameter de referentie-ID met de Globale Variabele en weert hiermee dubbele nummer in uw programma logic.</p>
+    </section>
+
+    <div class="pagebreak"></div>
+    <section id="project">
+        <h2>Geleide oefening: interactief gezicht / Smiley</h2>
+        <p>Hier combineren we alles: object compositie, kleuren, interactie (besturing), en renderlussen op vaste tijdsmetingen.</p>
+        <pre><code><span class="com"># We wijzen RGB lijsten toe via globale constructen:</span>
+<span class="kw">zet</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="kw">in</span> Wit
+<span class="kw">zet</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Zwart
+<span class="kw">zet</span> (<span class="num">100</span>, <span class="num">90</span>, <span class="num">10</span>) <span class="kw">in</span> Geel
+
+<span class="com"># Een statische radius als kader</span>
+<span class="kw">zet</span> <span class="num">300</span> <span class="kw">in</span> Limiet
+
+<span class="com"># Het hoofd Object</span>
+<span class="kw">label</span> (
+  <span class="kw">stel kleur in</span> Geel
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">120</span> <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">0</span>, <span class="num">0</span>)
+  <span class="kw">stel kleur in</span> Zwart
+  <span class="kw">omtrek</span> <span class="kw">straal</span> <span class="num">120</span> <span class="kw">dikte</span> <span class="num">8</span> <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">0</span>, <span class="num">0</span>)
+  
+  <span class="com"># De ogen</span>
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">12</span> <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">-40</span>, <span class="num">30</span>)
+  <span class="kw">cirkel</span> <span class="kw">straal</span> <span class="num">12</span> <span class="kw">op</span> <span class="kw">punt</span>(<span class="num">40</span>, <span class="num">30</span>)
+  
+  <span class="com"># De mond als Boog Lijn over 100 punten in as-breedte</span>
+  <span class="kw">boog</span> <span class="kw">straal</span> <span class="num">60</span> <span class="kw">dikte</span> <span class="num">8</span> <span class="kw">van</span> (<span class="num">-50</span>, <span class="num">-25</span>) <span class="kw">tot</span> (<span class="num">50</span>, <span class="num">-25</span>)
+) <span class="kw">als</span> Gezicht
+
+<span class="com"># Globale speler en staat declaratie. Let op het Point() datatype:</span>
+<span class="kw">zet</span> <span class="kw">punt</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Positie
+<span class="kw">zet</span> <span class="num">0</span> <span class="kw">in</span> Hoek
+
+<span class="kw">wis scherm</span>
+<span class="kw">schrijf</span> <span class="str">"Bedieningsinterface: Druk de cursortoetsen pijlen of AD voor Rotate as X"</span>
+<span class="kw">nieuwe regel</span>
+
+<span class="com"># Het zogenoemde Game Loop Constructie: </span>
+<span class="kw">zolang</span> (<span class="kw">waar</span>) <span class="kw">herhaal je</span> (
+  <span class="com"># De verwijzingsclausule voor interne blok variabelen</span>
+  <span class="kw">globaal</span> Positie, Hoek
+
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"x"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (<span class="kw">stop</span>)
+
+  <span class="com"># Update y en x via condities en toetsaanslagen</span>
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"UP"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">y</span> <span class="kw">van</span> Positie <span class="kw">in op</span> ((<span class="kw">y</span> <span class="kw">van</span> Positie) + <span class="num">5</span>)
+  )
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"DOWN"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">y</span> <span class="kw">van</span> Positie <span class="kw">in op</span> ((<span class="kw">y</span> <span class="kw">van</span> Positie) - <span class="num">5</span>)
+  )
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"LEFT"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">x</span> <span class="kw">van</span> Positie <span class="kw">in op</span> ((<span class="kw">x</span> <span class="kw">van</span> Positie) - <span class="num">5</span>)
+  )
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"RIGHT"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">stel</span> <span class="kw">x</span> <span class="kw">van</span> Positie <span class="kw">in op</span> ((<span class="kw">x</span> <span class="kw">van</span> Positie) + <span class="num">5</span>)
+  )
+
+  <span class="com"># Rotatie manipulaties via de letters op de as Hoek:</span>
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"a"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">zet</span> Hoek + <span class="num">5</span> <span class="kw">in</span> Hoek
+  )
+  <span class="kw">als</span> (<span class="kw">toets</span> <span class="str">"d"</span> <span class="kw">is</span> <span class="kw">ingedrukt</span>) <span class="kw">dan</span> (
+    <span class="kw">zet</span> Hoek - <span class="num">5</span> <span class="kw">in</span> Hoek
+  )
+
+  <span class="com"># Render de data van de canvas. Veeg eerst schoon via wit-canvas</span>
+  <span class="kw">wis canvas</span>
+  <span class="kw">stel kleur in</span> Wit
+  <span class="kw">rechthoek</span> <span class="kw">van</span> (-Limiet, -Limiet) <span class="kw">tot</span> (Limiet, Limiet)
+  
+  <span class="com"># Voeg en roteer het object aan in 1 commando:</span>
+  <span class="kw">draai</span> Gezicht <span class="kw">met</span> Hoek <span class="kw">graden en plaats het op</span> Positie
+  
+  <span class="kw">teken opnieuw</span>
+  <span class="kw">wacht</span> <span class="num">16</span> <span class="kw">ms</span>
+)</code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="ref">
+        <h2>Bijlage A: Snelle referentie van Matita</h2>
+
+        <h3>Algemene Commando's en Systeem</h3>
+        <table>
+            <tr><th>Commando</th><th>Beschrijving</th></tr>
+            <tr><td><code>zet WAARDE in NAAM</code></td><td>Maakt of overschrijft een variabele (standaard lokaal in geneste blokken).</td></tr>
+            <tr><td><code>globaal NAAM1, NAAM2</code></td><td>Geeft aan dat variabelen in een codeblok verwijzen naar de globale variabelen met dezelfde naam.</td></tr>
+            <tr><td><code>B alias A</code></td><td>Maakt een alias aan: Variabele B verwijst naar exact dezelfde geheugenlocatie als variabele A.</td></tr>
+            <tr><td><code>schrijf WAARDE</code></td><td>Drukt een waarde (tekst of getal) af in de console.</td></tr>
+            <tr><td><code>schrijf:N:ALL WAARDE</code></td><td>Drukt de waarde af in <code>N</code> spaties. De uitlijning <code>ALL</code> kan <code>l</code> (links), <code>c</code> (midden) of <code>r</code> (rechts, standaard) zijn.</td></tr>
+            <tr><td><code>nieuwe regel</code></td><td>Voegt een regeleinde in (een enter) in de console.</td></tr>
+            <tr><td><code>wis scherm</code></td><td>Wist alle eerdere tekstuitvoer in de console.</td></tr>
+            <tr><td><code>wacht N ms</code></td><td>Pauzeert het programma voor N milliseconden.</td></tr>
+            <tr><td><code>stop</code></td><td>Stopt de uitvoering van het programma onmiddellijk.</td></tr>
+            <tr><td><code>welketaal()</code></td><td>Geeft de momenteel ingestelde programmeertaal terug ("NL", "EN" of "IT").</td></tr>
+        </table>
+
+        <h3>Wiskunde en Operatoren</h3>
+        <table>
+            <tr><th>Functie / Commando</th><th>Beschrijving</th></tr>
+            <tr><td><code>decimalen N</code></td><td>Bepaalt het aantal weergegeven decimalen bij het afdrukken van getallen.</td></tr>
+            <tr><td><code>wetenschappelijk N</code></td><td>Getallen groter dan of gelijk aan N worden weergegeven in wetenschappelijke notatie.</td></tr>
+            <tr><td><code>willekeurig()</code> / <code>willekeurig(A)</code> / <code>willekeurig(A, B)</code></td><td>Genereert een willekeurig kommagetal tussen 0 en 1, 0 en A, of A en B.</td></tr>
+            <tr><td><code>dobbelsteen(N)</code></td><td>Genereert een willekeurig geheel getal van 1 tot en met N.</td></tr>
+            <tr><td><code>afronden(X)</code> / <code>afkappen(X)</code> / <code>ceil(X)</code></td><td>Rondt X af naar het dichtstbijzijnde gehele getal, verwijdert de decimalen, of rondt af naar boven.</td></tr>
+            <tr><td><code>wortel(X)</code> / <code>abs(X)</code></td><td>Berekent de vierkantswortel of de absolute (positieve) waarde van X.</td></tr>
+            <tr><td><code>sin(X)</code> / <code>cos(X)</code></td><td>Berekent de sinus of cosinus van hoek X (in radialen).</td></tr>
+        </table>
+
+        <h3>Besturingsstroom en Logica (Flow Control)</h3>
+        <table>
+            <tr><th>Constructie</th><th>Beschrijving</th></tr>
+            <tr><td><code>als (C) dan (...) anders als (C2) dan (...) anders (...)</code></td><td>Voert codeblokken uit op basis van voorwaarden.</td></tr>
+            <tr><td><code>teller I loopt van A tot B en je doet (...)</code></td><td>Een lus die een teller I van beginwaarde A tot eindwaarde B laat lopen.</td></tr>
+            <tr><td><code>voor elke X in L herhaal je (...)</code></td><td>Herhaalt het codeblok voor elk element in de lijst L.</td></tr>
+            <tr><td><code>zolang (C) herhaal je (...)</code></td><td>Blijft het codeblok herhalen zolang de voorwaarde C waar is.</td></tr>
+            <tr><td><code>herhaal N keer (...)</code></td><td>Simpele herhalingslus zonder variabele index (teller).</td></tr>
+            <tr><td><code>vraag NAAM met bericht "TEXT"</code></td><td>Toont een dialoogvenster aan de gebruiker en slaat de invoer op in de variabele NAAM.</td></tr>
+            <tr><td><code>toets "X" is ingedrukt</code></td><td>Geeft <code>waar</code> als de opgegeven toets (zoals "UP", "SPACE" of "a") momenteel is ingedrukt.</td></tr>
+            <tr><td><code>mouse_x()</code> / <code>mouse_y()</code> / <code>mouse_ingedrukt()</code></td><td>Geeft de huidige muiscoördinaten op het canvas of controleert of de linkermuisknop is ingedrukt.</td></tr>
+            <tr><td><code>tick</code> / <code>tock</code></td><td><code>tick</code> start de interne stopwatch; <code>tock</code> geeft de verstreken tijd in milliseconden terug.</td></tr>
+        </table>
+
+        <h3>Grafiek, GUI Canvas Componenten</h3>
+        <table>
+            <tr><th>Commando</th><th>Beschrijving</th></tr>
+            <tr><td><code>stel kleur in (R, G, B)</code></td><td>Stelt de tekenkleur in (Rood, Groen, Blauw van 0 tot 100).</td></tr>
+            <tr><td><code>wis canvas</code> / <code>vul achtergrond in</code></td><td>Wist alle getekende objecten of vult de achtergrond met de huidige kleur of afbeelding.</td></tr>
+            <tr><td><code>teken opnieuw</code></td><td>Werkt het canvas bij zodat alle wijzigingen direct zichtbaar worden.</td></tr>
+            <tr><td><code>toon alles</code></td><td>Past de camera aan zodat alle getekende objecten op het scherm passen.</td></tr>
+            <tr><td><code>cirkel straal R op (X,Y)</code></td><td>Tekent een gevulde cirkel.</td></tr>
+            <tr><td><code>omtrek straal R dikte D op (X,Y)</code></td><td>Tekent een holle cirkel (alleen de rand).</td></tr>
+            <tr><td><code>rechthoek van (X1,Y1) tot (X2,Y2)</code></td><td>Tekent een gevulde rechthoek tussen de twee hoekpunten.</td></tr>
+            <tr><td><code>lijn dikte D van (X1,Y1) tot (X2,Y2)</code></td><td>Tekent een lijnsegment tussen twee punten.</td></tr>
+            <tr><td><code>driehoek met hoekpunten P1, P2, P3</code></td><td>Tekent een gevulde driehoek door drie punten te verbinden.</td></tr>
+            <tr><td><code>boog straal R dikte D van P1 tot P2</code></td><td>Tekent een boog van P1 naar P2, tegen de klok in.</td></tr>
+            <tr><td><code>graffiti grootte G op (X,Y) "TEKST"</code></td><td>Tekent tekst op het canvas.</td></tr>
+            <tr><td><code>label (...) als Naam</code></td><td>Groepeert tekeninstructies tot een herbruikbaar grafisch object (label).</td></tr>
+            <tr><td><code>importeer "bestand.png" als Naam</code></td><td>Laadt een externe afbeelding in als een grafisch object.</td></tr>
+            <tr><td><code>importeer "broncode.txt"</code></td><td>Laadt en voert externe Matita-code in (handig voor bibliotheken).</td></tr>
+            <tr><td><code>teken Naam op (X,Y)</code></td><td>Tekent een eerder gedefinieerd label of afbeelding op de opgegeven positie.</td></tr>
+            <tr><td><code>schaal Naam met K</code></td><td>Vergroot of verkleint permanent een label of afbeelding.</td></tr>
+            <tr><td><code>draai Naam met G graden en plaats het op P</code></td><td>Roteert een object en plaatst het op punt P.</td></tr>
+        </table>
+
+        <h3>Audio Modellerings- en Synthesizer Functies</h3>
+        <table>
+            <tr><th>Commando</th><th>Beschrijving</th></tr>
+            <tr><td><code>geluid NAAM ( ... )</code></td><td>Definieert een nieuw geluidseffect of melodie (noise, note of sweep).</td></tr>
+            <tr><td><code>play NAAM</code></td><td>Speelt een gedefinieerd geluid af.</td></tr>
+            <tr><td><code>stop NAAM</code></td><td>Stopt het afspelen van een geluid (vooral nuttig voor lussen).</td></tr>
+            <tr><td><code>volume NAAM NIVEAU</code></td><td>Stelt het volume van een geluid in (schaal van 0 tot 100).</td></tr>
+            <tr><td><code>fade NAAM in/uit D ms</code></td><td>Laat het volume geleidelijk in- of uitfaden gedurende D milliseconden.</td></tr>
+            <tr><td><code>is aan het afspelen NAAM</code></td><td>Geeft <code>waar</code> als het geluid momenteel nog wordt afgespeeld.</td></tr>
+        </table>
+
+        <h3>Datastructuren (Lijsten, Woordenboeken, Records, Sets)</h3>
+        <table>
+            <tr><th>Commando</th><th>Beschrijving</th></tr>
+            <tr><td><code>zet lijst(A, B) in NAAM</code></td><td>Maakt een nieuwe lijst aan.</td></tr>
+            <tr><td><code>zet { "sleutel": V } in D</code></td><td>Maakt een woordenboek aan waarbij waarden gekoppeld zijn aan tekstsleutels (bijv. <code>D["sleutel"]</code>).</td></tr>
+            <tr><td><code>record NAAM(veld1, veld2)</code></td><td>Definieert een nieuw datatype met vaste velden (toegankelijk via <code>Object.veld1</code>).</td></tr>
+            <tr><td><code>zet set(A, B) in NAAM</code></td><td>Maakt een verzameling (set) aan zonder dubbele elementen.</td></tr>
+            <tr><td><code>lengte van NAAM</code></td><td>Geeft het aantal elementen in een lijst of het aantal sleutels in een woordenboek.</td></tr>
+            <tr><td><code>element N van NAAM</code></td><td>Leest het N-de element uit een lijst (1-gebaseerd).</td></tr>
+            <tr><td><code>voeg X toe aan L</code> / <code>voeg X toe in element N van L</code></td><td>Voegt een element toe aan het einde van een lijst, of voegt het in op positie N.</td></tr>
+            <tr><td><code>verwijder element N uit L</code> / <code>verwijder sleutel "K" uit D</code></td><td>Verwijdert een element uit een lijst of een sleutel uit een woordenboek.</td></tr>
+            <tr><td><code>heeft sleutel "K" in D</code> / <code>sleutels van D</code></td><td>Controleert of een sleutel bestaat, of geeft een lijst van alle sleutels in een woordenboek.</td></tr>
+            <tr><td><code>splits(VAL)</code> / <code>ontbind(V, T)</code> / <code>samenvoegen(L, T)</code></td><td>Functies om tekst op te splitsen in lijsten, of lijsten samen te voegen tot tekst of getallen.</td></tr>
+            <tr><td><code>cast(VAL, "TYPE")</code> / <code>unicode(X)</code></td><td>Converteert een waarde naar een ander type (bijv. tekst naar getal), of werkt met Unicode-tekencodes.</td></tr>
+            <tr><td><code>type(VAR)</code> / <code>numeriek(VAR)</code></td><td>Geeft het datatype van een variabele, of controleert of het een geldig getal is.</td></tr>
+        </table>
+    </section>
+
+    <div class="pagebreak"></div>
+
+    <section id="troubleshoot">
+        <h2>Bijlage B: Veelvoorkomende fouten</h2>
+        <table>
+            <tr><th>Type</th><th>Bericht en oorzaak</th></tr>
+            <tr>
+                <td><span class="warn-tag">Waarschuwing</span></td>
+                <td><code>Waarschuwing: lokale variabele 'NAAM' verbergt een globale variabele...</code><br>
+                Een lokale variabele gebruikt dezelfde naam als een globale variabele. Gebruik <code>globaal NAAM</code> als u de globale variabele wilt wijzigen, of kies een andere naam voor uw lokale variabele om verwarring te voorkomen.</td>
+            </tr>
+            <tr>
+                <td><span class="warn-tag">Waarschuwing</span></td>
+                <td><code>Alias gemaakt...</code><br>
+                Twee variabelen verwijzen nu naar exact dezelfde locatie in het geheugen. Een wijziging in de één zal ook de ander wijzigen.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Kan geen variabele vinden met de naam 'NAAM'</code><br>
+                De variabele is nog niet gedefinieerd. Controleer of u de variabele heeft aangemaakt met <code>zet ... in</code> voordat u deze gebruikt, of controleer op typefouten. (Namen zijn wel ongevoelig voor hoofdletters, dus <code>VARIABELE</code> is gelijk aan <code>variabele</code>).</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Recursielimiet overschreden</code><br>
+                Er is een "Stack Overflow" opgetreden. Dit gebeurt meestal wanneer een functie of procedure zichzelf oneindig blijft aanroepen zonder een stopconditie (basisgeval). De limiet in Matita is 200 geneste aanroepen.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Ongeldige argumenten voor procedure-aanroep</code><br>
+                De syntaxis voor het aanroepen van een procedure is onjuist. Gebruik <code>Naam(argumenten)</code> of <code>Naam met (argumenten)</code>.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Functie 'NAAM' beëindigd zonder 'geef ... terug'</code><br>
+                Zorg ervoor dat de functie altijd een waarde retourneert via <code>geef ... terug</code>, ongeacht welk logisch pad (bijv. in <code>als/anders</code>-blokken) wordt gevolgd.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Index I is ongeldig voor lijst 'NAAM'</code><br>
+                De opgegeven index valt buiten de grenzen van de lijst. Vergeet niet dat lijsten in Matita 1-gebaseerd zijn (het eerste element is index 1, niet 0).</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Kan geen elementen verwijderen uit een lege lijst</code><br>
+                U probeert een element te verwijderen (bijv. via <code>verwijder eerste element</code>) uit een lijst die al leeg is.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>De waarde voor een coördinaat moet een getal zijn</code><br>
+                U heeft een ongeldige waarde opgegeven voor een coördinaat. Dit moet altijd een geldig getal zijn (geen tekst of lijst).</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Ongeldige kleur</code><br>
+                Een kleur moet worden opgegeven als een lijst van exact drie getallen <code>(R, G, B)</code>, waarbij elke waarde tussen de 0 en 100 ligt.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Deze variabele is geen woordenboek / record.</code><br>
+                U probeert bewerkingen voor woordenboeken of records (zoals <code>D["sleutel"]</code> of <code>Object.veld</code>) uit te voeren op een variabele die een getal, tekst of lijst is.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Sleutel (of record sleutel) niet gevonden.</code><br>
+                U probeert een waarde op te vragen via een sleutel die niet bestaat in het opgegeven woordenboek of record.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Kan geen geluid vinden met de naam...</code><br>
+                U probeert een geluid af te spelen of te stoppen dat nog niet is gedefinieerd. Definieer het geluid eerst met een <code>geluid NAAM (...)</code> blok.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Kan afbeelding '...' niet laden</code><br>
+                Het afbeeldingsbestand kon niet worden gevonden of geladen. Controleer of de bestandsnaam klopt en in dezelfde map staat. Let op: online afbeeldingen kunnen worden geblokkeerd door browserbeveiliging (CORS).</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Onjuiste 'graffiti' instructie</code><br>
+                De syntaxis is onvolledig. De juiste vorm is: <code>graffiti grootte N op (X,Y) "TEKST"</code>.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Er bestaat al een label met de naam ... / Kan geen label vinden...</code><br>
+                U probeert een label te maken met een naam die al bestaat, of u probeert een label te tekenen dat nog niet is gedefinieerd in het geheugen.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>De lus heeft het maximum aantal iteraties overschreden</code><br>
+                Om te voorkomen dat uw computer vastloopt, heeft Matita een oneindige lus afgebroken. Controleer uw <code>zolang (waar)</code> of <code>zolang (C)</code> lussen om er zeker van te zijn dat ze een geldige ontsnappingsclausule (<code>stop</code> of een conditie die onwaar wordt) bevatten.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Kan 'tock' niet gebruiken: stopwatch niet gestart met 'tick'</code><br>
+                U moet eerst de stopwatch starten door het commando <code>tick</code> te gebruiken voordat u de verstreken tijd kunt aflezen met <code>tock</code>.</td>
+            </tr>
+        </table>
+    </section>
+</main>
+
+<figure style="max-width:var(--PaperW);margin:18px auto 40px;text-align:center;padding:0 18px;">
+    <img src="../graphics/coolcoder.png" alt="Cool Coder" style="max-width:520px;width:90%;height:auto;border-radius:12px;border:1px solid #e5e7eb;" />
+</figure>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+# *****
+# Name: Reaction Time
+# Category: Game
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Measures the user's reflexes by calculating the time between a visual signal and
+# a key press. Uses the tick and tock commands for precise timing in milliseconds.
+# Employs a random delay to make the test unpredictable and prevent anticipation.
+# *****
+
+clear screen
+write " Measuring your reaction time ..."; newline
+newline
+write "When the word 'START!' appears, press the SPACE BAR."
+newline
+write "Press SPACE to begin..."
+
+# Wait until the user presses space to start the game
+as long as (not (key "SPACE" is pressed)) you do (
+    wait 10 ms
+)
+
+# Wait until the user releases the key to prevent false starts
+as long as (key "SPACE" is pressed) you do (
+    wait 10 ms
+)
+
+clear screen
+write "Ready..."; newline
+
+# Calculate a random time between 2s and 5s
+put random(2000, 5000) in RandomWait
+wait RandomWait ms
+
+
+clear screen
+write "START!"
+tick # Start the stopwatch
+
+# Wait loop: runs as long as the space bar is NOT pressed
+as long as (not (key "SPACE" is pressed)) you do (
+    wait 1 ms
+)
+
+# As soon as the loop breaks (key pressed), we read the time with tock
+put tock in ReactionTime
+
+newline
+write "Reaction time: " + ReactionTime + " ms."; newline
+
+newline
+if (ReactionTime < 250) then (
+    write "Congratulations, lightning-fast reflexes!"
+) otherwise (
+    write "You can do better..."
+)

@@ -1,0 +1,252 @@
+# *****
+# Name: Verzamel en Ontsnap
+# Category: Game
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Een complete videogame met een basis physics-engine. Bestuur de blauwe cirkel
+# met de pijltjestoetsen om voedsel te verzamelen en vijanden te ontwijken.
+# Implementeert vectoren, snelheid, traagheidsversnelling en botsingsdetectie.
+# *****
+
+# Verzamel en Ontsnap
+# Beweeg de blauwe cirkel.
+# Verzamel de energiedeeltjes (lichtblauwe vierkanten).
+# Als een driehoek je raakt, verlies je een leven.
+# Je begint met 3 levens. Druk op 'x' om af te sluiten.
+
+# --- Begininstellingen ---
+
+# Globale statusvariabelen
+zet 0 in X_POS
+zet 0 in Y_POS
+zet 5 in SNELHEID
+zet 0 in AFSLUITEN 
+zet 0 in Score
+zet 0 in VOEDSEL_X
+zet 0 in VOEDSEL_Y
+zet 3 in LEVENS
+zet 0 in GAME_OVER
+
+# Constanten voor afmetingen
+zet 20 in SPELER_STRAAL
+zet 18 in DRIEHOEK_STRAAL # effectieve straal die dichter bij de getekende driehoek ligt
+zet 15 in VOEDSEL_GROOTTE
+zet 220 in SPEELGEBIED 
+
+# --- Fysicavariabelen ---
+zet 10 in DRIEHOEK_MASSA
+zet 20 in K_VEER
+zet 5 in C_DEMPER
+zet 50 in L_RUST
+zet 0.030 in DT          # Delta Time (komt overeen met "wacht 30 ms")
+
+# --- Lijsten voor Driehoeken ---
+zet lijst() in LIJST_DRIEHOEK_X
+zet lijst() in LIJST_DRIEHOEK_Y
+zet lijst() in LIJST_DRIEHOEK_VX
+zet lijst() in LIJST_DRIEHOEK_VY
+
+# Stel achtergrondkleur in (wit)
+stel kleur in (100, 100, 100)
+vul achtergrond in
+
+# --- Definieer Procedures ---
+
+definieer procedure plaats_voedsel () (
+    globaal VOEDSEL_X, VOEDSEL_Y, SPEELGEBIED
+    zet willekeurig(-SPEELGEBIED, SPEELGEBIED) in VOEDSEL_X
+    zet willekeurig(-SPEELGEBIED, SPEELGEBIED) in VOEDSEL_Y
+)
+
+# Voegt een driehoek toe die de speler niet overlapt
+definieer procedure voeg_driehoek_toe () (
+    globaal LIJST_DRIEHOEK_X, LIJST_DRIEHOEK_Y, LIJST_DRIEHOEK_VX, LIJST_DRIEHOEK_VY
+    globaal SPEELGEBIED, X_POS, Y_POS
+
+    zet willekeurig(-SPEELGEBIED, SPEELGEBIED) in TX
+    zet willekeurig(-SPEELGEBIED, SPEELGEBIED) in TY
+
+    zet TX - X_POS in DX
+    zet TY - Y_POS in DY
+    zet wortel((DX*DX) + (DY*DY)) in D
+
+    als (D < 120) dan (
+        als (abs(DX) > abs(DY)) dan (
+            als (DX >= 0) dan ( zet SPEELGEBIED in TX ) anders ( zet -SPEELGEBIED in TX )
+        ) anders (
+            als (DY >= 0) dan ( zet SPEELGEBIED in TY ) anders ( zet -SPEELGEBIED in TY )
+        )
+    )
+
+    voeg TX toe aan LIJST_DRIEHOEK_X
+    voeg TY toe aan LIJST_DRIEHOEK_Y
+    voeg 0 toe aan LIJST_DRIEHOEK_VX
+    voeg 0 toe aan LIJST_DRIEHOEK_VY
+
+    schrijf "Een nieuwe rode driehoek is verschenen!"
+    nieuwe regel
+)
+
+definieer procedure update_spel () (
+    globaal X_POS, Y_POS, AFSLUITEN, SNELHEID, LEVENS, GAME_OVER
+    globaal Score, VOEDSEL_X, VOEDSEL_Y, VOEDSEL_GROOTTE, SPELER_STRAAL, DRIEHOEK_STRAAL, SPEELGEBIED
+    globaal DRIEHOEK_MASSA, K_VEER, C_DEMPER, L_RUST, DT
+    globaal LIJST_DRIEHOEK_X, LIJST_DRIEHOEK_Y, LIJST_DRIEHOEK_VX, LIJST_DRIEHOEK_VY
+
+    # 1. Spelerbeweging
+    als (toets "UP" is ingedrukt) dan ( zet Y_POS + SNELHEID in Y_POS )
+    als (toets "DOWN" is ingedrukt) dan ( zet Y_POS - SNELHEID in Y_POS )
+    als (toets "LEFT" is ingedrukt) dan ( zet X_POS - SNELHEID in X_POS )
+    als (toets "RIGHT" is ingedrukt) dan ( zet X_POS + SNELHEID in X_POS )
+    als (toets "X" is ingedrukt) dan ( zet 1 in AFSLUITEN )
+
+    # --- 2. FYSICA en BOTSINGEN DRIEHOEKEN ---
+    zet lengte van LIJST_DRIEHOEK_X in NUM_DRIEHOEKEN
+
+    als (NUM_DRIEHOEKEN > 0) dan (
+        teller i loopt van 1 tot NUM_DRIEHOEKEN en je doet (
+            zet element i van LIJST_DRIEHOEK_X in T_X
+            zet element i van LIJST_DRIEHOEK_Y in T_Y
+            zet element i van LIJST_DRIEHOEK_VX in T_VX
+            zet element i van LIJST_DRIEHOEK_VY in T_VY
+
+            zet X_POS - T_X in VETTORE_X
+            zet Y_POS - T_Y in VETTORE_Y
+            zet wortel((VETTORE_X * VETTORE_X) + (VETTORE_Y * VETTORE_Y)) in AFSTAND
+            zet 0 in UITREKKING
+            als (AFSTAND > 0.1) dan ( zet AFSTAND - L_RUST in UITREKKING )
+            zet K_VEER * UITREKKING in VEERKRACHT_MAG
+
+            zet 0 in DIR_X
+            zet 0 in DIR_Y
+            als (AFSTAND > 0) dan (
+                zet VETTORE_X / AFSTAND in DIR_X
+                zet VETTORE_Y / AFSTAND in DIR_Y
+            )
+
+            zet (VEERKRACHT_MAG * DIR_X) - (C_DEMPER * T_VX) in TOT_KRACHT_X
+            zet (VEERKRACHT_MAG * DIR_Y) - (C_DEMPER * T_VY) in TOT_KRACHT_Y
+            zet TOT_KRACHT_X / DRIEHOEK_MASSA in ACCEL_X
+            zet TOT_KRACHT_Y / DRIEHOEK_MASSA in ACCEL_Y
+            zet T_VX + (ACCEL_X * DT) in T_VX_NEW
+            zet T_VY + (ACCEL_Y * DT) in T_VY_NEW
+            zet T_X + (T_VX_NEW * DT) in T_X_NEW
+            zet T_Y + (T_VY_NEW * DT) in T_Y_NEW
+
+            zet T_X_NEW in element i van LIJST_DRIEHOEK_X
+            zet T_Y_NEW in element i van LIJST_DRIEHOEK_Y
+            zet T_VX_NEW in element i van LIJST_DRIEHOEK_VX
+            zet T_VY_NEW in element i van LIJST_DRIEHOEK_VY
+
+            # --- Botsing Speler-Driehoek ---
+            zet T_X_NEW - X_POS in AFST_TX
+            zet T_Y_NEW - Y_POS in AFST_TY
+            zet (AFST_TX * AFST_TX) + (AFST_TY * AFST_TY) in AFST_T_K
+            zet SPELER_STRAAL + DRIEHOEK_STRAAL in R_TOT_T
+            zet R_TOT_T * R_TOT_T in R_TOT_T_K
+
+            als (AFST_T_K < R_TOT_T_K) dan (
+                zet LEVENS - 1 in LEVENS
+                als (LEVENS <= 0) dan (
+                    zet 1 in GAME_OVER
+                ) anders (
+                    schrijf "LEVEN VERLOREN! Levens over: "
+                    schrijf LEVENS
+                    nieuwe regel
+                    zet 0 in X_POS
+                    zet 0 in Y_POS
+                    teller j loopt van 1 tot NUM_DRIEHOEKEN en je doet (
+                        zet willekeurig(-SPEELGEBIED, SPEELGEBIED) in element j van LIJST_DRIEHOEK_X
+                        zet willekeurig(-SPEELGEBIED, SPEELGEBIED) in element j van LIJST_DRIEHOEK_Y
+                        zet 0 in element j van LIJST_DRIEHOEK_VX
+                        zet 0 in element j van LIJST_DRIEHOEK_VY
+                    )
+                    wacht 500 ms
+                )
+            )
+        )
+    )
+
+    # --- 3. Botsingslogica Voedsel ---
+    zet X_POS - VOEDSEL_X in AFST_X
+    zet Y_POS - VOEDSEL_Y in AFST_Y
+    zet (AFST_X * AFST_X) + (AFST_Y * AFST_Y) in AFST_KWADRAAT
+    zet SPELER_STRAAL + (VOEDSEL_GROOTTE / 2) in TOTALE_STRAAL
+    zet TOTALE_STRAAL * TOTALE_STRAAL in TOTALE_STRAAL_K
+
+    als (AFST_KWADRAAT < TOTALE_STRAAL_K) dan (
+        zet Score + 1 in Score
+        schrijf "Score: "
+        schrijf Score
+        nieuwe regel
+        plaats_voedsel()
+        voeg_driehoek_toe()
+    )
+
+    # --- 4. Update de grafiek ---
+    zet lengte van LIJST_DRIEHOEK_X in NUM_DRIEHOEKEN
+    wis canvas
+    stel kleur in (100, 100, 100)
+    vul achtergrond in
+
+    # Teken de Speler (Blauw) als eerste
+    stel kleur in (0, 0, 100)
+    cirkel straal SPELER_STRAAL op (X_POS, Y_POS)
+
+    # Teken Voedsel (Lichtblauw)
+    stel kleur in (50, 80, 100)
+    zet VOEDSEL_X - (VOEDSEL_GROOTTE / 2) in VOEDSEL_X1
+    zet VOEDSEL_Y - (VOEDSEL_GROOTTE / 2) in VOEDSEL_Y1
+    zet VOEDSEL_X + (VOEDSEL_GROOTTE / 2) in VOEDSEL_X2
+    zet VOEDSEL_Y + (VOEDSEL_GROOTTE / 2) in VOEDSEL_Y2
+    rechthoek van (VOEDSEL_X1, VOEDSEL_Y1) tot (VOEDSEL_X2, VOEDSEL_Y2)
+
+    # Teken Driehoeken en Veren boven de speler
+    als (NUM_DRIEHOEKEN > 0) dan (
+        teller i loopt van 1 tot NUM_DRIEHOEKEN en je doet (
+            zet element i van LIJST_DRIEHOEK_X in T_X
+            zet element i van LIJST_DRIEHOEK_Y in T_Y
+
+            stel kleur in (50, 50, 50)
+            lijn dikte 2 van (X_POS, Y_POS) tot (T_X, T_Y)
+
+            stel kleur in (100, 0, 0)
+            driehoek met hoekpunten punt(T_X, T_Y + 15), punt(T_X - 10, T_Y - 10), punt(T_X + 10, T_Y - 10)
+        )
+    )
+
+    # HUD
+    stel kleur in (0, 0, 0)
+    graffiti grootte 16 op (-SPEELGEBIED - 20, SPEELGEBIED + 20) "Score: " + Score
+    graffiti grootte 16 op (-SPEELGEBIED - 20, SPEELGEBIED) "Levens: " + LEVENS
+
+    teken opnieuw
+)
+
+# --- Hoofdlus van het spel ---
+plaats_voedsel()
+
+zolang (AFSLUITEN is 0 en GAME_OVER is 0) je doet (
+    update_spel()
+    wacht 30 ms 
+)
+
+# --- Eindscherm ---
+als (GAME_OVER is 1) dan (
+    wis canvas
+    stel kleur in (100, 100, 100)
+    vul achtergrond in
+    stel kleur in (100, 0, 0)
+    graffiti grootte 50 op (-130, 20) "GAME OVER"
+    stel kleur in (0, 0, 0)
+    graffiti grootte 20 op (-90, -40) "Eindscore: " + Score
+    teken opnieuw
+) anders (
+    schrijf "Spel afgelopen! Eindscore: "
+    schrijf Score
+    nieuwe regel
+)
+stop

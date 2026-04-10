@@ -1,0 +1,157 @@
+# *****
+# Name: Mandelbrot-fractaal
+# Category: Maths, Graphics
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Progressieve weergave van de Mandelbrotverzameling, een beroemde wiskundige
+# fractaal. Maakt gebruik van een "ontsnappingsalgoritme" op complexe getallen die
+# op het pixelraster in kaart zijn gebracht. Het programma stelt je in staat
+# verschillende gebieden van de fractaal te verkennen door de coördinaten in het
+# configuratiegedeelte te decommentariëren.
+# *****
+
+wis canvas
+wis scherm
+
+# ==========================================
+#     SELECTIE VAN DE BESTEMMING
+# ==========================================
+# Instructies: Haal ALLEEN de opmerkingen (verwijder #) weg 
+# bij het blok van het gebied dat je wilt bezoeken. Commentarieer de anderen.
+
+# --- 1. STANDAARDWEERGAVE (De gehele verzameling) ---
+ zet -0.75 in CENTRUM_X
+ zet 0.0   in CENTRUM_Y
+ zet 140   in ZOOM
+ zet 80    in MAX_ITERATIES
+
+# --- 2. ZEEPAARDJESVALLEI (Seahorse Valley) ---
+# zet -0.748 in CENTRUM_X
+# zet 0.1    in CENTRUM_Y
+# zet 3000   in ZOOM
+# zet 300    in MAX_ITERATIES
+
+# --- 3. DE SATELLIET (Mini Mandelbrot) ---
+# zet -1.7685 in CENTRUM_X
+# zet 0.0005  in CENTRUM_Y
+# zet 1000    in ZOOM
+# zet 200     in MAX_ITERATIES
+
+# --- 4. OLIFANTENVALLEI ---
+# zet 0.275 in CENTRUM_X
+# zet 0.006 in CENTRUM_Y
+# zet 2500  in ZOOM
+# zet 200   in MAX_ITERATIES
+
+# --- 5. DIEPE SPIRAAL (Deep Zoom) ---
+# zet -0.743643 in CENTRUM_X
+# zet 0.131825  in CENTRUM_Y
+# zet 40000     in ZOOM
+# zet 1200      in MAX_ITERATIES
+
+# ==========================================
+#                EINDE CONFIGURATIE
+# ==========================================
+
+# --- Vensterafmetingen (Hoge Resolutie) ---
+# Veelvouden van 32 om restblokken te vermijden
+zet 416 in HALVE_BREEDTE
+zet 320 in HALVE_HOOGTE
+
+# Berekening randen voor renderen
+zet -HALVE_BREEDTE in X_START
+zet  HALVE_BREEDTE in X_END
+zet -HALVE_HOOGTE   in Y_START
+zet  HALVE_HOOGTE   in Y_END
+
+# --- SETUP CAMERA ---
+# We zetten de framing vast op het maximale gebied voordat we beginnen met rekenen
+rechthoek van (X_START, Y_START) tot (X_END, Y_END)
+toon alles
+wis canvas
+
+# --- Logica Progressieve Rendering ---
+zet 32 in HUIDIGE_STAP
+zet 1  in MINIMUM_STAP
+zet 0  in MARGE
+
+schrijf "Renderen gecentreerd op (" + CENTRUM_X + ", " + CENTRUM_Y + ")"
+nieuwe regel
+
+zolang (HUIDIGE_STAP >= MINIMUM_STAP) je doet (
+    globaal HUIDIGE_STAP, Py
+    
+    schrijf "Detail verfijnen (Stap: " + HUIDIGE_STAP + ")..."
+    # We gaan niet naar een nieuwe regel voor een schonere console
+
+    # --- RIJLUS (Y) ---
+    zet Y_START in Py
+    
+    zolang (Py < Y_END) je doet (
+        globaal Py, Px
+        
+        # --- KOLOMLUS (X) ---
+        zet X_START in Px
+        
+        zolang (Px < X_END) je doet (
+            globaal Px, zx, zy, iter, straalKwadraat, tempX
+            
+            # 1. Coördinaten in kaart brengen
+            zet (Px / ZOOM) + CENTRUM_X in cx
+            zet (Py / ZOOM) + CENTRUM_Y in cy
+            
+            # 2. Initialisatie Mandelbrot
+            zet 0 in zx
+            zet 0 in zy
+            zet 0 in iter
+            zet 0 in straalKwadraat
+            
+            # 3. Ontsnappingslus
+            zolang ((straalKwadraat < 4) en (iter < MAX_ITERATIES)) je doet (
+                globaal zx, zy, iter, straalKwadraat, tempX
+                
+                zet (zx * zx) - (zy * zy) + cx in tempX
+                zet (2 * zx * zy) + cy in zy
+                zet tempX in zx
+                zet (zx * zx) + (zy * zy) in straalKwadraat
+                zet iter + 1 in iter
+            )
+
+            # 4. Kleuring (CORRECT 0-100)
+            als (iter == MAX_ITERATIES) dan (
+                stel kleur in (0, 0, 0)
+            ) anders (
+                # Sinusoïdaal palet aangepast voor Matita (0-100)
+                # 50 is het centrum, 50 is de amplitude. Max resultaat 100.
+                zet 0.1 in freq 
+                zet 50 + 50 * sin(freq * iter + 0.0) in R
+                zet 50 + 50 * sin(freq * iter + 2.0) in G
+                zet 50 + 50 * sin(freq * iter + 4.0) in B
+                stel kleur in (R, G, B)
+            )
+
+            # 5. Pixel Tekenen
+            rechthoek van (Px, Py) tot (Px + HUIDIGE_STAP + 1, Py + HUIDIGE_STAP + 1)
+
+            # Ga naar volgende kolom
+            zet Px + HUIDIGE_STAP in Px
+        )
+        
+        # Scherm bijwerken
+        teken opnieuw
+        wacht 0 ms 
+        
+        # Ga naar volgende rij
+        zet Py + HUIDIGE_STAP in Py
+    )
+
+    # Verhoog resolutie
+    zet HUIDIGE_STAP / 2 in HUIDIGE_STAP
+)
+
+nieuwe regel
+schrijf "Afbeelding voltooid!"
+toon alles

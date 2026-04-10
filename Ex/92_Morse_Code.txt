@@ -1,0 +1,41 @@
+# *****
+# Name: Morse Code
+# Category: Programming
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Translates a sentence entered by the user into Morse code. Splits the text into
+# characters and uses Unicode calculations to find the index in the code list.
+# Processes the translation letter by letter, converting spaces into visual
+# pauses.
+# *****
+
+# 'a', 'b', 'c', etc. in Morse code:
+put (".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", \
+"..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", \
+".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--..") \
+in morseAlphabet
+
+get text saying "Enter the text to translate in lowercase:"
+put split(text) in charList
+clear screen
+write "Text: " + text; newline
+write "Morse: "
+
+put unicode("a") in IndexA
+
+for each letter in charList you do (
+    put unicode(letter) - IndexA + 1 in j
+    if (j >= 1 and j <= 26) then (
+        put item j of morseAlphabet in code
+        write code + " "
+    ) otherwise (
+        if (letter equals " ") then (
+            write "   " 
+        ) otherwise (
+            write "?"
+        )
+    )
+)

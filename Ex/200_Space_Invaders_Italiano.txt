@@ -1,0 +1,363 @@
+# *****
+# Name: Space Invaders (Old)
+# Category: Game
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Una versione completa del classico gioco arcade, interamente localizzata in
+# italiano. Gestisce sprite multipli, movimento nemico a sciame e input del
+# giocatore. Include logica per proiettili, scudi distruttibili e punteggio.
+# *****
+
+# ------------------------------------------------------------------
+# --------------------   MATITA: SPACE INVADERS   ------------------   
+# ------------------------------------------------------------------
+
+# --- COLORI ---
+metti (0, 0, 0) in Nero
+metti (20, 100, 30) in Verde
+metti (100, 100, 100) in Bianco
+metti (100, 20, 20) in Rosso
+metti (100, 100, 20) in Giallo
+
+# --- SPRITE ---
+etichetta (
+  imposta colore Verde
+  rettangolo da (-20, -10) a (20, -6)
+  rettangolo da (-15, -6) a (15, 0)
+  rettangolo da (-5, 0) a (5, 8)
+) come NaveGiocatore
+
+etichetta (
+  imposta colore Bianco
+  rettangolo da (-12, -8) a (12, 8)
+  rettangolo da (-8, 8) a (-4, 12)
+  rettangolo da (4, 8) a (8, 12)
+  imposta colore Nero
+  rettangolo da (-6, -2) a (-2, 2)
+  rettangolo da (2, -2) a (6, 2)
+) come Alieno1
+
+etichetta (
+  imposta colore Bianco
+  rettangolo da (-12, -8) a (12, 8)
+  rettangolo da (-12, 4) a (-8, 8)
+  rettangolo da (8, 4) a (12, 8)
+  imposta colore Nero
+  rettangolo da (-6, -2) a (-2, 2)
+  rettangolo da (2, -2) a (6, 2)
+) come Alieno2
+
+etichetta (
+  imposta colore Giallo
+  rettangolo da (-10, -2) a (10, 2)
+  rettangolo da (-2, -10) a (2, 10)
+  imposta colore Bianco
+  rettangolo da (-6, -6) a (6, 6)
+) come Esplosione
+
+# --- CONFIGURAZIONE ---
+metti 300 in LarghezzaSchermo
+metti 240 in LivelloGiocatoreY
+metti -220 in GiocatoreY
+metti 6 in VelocitaGiocatore
+metti 9 in VelocitaProiettile
+metti 4 in VelocitaBomba
+metti 12 in LarghezzaAlieno
+metti 8 in AltezzaAlieno
+metti 5 in DimBloccoScudo
+metti 8 in DurataEsplosione
+
+# --- STATO INIZIALE ---
+metti 0 in Punteggio
+metti 3 in Vite
+metti 0 in GiocatoreX
+metti falso in ProiettileAttivo
+metti punto(0, 0) in Proiettile
+metti lista() in Alieni
+metti -180 in StormoX
+metti 150 in StormoY
+metti 1 in DirezioneStormo
+metti 3 in PassoStormoX
+metti -40 in PassoStormoY
+metti 10 in RitardoStormo
+metti RitardoStormo in RitardoAttuale
+metti 0 in TimerStormo
+metti 1 in FrameAnimazione
+metti 0 in TimerAnimazione
+metti lista() in Bombe
+metti 96 in ProbabilitaBomba
+metti lista() in Esplosioni
+metti 0 in TimerFlashRosso
+
+# Generazione Alieni
+indice riga va da 0 a 4 ed esegui (
+  indice col va da 0 a 10 ed esegui (
+    aggiungi punto(col * 40, riga * -35) a Alieni
+  )
+)
+metti dimensione di Alieni in TotaleAlieni
+
+# --- GENERAZIONE SCUDI ---
+metti lista() in BlocchiScudo
+metti -170 in ScudoY
+metti lista(-210, -70, 70, 210) in PosizioniScudi
+
+per ogni CentroX in PosizioniScudi esegui (
+  indice riga va da 0 a 4 ed esegui (
+    indice col va da -5 a 5 ed esegui (
+      se non (riga < 2 e col > -3 e col < 3) allora (
+        aggiungi punto(CentroX + col * DimBloccoScudo, ScudoY + riga * DimBloccoScudo) a BlocchiScudo
+      )
+    )
+  )
+)
+
+metti DimBloccoScudo / 2 in MezzoBlocco
+
+# Costanti calcolate
+metti -LarghezzaSchermo in SchermoSinistra
+metti LarghezzaSchermo in SchermoDestra
+metti GiocatoreY - 10 in HitBoxGiocatoreBasso
+metti GiocatoreY + 10 in HitBoxGiocatoreAlto
+metti ScudoY + 25 in TopBarriereY
+
+cancella schermo
+scrivi "Matita Space Invaders"
+
+# --- CICLO DI GIOCO ---
+fintanto Vite > 0 e dimensione di Alieni > 0 esegui (
+  globale GiocatoreX, ProiettileAttivo, Proiettile, TimerStormo, StormoX, StormoY
+  globale RitardoAttuale, TimerAnimazione, FrameAnimazione, Vite, Punteggio
+  globale Alieni, Bombe, BlocchiScudo, Esplosioni, DirezioneStormo, TimerFlashRosso
+
+  # 1. GRAFICA E SFONDO
+  cancella grafica
+  
+  # Gestione Flash Rosso
+  se TimerFlashRosso > 0 allora (
+    imposta colore Rosso
+    dipingi sfondo
+    metti TimerFlashRosso - 1 in TimerFlashRosso
+  ) altrimenti (
+    imposta colore Nero
+    dipingi sfondo
+  )
+
+  # Fix zoom (Rettangolo nero di base)
+  imposta colore Nero
+  rettangolo da (-320, -260) a (320, 260)
+
+  # Console Output
+  cancella schermo
+  scrivi "PUNTEGGIO: "
+  scrivi Punteggio
+  scrivi "    VITE: "
+  scrivi Vite
+
+  metti dimensione di Alieni in NumAlieni
+
+  # 2. CONTROLLI
+  se (tasto "LEFT" premuto) e GiocatoreX > SchermoSinistra allora (
+    metti GiocatoreX - VelocitaGiocatore in GiocatoreX
+  )
+  se (tasto "RIGHT" premuto) e GiocatoreX < SchermoDestra allora (
+    metti GiocatoreX + VelocitaGiocatore in GiocatoreX
+  )
+  se (tasto "SPACE" premuto) e ProiettileAttivo vale falso allora (
+    metti vero in ProiettileAttivo
+    metti punto(GiocatoreX, GiocatoreY + 20) in Proiettile
+  )
+  se (tasto "X" premuto) allora ( stop )
+
+  # 3. LOGICA ALIENI
+  metti TimerStormo + 1 in TimerStormo
+  se TimerStormo >= RitardoAttuale allora (
+    metti 0 in TimerStormo
+    metti StormoX + (PassoStormoX * DirezioneStormo) in StormoX
+    metti TimerAnimazione + 1 in TimerAnimazione
+    se TimerAnimazione > 1 allora (
+      metti 0 in TimerAnimazione
+      se FrameAnimazione uguale 1 allora ( metti 2 in FrameAnimazione ) altrimenti ( metti 1 in FrameAnimazione )
+    )
+    
+    metti falso in MuroColpito
+    per ogni alieno in Alieni esegui (
+      metti StormoX + x di alieno in AX
+      se (AX > SchermoDestra e DirezioneStormo uguale 1) o (AX < SchermoSinistra e DirezioneStormo uguale -1) allora (
+        metti vero in MuroColpito
+      )
+    )
+    se MuroColpito vale vero allora (
+      metti DirezioneStormo * -1 in DirezioneStormo
+      metti StormoY + PassoStormoY in StormoY
+    )
+  )
+
+  se casuale(1, 100) > ProbabilitaBomba e NumAlieni > 0 allora (
+    metti elemento casuale(1, NumAlieni) di Alieni in AlienoSparante
+    aggiungi punto(StormoX + x di AlienoSparante, StormoY + y di AlienoSparante) a Bombe
+  )
+
+  # 4. COLLISIONI
+  
+  # A. Proiettile AMICO vs SCUDI
+  se ProiettileAttivo vale vero allora (
+    metti lista() in BlocchiSopravvissuti
+    per ogni blocco in BlocchiScudo esegui (
+      metti vero in TieniBlocco
+      metti x di blocco in SX
+      metti y di blocco in SY
+      metti x di Proiettile in BX
+      se abs(BX - SX) < MezzoBlocco e (y di Proiettile < SY + MezzoBlocco) e (y di Proiettile + VelocitaProiettile >= SY - MezzoBlocco) allora (
+        metti falso in TieniBlocco
+        metti falso in ProiettileAttivo
+      )
+      se TieniBlocco vale vero allora ( aggiungi blocco a BlocchiSopravvissuti )
+    )
+    metti BlocchiSopravvissuti in BlocchiScudo
+  )
+
+  # B. Proiettile AMICO vs ALIENI
+  se ProiettileAttivo vale vero allora (
+    metti y di Proiettile + VelocitaProiettile in ProiettileNextY
+    metti x di Proiettile in BX
+    metti lista() in AlieniSopravvissuti
+    per ogni alieno in Alieni esegui (
+      metti vero in TieniAlieno
+      metti StormoX + x di alieno in AX
+      metti StormoY + y di alieno in AY
+      se abs(BX - AX) < LarghezzaAlieno e y di Proiettile < AY + AltezzaAlieno e ProiettileNextY >= AY - AltezzaAlieno allora (
+        metti falso in ProiettileAttivo
+        metti falso in TieniAlieno
+        metti Punteggio + 10 in Punteggio
+        metti RitardoStormo * (dimensione di Alieni / TotaleAlieni) in RitardoAttuale
+        aggiungi (punto(AX, AY), DurataEsplosione) a Esplosioni
+      )
+      se TieniAlieno vale vero allora ( aggiungi alieno a AlieniSopravvissuti )
+    )
+    metti AlieniSopravvissuti in Alieni
+  )
+
+  # C. Bombe NEMICHE vs GIOCATORE e SCUDI
+  metti lista() in BombeSopravvissute
+  per ogni bomba in Bombe esegui (
+    metti vero in BombaAttiva
+    metti x di bomba in BX
+    metti y di bomba in BY
+    metti BY - VelocitaBomba in BombaNextY
+
+    # Colpisce Giocatore?
+    se abs(BX - GiocatoreX) < 20 e BY >= HitBoxGiocatoreBasso e BombaNextY < HitBoxGiocatoreAlto allora (
+      metti Vite - 1 in Vite
+      metti falso in BombaAttiva
+      metti 25 in TimerFlashRosso
+      aggiungi (punto(GiocatoreX, GiocatoreY), DurataEsplosione) a Esplosioni
+    )
+
+    # Colpisce Scudi?
+    se BombaAttiva vale vero allora (
+      metti lista() in BlocchiSopravvissuti
+      per ogni blocco in BlocchiScudo esegui (
+        metti vero in TieniBlocco
+        metti x di blocco in SX
+        metti y di blocco in SY
+        # Collisione Scudo
+        se abs(BX - SX) < MezzoBlocco e BY >= (SY - MezzoBlocco) e BombaNextY < SY + MezzoBlocco allora (
+          metti falso in TieniBlocco
+          metti falso in BombaAttiva
+          aggiungi (punto(SX, SY), 2) a Esplosioni
+        )
+        se TieniBlocco vale vero allora ( aggiungi blocco a BlocchiSopravvissuti )
+      )
+      metti BlocchiSopravvissuti in BlocchiScudo
+    )
+    
+    se BombaAttiva vale vero allora ( aggiungi bomba a BombeSopravvissute )
+  )
+  metti BombeSopravvissute in Bombe
+
+  # D. Controllo INVASIONE
+  per ogni alieno in Alieni esegui (
+    metti StormoY + y di alieno in PosYAlieno
+    se (PosYAlieno < GiocatoreY - 10) allora ( metti 0 in Vite )
+  )
+
+  # 5. FISICA
+  se ProiettileAttivo vale vero allora (
+    imposta y di Proiettile a (y di Proiettile + VelocitaProiettile)
+    se y di Proiettile > LivelloGiocatoreY allora ( metti falso in ProiettileAttivo )
+  )
+
+  metti lista() in BombeAttive
+  per ogni bomba in Bombe esegui (
+    imposta y di bomba a (y di bomba - VelocitaBomba)
+    se y di bomba > -LivelloGiocatoreY allora ( aggiungi bomba a BombeAttive )
+  )
+  metti BombeAttive in Bombe
+  
+  metti lista() in EsplosioniAttive
+  per ogni exp in Esplosioni esegui (
+    metti elemento 1 di exp in PosExp
+    metti elemento 2 di exp in TimerExp
+    metti TimerExp - 1 in TimerExp
+    se TimerExp > 0 allora ( aggiungi (PosExp, TimerExp) a EsplosioniAttive )
+  )
+  metti EsplosioniAttive in Esplosioni
+
+  # 6. DISEGNO
+  se FrameAnimazione uguale 1 allora (
+    per ogni alieno in Alieni esegui ( disegna Alieno1 in punto(StormoX + x di alieno, StormoY + y di alieno) )
+  ) altrimenti (
+    per ogni alieno in Alieni esegui ( disegna Alieno2 in punto(StormoX + x di alieno, StormoY + y di alieno) )
+  )
+  
+  per ogni exp in Esplosioni esegui ( disegna Esplosione in (elemento 1 di exp) )
+
+  disegna NaveGiocatore in punto(GiocatoreX, GiocatoreY)
+  
+  imposta colore Verde
+  per ogni blocco in BlocchiScudo esegui (
+    metti x di blocco - MezzoBlocco in x1
+    metti y di blocco - MezzoBlocco in y1
+    metti x di blocco + MezzoBlocco in x2
+    metti y di blocco + MezzoBlocco in y2
+    rettangolo da (x1, y1) a (x2, y2)
+  )
+
+  se ProiettileAttivo vale vero allora (
+    imposta colore Bianco
+    rettangolo da (x di Proiettile - 2, y di Proiettile - 8) a (x di Proiettile + 2, y di Proiettile + 8)
+  )
+
+  imposta colore Rosso
+  per ogni bomba in Bombe esegui (
+    rettangolo da (x di bomba - 2, y di bomba - 6) a (x di bomba + 2, y di bomba + 6)
+  )
+
+  # --- HUD VISIBILE (Disegnato per ultimo) ---
+  imposta colore Bianco
+  graffiti grandezza 12 in (-290, 230) "VITE: " + Vite
+  graffiti grandezza 12 in (-290, 210) "PUNTI: " + Punteggio
+
+  aspetta 8 ms
+  inquadra grafica
+)
+
+# --- SCHERMATA FINE GIOCO ---
+cancella grafica
+imposta colore Nero
+dipingi sfondo
+
+imposta colore Rosso
+graffiti grandezza 50 in (-130, 20) "GAME OVER"
+
+imposta colore Bianco
+graffiti grandezza 25 in (-90, -40) "PUNTI: " + Punteggio
+
+cancella schermo
+scrivi "PARTITA TERMINATA"
+scrivi "Punteggio Finale: "
+scrivi Punteggio

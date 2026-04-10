@@ -1,0 +1,34 @@
+# *****
+# Name: Velocità di Caduta
+# Category: Physics
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Calcola la velocità di impatto di un oggetto in caduta libera sulla Terra da
+# un'altezza H. Utilizza la notazione scientifica (es. 5.9e24) per gestire le
+# grandi costanti fisiche. Confronta il risultato ottenuto con la velocità del
+# suono (Mach) e la velocità di fuga.
+# *****
+
+cancella schermo
+metti 5.9722e24 in MassaTerra # kg
+metti 6371e3 in RaggioTerra # m
+metti 6.6743e-11 in G # Costante di Cavendish
+
+chiedi H dicendo "Altezza di caduta (m)? "
+
+metti radice(2*MassaTerra*G*(1/RaggioTerra - 1/(RaggioTerra+H))) in v
+decimali 3
+scrivi "Altezza di caduta: " + H; accapo
+scrivi "Velocità di caduta: "; accapo
+scrivi "    " + v + " m/s"; accapo
+scrivi "    " + v*3.6 + " km/h"; accapo; accapo
+
+metti 343 in c # velocità del suono, altezza mare 15 gradi C
+scrivi "Mach: " + v/c; accapo
+
+metti radice(2*G*MassaTerra/RaggioTerra) in VelFuga
+
+scrivi "Rispetto alla velocità di fuga: " + v/VelFuga*100 + "%"; accapo

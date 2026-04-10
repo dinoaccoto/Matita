@@ -1,0 +1,96 @@
+# *****
+# Name: Koch-sneeuwvlok
+# Category: Maths, Graphics
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: De Koch-sneeuwvlok is een van de meest bekende fractale krommen. Dit programma
+# tekent het met behulp van recursie: elke rechte lijn is verdeeld in vier
+# segmenten. De diepte van de recursie bepaalt de mate van detail van de
+# uiteindelijke fractaal.
+# *****
+
+# Programma om de Koch-sneeuwvlok-fractaal te tekenen
+#
+# We definiëren het detailniveau van de fractaal.
+# Een waarde van 4 of 5 is een goed begin.
+# Hogere waarden (6+) kunnen erg traag zijn.
+zet 6 in maxNiveau
+
+# We stellen de lijndikte en de kleur in
+zet 1 in lijnDikte
+stel kleur in (0, 40, 80) # Een donkerblauw
+
+# We berekenen de constanten voor de rotatie van 60 graden (PI/3 radialen)
+# De interpreter gebruikt Math.sin/cos, die radialen vereisen.
+zet PI / 3 in PIDERDE
+zet cos(PIDERDE) in cos60
+zet -sin(PIDERDE) in sin60
+
+#
+# Dit is de recursieve procedure die een Koch-kromme tekent
+# tussen twee punten (x1, y1) en (x2, y2).
+#
+definieer procedure tekenKoch(niveau, x1, y1, x2, y2) (
+    
+    # Basisscenario: als het niveau 0 is, teken dan een rechte lijn.
+    als (niveau == 0) dan (
+        lijn dikte lijnDikte van (x1, y1) tot (x2, y2)
+    )
+    
+    # Recursief scenario: bereken de 4 segmenten en herhaal.
+    anders (
+        # 1. Bereken de vector van punt 1 naar punt 2
+        zet x2 - x1 in dx
+        zet y2 - y1 in dy
+        
+        # 2. Vind de punten A en B, die de lijn in 3 delen verdelen
+        zet x1 + dx / 3 in ax
+        zet y1 + dy / 3 in ay
+        
+        zet x1 + dx * 2 / 3 in bx
+        zet y1 + dy * 2 / 3 in by
+        
+        # 3. Bereken het punt C (de "punt") door het segment A->B
+        #    60 graden rond het punt A te draaien.
+        zet (dx / 3) * cos60 - (dy / 3) * sin60 in cx_rel
+        zet (dx / 3) * sin60 + (dy / 3) * cos60 in cy_rel
+        
+        zet ax + cx_rel in cx
+        zet ay + cy_rel in cy
+        
+        # 4. Roep de procedure 4 keer op voor de nieuwe segmenten
+        tekenKoch(niveau - 1, x1, y1, ax, ay)  # P1 -> A
+        tekenKoch(niveau - 1, ax, ay, cx, cy)  # A -> C
+        tekenKoch(niveau - 1, cx, cy, bx, by)  # C -> B
+        tekenKoch(niveau - 1, bx, by, x2, y2)  # B -> P2
+    )
+)
+
+# --- HOOFDPROGRAMMA ---
+
+# We definiëren de 3 hoekpunten van een grote gelijkzijdige driehoek
+# gecentreerd op de oorsprong (0, 0).
+zet 1000 in straal
+
+# Punt 1 (bovenaan)
+zet straal * cos(PI / 2) in p1x
+zet straal * sin(PI / 2) in p1y
+
+# Punt 2 (linksonder)
+zet straal * cos(7 * PI / 6) in p2x
+zet straal * sin(7 * PI / 6) in p2y
+
+# Punt 3 (rechtsonder)
+zet straal * cos(11 * PI / 6) in p3x
+zet straal * sin(11 * PI / 6) in p3y
+
+# We tekenen de sneeuwvlok door de procedure aan te roepen
+# voor elk van de 3 zijden van de driehoek.
+tekenKoch(maxNiveau, p1x, p1y, p2x, p2y)
+tekenKoch(maxNiveau, p2x, p2y, p3x, p3y)
+tekenKoch(maxNiveau, p3x, p3y, p1x, p1y)
+
+toon alles

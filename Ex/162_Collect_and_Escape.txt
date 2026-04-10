@@ -1,0 +1,252 @@
+# *****
+# Name: Collect and Escape
+# Category: Game
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: A complete video game with a basic physics engine. Control the blue circle with
+# the arrow keys to collect food and avoid enemies. Implements vectors, velocity,
+# inertial acceleration, and collision detection.
+# *****
+
+# Collect and Escape
+# Move the blue circle.
+# Collect the energy particles (light blue squares).
+# If a triangle hits you, you lose a life.
+# You start with 3 lives. Press 'X' to exit.
+
+# --- Initial Settings ---
+
+# Global state variables
+put 0 in X_POS
+put 0 in Y_POS
+put 5 in SPEED
+put 0 in EXIT_GAME 
+put 0 in Score
+put 0 in FOOD_X
+put 0 in FOOD_Y
+put 3 in LIVES
+put 0 in GAME_OVER
+
+# Size constants
+put 20 in PLAYER_RADIUS
+put 18 in TRIANGLE_RADIUS # effective radius closer to drawn triangle
+put 15 in FOOD_SIZE
+put 220 in PLAY_AREA 
+
+# --- Physics variables ---
+put 10 in TRIANGLE_MASS
+put 20 in K_SPRING
+put 5 in C_DAMPER
+put 50 in L_REST
+put 0.030 in DT          # Delta Time (corresponds to "wait 30 ms")
+
+# --- Lists for Triangles ---
+put list() in LIST_TRIANGLE_X
+put list() in LIST_TRIANGLE_Y
+put list() in LIST_TRIANGLE_VX
+put list() in LIST_TRIANGLE_VY
+
+# Set background color (white)
+set color (100, 100, 100)
+paint background
+
+# --- Define Procedures ---
+
+define procedure place_food () (
+    global FOOD_X, FOOD_Y, PLAY_AREA
+    put random(-PLAY_AREA, PLAY_AREA) in FOOD_X
+    put random(-PLAY_AREA, PLAY_AREA) in FOOD_Y
+)
+
+# Adds a triangle that doesn't overlap the player
+define procedure add_triangle () (
+    global LIST_TRIANGLE_X, LIST_TRIANGLE_Y, LIST_TRIANGLE_VX, LIST_TRIANGLE_VY
+    global PLAY_AREA, X_POS, Y_POS
+
+    put random(-PLAY_AREA, PLAY_AREA) in TX
+    put random(-PLAY_AREA, PLAY_AREA) in TY
+
+    put TX - X_POS in DX
+    put TY - Y_POS in DY
+    put squareroot((DX*DX) + (DY*DY)) in D
+
+    if (D < 120) then (
+        if (abs(DX) > abs(DY)) then (
+            if (DX >= 0) then ( put PLAY_AREA in TX ) otherwise ( put -PLAY_AREA in TX )
+        ) otherwise (
+            if (DY >= 0) then ( put PLAY_AREA in TY ) otherwise ( put -PLAY_AREA in TY )
+        )
+    )
+
+    add TX to LIST_TRIANGLE_X
+    add TY to LIST_TRIANGLE_Y
+    add 0 to LIST_TRIANGLE_VX
+    add 0 to LIST_TRIANGLE_VY
+
+    write "A new red triangle has appeared!"
+    newline
+)
+
+define procedure update_game () (
+    global X_POS, Y_POS, EXIT_GAME, SPEED, LIVES, GAME_OVER
+    global Score, FOOD_X, FOOD_Y, FOOD_SIZE, PLAYER_RADIUS, TRIANGLE_RADIUS, PLAY_AREA
+    global TRIANGLE_MASS, K_SPRING, C_DAMPER, L_REST, DT
+    global LIST_TRIANGLE_X, LIST_TRIANGLE_Y, LIST_TRIANGLE_VX, LIST_TRIANGLE_VY
+
+    # 1. Player movement
+    if (key "UP" is pressed) then ( put Y_POS + SPEED in Y_POS )
+    if (key "DOWN" is pressed) then ( put Y_POS - SPEED in Y_POS )
+    if (key "LEFT" is pressed) then ( put X_POS - SPEED in X_POS )
+    if (key "RIGHT" is pressed) then ( put X_POS + SPEED in X_POS )
+    if (key "X" is pressed) then ( put 1 in EXIT_GAME )
+
+    # --- 2. PHYSICS and TRIANGLE COLLISIONS ---
+    put dimension of LIST_TRIANGLE_X in NUM_TRIANGLES
+
+    if (NUM_TRIANGLES > 0) then (
+        index i goes from 1 to NUM_TRIANGLES and you do (
+            put item i of LIST_TRIANGLE_X in T_X
+            put item i of LIST_TRIANGLE_Y in T_Y
+            put item i of LIST_TRIANGLE_VX in T_VX
+            put item i of LIST_TRIANGLE_VY in T_VY
+
+            put X_POS - T_X in VECTOR_X
+            put Y_POS - T_Y in VECTOR_Y
+            put squareroot((VECTOR_X * VECTOR_X) + (VECTOR_Y * VECTOR_Y)) in DISTANCE
+            put 0 in EXTENSION
+            if (DISTANCE > 0.1) then ( put DISTANCE - L_REST in EXTENSION )
+            put K_SPRING * EXTENSION in SPRING_FORCE_MAG
+
+            put 0 in DIR_X
+            put 0 in DIR_Y
+            if (DISTANCE > 0) then (
+                put VECTOR_X / DISTANCE in DIR_X
+                put VECTOR_Y / DISTANCE in DIR_Y
+            )
+
+            put (SPRING_FORCE_MAG * DIR_X) - (C_DAMPER * T_VX) in TOT_FORCE_X
+            put (SPRING_FORCE_MAG * DIR_Y) - (C_DAMPER * T_VY) in TOT_FORCE_Y
+            put TOT_FORCE_X / TRIANGLE_MASS in ACCEL_X
+            put TOT_FORCE_Y / TRIANGLE_MASS in ACCEL_Y
+            put T_VX + (ACCEL_X * DT) in T_VX_NEW
+            put T_VY + (ACCEL_Y * DT) in T_VY_NEW
+            put T_X + (T_VX_NEW * DT) in T_X_NEW
+            put T_Y + (T_VY_NEW * DT) in T_Y_NEW
+
+            put T_X_NEW in item i of LIST_TRIANGLE_X
+            put T_Y_NEW in item i of LIST_TRIANGLE_Y
+            put T_VX_NEW in item i of LIST_TRIANGLE_VX
+            put T_VY_NEW in item i of LIST_TRIANGLE_VY
+
+            # --- Player-Triangle Collision ---
+            put T_X_NEW - X_POS in DIST_TX
+            put T_Y_NEW - Y_POS in DIST_TY
+            put (DIST_TX * DIST_TX) + (DIST_TY * DIST_TY) in DIST_T_SQ
+            put PLAYER_RADIUS + TRIANGLE_RADIUS in R_TOT_T
+            put R_TOT_T * R_TOT_T in R_TOT_T_SQ
+
+            if (DIST_T_SQ < R_TOT_T_SQ) then (
+                put LIVES - 1 in LIVES
+                if (LIVES <= 0) then (
+                    put 1 in GAME_OVER
+                ) otherwise (
+                    write "LIFE LOST! Lives left: "
+                    write LIVES
+                    newline
+                    put 0 in X_POS
+                    put 0 in Y_POS
+                    index j goes from 1 to NUM_TRIANGLES and you do (
+                        put random(-PLAY_AREA, PLAY_AREA) in item j of LIST_TRIANGLE_X
+                        put random(-PLAY_AREA, PLAY_AREA) in item j of LIST_TRIANGLE_Y
+                        put 0 in item j of LIST_TRIANGLE_VX
+                        put 0 in item j of LIST_TRIANGLE_VY
+                    )
+                    wait 500 ms
+                )
+            )
+        )
+    )
+
+    # --- 3. Food Collision Logic ---
+    put X_POS - FOOD_X in DIST_X
+    put Y_POS - FOOD_Y in DIST_Y
+    put (DIST_X * DIST_X) + (DIST_Y * DIST_Y) in DIST_SQ
+    put PLAYER_RADIUS + (FOOD_SIZE / 2) in TOTAL_RADIUS
+    put TOTAL_RADIUS * TOTAL_RADIUS in TOTAL_RADIUS_SQ
+
+    if (DIST_SQ < TOTAL_RADIUS_SQ) then (
+        put Score + 1 in Score
+        write "Score: "
+        write Score
+        newline
+        place_food()
+        add_triangle()
+    )
+
+    # --- 4. Update graphics ---
+    put dimension of LIST_TRIANGLE_X in NUM_TRIANGLES
+    clear graphics
+    set color (100, 100, 100)
+    paint background
+
+    # Draw Player (Blue) first
+    set color (0, 0, 100)
+    circle radius PLAYER_RADIUS at point(X_POS, Y_POS)
+
+    # Draw Food (Light Blue)
+    set color (50, 80, 100)
+    put FOOD_X - (FOOD_SIZE / 2) in FOOD_X1
+    put FOOD_Y - (FOOD_SIZE / 2) in FOOD_Y1
+    put FOOD_X + (FOOD_SIZE / 2) in FOOD_X2
+    put FOOD_Y + (FOOD_SIZE / 2) in FOOD_Y2
+    rectangle from point(FOOD_X1, FOOD_Y1) to point(FOOD_X2, FOOD_Y2)
+
+    # Draw Triangles and Springs above player
+    if (NUM_TRIANGLES > 0) then (
+        index i goes from 1 to NUM_TRIANGLES and you do (
+            put item i of LIST_TRIANGLE_X in T_X
+            put item i of LIST_TRIANGLE_Y in T_Y
+
+            set color (50, 50, 50)
+            line thickness 2 from point(X_POS, Y_POS) to point(T_X, T_Y)
+
+            set color (100, 0, 0)
+            triangle with vertices point(T_X, T_Y + 15), point(T_X - 10, T_Y - 10), point(T_X + 10, T_Y - 10)
+        )
+    )
+
+    # HUD
+    set color (0, 0, 0)
+    graffiti size 16 at point(-PLAY_AREA - 20, PLAY_AREA + 20) "Score: " + Score
+    graffiti size 16 at point(-PLAY_AREA - 20, PLAY_AREA) "Lives: " + LIVES
+
+    redraw
+)
+
+# --- Main Game Loop ---
+place_food()
+
+as long as (EXIT_GAME equals 0 and GAME_OVER equals 0) you do (
+    update_game()
+    wait 30 ms 
+)
+
+# --- End Screen ---
+if (GAME_OVER equals 1) then (
+    clear graphics
+    set color (100, 100, 100)
+    paint background
+    set color (100, 0, 0)
+    graffiti size 50 at (-130, 20) "GAME OVER"
+    set color (0, 0, 0)
+    graffiti size 20 at (-90, -40) "Final Score: " + Score
+    redraw
+) otherwise (
+    write "Game Ended! Final Score: "
+    write Score
+    newline
+)
+stop

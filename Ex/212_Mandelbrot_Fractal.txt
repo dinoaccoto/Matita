@@ -1,0 +1,156 @@
+# *****
+# Name: Mandelbrot Fractal
+# Category: Maths, Graphics
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Progressive rendering of the Mandelbrot set, a famous mathematical fractal. Uses
+# an "escape algorithm" on complex numbers mapped to the pixel grid. The program
+# allows you to explore different areas of the fractal by uncommenting coordinates
+# in the configuration section.
+# *****
+
+clear graphics
+clear screen
+
+# ==========================================
+#     DESTINATION SELECTION
+# ==========================================
+# Instructions: ONLY remove the comments (delete #) 
+# next to the block of the area you want to visit. Comment out the others.
+
+# --- 1. DEFAULT VIEW (The whole set) ---
+ put -0.75 in CENTER_X
+ put 0.0   in CENTER_Y
+ put 140   in ZOOM
+ put 80    in MAX_ITERATIONS
+
+# --- 2. SEAHORSE VALLEY ---
+# put -0.748 in CENTER_X
+# put 0.1    in CENTER_Y
+# put 3000   in ZOOM
+# put 300    in MAX_ITERATIONS
+
+# --- 3. THE SATELLITE (Mini Mandelbrot) ---
+# put -1.7685 in CENTER_X
+# put 0.0005  in CENTER_Y
+# put 1000    in ZOOM
+# put 200     in MAX_ITERATIONS
+
+# --- 4. ELEPHANT VALLEY ---
+# put 0.275 in CENTER_X
+# put 0.006 in CENTER_Y
+# put 2500  in ZOOM
+# put 200   in MAX_ITERATIONS
+
+# --- 5. DEEP SPIRAL (Deep Zoom) ---
+# put -0.743643 in CENTER_X
+# put 0.131825  in CENTER_Y
+# put 40000     in ZOOM
+# put 1200      in MAX_ITERATIONS
+
+# ==========================================
+#                END CONFIGURATION
+# ==========================================
+
+# --- Window Dimensions (High Resolution) ---
+# Multiples of 32 to avoid leftover blocks
+put 416 in HALF_WIDTH
+put 320 in HALF_HEIGHT
+
+# Calculate boundaries for rendering
+put -HALF_WIDTH in X_START
+put  HALF_WIDTH in X_END
+put -HALF_HEIGHT   in Y_START
+put  HALF_HEIGHT   in Y_END
+
+# --- CAMERA SETUP ---
+# We lock the framing on the maximum area before starting calculations
+rectangle from (X_START, Y_START) to (X_END, Y_END)
+frame graphics
+clear graphics
+
+# --- Progressive Rendering Logic ---
+put 32 in CURRENT_STEP
+put 1  in MIN_STEP
+put 0  in MARGIN
+
+write "Rendering centered at (" + CENTER_X + ", " + CENTER_Y + ")"
+newline
+
+as long as (CURRENT_STEP >= MIN_STEP) you do (
+    global CURRENT_STEP, Py
+    
+    write "Refining detail (Step: " + CURRENT_STEP + ")..."
+    # We don't go to a new line for a cleaner console
+
+    # --- ROW LOOP (Y) ---
+    put Y_START in Py
+    
+    as long as (Py < Y_END) you do (
+        global Py, Px
+        
+        # --- COLUMN LOOP (X) ---
+        put X_START in Px
+        
+        as long as (Px < X_END) you do (
+            global Px, zx, zy, iter, radiusSquared, tempX
+            
+            # 1. Map coordinates
+            put (Px / ZOOM) + CENTER_X in cx
+            put (Py / ZOOM) + CENTER_Y in cy
+            
+            # 2. Initialization Mandelbrot
+            put 0 in zx
+            put 0 in zy
+            put 0 in iter
+            put 0 in radiusSquared
+            
+            # 3. Escape loop
+            as long as ((radiusSquared < 4) and (iter < MAX_ITERATIONS)) you do (
+                global zx, zy, iter, radiusSquared, tempX
+                
+                put (zx * zx) - (zy * zy) + cx in tempX
+                put (2 * zx * zy) + cy in zy
+                put tempX in zx
+                put (zx * zx) + (zy * zy) in radiusSquared
+                put iter + 1 in iter
+            )
+
+            # 4. Coloring (CORRECT 0-100)
+            if (iter == MAX_ITERATIONS) then (
+                set color (0, 0, 0)
+            ) otherwise (
+                # Sinusoidal palette adapted for Matita (0-100)
+                # 50 is the center, 50 is the amplitude. Max result 100.
+                put 0.1 in freq 
+                put 50 + 50 * sin(freq * iter + 0.0) in R
+                put 50 + 50 * sin(freq * iter + 2.0) in G
+                put 50 + 50 * sin(freq * iter + 4.0) in B
+                set color (R, G, B)
+            )
+
+            # 5. Draw Pixel
+            rectangle from (Px, Py) to (Px + CURRENT_STEP + 1, Py + CURRENT_STEP + 1)
+
+            # Go to next column
+            put Px + CURRENT_STEP in Px
+        )
+        
+        # Update screen
+        redraw
+        wait 0 ms 
+        
+        # Go to next row
+        put Py + CURRENT_STEP in Py
+    )
+
+    # Increase resolution
+    put CURRENT_STEP / 2 in CURRENT_STEP
+)
+
+newline
+write "Image complete!"
+frame graphics

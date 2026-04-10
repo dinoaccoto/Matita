@@ -1,0 +1,623 @@
+# *****
+# Name: Space Invaders (Evo)
+# Category: Game
+# Program ver: 5.0
+# Date: 28-03-2026
+# Author: DA
+# Language: EN
+# Matita ver: 0.8
+# Description: Space Invaders (sounds + optimized engine) 
+# *****
+
+put (0, 0, 0) in Black
+put (0, 100, 0) in Green
+put (100, 100, 100) in White
+put (100, 0, 0) in Red
+put (100, 100, 0) in Yellow
+
+# ================================================================
+# SOUNDS
+# ================================================================
+
+sound Shoot (
+  sweep from 800 to 200 hz
+  duration 150 ms
+  wave square
+)
+
+sound AlienHit (
+  noise duration 150 ms
+  attack 5 ms
+  decay 120 ms
+  filter 1000 hz
+)
+
+sound PlayerHit (
+  noise duration 800 ms
+  attack 10 ms
+  decay 700 ms
+  filter 200 hz
+)
+
+sound ShieldHit (
+  noise duration 80 ms
+  attack 2 ms
+  decay 70 ms
+  filter 1500 hz
+)
+
+sound UfoMove (
+  notes (600, 400)
+  tempo 300
+  wave sine
+  loop true
+)
+
+sound Step1 ( sweep from 150 to 140 hz duration 60 ms wave square )
+sound Step2 ( sweep from 140 to 130 hz duration 60 ms wave square )
+sound Step3 ( sweep from 130 to 120 hz duration 60 ms wave square )
+sound Step4 ( sweep from 120 to 110 hz duration 60 ms wave square )
+
+sound WaveClear (
+  notes (440, 554, 659, 880)
+  tempo 180
+  wave square
+)
+
+sound GameOverSnd (
+  notes (200, 190, 180, 170)
+  tempo 80
+  wave sawtooth
+)
+
+# ================================================================
+# SPRITES
+# ================================================================
+
+label (
+  set color Green
+  rectangle from (-2, 6) to (2, 14)
+  rectangle from (-10, 0) to (10, 6)
+  rectangle from (-18, -8) to (18, 0)
+) as Ship
+
+label (
+  set color Green
+  rectangle from (-1, 3) to (1, 7)
+  rectangle from (-5, 0) to (5, 3)
+  rectangle from (-9, -4) to (9, 0)
+) as MiniShip
+
+label (
+  set color White
+  rectangle from (-6, 8) to (-2, 12)
+  rectangle from (2, 8) to (6, 12)
+  rectangle from (-14, -4) to (14, 8)
+  set color Black
+  rectangle from (-10, 0) to (-4, 6)
+  rectangle from (4, 0) to (10, 6)
+  set color White
+  rectangle from (-14, -8) to (-10, -4)
+  rectangle from (-4, -8) to (0, -4)
+  rectangle from (0, -8) to (4, -4)
+  rectangle from (10, -8) to (14, -4)
+) as Oct1
+
+label (
+  set color White
+  rectangle from (-6, 8) to (-2, 12)
+  rectangle from (2, 8) to (6, 12)
+  rectangle from (-14, -4) to (14, 8)
+  set color Black
+  rectangle from (-10, 0) to (-4, 6)
+  rectangle from (4, 0) to (10, 6)
+  set color White
+  rectangle from (-12, -8) to (-8, -4)
+  rectangle from (-2, -8) to (2, -4)
+  rectangle from (6, -8) to (10, -4)
+  rectangle from (10, -4) to (14, 0)
+) as Oct2
+
+label (
+  set color White
+  rectangle from (-4, 10) to (-2, 14)
+  rectangle from (2, 10) to (4, 14)
+  rectangle from (-12, -2) to (12, 10)
+  rectangle from (-16, 4) to (-12, 8)
+  rectangle from (12, 4) to (16, 8)
+  rectangle from (-18, 0) to (-14, 4)
+  rectangle from (14, 0) to (18, 4)
+  set color Black
+  rectangle from (-8, 2) to (-4, 6)
+  rectangle from (4, 2) to (8, 6)
+  set color White
+  rectangle from (-14, -6) to (-10, -2)
+  rectangle from (-4, -6) to (0, -2)
+  rectangle from (0, -6) to (4, -2)
+  rectangle from (10, -6) to (14, -2)
+) as Crab1
+
+label (
+  set color White
+  rectangle from (-4, 10) to (-2, 14)
+  rectangle from (2, 10) to (4, 14)
+  rectangle from (-12, -2) to (12, 10)
+  rectangle from (-18, 4) to (-12, 8)
+  rectangle from (12, 4) to (18, 8)
+  rectangle from (-20, -2) to (-16, 2)
+  rectangle from (16, -2) to (20, 2)
+  set color Black
+  rectangle from (-8, 2) to (-4, 6)
+  rectangle from (4, 2) to (8, 6)
+  set color White
+  rectangle from (-12, -6) to (-8, -2)
+  rectangle from (-4, -6) to (0, -2)
+  rectangle from (0, -6) to (4, -2)
+  rectangle from (8, -6) to (12, -2)
+) as Crab2
+
+label (
+  set color White
+  rectangle from (-2, 10) to (2, 16)
+  rectangle from (-8, 6) to (8, 10)
+  rectangle from (-10, -4) to (10, 6)
+  rectangle from (-14, -2) to (-10, 2)
+  rectangle from (10, -2) to (14, 2)
+  set color Black
+  rectangle from (-6, 0) to (-2, 4)
+  rectangle from (2, 0) to (6, 4)
+  set color White
+  rectangle from (-12, -8) to (-8, -4)
+  rectangle from (-2, -8) to (2, -4)
+  rectangle from (8, -8) to (12, -4)
+) as Squid1
+
+label (
+  set color White
+  rectangle from (-2, 10) to (2, 16)
+  rectangle from (-8, 6) to (8, 10)
+  rectangle from (-10, -4) to (10, 6)
+  rectangle from (-16, 0) to (-10, 4)
+  rectangle from (10, 0) to (16, 4)
+  set color Black
+  rectangle from (-6, 0) to (-2, 4)
+  rectangle from (2, 0) to (6, 4)
+  set color White
+  rectangle from (-10, -8) to (-6, -4)
+  rectangle from (0, -8) to (4, -4)
+  rectangle from (10, -8) to (14, -4)
+) as Squid2
+
+label (
+  set color Red
+  rectangle from (-18, -4) to (18, 4)
+  rectangle from (-10, 4) to (10, 10)
+  set color Yellow
+  circle radius 3 at (-8, 0)
+  circle radius 3 at (0, 0)
+  circle radius 3 at (8, 0)
+) as UFO
+
+label (
+  set color Yellow
+  rectangle from (-2, -12) to (2, 12)
+  rectangle from (-12, -2) to (12, 2)
+  rectangle from (-8, -8) to (-4, -4)
+  rectangle from (4, 4) to (8, 8)
+  rectangle from (-8, 4) to (-4, 8)
+  rectangle from (4, -8) to (8, -4)
+) as Blast
+
+# ================================================================
+# CONFIGURATION
+# ================================================================
+put 300 in HW
+put 240 in HH
+put -215 in PY
+put 7 in PlSpd
+put 11 in ProjSpd
+put 5 in BmbSpd
+put 14 in AW
+put 10 in AH
+put 5 in BSz
+put 10 in ED
+put 35 in CW
+put 30 in CH
+put -HW in SL
+put HW in SR
+put PY - 12 in HBB
+put PY + 12 in HBT
+put BSz / 2 in BH
+put -182 in ShldY
+put ShldY + 30 in InvY
+
+# ================================================================
+# SESSION STATE
+# ================================================================
+put 0 in Score, HiScore, Wave, PlayerX, RedFlashTimer, ShootCd, StepIdx
+put 3 in Lives
+clear graphics
+set color Black
+paint background
+rectangle from (-320, -260) to (320, 260)
+frame graphics
+
+# ================================================================
+# MAIN LOOP
+# ================================================================
+as long as Lives > 0 you do (
+  global Lives, Score, HiScore, Wave, PlayerX, RedFlashTimer, ShootCd, StepIdx
+
+  put Wave + 1 in Wave
+
+  # --- ALIEN GRID (DICTIONARIES) ---
+  put list() in Aliens
+  index row goes from 0 to 4 and you do (
+    index col goes from 0 to 10 and you do (
+      if row < 2 then ( put 3 in AType )
+      otherwise if row < 4 then ( put 2 in AType )
+      otherwise ( put 1 in AType )
+      
+      add {"x": col * CW, "y": row * -CH, "type": AType} to Aliens
+    )
+  )
+
+  # --- SWARM PARAMETERS ---
+  put -175 in SwX
+  put 130 in SwY
+  put 1 in SwDir
+  put 4 in StX
+  put -24 in StY
+  put max(1, 7 - Wave) in BaseDelay
+  put 0 in SwTimer, FrmTimer
+  put 1 in Frm
+
+  # --- SHIELDS ---
+  put list() in Blocks
+  put list(-195, -65, 65, 195) in ShldXL
+  for each CX in ShldXL you do (
+    index row goes from 0 to 4 and you do (
+      index col goes from -4 to 4 and you do (
+        if not (row < 2 and col > -3 and col < 3) then (
+          add point(CX + col * BSz, ShldY + row * BSz) to Blocks
+        )
+      )
+    )
+  )
+
+  # --- MISC STATE ---
+  put list() in Projs
+  put list() in Bombs, Expl
+  put max(75, 97 - Wave * 2) in BmbThr
+  put false in UfoOn
+  put 150 + dice(150) in UfoCd
+
+  # ================================================================
+  # INNER WAVE LOOP
+  # ================================================================
+  as long as Lives > 0 and dimension of Aliens > 0 you do (
+    global Lives, Score, HiScore, Wave, PlayerX, RedFlashTimer, ShootCd, StepIdx
+
+    put BaseDelay in CurD
+
+    # 1. BACKGROUND
+    clear graphics
+    if RedFlashTimer > 0 then (
+      set color Red
+      paint background
+      put RedFlashTimer - 1 in RedFlashTimer
+    ) otherwise (
+      set color Black
+      paint background
+    )
+    set color Black
+    rectangle from (-320, -260) to (320, 260)
+
+    # 2. INPUT & SHOOT COOLDOWN (MACHINE GUN)
+    if ShootCd > 0 then ( put ShootCd - 1 in ShootCd )
+    if (key "LEFT" is pressed) and PlayerX > SL then ( put PlayerX - PlSpd in PlayerX )
+    if (key "RIGHT" is pressed) and PlayerX < SR then ( put PlayerX + PlSpd in PlayerX )
+    
+    if (key "SPACE" is pressed) and ShootCd <= 0 then (
+      add point(PlayerX, PY + 16) to Projs
+      put 6 in ShootCd  
+      play Shoot
+    )
+
+    # 3. SWARM MOVEMENT
+    put SwTimer + 1 in SwTimer
+    if SwTimer >= CurD then (
+      put 0 in SwTimer
+      put SwX + StX * SwDir in SwX
+      put FrmTimer + 1 in FrmTimer
+      if FrmTimer > 1 then ( put 0 in FrmTimer  put 3 - Frm in Frm )
+      put false in HitWall
+      
+      for each alien in Aliens you do (
+        put SwX + alien["x"] in AX
+        if (AX > SR - 17 and SwDir equals 1) or (AX < SL + 17 and SwDir equals -1) then (
+          put true in HitWall
+        )
+      )
+      
+      if HitWall equals true then (
+        put SwDir * -1 in SwDir
+        put SwY + StY in SwY
+      )
+      
+      put StepIdx + 1 in StepIdx
+      if StepIdx mod 4 equals 0 then ( play Step1 )
+      otherwise if StepIdx mod 4 equals 1 then ( play Step2 )
+      otherwise if StepIdx mod 4 equals 2 then ( play Step3 )
+      otherwise ( play Step4 )
+    )
+
+    # UFO
+    put UfoCd - 1 in UfoCd
+    if UfoCd <= 0 and UfoOn equals false then (
+      put true in UfoOn
+      put SL - 20 in UfoX
+      put 150 + dice(150) in UfoCd
+      play UfoMove
+      volume UfoMove 25
+    )
+    if UfoOn equals true then (
+      put UfoX + 3 in UfoX
+      if UfoX > SR + 20 then ( 
+        put false in UfoOn 
+        stop UfoMove
+      )
+    )
+
+    # Random bombs (DICT)
+    put dimension of Aliens in N
+    if random(1, 100) > BmbThr and N > 0 then (
+      put item dice(N) of Aliens in SA
+      add {"x": SwX + SA["x"], "y": SwY + SA["y"]} to Bombs
+    )
+
+    # 4. COLLISIONS
+
+    # A. Projectiles vs Shields
+    put list() in NProjs
+    for each p in Projs you do (
+      put true in PActive
+      put x of p in PX
+      put list() in SB
+      for each blk in Blocks you do (
+        if PActive equals true and abs(PX - x of blk) < BH and y of p <= y of blk + BH and y of p + ProjSpd >= y of blk - BH then (
+          put false in PActive
+          play ShieldHit
+        ) otherwise ( add blk to SB )
+      )
+      put SB in Blocks
+      if PActive equals true then ( add p to NProjs )
+    )
+    put NProjs in Projs
+
+    # B. Projectiles vs Aliens
+    put list() in NProjs
+    for each p in Projs you do (
+      put true in PActive
+      put y of p + ProjSpd in PNY
+      put x of p in PX
+      put list() in NA
+      
+      for each alien in Aliens you do (
+        put SwX + alien["x"] in AX
+        put SwY + alien["y"] in AY
+        
+        if PActive equals true and abs(PX - AX) < AW and y of p <= AY + AH and PNY >= AY - AH then (
+          put false in PActive
+          if alien["type"] equals 1 then ( put Score + 30 in Score )
+          otherwise if alien["type"] equals 2 then ( put Score + 20 in Score )
+          otherwise ( put Score + 10 in Score )
+          
+          if Score > HiScore then ( put Score in HiScore )
+          
+          add {"x": AX, "y": AY + 15, "t": ED} to Expl
+          play AlienHit
+        ) otherwise ( add alien to NA )
+      )
+      put NA in Aliens
+      if PActive equals true then ( add p to NProjs )
+    )
+    put NProjs in Projs
+
+    # C. Projectiles vs UFO
+    put list() in NProjs
+    for each p in Projs you do (
+      put true in PActive
+      if UfoOn equals true and abs(x of p - UfoX) < 20 and abs(y of p - 210) < 14 then (
+        put false in PActive, UfoOn
+        put Score + 500 in Score
+        if Score > HiScore then ( put Score in HiScore )
+        
+        add {"x": UfoX, "y": 210 + 15, "t": 20} to Expl
+        play PlayerHit
+        stop UfoMove
+      )
+      if PActive equals true then ( add p to NProjs )
+    )
+    put NProjs in Projs
+
+    # D. Bombs — movement + collisions in one pass
+    put list() in SBombs
+    for each bomb in Bombs you do (
+      put true in BA
+      put bomb["x"] in BX
+      put bomb["y"] in BY
+      put BY - BmbSpd in BNY
+      
+      if abs(BX - PlayerX) < 18 and BY >= HBB and BNY <= HBT then (
+        put Lives - 1 in Lives
+        put false in BA
+        put 20 in RedFlashTimer
+        
+        add {"x": PlayerX, "y": PY + 15, "t": ED} to Expl
+        play PlayerHit
+      )
+      
+      if BA equals true then (
+        put list() in SB
+        for each blk in Blocks you do (
+          if BA equals true and abs(BX - x of blk) < BH and BY >= y of blk - BH and BNY <= y of blk + BH then (
+            put false in BA
+            add {"x": x of blk, "y": y of blk, "t": 3} to Expl
+            play ShieldHit
+          ) otherwise ( add blk to SB )
+        )
+        put SB in Blocks
+      )
+      
+      if BA equals true and BNY > PY - 250 then (
+        put BNY in bomb["y"]
+        add bomb to SBombs
+      )
+    )
+    put SBombs in Bombs
+
+    # E. Invasion check
+    for each alien in Aliens you do (
+      if SwY + alien["y"] - AH < InvY then ( put 0 in Lives )
+    )
+
+    # 5. PHYSICS
+    put list() in NProjs
+    for each p in Projs you do (
+      set y of p to (y of p + ProjSpd)
+      if y of p <= HH then ( add p to NProjs )
+    )
+    put NProjs in Projs
+    
+    put list() in AE
+    for each e in Expl you do (
+      put e["t"] - 1 in NT
+      if NT > 0 then ( 
+         put NT in e["t"]
+         add e to AE 
+      )
+    )
+    put AE in Expl
+
+    # 6. DRAWING
+    set color Green
+    rectangle from (-320, PY - 16) to (320, PY - 14)
+
+    for each alien in Aliens you do (
+      put SwX + alien["x"] in AX
+      put SwY + alien["y"] in AY
+      
+      if alien["type"] equals 3 then (
+        if Frm equals 1 then ( draw Oct1 at (AX, AY) ) otherwise ( draw Oct2 at (AX, AY) )
+      )
+      otherwise if alien["type"] equals 2 then (
+        if Frm equals 1 then ( draw Crab1 at (AX, AY) ) otherwise ( draw Crab2 at (AX, AY) )
+      )
+      otherwise (
+        if Frm equals 1 then ( draw Squid1 at (AX, AY) ) otherwise ( draw Squid2 at (AX, AY) )
+      )
+    )
+
+    if UfoOn equals true then ( draw UFO at (UfoX, 210) )
+
+    for each e in Expl you do ( draw Blast at (e["x"], e["y"]) )
+
+    draw Ship at (PlayerX, PY)
+
+    set color Green
+    for each blk in Blocks you do (
+      rectangle from (x of blk - BH, y of blk - BH) to (x of blk + BH, y of blk + BH)
+    )
+
+    set color White
+    for each p in Projs you do (
+      rectangle from (x of p - 2, y of p - 8) to (x of p + 2, y of p + 8)
+    )
+
+    set color Red
+    for each bomb in Bombs you do (
+      rectangle from (bomb["x"] - 2, bomb["y"] - 6) to (bomb["x"] + 2, bomb["y"] + 6)
+    )
+
+    # HUD
+    set color Green
+    graffiti size 14 at (-300, 230) "SCORE: " + Score
+    set color White
+    graffiti size 14 at (50, 230) "HI-SCORE: " + HiScore
+    set color Yellow
+    graffiti size 12 at (-300, -240) "WAVE " + Wave
+    set color Green
+    if Lives > 0 then (
+      index li goes from 1 to Lives and you do ( draw MiniShip at (-260 + li * 24, -238) )
+    )
+
+    wait 12 ms
+    redraw
+  )
+
+  # WAVE CLEAR SCREEN
+  if dimension of Aliens equals 0 and Lives > 0 then (
+    stop UfoMove
+    play WaveClear
+    clear graphics
+    set color Black
+    paint background
+    set color Black
+    rectangle from (-320, -260) to (320, 260)
+    set color Green
+    graffiti size 30 at (0, 20) "WAVE " + Wave + " CLEAR!"
+    set color White
+    graffiti size 18 at (0, -30) "SCORE: " + Score
+    redraw
+    wait 2000 ms
+  )
+)
+
+# ================================================================
+# GAME OVER SCREEN
+# ================================================================
+stop UfoMove
+play GameOverSnd
+clear graphics
+set color Black
+paint background
+set color Black
+rectangle from (-320, -260) to (320, 260)
+
+# Retro scanlines
+set color (4, 4, 4)
+index sy goes from -25 to 25 and you do (
+  rectangle from (-320, sy * 10 + 1) to (320, sy * 10 + 3)
+)
+
+set color Red
+graffiti size 55 at (0, 65) "GAME OVER"
+set color White
+graffiti size 22 at (0, 10) "SCORE: " + Score
+set color Yellow
+graffiti size 22 at (0, -30) "HI-SCORE: " + HiScore
+
+# Score table
+set color (35, 35, 35)
+rectangle from (-250, -100) to (250, -55)
+draw Squid1 at (-190, -77)
+set color White
+graffiti size 11 at (-155, -82) "= 30 pts"
+draw Crab1 at (-55, -77)
+graffiti size 11 at (-20, -82) "= 20 pts"
+draw Oct1 at (80, -77)
+graffiti size 11 at (115, -82) "= 10 pts"
+draw UFO at (210, -77)
+set color Yellow
+graffiti size 11 at (210, -96) "= 500 pts"
+
+set color (70, 70, 70)
+graffiti size 14 at (0, -145) "press F5 to play again"
+
+redraw
+clear screen
+write "GAME OVER — Score: "
+write Score
+write "  Hi-Score: "
+write HiScore

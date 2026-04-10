@@ -1,0 +1,26 @@
+# *****
+# Name: Emoji Unicode
+# Category: Programming
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Stampa una tabella di caratteri Emoji utilizzando i codici standard Unicode.
+# Itera attraverso un intervallo di numeri interi convertendoli in simboli
+# grafici. Dimostra l'uso della funzione unicode() per trasformare codici numerici
+# in testo.
+# *****
+
+cancella schermo
+scrivi "--- Tabella Emoji UNICODE ---"; accapo
+scrivi "Simbolo   |   Codice"
+scrivi "------------------"; accapo
+
+metti 128512 in Inizio # da dove iniziamo a scorrere il codice UNICODE
+metti 128591 in Fine # dove ci fermiamo
+
+variabile N va da Inizio a Fine ed esegui (
+    metti unicode(N) in Faccina
+    scrivi "   " + Faccina + "       |   " + N; accapo
+)

@@ -1,0 +1,27 @@
+# *****
+# Name: Polaire Krommen
+# Category: Maths, Graphics
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Generatie van complexe geometrische figuren met behulp van polaire coördinaten.
+# Zet straal en hoek om in cartesische coördinaten (x, y) voor het tekenen. Maakt
+# gebruik van wiskundige lussen om kleur en vorm te variëren tijdens het tekenen.
+# *****
+
+zet 300 in R0
+zet 5000 in stappen
+zet 2*PI/stappen in inc
+zet 3 in R
+zet 0 in hoek
+
+teller I loopt van 0 tot stappen-1 en je doet (
+   zet hoek+inc in hoek
+   zet R0*cos(hoek)*sin(13*hoek) in R1
+   stel kleur in (afronden(I/stappen)*100, (1-afronden(I/stappen))*100, 90)
+
+   cirkel straal R op (R1*cos(hoek), R1*sin(hoek))
+)
+toon alles

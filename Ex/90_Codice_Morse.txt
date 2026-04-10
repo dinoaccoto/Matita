@@ -1,0 +1,41 @@
+# *****
+# Name: Codice Morse
+# Category: Programming
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Traduce una frase inserita dall'utente in codice Morse. Scompone il testo in
+# caratteri e usa l'aritmetica Unicode per trovare l'indice nella lista dei
+# codici. Gestisce la traduzione lettera per lettera, convertendo gli spazi in
+# pause visive.
+# *****
+
+# 'a', 'b', 'c', ecc. in codice Morse:
+metti (".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", \
+"..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", \
+".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--..") \
+in alfabetoMorse
+
+chiedi testo dicendo "Scrivi in minuscolo il testo da tradurre:"
+metti scomponi(testo) in listaCaratteri
+cancella schermo
+scrivi "Testo: " + testo; accapo
+scrivi "Morse: "
+
+metti Unicode("a") in IndiceA
+
+per ogni lettera in listaCaratteri esegui (
+    metti Unicode(lettera) - IndiceA + 1 in j
+    se (j>= 1 e j<=26) allora (
+        metti elemento j di alfabetoMorse in codice
+        scrivi codice + " "
+    ) altrimenti (
+        se (lettera == " ") allora (
+            scrivi "   " 
+        ) altrimenti (
+            scrivi "?"
+        )
+    )
+)

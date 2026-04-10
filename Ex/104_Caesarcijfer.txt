@@ -1,0 +1,36 @@
+# *****
+# Name: Caesarcijfer
+# Category: Programming
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Implementeert een oud cryptografisch algoritme met eenvoudige substitutie. Het
+# verschuift elke letter van de tekst een vast aantal posities, bepaald door de
+# sleutel. Maakt gebruik van de modulo operator (modulo) om het "omdraaien" van
+# het alfabet van Z naar A af te handelen.
+# *****
+
+vraag tekst met bericht "Schrijf de te versleutelen tekst (in kleine letters):"
+vraag sleutel met bericht "Voer de sleutel in (geheel getal):"
+
+zet splits(tekst) in lijstKarakters
+zet unicode("a") in basisA
+
+wis scherm
+schrijf "Originele Tekst: " + tekst; nieuwe regel
+schrijf "Gecijferde Tekst:    "
+
+voor elk letter in lijstKarakters je doet (
+    zet unicode(letter) in code
+    als (code >= basisA en code <= basisA+25) dan (
+        zet code - basisA in index0
+        zet index0 + sleutel in verschovenIndex
+        zet verschovenIndex modulo 26 in nieuweIndex
+        zet nieuweIndex + basisA in gecijferdeCode
+        schrijf unicode(gecijferdeCode)
+    ) anders (# We laten het ongewijzigd als het geen letter is (spatie, punt, enz.):
+        schrijf letter
+    )
+)

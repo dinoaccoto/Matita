@@ -1,0 +1,184 @@
+# *****
+# Name: Gravitation
+# Category: Physics
+# Program ver: 6.0
+# Date: 27-03-2026
+# Author: DA
+# Language: EN
+# Matita ver: 0.9
+# Description: Simulation of N bodies orbiting. 3D distribution. 
+# Use the arrow keys to tilt the camera around the central mass.
+# Inelastic collisions enabled. 
+# *****
+
+record Body(px, py, pz, vx, vy, vz, ms, ax, ay, az, on)
+
+# ── Parameters ────────────────────────────────────────────
+put 50    in N
+put 0.4   in G
+put 0.7   in DT
+put 5     in EPS
+put 600   in M0
+put 4     in R_MULT   # Radius scale factor (density)
+
+# Pre-computed constants
+put EPS * EPS in EPS2
+put ()        in BODIES
+
+# Camera Rotation Angles
+global ROT_X, ROT_Y
+put 0 in ROT_X
+put 0 in ROT_Y
+
+# ── Initial conditions (3D distribution) ──────────────────
+add Body(0, 0, 0, 0, 0, 0, M0, 0, 0, 0, true) to BODIES
+
+index K goes from 2 to N and you do (
+    put random(70, 290)          in DST
+    put random(0, 628) / 100     in ANG
+    put squareroot(G * M0 / DST) in VC
+
+    # Distribute in a thick disk
+    put DST * cos(ANG)           in BPX
+    put DST * sin(ANG)           in BPY
+    put random(-60, 60)          in BPZ
+
+    # Tangential orbital velocity + slight Z drift
+    put -VC * sin(ANG)           in BVX
+    put  VC * cos(ANG)           in BVY
+    put random(-10, 10) / 10     in BVZ
+
+    put random(8, 55)            in BMS
+    add Body(BPX, BPY, BPZ, BVX, BVY, BVZ, BMS, 0, 0, 0, true) to BODIES
+)
+
+# ── Background (drawn once, persists) ─────────────────────
+set color (4, 6, 14)
+paint background
+
+# ── Initial camera fit ────────────────────────────────────
+clear graphics
+index K goes from 1 to N and you do (
+    B alias item K of BODIES
+    set color (20, 40, 80)
+    # Raggio iniziale per il fit basato sulla densità
+    circle radius (B.ms ^ (1/3)) * R_MULT at (B.px, B.py)
+)
+frame graphics
+
+# ══════════════════════════════════════════════════════════
+#  MAIN LOOP
+# ══════════════════════════════════════════════════════════
+as long as (true) you do (
+
+    # ── 0. Handle Camera Rotation ─────────────────────────
+    if (key "UP" is pressed)    then ( put ROT_X - 0.05 in ROT_X )
+    if (key "DOWN" is pressed)  then ( put ROT_X + 0.05 in ROT_X )
+    if (key "LEFT" is pressed)  then ( put ROT_Y - 0.05 in ROT_Y )
+    if (key "RIGHT" is pressed) then ( put ROT_Y + 0.05 in ROT_Y )
+
+    # ── 1. Reset accelerations ────────────────────────────
+    index K goes from 1 to N and you do (
+        B alias item K of BODIES
+        if (B.on) then (
+            put 0 in B.ax
+            put 0 in B.ay
+            put 0 in B.az
+        )
+    )
+
+    # ── 2. Pairwise O(N²/2) 3D gravity + inelastic merge ──
+    index I goes from 1 to N - 1 and you do (
+        BI alias item I of BODIES
+        if (BI.on) then (
+            index J goes from I + 1 to N and you do (
+                BJ alias item J of BODIES
+                if (BJ.on) then (
+                    put BJ.px - BI.px in DX
+                    put BJ.py - BI.py in DY
+                    put BJ.pz - BI.pz in DZ
+                    put DX * DX + DY * DY + DZ * DZ in D2
+                    
+                    # ── Collision check based on 3D uniform density ──
+                    put (BI.ms ^ (1/3)) * R_MULT in RI
+                    put (BJ.ms ^ (1/3)) * R_MULT in RJ
+                    put max(RI, RJ) in MAX_R
+
+                    if (D2 < MAX_R * MAX_R) then (
+                        # ── Inelastic merge: momentum & center of mass conservation ──
+                        put BI.ms + BJ.ms in NM
+                        put (BI.px * BI.ms + BJ.px * BJ.ms) / NM in BI.px
+                        put (BI.py * BI.ms + BJ.py * BJ.ms) / NM in BI.py
+                        put (BI.pz * BI.ms + BJ.pz * BJ.ms) / NM in BI.pz
+                        put (BI.vx * BI.ms + BJ.vx * BJ.ms) / NM in BI.vx
+                        put (BI.vy * BI.ms + BJ.vy * BJ.ms) / NM in BI.vy
+                        put (BI.vz * BI.ms + BJ.vz * BJ.ms) / NM in BI.vz
+                        
+                        put NM    in BI.ms
+                        put false in BJ.on
+                    )
+                    otherwise (
+                        # ── Softened Newton (Plummer kernel) ────────
+                        put squareroot(D2 + EPS2) in RS
+                        put G / (RS * RS * RS) in F
+                        put F * BJ.ms in FJ
+                        put F * BI.ms in FI
+                        put BI.ax + FJ * DX in BI.ax
+                        put BI.ay + FJ * DY in BI.ay
+                        put BI.az + FJ * DZ in BI.az
+                        put BJ.ax - FI * DX in BJ.ax
+                        put BJ.ay - FI * DY in BJ.ay
+                        put BJ.az - FI * DZ in BJ.az
+                    )
+                )
+            )
+        )
+    )
+
+    # ── 3. Symplectic Euler (3D) v → x ────────────────────
+    index K goes from 1 to N and you do (
+        B alias item K of BODIES
+        if (B.on) then (
+            put B.vx + B.ax * DT in B.vx
+            put B.vy + B.ay * DT in B.vy
+            put B.vz + B.az * DT in B.vz
+            put B.px + B.vx * DT in B.px
+            put B.py + B.vy * DT in B.py
+            put B.pz + B.vz * DT in B.pz
+        )
+    )
+
+    # ── 4. Render 3D Projection ───────────────────────────
+    clear graphics
+    
+    put cos(ROT_X) in CX
+    put sin(ROT_X) in SX
+    put cos(ROT_Y) in CY
+    put sin(ROT_Y) in SY
+
+    index K goes from 1 to N and you do (
+        B alias item K of BODIES
+        if (B.on) then (
+            # Y-axis rotation (Yaw)
+            put B.px * CY - B.pz * SY in PX1
+            put B.px * SY + B.pz * CY in PZ1
+
+            # X-axis rotation (Pitch)
+            put B.py * CX - PZ1 * SX in PY2
+            put B.py * SX + PZ1 * CX in PZ2
+
+            # Color mapping
+            put min(100, B.ms * 0.15) in T
+            set color (min(100, 15 + T * 0.9), min(100, 25 + T * 0.65), min(100, 90 - T * 0.8))
+
+            # Perspective scale based on Z depth
+            put max(0.1, 1 + PZ2 / 800) in PERSP
+            
+            # Rendering dinamico basato sempre sulla radice cubica della massa
+            circle radius ((B.ms ^ (1/3)) * R_MULT * PERSP) at (PX1, PY2)
+        )
+    )
+    
+    redraw
+    wait 1 ms
+)

@@ -1,0 +1,41 @@
+# *****
+# Name: Morsecodering
+# Category: Programming
+# Program ver:
+# Date:
+# Author: DA
+# Language: NL
+# Matita ver: 0.4
+# Description: Vertaalt een door de gebruiker ingevoerde zin naar morsecode. Het splitst de
+# tekst in tekens en gebruikt Unicode-berekeningen om de index in de codelijst te
+# vinden. Verwerkt de vertaling letter voor letter, waarbij spaties worden omgezet
+# in visuele pauzes.
+# *****
+
+# 'a', 'b', 'c', enz. in morsecodering:
+zet (".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", \
+"..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", \
+".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--..") \
+in morseAlfabet
+
+vraag tekst met bericht "Schrijf de te vertalen tekst in kleine letters:"
+zet splits(tekst) in lijstKarakters
+wis scherm
+schrijf "Tekst: " + tekst; nieuwe regel
+schrijf "Morse: "
+
+zet unicode("a") in IndexA
+
+voor elk letter in lijstKarakters je doet (
+    zet unicode(letter) - IndexA + 1 in j
+    als (j >= 1 en j <= 26) dan (
+        zet element j van morseAlfabet in code
+        schrijf code + " "
+    ) anders (
+        als (letter gelijk " ") dan (
+            schrijf "   " 
+        ) anders (
+            schrijf "?"
+        )
+    )
+)

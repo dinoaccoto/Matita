@@ -1,0 +1,27 @@
+# *****
+# Name: Curve Polari
+# Category: Maths, Graphics
+# Program ver: 2.0
+# Date: 27-03-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Generazione di figure geometriche complesse utilizzando coordinate polari.
+# Converte raggio e angolo in coordinate cartesiane (x, y) per il disegno. Usa
+# cicli matematici per variare il colore e la forma durante il tracciamento.
+# *****
+
+metti 300 in R0
+metti 5000 in passi
+metti 2*PI/passi in inc
+metti 3 in R
+metti 0 in angolo
+
+indice I va da 0 a passi-1 ed esegui (
+   metti angolo+inc in angolo
+   metti R0*cos(angolo)*sin(13*angolo) in R1
+   imposta colore (arrotonda(I/passi)*100, (1-arrotonda(I/passi))*100, 90)
+
+   cerchio raggio R in (R1*cos(angolo), R1*sin(angolo))
+)
+inquadra grafica

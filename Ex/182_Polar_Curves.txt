@@ -1,0 +1,27 @@
+# *****
+# Name: Polar Curves
+# Category: Maths, Graphics
+# Program ver:
+# Date:
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Generation of complex geometric figures using polar coordinates. Converts radius
+# and angle to Cartesian coordinates (x, y) for drawing. Uses mathematical loops
+# to vary color and shape while drawing.
+# *****
+
+put 300 in R0
+put 5000 in steps
+put 2*pi/steps in inc
+put 3 in R
+put 0 in angle
+
+index I goes from 0 to steps-1 and you do (
+   put angle+inc in angle
+   put R0*cos(angle)*sin(13*angle) in R1
+   set color (round(I/steps)*100, (1-round(I/steps))*100, 90)
+
+   circle radius R at (R1*cos(angle), R1*sin(angle))
+)
+frame graphics
