@@ -1,0 +1,57 @@
+# *****
+# Name: Grafico di funzione
+# Category: Maths
+# Program ver: 1.1
+# Date: Feb-2026
+# Author: DA
+# Language: IT
+# Matita ver: 0.4
+# Description: Plotta il grafico di una funzione su un intervallo definito dall'utente.
+# E' possibile esplorare il grafico usando le funzionalità CAD del canvas.s
+# *****
+
+
+# funzione da disegnare:
+definisci funzione f(x) (
+    restituisci sin(x^2)-cos(x)
+)
+
+# Intervallo della variabile indipendente da considerare:
+metti -5 in Xmin
+metti 5 in Xmax
+
+metti 1000 in step
+metti (Xmax-Xmin)/step in Inc
+
+metti 0.06 in S
+metti (0, 0, 0) in nero
+metti (70, 70, 70) in grigio
+imposta colore nero
+
+metti 0 in YMin, Ymax
+
+metti punto(Xmin, f(Xmin)) in Inizio
+metti Xmin in x
+fintanto (x<Xmax) esegui (
+    globale x, Inizio, YMin, YMax
+    metti f(x) in f
+    se (f<YMin) allora (metti f in YMin)
+    se (f>YMax) allora (metti f in YMax)
+
+    metti punto(x, f) in Fine
+    linea spessore S da Inizio a Fine
+    metti Fine in Inizio
+    metti x+Inc in x    
+)
+
+# Disegno gli assi cartesiani:
+imposta colore grigio
+metti 2 in K
+linea spessore S/5 da (Xmin, 0) a (Xmax, 0) # asse x
+triangolo con vertici (Xmax, -K*S), (Xmax, K*S), (Xmax+2*K*S, 0)
+
+linea spessore S/5 da (0, YMin) a (0, YMax) # asse y
+triangolo con vertici (-K*S, YMax), (K*S, Ymax), (0, Ymax+2*K*S)
+
+
+inquadra grafica

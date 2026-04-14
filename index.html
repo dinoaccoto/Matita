@@ -412,99 +412,233 @@
 
     /* --- SPLASH SCREEN --- */
     #splash-screen {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.85); /* var(--bg-app) con opacità */
-      backdrop-filter: blur(8px);
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 20px;
-      transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
-    }
-    #splash-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-    .splash-content {
-      width: 100%;
-      max-width: 500px;
-      background: var(--bg-pane);
-      padding: 40px 30px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      animation: splash-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes splash-pop {
-      0% { transform: scale(0.95); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .splash-title {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: var(--accent-color);
-      margin-bottom: 12px;
-      font-family: 'Roboto Mono', monospace;
-      letter-spacing: -1px;
-    }
-    .splash-subtitle {
-      font-size: 1.05rem;
-      color: var(--text-primary);
-      margin-bottom: 24px;
-      line-height: 1.4;
-    }
-    .splash-meta {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.8;
-      margin-bottom: 24px;
-    }
-    .splash-meta a {
-      color: var(--accent-hover);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .splash-meta a:hover {
-      text-decoration: underline;
-    }
-    .splash-cta {
-      font-size: 0.9rem;
-      color: #fbbf24; /* Giallo caldo per la call to action */
-      background: rgba(251, 191, 36, 0.1);
-      padding: 10px 15px;
-      border-radius: var(--radius-sm);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.90);
+    backdrop-filter: blur(10px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.7s ease-out, visibility 0.7s ease-out;
+  }
+  #splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
 
-  </style>
+  .splash-content {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg-pane);
+    padding: 44px 36px 32px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: splash-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes splash-rise {
+    from { transform: translateY(18px) scale(0.97); opacity: 0; }
+    to   { transform: translateY(0)    scale(1);    opacity: 1; }
+  }
+
+  /* Logo */
+  .splash-logo {
+    width: 40%;
+    /* height: 56px; */
+    margin-bottom: 20px;
+    animation: splash-fade 0.4s 0.15s ease-out both;
+  }
+
+  /* Titolo + badge versione stssa riga */
+  .splash-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    animation: splash-fade 0.4s 0.25s ease-out both;
+  }
+  .splash-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .splash-version {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border-color);
+    border-radius: 99px;
+    padding: 3px 9px;
+    letter-spacing: 0.5px;
+    align-self: center;
+  }
+
+  /* Sottotitolo  */
+  .splash-subtitle {
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    animation: splash-fade 0.4s 0.35s ease-out both;
+  }
+
+  /* Meta links */
+  .splash-meta {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 2;
+    margin-bottom: 28px;
+    animation: splash-fade 0.4s 0.45s ease-out both;
+  }
+  .splash-meta a {
+    color: var(--accent-hover);
+    text-decoration: none;
+  }
+  .splash-meta a:hover { text-decoration: underline; }
+
+    .splash-tips-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    margin-bottom: 24px;
+    animation: splash-fade 0.4s 0.55s ease-out both;
+  }
+  .splash-tips-box {
+    grid-column: 2;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .splash-tip {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    padding: 4px 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: left;
+  }
+  .splash-tip-num {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    opacity: 0.5;
+    min-width: 12px;
+    text-align: right;
+    font-family: 'Roboto Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  /* Progress bar */
+  .splash-progress {
+    width: 100%;
+    height: 2px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    animation: splash-fade 0.4s 0.6s ease-out both;
+  }
+  .splash-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent-color);
+    border-radius: 99px;
+    animation: splash-progress 12s linear forwards;
+  }
+  @keyframes splash-progress {
+    from { width: 0%; }
+    to   { width: 100%; }
+  }
+
+  /* Divisore + privacy */
+  .splash-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin-bottom: 16px;
+    animation: splash-fade 0.4s 0.65s ease-out both;
+  }
+  .splash-privacy {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    opacity: 0.6;
+    letter-spacing: 0.3px;
+    animation: splash-fade 0.4s 0.65s ease-out both;
+  }
+
+  @keyframes splash-fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
 
 
 </head>
 <body>
 
-  <div id="splash-screen">
-    <div class="splash-content">
+<div id="splash-screen">
+  <div class="splash-content">
+
+    <img src="graphics/favicon.png" alt="Matita Logo" class="splash-logo">
+
+    <div class="splash-header">
       <div class="splash-title">Matita</div>
-      <div class="splash-subtitle">The fast, high-level, multilingual programming language</div>
-      <div class="splash-meta">
-        ver. 0.9.3<br>
-        Open-source (GPL-3.0)<br>
-        <a href="https://github.com/dinoaccoto/Matita" target="_blank">github.com/dinoaccoto/Matita</a><br>
-        © 2025-2026 Dino Accoto<br>
-        Contact: da AT matitacode.com
-      </div>
-      <div class="splash-cta">
-        ⛶ Toggle to Full Screen for the best experience
+      <span class="splash-version">v 1.0.0</span>
+    </div>
+
+    <div class="splash-subtitle">Code the way you think</div>
+
+      <div class="splash-tips-grid"><div class="splash-tips-box">
+        <div class="splash-tip"><span class="splash-tip-num">1</span> Choose your language</div>
+        <div class="splash-tip"><span class="splash-tip-num">2</span> Enter full-screen mode</div>
+        <div class="splash-tip"><span class="splash-tip-num">3</span> Have a look at the manual</div>
+        <div class="splash-tip"><span class="splash-tip-num">4</span> Use the examples as inspiration</div>
+        <div class="splash-tip"><span class="splash-tip-num">5</span> Save your programs frequently</div>
+        <div class="splash-tip"><span class="splash-tip-num">6</span> Have fun</div>
       </div>
     </div>
+
+    <div class="splash-progress">
+      <div class="splash-progress-bar"></div>
+    </div>
+
+    <div class="splash-divider"></div>
+
+
+
+    <div class="splash-meta">
+      Open-source (GPL-3.0) &nbsp;·&nbsp;
+      <a href="https://github.com/dinoaccoto/Matita" target="_blank">GitHub</a>
+      <br>
+      © 2025-2026 &nbsp;·&nbsp; da@matitacode.com
+    </div>
+    <div class="splash-divider"></div>
+
+    <div class="splash-privacy">
+      Free &nbsp;·&nbsp; No Data Collection &nbsp;·&nbsp; Zero Footprint
+    </div>
+
   </div>
+</div>
 
   <div class="split-container">
     <div class="pane" id="editor-pane">
@@ -552,7 +686,15 @@
     <div id="canvasWindowHeader" class="canvas-window-header">
         <div id="canvasWindowTitle" class="canvas-window-title">canvas</div>
           <div class="canvas-window-actions">
-            <button id="snapButton" title="Attiva/Disattiva Snap ai punti (Calamita)" aria-label="Snap">🧲</button>
+            
+            <button id="snapButton" title="Attiva/Disattiva Snap ai punti (Calamita)" aria-label="Snap" style="display: flex; align-items: center; justify-content: center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 18v-8a7 7 0 0 1 14 0v8h-4v-8a3 3 0 0 0-6 0v8Z"></path>
+                <path d="M5 13h4"></path>
+                <path d="M15 13h4"></path>
+              </svg>
+            </button>
+            
             <button id="orthoButton" title="Vincola a direzioni ortogonali (Ortho)" aria-label="Ortho">⟂</button>
             
             <div style="display:flex; align-items:center; gap: 4px; border-left: 1px solid var(--border-color); padding-left: 6px; margin-left: 2px; border-right: 1px solid var(--border-color); padding-right: 6px; margin-right: 2px;">
@@ -605,7 +747,7 @@ function initMatita() {
       greetingMorning: "Buongiorno", greetingAfternoon: "Buon pomeriggio",
       greetingEvening: "Buonasera", welcomeMessage: "Matita pronto.",
       saveFilename: "codice_matita.txt", downloadFilename: "matita.html",
-      errorPrefix: "Errore alla riga", executionStopped: "Programma interrotto:",
+      errorPrefix: "Errore alla riga", warningPrefix: "Avviso alla riga", executionStopped: "Programma interrotto:",
       timeIs: "Sono le", todayIs: "Oggi è",
       warningShadowing: (name) => `Avviso: La variabile locale '${name}' sta nascondendo una variabile globale con lo stesso nome.`,
       variableNotFound: (name) => `Non riesco a trovare una variabile di nome '${name}'`,
@@ -697,7 +839,8 @@ function initMatita() {
       aliasLeftVar: "A sinistra di 'alias' serve un nome variabile.",
       aliasRightVar: "A destra di 'alias' serve una variabile o un elemento di lista.",
       scientificPositive: "Il valore per 'scientifica' deve essere un numero positivo.",
-      aliasCreateFail: (msg) => `Impossibile creare alias: ${msg}`,  
+      aliasCreateFail: (msg) => `Impossibile creare alias: ${msg}`,
+      privateAccess: (prop) => `'${prop}' è un membro privato (inizia con '_'). L'accesso dall'esterno della classe è sconsigliato.`,
     },
 
 
@@ -712,7 +855,7 @@ function initMatita() {
       greetingMorning: "Good morning", greetingAfternoon: "Good afternoon",
       greetingEvening: "Good evening", welcomeMessage: "Matita ready.",
       saveFilename: "matita_code.txt", downloadFilename: "matita.html",
-      errorPrefix: "Error on line", executionStopped: "Program interrupted:",
+      errorPrefix: "Error on line", warningPrefix: "Warning on line", executionStopped: "Program interrupted:",
       timeIs: "The time is", todayIs: "Today is",
       warningShadowing: (name) => `Warning: Local variable '${name}' is shadowing a global variable with the same name.`,
       variableNotFound: (name) => `I can't find a variable named '${name}'`,
@@ -797,6 +940,7 @@ function initMatita() {
       aliasRightVar: "A variable or list item is required on the right of 'alias'.",
       scientificPositive: "The value for 'scientific' must be a positive number.",
       aliasCreateFail: (msg) => `Cannot create alias: ${msg}`,
+      privateAccess: (prop) => `'${prop}' is a private member (starts with '_'). Access from outside the class is discouraged.`,
     },
 
     nl: {
@@ -810,7 +954,7 @@ function initMatita() {
       greetingMorning: "Goedemorgen", greetingAfternoon: "Goedemiddag",
       greetingEvening: "Goedenavond", welcomeMessage: "Matita klaar.",
       saveFilename: "matita_code.txt", downloadFilename: "matita.html",
-      errorPrefix: "Fout op regel", executionStopped: "Programma onderbroken:",
+      errorPrefix: "Fout op regel", warningPrefix: "Waarschuwing op regel", executionStopped: "Programma onderbroken:",
       timeIs: "Het is", todayIs: "Vandaag is het",
       warningShadowing: (name) => `Waarschuwing: lokale variabele '${name}' verbergt een globale variabele met dezelfde naam.`,
       variableNotFound: (name) => `Kan geen variabele vinden met de naam '${name}'`,
@@ -905,6 +1049,7 @@ function initMatita() {
       aliasRightVar: "Rechts van 'alias' is een variabele of lijstelement vereist.",
       scientificPositive: "De waarde voor 'wetenschappelijk' moet een positief getal zijn.",
       aliasCreateFail: (msg) => `Kan alias niet aanmaken: ${msg}`,
+      privateAccess: (prop) => `'${prop}' is een privélid (begint met '_'). Toegang van buiten de klasse wordt afgeraden.`,
     }
   };
 
@@ -1016,7 +1161,7 @@ function initMatita() {
     } else {
       orthoAngleButton.classList.remove("active");
     }
-    // Ridisegna subito se si cambia asse stando fermi col mouse
+    // Ridisegno subito se si cambia asse e mouse fermo
     if (!isRunning && isOrthoEnabled) redrawAll(env.gfxObjects, { backgroundColor: env.backgroundColor, backgroundImage: env.backgroundImage });
   });
 
@@ -1220,7 +1365,7 @@ const dictEnToNl = {
   const EXAMPLE_IT = `cancella schermo\n\nchiedi Nome dicendo "Come ti chiami?"\nmetti "Ciao, " + Nome+ ". Facciamo qualcosa insime! " in Messaggio\nscrivi Messaggio\n\nmetti 10 in N # numero di ripetizioni\nmetti 30 in H # altezza del testo\n\nindice I va da 1 a N ed esegui (\n    imposta colore (50, 10*I, 100-10*I)\n    graffiti grandezza H in punto(0, H*I-150) Nome\n)`;
   const EXAMPLE_NL = `wis scherm\n\nvraag Naam met bericht "Hoe heet je?"\nzet "Hallo, " + Naam + ". Laten we iets doen! " in Bericht\nschrijf Bericht\n\nzet 10 in N # aantal herhalingen\nzet 30 in H # tekstgrootte\n\nteller I loopt van 1 tot N en je doet (\n    stel kleur in (50, 10*I, 100-10*I)\n    graffiti grootte H op punt(0, H*I-150) Naam\n)`;
 
-  // ─── UNICO PUNTO DI REGISTRAZIONE LINGUE ───
+  // ===== PUNTO DI REGISTRAZIONE LINGUE =====
   const LANG_REGISTRY = {
     en: { uiStrings: uiStrings.en, dict: null,       inverseDict: null,       example: EXAMPLE_EN, suggestions: null },
     it: { uiStrings: uiStrings.it, dict: dictEnToIt, inverseDict: dictItToEn, example: EXAMPLE_IT,       suggestions: null },
@@ -1228,7 +1373,7 @@ const dictEnToNl = {
   };
 
   
-  // Applica un dizionario EN→XX a un testo in un singolo passaggio (previene le doppie traduzioni)
+  // Applica un dizionario EN→XX a un testo in un singolo passaggio
   function applyDict(code, dict) {
     if (!dict) return code;
     const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
@@ -1289,6 +1434,11 @@ const dictEnToNl = {
     "cast":         {en:"cast",          it:"cast",             nl:"cast"},
     "unicode":      {en:"unicode",       it:"unicode",          nl:"unicode"},
     "tock":         {en:"tock",          it:"tock",             nl:"tock"},
+    "tan":          {en:"tan",           it:"tan",              nl:"tan"},
+    "atan2":        {en:"atan2",         it:"atan2",            nl:"atan2"},
+    "log":          {en:"log",           it:"log",              nl:"log"},
+    "log10":        {en:"log10",         it:"log10",            nl:"log10"},
+    "sign":         {en:"sign",          it:"sign",             nl:"sign"},
     "whichlanguage":{en:"whichlanguage", it:"chelingua",        nl:"welketaal"},
   };
 
@@ -1370,8 +1520,9 @@ const dictEnToNl = {
 
     switch (node.type) {
       case "Literal": {
-        const v = node.value;
-        if (v === true)      return G("true_");
+        const v = node.value;
+        if (v === "__THIS__") return { en: "this", it: "questo", nl: "dit" }[lang] || "this";
+        if (v === true)      return G("true_");
         if (v === false)     return G("false_");
         if (v === null)      return "null";
         if (Array.isArray(v)) {
@@ -1457,9 +1608,11 @@ const dictEnToNl = {
       case "SetLiteral":
         return "set(" + node.items.map(n => serializeExpr(n, lang)).join(", ") + ")";
       case "RecordProp":
-        return serializeExpr(node.object, lang) + "." + node.prop;
-      default:
-        return "/*?*/";
+        return serializeExpr(node.object, lang) + "." + node.prop;
+      case "MethodCallExpr":
+        return serializeExpr(node.objExpr, lang) + "." + node.methodName + "(" + node.args.map(a => serializeExpr(a, lang)).join(", ") + ")";
+      default:
+        return "/*?*/";
     }
   }
 
@@ -1542,8 +1695,10 @@ const dictEnToNl = {
     and__:    {en:"and",               it:"ed",                 nl:"en"},
     define:   {en:"define",            it:"definisci",          nl:"definieer"},
     fn:       {en:"function",          it:"funzione",           nl:"functie"},
-    proc:     {en:"procedure",         it:"procedura",          nl:"procedure"},
-    return_:  {en:"return",            it:"restituisci",        nl:"geef"},
+    proc:     {en:"procedure",         it:"procedura",          nl:"procedure"},
+    class_:   {en:"class",             it:"classe",             nl:"klasse"},
+    extends_: {en:"extends",           it:"estende",            nl:"uitbreidt"},
+    return_:  {en:"return",            it:"restituisci",        nl:"geef"},
     ret_sfx:  {en:"",                  it:"",                   nl:"terug"},
     stop_:    {en:"stop",              it:"stop",               nl:"stop"},
     global_:  {en:"global",            it:"globale",            nl:"globaal"},
@@ -1563,9 +1718,18 @@ const dictEnToNl = {
     switch (node.type) {
 
       case "GlobalDecl":
-        return K("global_") + " " + node.names.join(", ");
+        return K("global_") + " " + node.names.join(", ");
 
-      case "RecordDecl":
+      case "ClassDef": {
+        const ext = node.baseClass ? " " + K("extends_") + " " + node.baseClass : "";
+        const fields = (node.fields && node.fields.length > 0) ? " (" + node.fields.join(", ") + ")" : "";
+        return K("define") + " " + K("class_") + " " + node.name + ext + fields + " " + sb(node.body);
+      }
+
+      case "MethodCall":
+        return node.objName + "." + node.methodName + "(" + node.args.map(a => sx(a)).join(", ") + ")";
+
+      case "RecordDecl":
         return "record " + node.name + "(" + node.keys.join(", ") + ")";
 
       case "RecordSet":
@@ -1837,7 +2001,7 @@ const dictEnToNl = {
   const langDropdownMenu = document.getElementById("langDropdownMenu");
   const fileDropdownMenu = document.getElementById("fileDropdownMenu");
   const fileMenuButton = document.getElementById("fileMenuButton");
-  const infoButton = document.getElementById("infoButton");
+  // const infoButton = document.getElementById("infoButton");
 
   fileMenuButton.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -1848,10 +2012,10 @@ const dictEnToNl = {
     langDropdownMenu.style.display = "none"; // Chiude l'altro menu se aperto
   });
 
-  infoButton.addEventListener("click", () => {
-    fileDropdownMenu.style.display = "none";
-    alert("Matita ver. 0.9.3 (beta)\n(c) 2025-2026 Dino Accoto");
-  });
+  //infoButton.addEventListener("click", () => {
+  //  fileDropdownMenu.style.display = "none";
+  //  alert("Matita ver. 0.9.3 (beta)\n(c) 2025-2026 Dino Accoto");
+  //});
 
   // Chiudi menu File al click sulle voci (le funzioni originali vengono comunque innescate grazie agli ID)
   [openButton, saveButton, getMatitalkButton].forEach(btn => {
@@ -1950,7 +2114,7 @@ const dictEnToNl = {
     "circle","radius","circumference","thickness","rectangle","line","triangle","arc","graffiti","draw",
     "rotate","deg","place","it","at","scale","by","load","paint","background",
     "true","false","or","not","is","equals", "different", "digits", "mod","pi","infinity","nan",
-    "abs","sin","cos","trunc","round","ceil","squareroot","min","max","random","point","pressed",
+    "abs","sin","cos","tan","atan2","log","log10","sign","trunc","round","ceil","squareroot","min","max","random","point","pressed",
     "split","decomposition","composition","unicode","indexof","tick","tock","null","import","label", "scientific",
     "repeat","times","ripeti","volte","keer"
   ];
@@ -1983,7 +2147,7 @@ const dictEnToNl = {
 
   const RE_NUMBER = /^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/;
   const RE_IDENT = /^[A-Za-z_àèéìòùÀÈÉÌÒÙ][A-Za-z0-9_àèéìòùÀÈÉÌÒÙ]*/;
-  const RE_OP = /^(===|!==|==|!=|<=|>=|<|>|\+|-|\*|\/|%|\^|=|;)/;
+  const RE_OP = /^(!==|!=|<>|<=|>=|<<|>>|<|>|\+|-|\*\*|\*|\/\/|\/|%%|%|\^|=+|;)/;
 
   function highlightLine(line) {
     let out = "";
@@ -1991,7 +2155,7 @@ const dictEnToNl = {
     while (i < line.length) {
       const ch = line[i];
 
-      if (ch === "#") { out += `<span class="tok-comment">${escapeHtml(line.slice(i))}</span>`; break; }
+      if (ch === "#" || (ch === "/" && line[i + 1] === "/")) { out += `<span class="tok-comment">${escapeHtml(line.slice(i))}</span>`; break; }
 
       if (ch === '"') {
         let j = i + 1, esc = false;
@@ -2160,8 +2324,14 @@ const dictEnToNl = {
     { label: "tock", insert: "tock", detail: "Elapsed ms since tick" },
     { label: "whichlanguage()", insert: "whichlanguage()", detail: "Returns active language (EN, IT, NL)" },
     { label: "random(min, max)", insert: "random(MIN, MAX)", detail: "Random number A to B" },
+    { label: "tan(x)", insert: "tan(VALUE)", detail: "Tangent (radians)" },
+    { label: "atan2(y, x)", insert: "atan2(Y, X)", detail: "Arctangent of Y/X → angle in radians" },
+    { label: "log(x)", insert: "log(VALUE)", detail: "Natural logarithm (base e)" },
+    { label: "log10(x)", insert: "log10(VALUE)", detail: "Logarithm base 10" },
+    { label: "sign(x)", insert: "sign(VALUE)", detail: "Sign of x: -1, 0 or 1" },
     { label: "dice( faces )", insert: "dice(FACES)", detail: "Random integer 1 to N" },
-    // Audio
+    
+    // Audio
     { label: "sound NAME ( ... )", insert: "sound NAME (\n    noise duration 500 ms\n)\n", detail: "Define a new sound" },
     { label: "play SOUND_NAME", insert: "play SOUND_NAME\n", detail: "Play a defined sound" },
     { label: "stop SOUND_NAME", insert: "stop SOUND_NAME\n", detail: "Stop a looping sound" },
@@ -2228,9 +2398,15 @@ const dictEnToNl = {
         { label: "tock", insert: "tock", detail: "Millisecondi trascorsi da tick" },
         { label: "chelingua()", insert: "chelingua()", detail: "Restituisce la lingua attiva (EN, IT, NL)" },
         { label: "casuale(min, max)", insert: "casuale(MIN, MAX)", detail: "Numero casuale tra A e B" },
+        { label: "tan(x)", insert: "tan(VALORE)", detail: "Tangente (radianti)" },
+        { label: "atan2(y, x)", insert: "atan2(Y, X)", detail: "Arcotangente di Y/X → angolo in radianti" },
+        { label: "log(x)", insert: "log(VALORE)", detail: "Logaritmo naturale (base e)" },
+        { label: "log10(x)", insert: "log10(VALORE)", detail: "Logaritmo in base 10" },
+        { label: "sign(x)", insert: "sign(VALORE)", detail: "Segno di x: -1, 0 oppure 1" },
         { label: "dado( facce )", insert: "dado(FACCE)", detail: "Numero intero tra 1 e N" },
         { label: "tipo(x)", insert: "tipo(VALORE)", detail: "Restituisce 'number', 'string', 'list', 'point'..." },
         { label: "numerico(x)", insert: "numerico(VALORE)", detail: "Vero se l'argomento è un numero valido" },
+
         // Audio
         { label: "suono NOME ( ... )", insert: "suono NOME (\n    rumore durata 500 ms\n)\n", detail: "Definisce un nuovo suono — usa 'play' e 'stop' per riprodurlo" },
         { label: "play NOME_SUONO", insert: "play NOME_SUONO\n", detail: "Riproduce un suono" },
@@ -2283,6 +2459,7 @@ const dictEnToNl = {
       { label: "vul achtergrond in", insert: "vul achtergrond in\n", detail: "Achtergrondkleur" },
       { label: "wacht N ms", insert: "wacht DUUR ms\n", detail: "Pauze" },
       { label: "vraag VAR met bericht \"...\"", insert: "vraag VAR met bericht \"BERICHT\"\n", detail: "Gebruikersinvoer" },
+
       // Woordenboeken
       { label: "zet {} in D",                    insert: "zet {} in DICT\n",                              detail: "Leeg woordenboek" },
       { label: "zet {k:v} in D",                 insert: "zet {\"SLEUTEL\": WAARDE} in DICT\n",           detail: "Woordenboek met waarden" },
@@ -2296,6 +2473,11 @@ const dictEnToNl = {
       { label: "tock", insert: "tock", detail: "Milliseconden verstreken na tick" },
       { label: "welketaal()", insert: "welketaal()", detail: "Geeft de actieve taal terug (EN, IT, NL)" },      
       { label: "willekeurig(min, max)", insert: "willekeurig(MIN, MAX)", detail: "Willekeurig getal van A tot B" },
+      { label: "tan(x)", insert: "tan(WAARDE)", detail: "Tangens (radialen)" },
+      { label: "atan2(y, x)", insert: "atan2(Y, X)", detail: "Boogtangens van Y/X → hoek in radialen" },
+      { label: "log(x)", insert: "log(WAARDE)", detail: "Natuurlijke logaritme (grondtal e)" },
+      { label: "log10(x)", insert: "log10(WAARDE)", detail: "Logaritme grondtal 10" },
+      { label: "sign(x)", insert: "sign(WAARDE)", detail: "Teken van x: -1, 0 of 1" },
       { label: "dobbelsteen( vlakken )", insert: "dobbelsteen(VLAKKEN)", detail: "Geheel getal van 1 tot N" },
       { label: "type(x)", insert: "type(WAARDE)", detail: "Geeft 'number', 'string', 'list', 'point'..." },
       { label: "numeriek(x)", insert: "numeriek(WAARDE)", detail: "Waar als het argument een geldig getal is" },
@@ -2310,6 +2492,7 @@ const dictEnToNl = {
       { label: "afkappen(N)", insert: "afkappen(N)", detail: "Geeft het gehele deel (afgekapt)" },
       { label: "afronden(N)", insert: "afronden(N)", detail: "Rondt af op het dichtstbijzijnde gehele getal" },
       { label: "A verschillend van B", insert: "A verschillend van B", detail: "Ongelijkheidsoperator" },
+
       // Audio
       { label: "geluid NAAM ( ... )", insert: "geluid NAAM (\n    ruis duur 500 ms\n)\n", detail: "Definieert een nieuw geluid" },
       { label: "play GELUID_NAAM", insert: "play GELUID_NAAM\n", detail: "Speelt een geluid af" },
@@ -2401,7 +2584,8 @@ const dictEnToNl = {
     if (_caretStylesReady) return;
     _caretStylesReady = true;
     const cs = window.getComputedStyle(codeInput);
-    // Proprietà statiche: si leggono una sola volta (non cambiano col resize)
+
+    // Proprietà statiche che non cambiano col resize:
     ["fontFamily","fontSize","fontWeight","fontStyle","letterSpacing","textTransform",
      "paddingTop","paddingRight","paddingBottom","paddingLeft",
      "borderTopWidth","borderRightWidth","borderBottomWidth","borderLeftWidth",
@@ -3096,7 +3280,7 @@ const dictEnToNl = {
       } else {
         // Default JS (solitamente 6 cifre) se non specificato
         s = n.toExponential();
-        // Pulizia estetica per rimuovere zeri non necessari (es 1.500000e+9)
+        // Pulizia estetica per rsimuovere zeri non necessari (es 1.500000e+9)
         if (s.indexOf('.') !== -1) {
             s = s.replace(/0+e/, 'e').replace(/\.e/, 'e');
         }
@@ -3133,11 +3317,15 @@ const dictEnToNl = {
       return `set(${value.__data.map(v => formatForOutput(v, precision)).join(", ")})`;
     }
     if (typeof value === "object" && value !== null && value.__type === "record") {
-      const entries = Object.entries(value.__data).map(([k,v]) => `${k}: ${formatForOutput(v, precision)}`);
-      return `record(${entries.join(", ")})`;
-    }
-    return String(value);
-  }
+      const entries = Object.entries(value.__data).map(([k,v]) => `${k}: ${formatForOutput(v, precision)}`);
+      return `record(${entries.join(", ")})`;
+    }
+    if (typeof value === "object" && value !== null && (value.__type === "instance" || value.__type === "super")) {
+      const prefix = currentLang === "it" ? "Istanza di" : currentLang === "nl" ? "Instantie van" : "Instance of";
+      return `<${prefix} ${value.__class}>`;
+    }
+    return String(value);
+  }
 
 
   function appendLine(message, isError=false, precision=null) {
@@ -3487,7 +3675,7 @@ function scheduleRedraw() {
 }
 
 function redrawAll(objects, context) {
-    // --- GESTIONE VISIBILITÀ CURSORE ---
+    // --- GESTIONE VISIBILITÀ DEL CURSORE ---
     // Se stiamo tracciando una linea Ortho, nascondiamo il puntatore reale del sistema
     if (isOrthoEnabled && orthoBasePoint) {
       gfxCanvas.style.cursor = "none";
@@ -3727,6 +3915,9 @@ function redrawAll(objects, context) {
     IS: [["is"],["viene"],["vale"],["uguale"]],
     EQUALS: [["equals"],["uguale"],["gelijk"]],
     PRESSED: [["pressed"],["premuto"],["ingedrukt"]],
+    CLASS:   [["class"],["classe"],["klasse"]],
+    EXTENDS: [["extends"],["estende"],["uitbreidt"]],
+    THIS:    [["this"],["questo"],["dit"]],
     TICK: [["tick"]],
     TOCK: [["tock"]],
     IMPORT: [["import"],["importa"],["importeer"]],
@@ -3839,7 +4030,8 @@ function redrawAll(objects, context) {
             return t; 
           }
 
-          if (ch === "#") { this.skipComment(); continue; } // comment
+          if (ch === "#") { this.skipComment(); continue; }
+          if (ch === "/" && this.src[this.i + 1] === "/") { this.skipComment(); continue; }
 
           // string
           if (ch === "\"") return this.readString();
@@ -3856,7 +4048,7 @@ function redrawAll(objects, context) {
           if ("+-*/%^<>=!".includes(ch)) {
             const line = this.line, col = this.col;
             const rest = this.src.slice(this.i);
-            const m = rest.match(/^(===|!==|==|!=|<=|>=|<|>|\+|-|\*|\/|%|\^|=)/);
+            const m = rest.match(/^(!==|!=|<>|<=|>=|<<|>>|<|>|\+|-|\*\*|\*|\/\/|\/|%%|%|\^|=+)/);
             const op = m ? m[0] : ch;
             for (let k = 0; k < op.length; k++) this.nextChar();
             return this.makeToken("OP", op, line, col);
@@ -3985,8 +4177,7 @@ function redrawAll(objects, context) {
         if (op==="^") return 7;
         if (op==="*" || op==="/" || op==="%") return 6;
         if (op==="+" || op==="-") return 5;
-        if (op==="=="||op==="==="||op==="!="||op==="!=="||op==="<"||op===">"||op==="<="||op===">=") return 4;
-        if (op==="=") return 4;
+        if (/^=+$/.test(op)||op==="!="||op==="!=="||op==="<>"||op==="<"||op===">"||op==="<="||op===">=") return 4;
         return 0;
       }
       if (tok.type==="IDENT") {
@@ -4189,6 +4380,7 @@ function redrawAll(objects, context) {
 
         // keywordish literals
         const litMap = {
+          "this": "__THIS__", "questo": "__THIS__", "dit": "__THIS__",
           "true": true, "vero": true, "waar": true,
           "false": false, "falso": false, "onwaar": false,
           "pi": Math.PI, "π": Math.PI,
@@ -4197,6 +4389,25 @@ function redrawAll(objects, context) {
         };
 
         if (nameLower in litMap) return { type:"Literal", value: litMap[nameLower], line: id.line };
+
+        // method call or property expression: obj.method(args) or obj.prop
+        if (this.peek().type==="DOT") {
+          this.consume(); // DOT
+          const methTok = this.parseIdentifier();
+          const lp = this.matchType("LPAREN");
+          if (!lp) {
+            return { type: "RecordProp", object: { type:"Var", name, nameLower, nameUpper: name.toUpperCase(), line: id.line }, prop: methTok.value, line: id.line };
+          }
+          const args = [];
+          if (this.peek().type !== "RPAREN") {
+            while (true) {
+              args.push(this.parseExpression(0, null));
+              if (!this.matchType("COMMA")) break;
+            }
+          }
+          if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, id.line);
+          return { type: "MethodCallExpr", objExpr: { type:"Var", name, nameLower, nameUpper: name.toUpperCase(), line: id.line }, methodName: methTok.value, args, line: id.line };
+        }
 
         // function call?
         if (this.peek().type==="LPAREN") {
@@ -4227,7 +4438,8 @@ function redrawAll(objects, context) {
         return { type: "RecordProp", object: left, prop: id.value, line: left.line };
       }
       if (tok.type==="OP") {
-        const op=this.consume().value;
+        const rawOp=this.consume().value;
+        const op = /^=+$/.test(rawOp) ? "===" : rawOp === "<>" ? "!=" : rawOp === "%%" ? "%" : rawOp === "**" ? "^" : rawOp;
         const right=this.parseExpression(opPrec, stopSet);
         return { type:"Binary", op, left, right, line: left.line };
       }
@@ -4331,8 +4543,27 @@ function redrawAll(objects, context) {
         return { type: "RecordDecl", name: nameTok.value, keys, line: t.line };
       }
 
-      // define function/procedure
+      // define function/procedure/class
       if (this.matchKW("DEFINE")) {
+
+        // define class
+        if (this.matchKW("CLASS")) {
+          const nameTok = this.parseIdentifier();
+          let baseClass = null;
+          if (this.matchKW("EXTENDS")) baseClass = this.parseIdentifier().value;
+          const lp = this.matchType("LPAREN");
+          const fields = [];
+          if (this.peek().type !== "RPAREN") {
+            while (true) {
+              fields.push(this.parseIdentifier().value);
+              if (!this.matchType("COMMA")) break;
+            }
+          }
+          if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, t.line);
+          const body = this.parseBlock();
+          return { type: "ClassDef", name: nameTok.value, baseClass, fields, body, line: t.line };
+        }
+
         const kindTok = this.matchKW("FUNCTION") || this.matchKW("PROCEDURE");
         if (!kindTok) this.throwParse(uiStrings[lang].expectedFuncProc, t.line);
         const kind = (kindTok.value.toLowerCase()==="function" || kindTok.value.toLowerCase()==="funzione" || kindTok.value.toLowerCase()==="functie") ? "function" : "procedure";
@@ -5000,6 +5231,24 @@ function redrawAll(objects, context) {
         return { type: "Repeat", countExpr, block, line: t.line };
       }
 
+      // method call: OBJ.method(args)
+      if (t.type==="IDENT" && this.peek(1).type==="DOT" &&
+          this.peek(2).type==="IDENT" && this.peek(3).type==="LPAREN") {
+        const objTok    = this.consume(); // object name
+        this.consume();                   // DOT
+        const methTok   = this.consume(); // method name
+        this.consume();                   // LPAREN
+        const args = [];
+        if (this.peek().type !== "RPAREN") {
+          while (true) {
+            args.push(this.parseExpression(0, null));
+            if (!this.matchType("COMMA")) break;
+          }
+        }
+        if (!this.matchType("RPAREN")) this.throwParse(uiStrings[lang].unbalancedParens, t.line);
+        return { type: "MethodCall", objName: objTok.value, methodName: methTok.value, args, line: t.line };
+      }
+
       // procedure call or unknown command: IDENT ...
       if (t.type==="IDENT") {
         const nameTok=this.consume();
@@ -5499,6 +5748,11 @@ function builtin_split(args) {
   function regBuiltin(names, fn) { names.forEach(n => { BUILTINS[n] = fn; }); }
 
   regBuiltin(["abs", "assoluto"], (a)=>Math.abs(a[0] ?? 0));
+  regBuiltin(["tan"],   (a)=>Math.tan(a[0] ?? 0));
+  regBuiltin(["atan2"], (a)=>Math.atan2(a[0] ?? 0, a[1] ?? 1));
+  regBuiltin(["log"],   (a)=>Math.log(a[0] ?? 1));
+  regBuiltin(["log10"], (a)=>Math.log10(a[0] ?? 1));
+  regBuiltin(["sign"],  (a)=>Math.sign(a[0] ?? 0));
   regBuiltin(["sin", "seno"], (a)=>Math.sin(a[0] ?? 0));
   regBuiltin(["cos", "coseno"], (a)=>Math.cos(a[0] ?? 0));  
   regBuiltin(["trunc","tronca","afkappen"], (a)=>Math.trunc(a[0] ?? 0));
@@ -5533,6 +5787,11 @@ function builtin_split(args) {
   regBuiltin(["mouse_y"], () => env.mouseY || 0);
   regBuiltin(["mouse_pressed", "mouse_premuto", "mouse_ingedrukt"], () => !!env.mouseDown);
   regBuiltin(["whichlanguage", "chelingua", "welketaal"], () => currentLang.toUpperCase());
+  regBuiltin(["classof", "classedi", "klassevan"], (args) => {
+    const inst = args[0];
+    if (!inst || inst.__type !== "instance") return null;
+    return inst.__class.toLowerCase();
+  });
 
 
   
@@ -6207,6 +6466,12 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       return res;
     },
     recordGet: (obj, prop) => {
+      if (obj && obj.__type === "instance") {
+        const p = prop.toUpperCase();
+        if (!(p in obj.__data)) throw new Error("RECORD_KEY_NOT_FOUND:" + prop);
+        return obj.__data[p];
+      }
+
       if (obj && obj.__type === "record") {
         if (!(prop in obj.__data)) throw new Error("RECORD_KEY_NOT_FOUND:" + prop);
         return obj.__data[prop];
@@ -6214,6 +6479,13 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       throw new Error("NOT_A_RECORD");
     },
     recordSet: (obj, prop, val) => {
+      if (obj && obj.__type === "instance") {
+        const p = prop.toUpperCase();
+        if (!(p in obj.__data)) throw new Error("RECORD_KEY_NOT_FOUND:" + prop);
+        obj.__data[p] = rt.deepCopy(val);
+        return;
+      }
+
       if (obj && obj.__type === "record") {
         if (!(prop in obj.__data)) throw new Error("RECORD_KEY_NOT_FOUND:" + prop);
         obj.__data[prop] = rt.deepCopy(val);
@@ -6221,6 +6493,32 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
       }
       throw new Error("NOT_A_RECORD");
     },
+
+    callMethod: async (inst, methU, args, sc, env) => {
+      // Gestione super: risale alla classe genitore evitando ricorsione
+      if (inst && inst.__type === "super") {
+        const parentClsName = env.classes[inst.__class] && env.classes[inst.__class].baseClass;
+        if (!parentClsName) throw new Error("NO_SUPER_CLASS");
+        const fn = env.classes[parentClsName].methods[methU];
+        if (!fn) throw new Error(`METHOD_NOT_FOUND:${methU}`);
+        const result = await fn(rt, env, [sc[0]], args, sc, inst.__inst);
+        if (result && result.__return) return result.value;
+        return null;
+      }
+      if (!inst || inst.__type !== "instance") throw new Error("NOT_AN_INSTANCE");
+      const cls = env.classes[inst.__class];
+      const fn = cls.methods[methU];
+      if (!fn) throw new Error(`METHOD_NOT_FOUND:${methU}`);
+      const result = await fn(rt, env, [sc[0]], args, sc, inst);
+      if (result && result.__return) return result.value;
+      return null;
+    },
+
+    warnPrivate: (prop, line) => {
+      const msg = uiStrings[lang].privateAccess(prop);
+      appendLine(`${uiStrings[lang].warningPrefix} ${line + 1}: ${msg}`, false);
+    },
+
     addOps: (a, b) => {
       if (a && a.__type === "set" && b && b.__type === "set") return rt.setUnion(a, b);
       if (typeof a !== "string" && typeof b !== "string") return Number(a) + Number(b);
@@ -6240,6 +6538,9 @@ env.gfxObjects.push({ type: "text", x: x - w/2, y: y - h/2, width: w, height: h,
   };
 
   // ===== FASE C: TRANSPILATORE (AST -> JS) =====
+
+  let _compileEnv = { classes: {} };
+  let _compileCtx = null;
 
 function extractListPath(expr, isAsync) {
   const path = [];
@@ -6261,8 +6562,14 @@ function extractListPath(expr, isAsync) {
   function compileExpr(node, isAsync) {
     if (!node) return "null";
     switch (node.type) {
-      case "Literal": return JSON.stringify(node.value);
-      case "Var": return node.nameLower === "tock" ? `rt.tock()` : `rt.getVar(sc, "${node.nameUpper}")`;
+      case "Literal":
+        if (node.value === "__THIS__") return `rt.getVar(sc, "__THIS__")`;
+        return JSON.stringify(node.value);
+      case "Var": 
+        if (_compileCtx && _compileCtx.fields.includes(node.nameUpper)) {
+          return `__inst.__data["${node.nameUpper}"]`;
+        }
+        return node.nameLower === "tock" ? `rt.tock()` : `rt.getVar(sc, "${node.nameUpper}")`;
       case "Tuple": return `[${node.items.map(i => compileExpr(i, isAsync)).join(", ")}]`;
       
       case "Unary":
@@ -6272,7 +6579,7 @@ function extractListPath(expr, isAsync) {
       case "Binary": {
         if (node.op === "and") return `(rt.t(${compileExpr(node.left, isAsync)}) && rt.t(${compileExpr(node.right, isAsync)}))`;
         if (node.op === "or") return `(rt.t(${compileExpr(node.left, isAsync)}) || rt.t(${compileExpr(node.right, isAsync)}))`;
-        if (["===","==","="].includes(node.op)) return `(Object.is(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)}))`;
+        if (node.op === "===") return `(Object.is(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)}))`;
         if (["!==","!="].includes(node.op)) return `(!Object.is(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)}))`;
         if (node.op === "^") return `Math.pow(Number(${compileExpr(node.left, isAsync)}), Number(${compileExpr(node.right, isAsync)}))`;
         if (node.op === "+") return `rt.addOps(${compileExpr(node.left, isAsync)}, ${compileExpr(node.right, isAsync)})`;
@@ -6305,7 +6612,17 @@ function extractListPath(expr, isAsync) {
       case "SetLiteral":
         return `rt.createSet([${node.items.map(i => compileExpr(i, isAsync)).join(", ")}])`;
       case "RecordProp":
+        if (node.prop.startsWith("_") && !_compileCtx) {
+          // Accesso a campo privato dall'esterno emette avviso a runtime
+          return `(rt.warnPrivate("${node.prop}", ${node.line}), rt.recordGet(${compileExpr(node.object, isAsync)}, "${node.prop}"))`;
+        }
         return `rt.recordGet(${compileExpr(node.object, isAsync)}, "${node.prop}")`;
+      case "MethodCallExpr": {
+        const callArgs = `[${node.args.map(a => `{val: ${compileExpr(a, isAsync)}, isVar: ${a.type==="Var"}, name: "${a.name||""}"}`).join(", ")}]`;
+        return isAsync
+          ? `(await rt.callMethod(${compileExpr(node.objExpr, isAsync)}, "${node.methodName.toUpperCase()}", ${callArgs}, sc, env))`
+          : `rt.callMethod(${compileExpr(node.objExpr, isAsync)}, "${node.methodName.toUpperCase()}", ${callArgs}, sc, env)`;
+      }
       default: return "null";
     }
   }
@@ -6315,6 +6632,87 @@ function extractListPath(expr, isAsync) {
     code += `${indent}if (env.__forceStop) return { type: "ExecutionStop" };\n`;
     
     switch (node.type) {
+
+      case "ClassDef": {
+        const clsU = node.name.toUpperCase();
+        
+        // Logica a TEMPO DI COMPILAZIONE per estrarre tutti i campi, base compresa
+        const allFields = [];
+        if (node.baseClass && _compileEnv.classes[node.baseClass.toUpperCase()]) {
+            allFields.push(..._compileEnv.classes[node.baseClass.toUpperCase()].fields);
+        }
+        for (const f of node.fields) {
+            const up = f.toUpperCase();
+            if (!allFields.includes(up)) allFields.push(up);
+        }
+        _compileEnv.classes[clsU] = { fields: allFields };
+
+        // A RUNTIME: Registra classe usando i Prototypes (Object.create) per la gerarchia metodi
+        code += `${indent}env.classes["${clsU}"] = { fields: [${allFields.map(f=>`"${f}"`).join(",")}], baseClass: ${node.baseClass ? `"${node.baseClass.toUpperCase()}"` : "null"} };\n`;
+        code += `${indent}env.classes["${clsU}"].methods = Object.create(${node.baseClass ? `env.classes["${node.baseClass.toUpperCase()}"].methods` : "null"});\n`;
+
+        // Costruttore di default
+        code += `${indent}env.functions["${clsU}"] = async function(rt, env, scChain, args, _callerSc) {\n`;
+        code += `${indent}  const cls = env.classes["${clsU}"];\n`;
+        code += `${indent}  const inst = { __type:"instance", __class:"${clsU}", __data:Object.create(null) };\n`;
+        code += `${indent}  for (const f of cls.fields) inst.__data[f] = null;\n`;
+        // Se INITIALIZE esiste, riceve gli args ed è l'unico responsabile dell'init.
+        // Altrimenti, l'assegnazione posizionale avviene automaticamente.
+        code += `${indent}  const __initFn = cls.methods["INIZIALIZZA"] || cls.methods["INITIALIZE"];\n`;
+        code += `${indent}  if (__initFn) { await __initFn(rt, env, scChain, args, _callerSc, inst); }\n`;
+        code += `${indent}  else { for (let i=0;i<Math.min(args.length,cls.fields.length);i++) inst.__data[cls.fields[i]] = rt.deepCopy(args[i].val); }\n`;
+        code += `${indent}  return { __return:true, value:inst };\n`;
+        code += `${indent}};\n`;
+
+        // Compila i metodi
+        for (const stmt of node.body.stmts) {
+          if (stmt.type !== "Define") continue;
+          const methU = stmt.name.toUpperCase();
+          const isFunc = stmt.kind === "function";
+          code += `${indent}env.classes["${clsU}"].methods["${methU}"] = async function(rt, env, scChain, args, _callerSc, __inst) {\n`;
+          code += `${indent}  if (env.callDepth >= 200) throw new Error("RECURSION_LIMIT");\n`;
+          code += `${indent}  env.callDepth++;\n`;
+          code += `${indent}  try {\n`;
+          code += `${indent}    const localScope = rt.makeScope();\n`;
+          code += `${indent}    const sc = [...scChain, localScope];\n`;
+          code += `${indent}    localScope["__THIS__"] = __inst;\n`; // Supporto per this/questo/dit
+        // Supporto per super/sovra/ouder: permette di chiamare i metodi della classe genitore
+          code += `${indent}    const __superRef = { __type: "super", __class: "${clsU}", __inst: __inst };\n`;
+          code += `${indent}    localScope["SUPER"] = __superRef;\n`;
+          code += `${indent}    localScope["SOVRA"] = __superRef;\n`; // alias IT
+          code += `${indent}    localScope["OUDER"] = __superRef;\n`; // alias NL
+          
+          if (stmt.params.length > 0) {
+            code += `${indent}    if (args.length !== ${stmt.params.length}) throw new Error("ARG_COUNT:${stmt.name}:${stmt.params.length}:"+args.length+":${isFunc?"func":"proc"}");\n`;
+            stmt.params.forEach((p, i) => {
+              code += `${indent}    localScope["${p.name.toUpperCase()}"] = rt.deepCopy(args[${i}].val);\n`;
+            });
+          }
+          
+          // Abilita il Context per tradurre le variabili statiche
+          try {
+            _compileCtx = { fields: allFields };
+            code += compileBlock(stmt.body, indent + "    ", true);
+          } finally {
+            _compileCtx = null; // Resetta il Context anche in caso di errore di compilazione
+          }
+          
+          if (isFunc) code += `${indent}    throw new Error("FUNC_NO_RETURN:${stmt.name}");\n`;
+          code += `${indent}  } finally { env.callDepth--; }\n`;
+          code += `${indent}};\n`;
+        }
+        break;
+      }
+
+      case "MethodCall": {
+        const callArgs = `[${node.args.map(a=>`{val:${compileExpr(a,isAsync)},isVar:${a.type==="Var"},name:"${a.name||""}"}`).join(",")}]`;
+        code += `${indent}await rt.callMethod(rt.getVar(sc,"${node.objName.toUpperCase()}"), "${node.methodName.toUpperCase()}", ${callArgs}, sc, env);\n`;
+        break;
+      }
+
+
+
+
       case "RecordDecl":
         // Genera una funzione costruttore salvata con il nome del record
         code += `${indent}env.functions["${node.name.toUpperCase()}"] = async function(rt, env, scChain, args, _callerSc) {\n`;
@@ -6331,8 +6729,13 @@ function extractListPath(expr, isAsync) {
         break;
 
       case "RecordSet":
+        if (node.target.prop.startsWith("_") && !_compileCtx) {
+          // Scrittura a campo privato dall'esterno emette avviso a runtime
+          code += `${indent}rt.warnPrivate("${node.target.prop}", ${node.line});\n`;
+        }
         code += `${indent}rt.recordSet(${compileExpr(node.target.object, isAsync)}, "${node.target.prop}", ${compileExpr(node.rhs, isAsync)});\n`;
         break;
+
       case "GlobalDecl":
         code += `${indent}sc[sc.length - 1].__globalVars ||= new Set();\n`;
         node.names.forEach(n => { code += `${indent}sc[sc.length - 1].__globalVars.add("${n.toUpperCase()}");\n`; });
@@ -6415,27 +6818,34 @@ function extractListPath(expr, isAsync) {
       
       case "LoadBackground": code += `${indent}await rt.loadBg(${compileExpr(node.filenameExpr, isAsync)}, ${compileExpr(node.scaleExpr, isAsync)});\n`; break;
       case "PutVar":
-        if (node.aliasExpr) {
-          const aliasName = node.varNameUpper;
-          const tExpr = node.aliasExpr.right;
-          if (tExpr.type === "Var") code += `${indent}rt.makeAliasVar(sc, "${aliasName}", "${tExpr.nameUpper}");\n`;
-          else if (tExpr.type === "ItemOf") code += `${indent}rt.makeAliasItem(sc, "${aliasName}", () => ${compileExpr(tExpr.list, isAsync)}, () => ${compileExpr(tExpr.index, isAsync)}); \n`;
-          else if (tExpr.type === "Subscript") code += `${indent}rt.makeAliasDict(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, () => ${compileExpr(tExpr.key, isAsync)}); \n`;
-          else if (tExpr.type === "RecordProp") code += `${indent}rt.makeAliasRecord(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, "${tExpr.prop}"); \n`;
-          else if (tExpr.type === "PointProp") code += `${indent}rt.makeAliasPoint(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, "${tExpr.prop}"); \n`;
-          else code += `${indent}throw new Error("INVALID_ALIAS_DEST");\n`;
-          code += `${indent}rt.setVar(sc, "${aliasName}", rt.maybeCopy(${compileExpr(node.rhs, isAsync)}));\n`;
-        } else if (node.targets && node.targets.length > 1) {
-          code += `${indent}{ const __putRhs = ${compileExpr(node.rhs, isAsync)};\n`;
-          node.targets.forEach((tgt) => {
-            code += `${indent}  rt.setVar(sc, "${tgt.varNameUpper}", rt.maybeCopy(__putRhs));\n`;
-          });
-          code += `${indent}}\n`;
-
-        } else {
-          code += `${indent}rt.setVar(sc, "${node.varNameUpper}", rt.maybeCopy(${compileExpr(node.rhs, isAsync)}));\n`;
-        }
-        break;
+        if (node.aliasExpr) {
+          const aliasName = node.varNameUpper;
+          const tExpr = node.aliasExpr.right;
+          if (tExpr.type === "Var") code += `${indent}rt.makeAliasVar(sc, "${aliasName}", "${tExpr.nameUpper}");\n`;
+          else if (tExpr.type === "ItemOf") code += `${indent}rt.makeAliasItem(sc, "${aliasName}", () => ${compileExpr(tExpr.list, isAsync)}, () => ${compileExpr(tExpr.index, isAsync)}); \n`;
+          else if (tExpr.type === "Subscript") code += `${indent}rt.makeAliasDict(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, () => ${compileExpr(tExpr.key, isAsync)}); \n`;
+          else if (tExpr.type === "RecordProp") code += `${indent}rt.makeAliasRecord(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, "${tExpr.prop}"); \n`;
+          else if (tExpr.type === "PointProp") code += `${indent}rt.makeAliasPoint(sc, "${aliasName}", () => ${compileExpr(tExpr.object, isAsync)}, "${tExpr.prop}"); \n`;
+          else code += `${indent}throw new Error("INVALID_ALIAS_DEST");\n`;
+          code += `${indent}rt.setVar(sc, "${aliasName}", rt.maybeCopy(${compileExpr(node.rhs, isAsync)}));\n`;
+        } else if (node.targets && node.targets.length > 1) {
+          code += `${indent}{ const __putRhs = ${compileExpr(node.rhs, isAsync)};\n`;
+          node.targets.forEach((tgt) => {
+            if (_compileCtx && _compileCtx.fields.includes(tgt.varNameUpper)) {
+              code += `${indent}  __inst.__data["${tgt.varNameUpper}"] = rt.maybeCopy(__putRhs);\n`;
+            } else {
+              code += `${indent}  rt.setVar(sc, "${tgt.varNameUpper}", rt.maybeCopy(__putRhs));\n`;
+            }
+          });
+          code += `${indent}}\n`;
+        } else {
+          if (_compileCtx && _compileCtx.fields.includes(node.varNameUpper)) {
+            code += `${indent}__inst.__data["${node.varNameUpper}"] = rt.maybeCopy(${compileExpr(node.rhs, isAsync)});\n`;
+          } else {
+            code += `${indent}rt.setVar(sc, "${node.varNameUpper}", rt.maybeCopy(${compileExpr(node.rhs, isAsync)}));\n`;
+          }
+        }
+        break;
 
       case "PutItem": {
         const p = extractListPath(node.listExpr, isAsync);
@@ -6568,8 +6978,10 @@ function extractListPath(expr, isAsync) {
   }
 
   function compileProgram(ast) {
-    const isAsync = true;
-    let code = `
+    _compileEnv = { classes: {} }; // Reset ambiente statico
+    _compileCtx = null;
+    const isAsync = true;
+    let code = `
       let __line = 0; let __chk = 0;
       const __t0 = performance.now(); let __lastYield = __t0;
       try {
@@ -6607,9 +7019,12 @@ function extractListPath(expr, isAsync) {
          else if (msg === "GRAFFITI_CONTENT_NOT_STRING") rt.fail("graffitiContentNotString", null, __line);
          else if (msg === "SCI_POSITIVE") rt.fail("scientificPositive", null, __line);
          else if (msg === "NOT_A_DICT") rt.fail("notADict", null, __line);
+         else if (msg === "NOT_AN_INSTANCE") rt.fail("genericFail", {msg: "This variable is not a class instance."}, __line);
+         else if (msg === "NO_SUPER_CLASS") rt.fail("genericFail", {msg: "This class has no parent class ('super' not available)."}, __line);
+         else if (msg.startsWith("METHOD_NOT_FOUND:")) rt.fail("genericFail", {msg: "Method not found: " + msg.split(":")[1]}, __line);
          else if (msg === "DIM_NOT_LIST_OR_DICT") rt.fail("dimensionNeedsList", null, __line);
-         else if (msg === "NOT_A_RECORD") rt.fail("genericFail", {msg: "Questa variabile non è un record."}, __line);
-         else if (msg.startsWith("RECORD_KEY_NOT_FOUND:")) rt.fail("genericFail", {msg: "Chiave record non trovata: " + msg.split(":")[1]}, __line);
+         else if (msg === "NOT_A_RECORD") rt.fail("genericFail", {msg: "${currentLang === 'it' ? 'Questa variabile non è un record.' : currentLang === 'nl' ? 'Deze variabele is geen record.' : 'This variable is not a record.'}"}, __line);
+         else if (msg.startsWith("RECORD_KEY_NOT_FOUND:")) rt.fail("genericFail", {msg: "${currentLang === 'it' ? 'Chiave record non trovata: ' : currentLang === 'nl' ? 'Record sleutel niet gevonden: ' : 'Record key not found: '}" + msg.split(":")[1]}, __line);
          else if (msg.startsWith("KEY_NOT_FOUND:")) rt.fail("keyNotFound", msg.slice(14), __line);
          else if (msg === "REPEAT_NOT_NUMERIC") rt.fail("shapeParamsNotNumeric", "repeat/ripeti/herhaal", __line);
          else if (msg === "infiniteLoop") rt.fail("infiniteLoop", null, __line);
@@ -6669,6 +7084,7 @@ function extractListPath(expr, isAsync) {
       env.mouseDown = false;
 
       env.varOriginalNames = {};
+      env.classes = Object.create(null);
 
       resetCameraToCenter();
 
@@ -7480,10 +7896,10 @@ function getExample(lang) {
   // --- SPLASH SCREEN LOGIC ---
   const splashScreen = document.getElementById("splash-screen");
   if (splashScreen) {
-    // Scompare automaticamente dopo 7 secondi
+    // Scompare automaticamente dopo 12 secondi
     const splashTimeout = setTimeout(() => {
       splashScreen.classList.add("hidden");
-    }, 7000);
+    }, 12000);
 
     // Permette all'utente di chiuderlo prima cliccando ovunque
     splashScreen.addEventListener("click", () => {
@@ -7503,7 +7919,7 @@ document.addEventListener("DOMContentLoaded", initMatita);
   <div class="menu-option" id="saveButton">Salva</div>
   <div class="menu-option" id="getMatitalkButton">Download</div>
   <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 4px 0;"></div>
-  <div class="menu-option" id="infoButton">Info</div>
+  <!-- <div class="menu-option" id="infoButton">Info</div> -->
 </div>
 
 <div id="langDropdownMenu" style="display:none; position:fixed; background:rgba(2,6,23,0.97); border:1px solid var(--border-color); border-radius:var(--radius-md); z-index:9999; min-width:72px; box-shadow:0 8px 20px rgba(0,0,0,0.4);">

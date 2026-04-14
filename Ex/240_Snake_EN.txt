@@ -1,0 +1,200 @@
+# *****
+# Name: Snake
+# Category: Game
+# Program ver: 1.0
+# Matita ver: 0.9
+# Date: 2026-04-10
+# Language: EN
+# Description: The classic Snake game.
+# *****
+
+clear screen
+clear graphics
+
+# --- SOUNDS ---
+# A soft, high-pitched chime for eating food
+sound EatSound (
+    sweep from 600 to 1200 hz
+    duration 100 ms
+    wave "sine"
+)
+volume EatSound 20
+
+# A low, descending synth for hitting a wall/tail
+sound DieSound (
+    sweep from 300 to 50 hz
+    duration 400 ms
+    wave "sawtooth"
+)
+volume DieSound 30
+
+# --- INITIAL SETUP ---
+put list() in SNAKE_X
+put list() in SNAKE_Y
+put 10 in STEP
+put 150 in BOUNDARY
+
+# Initialize Snake (3 segments starting at the center)
+add 0 to SNAKE_X
+add 0 to SNAKE_Y
+add -10 to SNAKE_X
+add 0 to SNAKE_Y
+add -20 to SNAKE_X
+add 0 to SNAKE_Y
+
+# Initial Direction (Moving Right)
+put 10 in DIR_X
+put 0 in DIR_Y
+
+put 0 in SCORE
+put 0 in GAME_OVER
+
+put 50 in FOOD_X
+put 0 in FOOD_Y
+
+# Speed control variable (starts slow at 150ms)
+put 150 in DELAY
+
+# Procedure to place food aligned to the grid
+define procedure place_food() (
+    global FOOD_X, FOOD_Y, STEP
+    put (dice(29) - 15) * STEP in FOOD_X
+    put (dice(29) - 15) * STEP in FOOD_Y
+)
+
+place_food()
+
+# Pre-frame the camera so it doesn't jump around
+set color (0, 0, 0)
+rectangle from (-BOUNDARY - 20, -BOUNDARY - 20) to (BOUNDARY + 20, BOUNDARY + 20)
+frame graphics
+
+# --- MAIN GAME LOOP ---
+as long as (GAME_OVER equals 0) you do (
+    global SNAKE_X, SNAKE_Y, DIR_X, DIR_Y, SCORE, GAME_OVER, FOOD_X, FOOD_Y, STEP, BOUNDARY, DELAY
+    
+    # 1. INPUT
+    # Prevent reversing direction directly onto itself
+    if (key "UP" is pressed) and (DIR_Y equals 0) then ( put 0 in DIR_X; put STEP in DIR_Y )
+    if (key "DOWN" is pressed) and (DIR_Y equals 0) then ( put 0 in DIR_X; put -STEP in DIR_Y )
+    if (key "LEFT" is pressed) and (DIR_X equals 0) then ( put -STEP in DIR_X; put 0 in DIR_Y )
+    if (key "RIGHT" is pressed) and (DIR_X equals 0) then ( put STEP in DIR_X; put 0 in DIR_Y )
+    
+    # 2. MOVEMENT CALCULATIONS
+    put item 1 of SNAKE_X in HEAD_X
+    put item 1 of SNAKE_Y in HEAD_Y
+    
+    put HEAD_X + DIR_X in NEW_HEAD_X
+    put HEAD_Y + DIR_Y in NEW_HEAD_Y
+    
+    # 3. COLLISIONS
+    # Wall Collision
+    if (NEW_HEAD_X > BOUNDARY) or (NEW_HEAD_X < -BOUNDARY) or (NEW_HEAD_Y > BOUNDARY) or (NEW_HEAD_Y < -BOUNDARY) then (
+        if (GAME_OVER equals 0) then ( play DieSound )
+        put 1 in GAME_OVER
+    )
+    
+    # Self Collision (Check if new head hits any existing body part)
+    put dimension of SNAKE_X in LEN
+    index i goes from 1 to LEN and you do (
+        put item i of SNAKE_X in SEG_X
+        put item i of SNAKE_Y in SEG_Y
+        if (NEW_HEAD_X equals SEG_X) and (NEW_HEAD_Y equals SEG_Y) then (
+            if (GAME_OVER equals 0) then ( play DieSound )
+            put 1 in GAME_OVER
+        )
+    )
+    
+    # 4. UPDATE SNAKE
+    if (GAME_OVER equals 0) then (
+        # Add new head position
+        insert NEW_HEAD_X at item 1 of SNAKE_X
+        insert NEW_HEAD_Y at item 1 of SNAKE_Y
+        
+        # Check Food Logic
+        if (NEW_HEAD_X equals FOOD_X) and (NEW_HEAD_Y equals FOOD_Y) then (
+            play EatSound
+            put SCORE + 10 in SCORE
+            
+            # --- SPEED UP LOGIC ---
+            put DELAY - 4 in DELAY
+            if (DELAY < 30) then ( put 30 in DELAY )
+            
+            place_food()
+        ) otherwise (
+            # If we didn't eat, remove the tail to keep length constant
+            remove last item from SNAKE_X
+            remove last item from SNAKE_Y
+        )
+    )
+
+    # 5. DRAWING
+    clear graphics
+    set color (30, 30, 30)
+    paint background
+    
+    # Draw Arena limits
+    set color (10, 10, 10)
+    rectangle from (-BOUNDARY, -BOUNDARY) to (BOUNDARY, BOUNDARY)
+    set color (100, 100, 100)
+    line thickness 2 from (-BOUNDARY, -BOUNDARY) to (BOUNDARY, -BOUNDARY)
+    line thickness 2 from (BOUNDARY, -BOUNDARY) to (BOUNDARY, BOUNDARY)
+    line thickness 2 from (BOUNDARY, BOUNDARY) to (-BOUNDARY, BOUNDARY)
+    line thickness 2 from (-BOUNDARY, BOUNDARY) to (-BOUNDARY, -BOUNDARY)
+
+    # Draw Food
+    set color (100, 20, 20)
+    rectangle from (FOOD_X - 4, FOOD_Y - 4) to (FOOD_X + 4, FOOD_Y + 4)
+    
+    # Draw Snake
+    put dimension of SNAKE_X in NEW_LEN
+    index i goes from 1 to NEW_LEN and you do (
+        put item i of SNAKE_X in SX
+        put item i of SNAKE_Y in SY
+        if (i equals 1) then (
+            set color (50, 100, 50) # Head is lighter green
+        ) otherwise (
+            set color (20, 80, 20)  # Body is darker green
+        )
+        rectangle from (SX - 4, SY - 4) to (SX + 4, SY + 4)
+    )
+    
+    # Draw HUD
+    set color (100, 100, 100)
+    graffiti size 14 at point(0, BOUNDARY + 15) "SCORE: " + SCORE
+    
+    redraw
+    
+    wait DELAY ms
+)
+
+# --- GAME OVER SCREEN ---
+clear graphics
+set color (0, 0, 0)
+paint background
+
+# Draw a decorative border for the Game Over window
+set color (100, 20, 20)
+rectangle from (-160, -80) to (160, 80)
+set color (10, 10, 10)
+rectangle from (-150, -70) to (150, 70)
+
+# Game Over Text
+set color (100, 20, 20)
+graffiti size 45 at point(0, 25) "GAME OVER"
+
+# Final Score Text
+set color (100, 80, 20)
+graffiti size 25 at point(0, -20) "SCORE: " + SCORE
+
+# Restart hint
+set color (60, 60, 60)
+graffiti size 12 at point(0, -50) "Press RUN to play again"
+
+redraw
+
+clear screen
+write "=== GAME OVER ==="
+newline
+write "Final Score: "
+write SCORE

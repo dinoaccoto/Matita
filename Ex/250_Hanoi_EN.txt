@@ -1,0 +1,122 @@
+# *****
+# Name: Tower of Hanoi
+# Category: Programming, Game
+# Program ver: 1.1
+# Date: 2026-04-12
+# Author: DA
+# Language: EN
+# Matita ver: 0.4
+# Description: Move all the discs from the left to the right peg. 
+# On any peg, a disc can only be placed on top of a larger disc.
+# *****
+
+put 8 in N
+put max(2,400-2^N) in WaitTime
+put list() in A
+put list() in B
+put list() in C
+put 0 in Moves
+global N, A, B, C, Moves, WaitTime
+
+index I goes from N to 1 and you do (
+    add I to A
+)
+
+define procedure drawPeg(peg, cx) (
+        if (dimension of peg > 0) then (
+            put 240 / N in SP
+            if (SP > 26) then ( put 26 in SP )
+            put SP * 0.88 in DH
+
+            index I goes from 1 to dimension of peg and you do (
+                put item I of peg in D
+                
+                put 10 + (D * 65 / N) in HW
+                put -124 + (I-1)*SP in Y0
+                
+                put 85 - (D * 80 / N) in ColR
+                put 15 + (D * 85 / N) in ColG
+                put 90 - (D * 60 / N) in ColB
+                
+                set color (ColR, ColG, ColB)
+                rectangle from (cx - HW, Y0) to (cx + HW, Y0 + DH)
+                
+                set color (90, 90, 90)
+                if (DH > 10) then (
+                    graffiti size (DH * 0.6) at (cx, Y0 + DH * 0.45) D
+                )
+            )
+        )
+)
+
+define procedure render(msg) (
+    clear graphics
+
+    set color (6, 8, 15)
+    rectangle from (-285, -195) to (285, 215)
+
+    set color (26, 16, 8)
+    rectangle from (-250, -146) to (250, -122)
+
+    set color (40, 26, 10)
+    line thickness 12 from (-162, -122) to (-162, 128)
+    line thickness 12 from (0, -122) to (0, 128)
+    line thickness 12 from (162, -122) to (162, 128)
+
+    drawPeg(A, -162)
+    drawPeg(B, 0)
+    drawPeg(C, 162)
+
+    set color (48, 58, 78)
+    graffiti size 20 at (-162, -162) "A"
+    graffiti size 20 at (0, -162) "B"
+    graffiti size 20 at (162, -162) "C"
+
+    set color (65, 60, 42)
+    graffiti size 15 at (0, -182) "Tower of Hanoi — " + N + " disks"
+
+    set color (70, 65, 45)
+    graffiti size 13 at (0, 152) msg
+    graffiti size 13 at (0, 172) "Move " + Moves + " / " + (2^N - 1)
+
+    frame graphics
+    redraw
+    
+    wait WaitTime ms
+)
+
+define procedure hanoi(disks, src, dst, aux) (
+    if (disks > 0) then (
+        hanoi(disks-1, src, aux, dst)
+
+        if (src is "A") then (
+            put item (dimension of A) of A in disk
+            remove last item from A
+        )
+        if (src is "B") then (
+            put item (dimension of B) of B in disk
+            remove last item from B
+        )
+        if (src is "C") then (
+            put item (dimension of C) of C in disk
+            remove last item from C
+        )
+
+        if (dst is "A") then ( add disk to A )
+        if (dst is "B") then ( add disk to B )
+        if (dst is "C") then ( add disk to C )
+
+        put Moves + 1 in Moves
+        render(src + "  -->  " + dst + "   (disk " + disk + ")")
+
+        hanoi(disks-1, aux, dst, src)
+    )
+)
+
+render("Initial state")
+hanoi(N, "A", "C", "B")
+render("Solved!")
+
+clear screen
+write "Solved in " + Moves + " moves."
+newline

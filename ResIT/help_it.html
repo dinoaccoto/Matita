@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Matita v0.9.3 - Guida</title>
+    <title>Matita v1.0.0 - Guida Completa</title>
     <meta name="author" content="Dino Accoto" />
-    <meta name="description" content="Una guida completa per programmare con Matita v0.9.3." />
+    <meta name="description" content="Una guida completa per programmare con Matita v1.0.0." />
     <meta name="subject" content="Guida operativa alla programmazione con Matita (sintassi italiana)" />
     <meta name="keywords" content="programmazione, grafica, Matita, cicli, variabili, interattività, liste, dizionari, record, audio, alias, inout, null, procedure, funzioni, scope, globale, etichette, dimensione, accapo, scrivi, cast, unicode" />
     <style>
@@ -16,6 +16,7 @@
             --DarkText: #212529;
             --CodeBackground: #1e293b;
             --CodeText: #f8fafc;
+            --SidebarBg: #0f172a;
             --PaperW: 900px;
         }
 
@@ -24,8 +25,78 @@
             padding: 0;
             background: #fff;
             color: var(--DarkText);
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif;
             line-height: 1.7;
+        }
+
+        /* --- LAYOUT CON MENU A SINISTRA --- */
+        @media (min-width: 1024px) {
+            body {
+                padding-left: 320px; /* Spazio per la sidebar a sinistra */
+            }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 320px;
+                height: 100vh;
+                background: var(--SidebarBg);
+                color: #cbd5e1;
+                overflow-y: auto;
+                padding: 30px 20px;
+                box-sizing: border-box;
+                box-shadow: 4px 0 15px rgba(0,0,0,0.1); /* Ombra invertita verso destra */
+                z-index: 20;
+            }
+            header {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .sidebar {
+                width: 100%;
+                background: var(--SidebarBg);
+                color: #cbd5e1;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            header {
+                width: 100%;
+            }
+        }
+
+        /* Stili Sidebar */
+        .sidebar h2 {
+            color: #fff;
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        .sidebar ol {
+            padding-left: 15px;
+            list-style-type: decimal;
+            margin-bottom: 1.5rem;
+        }
+        .sidebar li {
+            margin-bottom: 8px;
+        }
+        .sidebar li > ol {
+            margin-top: 6px;
+            list-style-type: disc;
+            padding-left: 20px;
+            font-size: 0.95em;
+        }
+        .sidebar a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .sidebar a:hover {
+            color: #38bdf8;
+            text-decoration: underline;
         }
 
         header {
@@ -48,12 +119,12 @@
         header .left { font-weight: 700; color: var(--PrimaryBlue); }
         header .right { color: #6b7280; }
 
-        main { max-width: var(--PaperW); margin: 0 auto; padding: 16px; }
+        main { max-width: var(--PaperW); margin: 0 auto; padding: 24px 32px; }
 
         h1, h2, h3, h4 { line-height: 1.25; }
         h1 { font-size: 2.2rem; margin: 24px 0 8px; }
-        h2 { font-size: 1.7rem; margin: 24px 0 8px; border-bottom: 2px solid #f3f4f6; padding-bottom: 6px; }
-        h3 { font-size: 1.2rem; margin: 18px 0 6px; }
+        h2 { font-size: 1.7rem; margin: 32px 0 12px; border-bottom: 2px solid #f3f4f6; padding-bottom: 6px; color: #111827; }
+        h3 { font-size: 1.25rem; margin: 24px 0 8px; color: #1f2937; }
         h4 { font-size: 1.05rem; margin: 16px 0 4px; }
 
         .title {
@@ -65,21 +136,11 @@
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 24px;
+            margin-bottom: 30px;
         }
 
         .title img { max-width: 45%; height: auto; border-radius: 8px; }
         .muted { color: #6b7280; font-size: 1.2rem; }
-
-        .toc {
-            background: var(--White);
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .toc ol { padding-left: 20px; }
-        .toc a { color: var(--PrimaryBlue); text-decoration: none; }
-        .toc a:hover { text-decoration: underline; }
 
         code, .code {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -87,10 +148,12 @@
 
         pre {
             background: var(--CodeBackground);
-            padding: 12px 14px;
+            padding: 16px;
             border-radius: 10px;
             overflow: auto;
             border: 1px solid #475569;
+            margin: 16px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         pre code {
@@ -101,7 +164,7 @@
         code:not(pre code) {
             color: #0369a1;
             background-color: #f1f5f9;
-            padding: 2px 5px;
+            padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.9em;
             border: 1px solid #e2e8f0;
@@ -116,16 +179,29 @@
         figcaption { font-size: .9rem; color: #6b7280; margin-top: 6px; }
 
         .note {
-            background: #fff8e1;
-            border: 1px solid #ffe082;
-            padding: 10px 12px;
-            border-radius: 8px;
+            background: #f8fafc;
+            border-left: 4px solid var(--PrimaryBlue);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
         }
 
-        table { border-collapse: collapse; width: 100%; margin: 8px 0; }
-        th, td { border: 1px solid #e5e7eb; padding: 8px; vertical-align: top; text-align: left; }
-        th { background: #f3f4f6; }
-        /* Alternanza righe come da stile LaTeX */
+        .badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            vertical-align: middle;
+            margin-left: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.95rem; }
+        th, td { border: 1px solid #e5e7eb; padding: 10px 12px; vertical-align: top; text-align: left; }
+        th { background: #f8fafc; color: #334155; }
         tr:nth-child(even) { background-color: #f9fafb; }
 
         .kbd {
@@ -136,6 +212,7 @@
             border-radius: 6px;
             background: #fff;
             font-family: inherit;
+            font-size: 0.85em;
         }
 
         footer { max-width: var(--PaperW); margin: 24px auto 40px; color: #6b7280; text-align: center; }
@@ -151,9 +228,9 @@
             margin: 2px;
         }
 
-        .pagebreak { height: 1px; background: #e5e7eb; margin: 32px 0; }
+        .pagebreak { height: 1px; background: #e5e7eb; margin: 40px 0; }
 
-        .top-links { text-align: center; margin-bottom: 30px; font-weight: 500; font-size: 1.5rem; }
+        .top-links { text-align: center; margin-bottom: 30px; font-weight: 600; font-size: 1.2rem; }
         .top-links a { text-decoration: none; color: var(--PrimaryBlue); transition: color 0.2s; }
         .top-links a:hover { text-decoration: underline; color: #0056b3; }
         .separator { margin: 0 10px; color: #cbd5e1; }
@@ -165,10 +242,57 @@
 <body>
 <header>
     <div class="bar">
-        <div class="left">Matita v0.9.3</div>
+        <div class="left">Matita v1.0.0</div>
         <div class="right">Guida per l'Utente</div>
     </div>
 </header>
+
+<aside class="sidebar">
+    <h2>Indice dei contenuti</h2>
+    <nav aria-label="Indice dei contenuti">
+        <ol>
+            <li><strong>Fondamenti di programmazione</strong>
+                <ol>
+                    <li><a href="#intro">Basi del Linguaggio</a></li>
+                    <li><a href="#output">I Primi Comandi</a></li>
+                    <li><a href="#variables">Variabili</a></li>
+                    <li><a href="#math">Matematica</a></li>
+                    <li><a href="#lists">Liste</a></li>
+                    <li><a href="#dictionaries">Dizionari, Record e Insiemi</a></li>
+                    <li><a href="#logic">Controllo del Flusso</a></li>
+                    <li><a href="#manipulation">Manipolazione Dati</a></li>
+                    <li><a href="#procedures-functions">Procedure e Funzioni</a></li>
+                    <li><a href="#memory">Gestione della memoria</a></li>
+                    <li><a href="#oop">Programmazione a Oggetti</a></li>
+                </ol>
+            </li>
+            <li style="margin-top: 15px;"><strong>Grafica e Interattività</strong>
+                <ol>
+                    <li><a href="#coordinates">Elementi Grafici</a></li>
+                    <li><a href="#colors">Colori e Sfondi</a></li>
+                    <li><a href="#shapes">Disegnare Forme</a></li>
+                    <li><a href="#graffiti">Graffiti</a></li>
+                    <li><a href="#redraw">Ridisegnare una scena</a></li>
+                    <li><a href="#frame">Inquadrare la grafica</a></li>
+                    <li><a href="#animations">Animazioni</a></li>
+                    <li><a href="#input">Input Tastiera e Mouse</a></li>
+                    <li><a href="#labels">Etichette grafiche</a></li>
+                    <li><a href="#transformations">Trasformazioni</a></li>
+                    <li><a href="#images">Immagini</a></li>
+                    <li><a href="#audio">Audio e Suoni</a></li>
+                    <li><a href="#canvas-interaction">Interagire col canvas</a></li>
+                    <li><a href="#project">Esercizio guidato</a></li>
+                </ol>
+            </li>
+            <li style="margin-top: 15px;"><strong>Appendici</strong>
+                <ol>
+                    <li><a href="#ref">A: Riferimento Rapido</a></li>
+                    <li><a href="#troubleshoot">B: Errori Comuni</a></li>
+                </ol>
+            </li>
+        </ol>
+    </nav>
+</aside>
 
 <main>
     <div class="top-links">
@@ -185,46 +309,6 @@
             <img src="../graphics/matita.png" alt="Logo Matita" />
         </figure>
     </section>
-
-    <nav class="toc" aria-label="Indice dei contenuti">
-        <strong>Indice</strong>
-        <ol>
-            <li><strong>Parte Prima: Fondamenti di programmazione</strong>
-                <ol>
-                    <li><a href="#intro">Basi del Linguaggio</a></li>
-                    <li><a href="#output">I Primi Comandi</a></li>
-                    <li><a href="#variables">Variabili</a></li>
-                    <li><a href="#math">Matematica</a></li>
-                    <li><a href="#lists">Liste</a></li>
-                    <li><a href="#dictionaries">Dizionari, Record e Insiemi</a></li>
-                    <li><a href="#logic">Controllo del Flusso</a></li>
-                    <li><a href="#manipulation">Manipolazione di Testo e Numeri</a></li>
-                    <li><a href="#procedures-functions">Procedure e Funzioni</a></li>
-                    <li><a href="#memory">Gestione della memoria</a></li>
-                </ol>
-            </li>
-            <li><strong>Parte Seconda: Grafica e Interattività</strong>
-                <ol>
-                    <li><a href="#coordinates">Elementi Grafici</a></li>
-                    <li><a href="#colors">Colori e Sfondi</a></li>
-                    <li><a href="#shapes">Disegnare Forme di Base</a></li>
-                    <li><a href="#graffiti">Graffiti</a></li>
-                    <li><a href="#redraw">Ridisegnare una scena</a></li>
-                    <li><a href="#frame">Inquadrare la grafica</a></li>
-                    <li><a href="#animations">Creare Animazioni</a></li>
-                    <li><a href="#input">Input da Tastiera e Mouse</a></li>
-                    <li><a href="#labels">Etichette grafiche</a></li>
-                    <li><a href="#transformations">Trasformazioni</a></li>
-                    <li><a href="#images">Immagini</a></li>
-                    <li><a href="#audio">Audio e Suoni</a></li>
-                    <li><a href="#canvas-interaction">Interagire col canvas</a></li>
-                    <li><a href="#project">Esercizio guidato</a></li>
-                </ol>
-            </li>
-            <li><a href="#ref">Appendice A: Riferimento Rapido</a></li>
-            <li><a href="#troubleshoot">Appendice B: Errori Comuni</a></li>
-        </ol>
-    </nav>
 
     <div class="pagebreak"></div>
     <h1>Parte Prima: Fondamenti di programmazione</h1>
@@ -255,10 +339,10 @@
         <h4>Scorciatoie da Tastiera</h4>
         <p>Per velocizzare la scrittura e il test del codice, l'IDE supporta diverse combinazioni di tasti utili:</p>
         <ul>
-            <li><code>Ctrl + Invio</code>: Funzione equivalente al pulsante <strong>Esegui</strong>. Avvia immediatamente l'interpretazione del programma corrente.</li>
-            <li><code>Ctrl + Spazio</code>: Attiva il sistema di <strong>suggerimenti automatici</strong> (IntelliSense). Se digitato mentre si scrive una parola, apre una lista di comandi compatibili con quanto digitato.</li>
-            <li><code>TAB</code>: Se il menu dei suggerimenti è aperto, il tasto TAB accetta e inserisce automaticamente il comando selezionato nell'editor. Inoltre, TAB è utile per indentare il codice e mantenerlo ordinato.</li>
-            <li><code>ESC</code>: Chiude la finestra dei suggerimenti o altre finestre modali (come l'Area Grafica se in primo piano), restituendo il controllo all'editor.</li>
+            <li><span class="kbd">Ctrl</span> + <span class="kbd">Invio</span>: Funzione equivalente al pulsante <strong>Esegui</strong>. Avvia immediatamente l'interpretazione del programma corrente.</li>
+            <li><span class="kbd">Ctrl</span> + <span class="kbd">Spazio</span>: Attiva il sistema di <strong>suggerimenti automatici</strong> (IntelliSense). Se digitato mentre si scrive una parola, apre una lista di comandi compatibili con quanto digitato.</li>
+            <li><span class="kbd">TAB</span>: Se il menu dei suggerimenti è aperto, accetta e inserisce automaticamente il comando selezionato. Inoltre, è utile per indentare il codice e mantenerlo ordinato.</li>
+            <li><span class="kbd">ESC</span>: Chiude la finestra dei suggerimenti o altre finestre modali.</li>
         </ul>
     </section>
 
@@ -304,10 +388,11 @@
 <span class="kw">accapo</span>
 <span class="kw">scrivi</span> <span class="str">"Seconda riga."</span></code></pre>
 
-        <p>Un elemento sintattico fondamentale è il carattere <code>#</code>, che indica l'inizio di un <strong>commento</strong>. Il testo che segue questo carattere viene ignorato dall'interprete. I commenti sono utili per documentare il codice:</p>
-        <pre><code><span class="com"># questo è un commento.</span>
-<span class="kw">metti</span> <span class="num">31</span> <span class="kw">in</span> GiorniMarzo <span class="com"># numero di giorni nel mese di marzo</span>
-<span class="com"># Mostriamo quanti giorni ha marzo:</span>
+        <h3>Commenti <span class="badge">V1.0.0</span></h3>
+        <p>Un elemento sintattico fondamentale è il <strong>commento</strong>, che viene ignorato dall'interprete ed è utilissimo per documentare o disattivare parti del codice. Matita supporta sia l'uso del cancelletto <code>#</code>, sia l'uso della doppia barra <code>//</code>:</p>
+        <pre><code><span class="com"># questo è un commento tradizionale.</span>
+<span class="com">// anche questo è un commento valido.</span>
+<span class="kw">metti</span> <span class="num">31</span> <span class="kw">in</span> GiorniMarzo <span class="com">// numero di giorni nel mese di marzo</span>
 <span class="kw">scrivi</span> <span class="str">"Marzo ha "</span> + GiorniMarzo + <span class="str">" giorni."</span></code></pre>
 
         <div class="note">
@@ -319,10 +404,11 @@
         <p>Per inserire più istruzioni sulla stessa riga, è necessario separarle con un punto e virgola (;):</p>
         <pre><code><span class="kw">scrivi</span> <span class="str">"ciao."</span>; <span class="kw">accapo</span></code></pre>
 
-        <h3>Singolo comando su più righe</h3>
-        <p>Qualora un comando fosse troppo lungo per una singola riga, è possibile spezzarlo utilizzando una barra rovesciata, ossia il carattere "\" chiamato <em>backslash</em> in inglese, al termine della riga. L'interprete considererà le righe separate da "\" come un'unica istruzione:</p>
+        <h3>Continuità di riga <span class="badge">V1.0.0</span></h3>
+        <p>Qualora un'istruzione fosse troppo lunga per una singola riga, è possibile spezzarla utilizzando una barra rovesciata, ossia il carattere <code>\</code> (backslash) al termine della riga. L'interprete unirà automaticamente le righe ignorando gli accapo:</p>
         <pre><code><span class="kw">scrivi</span> \
-<span class="str">"istruzione su due linee"</span></code></pre>
+<span class="str">"istruzione lunghissima scritta "</span> + \
+<span class="str">"su più linee per comodità"</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
@@ -343,17 +429,13 @@
         <pre><code> Il valore in A è 5
  Informatica</code></pre>
 
-        <p>Si noti che le stringhe di testo devono essere racchiuse tra virgolette, ad esempio "Informatica".</p>
-
-        <p>Per leggere il contenuto di una variabile, è sufficiente scrivere il nome della variabile all’interno di un’espressione (come nell’esempio precedente con <code>A</code> e <code>B</code>). In altre parole, il nome è l’<em>identificatore</em> che permette di accedere al valore memorizzato.</p>
-
-        <p>In Matita i nomi delle variabili sono <strong>case-insensitive</strong>: <code>Nome</code>, <code>nome</code>, <code>nOmE</code>, <code>NOME</code> fanno riferimento alla stessa locazione di memoria. Un identificatore valido può contenere numeri, ma deve iniziare con una lettera. Caratteri accentati o speciali non sono ammessi per definire il nome.</p>
+        <p>Per leggere il contenuto di una variabile, è sufficiente scrivere il nome della variabile all’interno di un’espressione. In Matita i nomi delle variabili sono <strong>case-insensitive</strong>: <code>Nome</code>, <code>nome</code>, <code>nOmE</code>, <code>NOME</code> fanno riferimento alla stessa locazione di memoria. Un identificatore valido deve iniziare con una lettera e può contenere numeri o il trattino basso <code>_</code>. Caratteri accentati o speciali non sono ammessi.</p>
 
         <p>Per aggiornare il valore di una variabile, si utilizza nuovamente il comando <code>metti</code>.</p>
         <pre><code><span class="kw">metti</span> <span class="num">100</span> <span class="kw">in</span> salute
 <span class="kw">scrivi</span> <span class="str">"Salute iniziale: "</span> + salute
 <span class="kw">accapo</span>
-<span class="kw">metti</span> salute - <span class="num">15</span> <span class="kw">in</span> salute <span class="com"># Il giocatore subisce 15 danni</span>
+<span class="kw">metti</span> salute - <span class="num">15</span> <span class="kw">in</span> salute <span class="com">// Il giocatore subisce 15 danni</span>
 <span class="kw">scrivi</span> <span class="str">"Stato aggiornato. La salute ora è: "</span> + salute</code></pre>
 
         <h3>Input da utente: <code>chiedi</code></h3>
@@ -375,53 +457,62 @@
 <span class="kw">scrivi</span> <span class="str">"A + B = "</span> + Somma; <span class="kw">accapo</span>
 <span class="kw">scrivi</span> <span class="str">"A * B = "</span> + Prodotto</code></pre>
 
-        <p>L'operatore <code>mod</code> ("<em>modulo</em>") restituisce il resto della divisione intera. Ad esempio, <code>10 mod 3</code> restituisce 1.</p>
+        <p>Il calcolo del resto di una divisione (operazione <strong>Modulo</strong>) si effettua utilizzando la parola <code>mod</code>, oppure <code>modulo</code>, <code>%</code> o la nuova variante sicura <code>%%</code>.</p>
         <pre><code><span class="kw">cancella schermo</span>
 <span class="kw">metti</span> <span class="num">39</span> <span class="kw">in</span> A
 <span class="kw">metti</span> <span class="num">7</span> <span class="kw">in</span> B
-<span class="kw">metti</span> A <span class="kw">mod</span> B <span class="kw">in</span> C
-<span class="kw">scrivi</span> <span class="str">"Il resto di "</span> + A + <span class="str">"/"</span> + B + <span class="str">" è "</span> + C</code></pre>
+<span class="kw">metti</span> A <span class="kw">%%</span> B <span class="kw">in</span> C
+<span class="kw">scrivi</span> <span class="str">"Il resto di "</span> + A + <span class="str">"/"</span> + B + <span class="str">" è "</span> + C  <span class="com">// Risultato: 4</span></code></pre>
 
-        <h3>Operatori ed espressioni</h3>
-        <p>In Matita un'espressione è una combinazione di operandi (numeri, testi, liste, punti) e operatori. Il risultato può essere assegnato a una variabile o utilizzato come condizione logica.</p>
+        <h3>Operatori ed espressioni </h3>
+        <p>In Matita un'espressione è una combinazione di operandi (numeri, testi, liste, punti) e operatori.</p>
         <ul>
-            <li><strong>Valori booleani</strong>: <code>vero</code>, <code>falso</code></li>
-            <li><strong>Operatori logici</strong>: <code>e</code> (AND), <code>o</code> (OR), <code>non</code> (NOT)</li>
+            <li><strong>Valori booleani</strong>: <code>vero</code> (o <code>true</code>), <code>falso</code> (o <code>false</code>)</li>
+            <li><strong>Operatori logici</strong>: <code>e</code> (o <code>and</code>, <code>ed</code>), <code>o</code> (o <code>or</code>), <code>non</code> (o <code>not</code>)</li>
             <li><strong>Confronti</strong>:
                 <ul>
-                    <li>Uguaglianza: <code>uguale a</code>, <code>vale</code>, <code>uguale</code></li>
-                    <li>Disuguaglianza: <code>diverso da</code></li>
+                    <li>Uguaglianza: <code>=</code>, <code>==</code>, <code>===</code>, <code>uguale a</code>, <code>vale</code>, <code>uguale</code></li>
+                    <li>Disuguaglianza: <code>&lt;&gt;</code>, <code>!=</code>, <code>!==</code>, <code>diverso</code>, <code>diverso da</code></li>
                     <li>Confronti numerici: <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></li>
                 </ul>
             </li>
             <li><strong>Operatori aritmetici</strong>: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code></li>
-            <li><strong>Resto</strong>: <code>mod</code></li>
-            <li><strong>Potenza</strong>: <code>^</code> (es. <code>2^3</code>)</li>
+            <li><strong>Resto (Modulo)</strong>: <code>mod</code>, <code>modulo</code>, <code>%</code>, <code>%%</code></li>
+            <li><strong>Potenza</strong>: <code>^</code> oppure <code>**</code></li>
             <li><strong>Negazione (unario)</strong>: <code>-X</code></li>
         </ul>
 
         <p>Esempio potenza:</p>
-        <pre><code><span class="kw">metti</span> <span class="num">2</span>^<span class="num">3</span> <span class="kw">in</span> Cubo
-<span class="kw">scrivi</span> Cubo <span class="com"># Output: 8</span></code></pre>
+        <pre><code><span class="kw">metti</span> <span class="num">2</span>**<span class="num">3</span> <span class="kw">in</span> Cubo
+<span class="kw">scrivi</span> Cubo <span class="com">// Output: 8</span></code></pre>
 
-        <h3>Costanti e funzioni matematiche</h3>
-        <p>Matita include diverse costanti e funzioni matematiche pronte all'uso. Una lista completa delle funzioni predefinite è disponibile nell'Appendice A.</p>
+        <h3>Costanti e funzioni matematiche <span class="badge">V1.0.0</span></h3>
+        <p>Matita 1.0.0 include molteplici costanti e funzioni matematiche avanzate, comodissime per fisica e geometria:</p>
         <ul>
             <li><strong>Costanti</strong>: <code>pi</code> (o π), <code>infinito</code>, <code>nan</code> (Not a Number)</li>
-            <li><strong>Funzioni trigonometriche e calcolo</strong>: <code>assoluto(x)</code>, <code>seno(x)</code>, <code>coseno(x)</code>, <code>radice(x)</code>, ecc.</li>
+            <li><strong>Funzioni geometriche e calcolo</strong>: 
+                <ul>
+                    <li><code>assoluto(x)</code> o <code>abs(x)</code>: Valore assoluto.</li>
+                    <li><code>seno(x)</code> (o <code>sin</code>), <code>coseno(x)</code> (o <code>cos</code>), <code>tan(x)</code>: Trigonometria (radianti).</li>
+                    <li><code>atan2(y, x)</code>: Arcotangente (in radianti, utile per calcolare gli angoli di vettori).</li>
+                    <li><code>radice(x)</code> o <code>squareroot(x)</code>: Radice quadrata.</li>
+                    <li><code>log(x)</code>, <code>log10(x)</code>: Logaritmi.</li>
+                    <li><code>sign(x)</code>: Restituisce -1, 0 o 1 a seconda del segno del numero.</li>
+                </ul>
+            </li>
             <li><strong>Funzioni di arrotondamento</strong>:
                 <ul>
-                    <li><code>arrotonda(x)</code>: Arrotonda all'intero più vicino.</li>
-                    <li><code>tronca(x)</code>: Rimuove la parte decimale senza arrotondare (troncamento verso lo zero).</li>
-                    <li><code>intero_superiore(x)</code>: Arrotonda al numero intero superiore (verso l'alto).</li>
+                    <li><code>arrotonda(x)</code> o <code>round(x)</code>: Arrotonda all'intero più vicino.</li>
+                    <li><code>tronca(x)</code> o <code>trunc(x)</code>: Rimuove la parte decimale.</li>
+                    <li><code>intero_superiore(x)</code> o <code>ceil(x)</code>: Arrotonda al numero intero superiore (verso l'alto).</li>
                 </ul>
             </li>
         </ul>
 
         <p>Esempio di arrotondamento:</p>
-        <pre><code><span class="kw">scrivi</span> <span class="kw">tronca</span>(<span class="num">3.9</span>) <span class="com"># Output: 3</span>
+        <pre><code><span class="kw">scrivi</span> <span class="kw">tronca</span>(<span class="num">3.9</span>) <span class="com">// Output: 3</span>
 <span class="kw">accapo</span>
-<span class="kw">scrivi</span> <span class="kw">intero_superiore</span>(<span class="num">3.1</span>)   <span class="com"># Output: 4</span></code></pre>
+<span class="kw">scrivi</span> <span class="kw">intero_superiore</span>(<span class="num">3.1</span>)   <span class="com">// Output: 4</span></code></pre>
 
         <h3>Punti e Coordinate: <code>punto</code></h3>
         <p>Oltre ai numeri semplici, Matita permette di lavorare con le coordinate cartesiane tramite l'oggetto <strong>punto</strong>. Questo è essenziale per la grafica, ma può essere usato anche per calcoli vettoriali o geometrici.</p>
@@ -439,7 +530,7 @@
 <span class="com"># Output:  Distanza orizzontale: 10</span></code></pre>
 
         <h3>Generazione di Numeri Casuali</h3>
-        <p>La generazione di numeri casuali è essenziale per simulazioni e giochi. Matita offre diverse opzioni tramite i comandi <code>casuale</code> e <code>dado</code>:</p>
+        <p>La generazione di numeri casuali è essenziale per simulazioni e giochi. Matita offre diverse opzioni tramite i comandi <code>casuale</code> (o <code>random</code>) e <code>dado</code> (o <code>dice</code>):</p>
         <ul>
             <li><code>casuale()</code>: Senza argomenti, restituisce un numero reale compreso tra 0.0 (incluso) e 1.0 (escluso).</li>
             <li><code>casuale(MAX)</code>: Restituisce un numero reale compreso tra 0.0 e MAX.</li>
@@ -448,36 +539,36 @@
         </ul>
 
         <p>Esempi:</p>
-        <pre><code><span class="kw">metti</span> <span class="kw">casuale</span>() <span class="kw">in</span> Probabilita <span class="com"># es. 0.453</span>
-<span class="kw">metti</span> <span class="kw">casuale</span>(<span class="num">100</span>) <span class="kw">in</span> Percentuale <span class="com"># es. 87.21</span>
-<span class="kw">metti</span> <span class="kw">casuale</span>(<span class="num">10</span>, <span class="num">20</span>) <span class="kw">in</span> Temperatura <span class="com"># es. 14.5</span>
-<span class="kw">metti</span> <span class="kw">dado</span>(<span class="num">6</span>) <span class="kw">in</span> Lancio <span class="com"># es. 4 (dà un numero intero tra 1 e 6)</span></code></pre>
+        <pre><code><span class="kw">metti</span> <span class="kw">casuale</span>() <span class="kw">in</span> Probabilita <span class="com">// es. 0.453</span>
+<span class="kw">metti</span> <span class="kw">casuale</span>(<span class="num">100</span>) <span class="kw">in</span> Percentuale <span class="com">// es. 87.21</span>
+<span class="kw">metti</span> <span class="kw">casuale</span>(<span class="num">10</span>, <span class="num">20</span>) <span class="kw">in</span> Temperatura <span class="com">// es. 14.5</span>
+<span class="kw">metti</span> <span class="kw">dado</span>(<span class="num">6</span>) <span class="kw">in</span> Lancio <span class="com">// es. 4 (dà un numero intero tra 1 e 6)</span></code></pre>
 
         <h3>Definire la Precisione Numerica</h3>
         <p>Per controllare il numero di cifre decimali visualizzate nel comando <code>scrivi</code>, è possibile utilizzare il comando <code>decimali</code>. Questo comando influisce solo sulla <em>visualizzazione</em> dell'output in console, non sul valore interno della variabile.</p>
         <pre><code><span class="kw">decimali</span> <span class="num">2</span>
 <span class="kw">metti</span> <span class="num">10</span> / <span class="num">3</span> <span class="kw">in</span> Risultato
-<span class="kw">scrivi</span> Risultato <span class="com"># Output: 3.33</span>
+<span class="kw">scrivi</span> Risultato <span class="com">// Output: 3.33</span>
 <span class="kw">accapo</span>
 <span class="kw">decimali</span> <span class="num">5</span>
-<span class="kw">scrivi</span> Risultato <span class="com"># Output: 3.33333</span></code></pre>
+<span class="kw">scrivi</span> Risultato <span class="com">// Output: 3.33333</span></code></pre>
 
         <h3>Notazione Scientifica: <code>scientifica</code></h3>
         <p>Quando Matita gestisce numeri molto grandi, il sistema può passare automaticamente alla visualizzazione in <strong>notazione scientifica</strong> per migliorare la leggibilità. Il formato utilizzato è "<code>numero e esponente</code>".</p>
         <p>Per default, la soglia per l'attivazione della notazione scientifica è <code>1e6</code>.</p>
         <p>È possibile modificare questa soglia utilizzando il comando <code>scientifica(N)</code>.</p>
         <p>Se si imposta anche un valore per <code>decimali</code>, questo influenzerà il numero di cifre mostrate nella mantissa.</p>
-        <pre><code><span class="com"># Impostiamo la soglia bassa per vedere l'effetto subito</span>
+        <pre><code><span class="com">// Impostiamo la soglia bassa per vedere l'effetto subito</span>
 <span class="kw">scientifica</span>(<span class="num">100</span>) 
 <span class="kw">metti</span> <span class="num">150</span> <span class="kw">in</span> Valore
 
 <span class="kw">scrivi</span> Valore 
-<span class="com"># Output:  1.5e+2</span>
+<span class="com">// Output:  1.5e2</span>
 
-<span class="com"># Cambiamo i decimali visualizzati nella mantissa</span>
+<span class="com">// Cambiamo i decimali visualizzati nella mantissa</span>
 <span class="kw">decimali</span> <span class="num">4</span>
 <span class="kw">scrivi</span> Valore
-<span class="com"># Output:  1.5000e+2</span></code></pre>
+<span class="com">// Output:  1.5000e2</span></code></pre>
 
         <h3>Precedenza degli operatori</h3>
         <ol>
@@ -485,8 +576,8 @@
             <li><code>e</code></li>
             <li>Confronti (<code>uguale a</code>, <code>diverso da</code>, <code>&lt;</code>, ecc.)</li>
             <li><code>+</code>, <code>-</code></li>
-            <li><code>*</code>, <code>/</code>, <code>mod</code></li>
-            <li><code>^</code> (Potenza)</li>
+            <li><code>*</code>, <code>/</code>, <code>mod</code>, <code>%%</code></li>
+            <li><code>^</code>, <code>**</code> (Potenza)</li>
             <li>Accessi a proprietà o elementi (es. <code>x di P</code>, <code>elemento N di LISTA</code>)</li>
         </ol>
     </section>
@@ -511,23 +602,23 @@
         <p>Per leggere un valore in una posizione specifica, si utilizza la sintassi <code>elemento ... di ...</code>.</p>
         <p><strong>L'indicizzazione in Matita è 1-based</strong>: il primo elemento si trova all'indice 1, il secondo all'indice 2, ecc.</p>
         <pre><code><span class="kw">metti</span> (<span class="num">100</span>, <span class="num">200</span>, <span class="num">300</span>) <span class="kw">in</span> dati
-<span class="kw">metti</span> <span class="kw">elemento</span> <span class="num">2</span> <span class="kw">di</span> dati <span class="kw">in</span> Valore <span class="com"># Valore ora contiene 200</span>
-<span class="kw">scrivi</span> Valore <span class="com"># Stampa 200</span></code></pre>
+<span class="kw">metti</span> <span class="kw">elemento</span> <span class="num">2</span> <span class="kw">di</span> dati <span class="kw">in</span> Valore <span class="com">// Valore ora contiene 200</span>
+<span class="kw">scrivi</span> Valore <span class="com">// Stampa 200</span></code></pre>
 
         <p><strong>Ricerca di un elemento</strong>: Per trovare la posizione di un valore specifico all'interno della lista, si utilizza il comando <code>indicedi(lista, valore)</code>. Se l'elemento viene trovato, viene restituito il suo indice (partendo da 1), altrimenti viene restituito 0.</p>
         <pre><code><span class="kw">metti</span> (<span class="str">"Mela"</span>, <span class="str">"Pera"</span>, <span class="str">"Banana"</span>) <span class="kw">in</span> Frutta
 <span class="kw">metti</span> <span class="kw">indicedi</span>(Frutta, <span class="str">"Pera"</span>) <span class="kw">in</span> Posizione
-<span class="kw">scrivi</span> <span class="str">"La Pera è in posizione "</span> + Posizione <span class="com"># Output: 2</span></code></pre>
+<span class="kw">scrivi</span> <span class="str">"La Pera è in posizione "</span> + Posizione <span class="com">// Output: 2</span></code></pre>
 
         <h4>Determinazione della Dimensione</h4>
         <p>Per ottenere la cardinalità della lista (numero di elementi), si usa l'operatore <code>dimensione di</code>.</p>
         <pre><code><span class="kw">metti</span> (<span class="str">"rosso"</span>, <span class="str">"verde"</span>, <span class="str">"blu"</span>, <span class="str">"giallo"</span>) <span class="kw">in</span> ListaColori
-<span class="kw">metti</span> <span class="kw">dimensione</span> <span class="kw">di</span> ListaColori <span class="kw">in</span> N <span class="com"># N ora contiene 4</span>
+<span class="kw">metti</span> <span class="kw">dimensione</span> <span class="kw">di</span> ListaColori <span class="kw">in</span> N <span class="com">// N ora contiene 4</span>
 <span class="kw">scrivi</span> ListaColori + <span class="str">" sono "</span> + N + <span class="str">" colori\n"</span>
 <span class="kw">scrivi</span> <span class="str">"il secondo colore è "</span> + <span class="kw">elemento</span> <span class="num">2</span> <span class="kw">di</span> ListaColori</code></pre>
 
         <p>L'output sarà:</p>
-        <pre><code> rosso,verde,blu,giallo sono 4 colori
+        <pre><code> (rosso, verde, blu, giallo) sono 4 colori
  il secondo colore è verde</code></pre>
 
         <h4>Massimo e minimo di una lista di valori</h4>
@@ -542,28 +633,28 @@
             <li><code>argmin(lista)</code> / <code>argmax(lista)</code>: Restituiscono l'<strong>indice</strong> (la posizione) in cui si trova rispettivamente il valore minimo o massimo.</li>
         </ul>
         <p>A seguire un esempio completo di come utilizzare queste funzioni per analizzare un set di dati.</p>
-        <pre><code><span class="com"># Introduciamo i dati su cui lavorare.</span>
-<span class="com"># Notare che la lista delle altezze è ibrida, perché non contiene </span>
-<span class="com"># solo valori numerici: l'intestazione, infatti, è una stringa.</span>
+        <pre><code><span class="com">// Introduciamo i dati su cui lavorare.</span>
+<span class="com">// Notare che la lista delle altezze è ibrida, perché non contiene </span>
+<span class="com">// solo valori numerici: l'intestazione, infatti, è una stringa.</span>
 
 <span class="kw">metti</span> ((<span class="str">"Nome"</span>, <span class="str">"Altezza"</span>),\ 
 (<span class="str">"Marco"</span>, <span class="num">175</span>), (<span class="str">"Anna"</span>, <span class="num">182</span>), (<span class="str">"Luca"</span>, <span class="num">185</span>), (<span class="str">"Giulia"</span>, <span class="num">176</span>), (<span class="str">"Paolo"</span>, <span class="num">189</span>),\
 (<span class="str">"Sofia"</span>, <span class="num">168</span>), (<span class="str">"Davide"</span>, <span class="num">178</span>), (<span class="str">"Elena"</span>, <span class="num">165</span>), (<span class="str">"Matteo"</span>, <span class="num">181</span>),\
 (<span class="str">"Chiara"</span>, <span class="num">173</span>) ) <span class="kw">in</span> Gruppo
 
-<span class="com"># Creiamo la lista delle altezze</span>
-<span class="kw">metti</span> () <span class="kw">in</span> ListaAltezze <span class="com"># Inizializzazione</span>
+<span class="com">// Creiamo la lista delle altezze</span>
+<span class="kw">metti</span> () <span class="kw">in</span> ListaAltezze <span class="com">// Inizializzazione</span>
 <span class="kw">per</span> <span class="kw">ogni</span> P <span class="kw">in</span> Gruppo <span class="kw">esegui</span> ( <span class="kw">aggiungi</span> <span class="kw">elemento</span> <span class="num">2</span> <span class="kw">di</span> P <span class="kw">a</span> ListaAltezze )
 
-<span class="com"># Troviamo dove sono i membri del gruppo rispettivamente più basso e più alto:</span>
+<span class="com">// Troviamo dove sono i membri del gruppo rispettivamente più basso e più alto:</span>
 <span class="kw">metti</span> <span class="kw">argmin</span>(ListaAltezze) <span class="kw">in</span> IndiceDelMin
 <span class="kw">metti</span> <span class="kw">argmax</span>(ListaAltezze) <span class="kw">in</span> IndiceDelMax
 
-<span class="com"># Recuperiamo i nomi:</span>
+<span class="com">// Recuperiamo i nomi:</span>
 <span class="kw">metti</span> <span class="kw">elemento</span> <span class="num">1</span> <span class="kw">di</span> (<span class="kw">elemento</span> IndiceDelMin <span class="kw">di</span> Gruppo) <span class="kw">in</span> NomeBasso
 <span class="kw">metti</span> <span class="kw">elemento</span> <span class="num">1</span> <span class="kw">di</span> (<span class="kw">elemento</span> IndiceDelMax <span class="kw">di</span> Gruppo) <span class="kw">in</span> NomeAlto
 
-<span class="com"># Infine, output:</span>
+<span class="com">// Infine, output:</span>
 <span class="kw">cancella schermo</span>
 <span class="kw">scrivi</span> <span class="str">"Membro più basso: "</span> + NomeBasso + <span class="str">" ("</span> + <span class="kw">valmin</span>(ListaAltezze) + <span class="str">")"</span>; <span class="kw">accapo</span>
 <span class="kw">scrivi</span> <span class="str">"Membro più alto:  "</span> + NomeAlto  + <span class="str">" ("</span> + <span class="kw">valmax</span>(ListaAltezze) + <span class="str">")"</span></code></pre>
@@ -577,13 +668,13 @@
         
         <p><strong>Aggiunta di elementi</strong>: Il comando <code>aggiungi</code> inserisce un nuovo elemento in coda alla lista. Sintassi: <code>aggiungi &lt;valore&gt; a &lt;nomeLista&gt;</code></p>
         <pre><code><span class="kw">metti</span> <span class="kw">lista</span>(<span class="num">1</span>, <span class="num">2</span>) <span class="kw">in</span> numeri
-<span class="kw">aggiungi</span> <span class="num">3</span> <span class="kw">a</span> numeri <span class="com"># numeri ora è (1, 2, 3)</span></code></pre>
+<span class="kw">aggiungi</span> <span class="num">3</span> <span class="kw">a</span> numeri <span class="com">// numeri ora è (1, 2, 3)</span></code></pre>
 
         <p><strong>Inserimento in una posizione specifica</strong>: Per inserire un valore in una posizione arbitraria, facendo slittare gli elementi successivi, si utilizza <code>inserisci ... in elemento ...</code>. Sintassi: <code>inserisci &lt;valore&gt; in elemento &lt;indice&gt; di &lt;nomeLista&gt;</code></p>
         <pre><code><span class="kw">metti</span> (<span class="str">"A"</span>, <span class="str">"C"</span>) <span class="kw">in</span> Lettere
 <span class="kw">inserisci</span> <span class="str">"B"</span> <span class="kw">in</span> <span class="kw">elemento</span> <span class="num">2</span> <span class="kw">di</span> Lettere
 <span class="kw">scrivi</span> Lettere
-<span class="com"># Output:  (A, B, C)</span></code></pre>
+<span class="com">// Output:  (A, B, C)</span></code></pre>
 
         <p><strong>Rimozione in testa o in coda</strong>:</p>
         <pre><code><span class="kw">metti</span> (<span class="str">"rosso"</span>, <span class="str">"verde"</span>, <span class="str">"blu"</span>, <span class="str">"giallo"</span>) <span class="kw">in</span> ListaColori
@@ -621,10 +712,10 @@
   <span class="kw">scrivi</span> Doppio
   <span class="kw">accapo</span>
 )
-<span class="com"># Output:</span>
-<span class="com">#  2</span>
-<span class="com">#  4</span>
-<span class="com">#  6</span></code></pre>
+<span class="com">// Output:</span>
+<span class="com">//  2</span>
+<span class="com">//  4</span>
+<span class="com">//  6</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
@@ -636,16 +727,16 @@
         <p>I Dizionari (o "mappe") permettono di memorizzare valori associandoli non a un indice numerico, ma a una parola chiave (una stringa). Sono definiti tramite parentesi graffe <code>{}</code>.</p>
         
         <p><strong>Creazione e Inizializzazione:</strong></p>
-        <pre><code><span class="com"># Crea un dizionario vuoto</span>
+        <pre><code><span class="com">// Crea un dizionario vuoto</span>
 <span class="kw">metti</span> {} <span class="kw">in</span> Giocatore
 
-<span class="com"># Crea un dizionario già popolato</span>
+<span class="com">// Crea un dizionario già popolato</span>
 <span class="kw">metti</span> {<span class="str">"nome"</span>: <span class="str">"Alex"</span>, <span class="str">"vite"</span>: <span class="num">3</span>} <span class="kw">in</span> Giocatore</code></pre>
 
         <p><strong>Lettura e Scrittura:</strong> Si accede al valore di un dizionario utilizzando le parentesi quadre <code>[]</code>.</p>
-        <pre><code><span class="kw">scrivi</span> Giocatore[<span class="str">"nome"</span>] <span class="com"># Output: Alex</span>
+        <pre><code><span class="kw">scrivi</span> Giocatore[<span class="str">"nome"</span>] <span class="com">// Output: Alex</span>
 <span class="kw">accapo</span>
-<span class="com"># Aggiorniamo un valore o aggiungiamo una nuova chiave</span>
+<span class="com">// Aggiorniamo un valore o aggiungiamo una nuova chiave</span>
 <span class="kw">metti</span> <span class="num">4</span> <span class="kw">in</span> Giocatore[<span class="str">"vite"</span>]
 <span class="kw">metti</span> <span class="num">1500</span> <span class="kw">in</span> Giocatore[<span class="str">"punteggio"</span>]</code></pre>
 
@@ -665,21 +756,21 @@
         <p>I <strong>Record</strong> offrono un modo formale e compatto per creare tipologie di dati personalizzate con campi nominati. A differenza dei dizionari, nei record i campi (le "chiavi") si dichiarano in anticipo e l'accesso avviene con l'operatore punto <code>.</code>.</p>
         
         <p>Per utilizzare un record, si deve prima dichiararne la struttura con il comando <code>record</code>, e poi se ne istanziano copie passandogli i parametri in ordine.</p>
-        <pre><code><span class="com"># Definizione della struttura</span>
+        <pre><code><span class="com">// Definizione della struttura</span>
 <span class="kw">record</span> Persona(nome, eta, citta)
 
-<span class="com"># Istanziazione di un record (creazione di una "copia")</span>
+<span class="com">// Istanziazione di un record (creazione di una "copia")</span>
 <span class="kw">metti</span> Persona(<span class="str">"Giulia"</span>, <span class="num">28</span>, <span class="str">"Roma"</span>) <span class="kw">in</span> Utente1
 
-<span class="com"># Lettura e scrittura dei campi tramite operatore punto</span>
+<span class="com">// Lettura e scrittura dei campi tramite operatore punto</span>
 <span class="kw">scrivi</span> Utente1.nome + <span class="str">" ha "</span> + Utente1.eta + <span class="str">" anni."</span>
-<span class="kw">metti</span> <span class="num">29</span> <span class="kw">in</span> Utente1.eta <span class="com"># Aggiorna il valore</span></code></pre>
+<span class="kw">metti</span> <span class="num">29</span> <span class="kw">in</span> Utente1.eta <span class="com">// Aggiorna il valore</span></code></pre>
 
         <h3>Insiemi (Set)</h3>
         <p>Gli Insiemi (Set) sono collezioni non ordinate che, a differenza delle liste, <strong>non contengono duplicati</strong>.</p>
         <p>Si creano con il comando <code>set(...)</code>. Sono particolarmente utili in combinazione con la matematica degli insiemi per confrontare elementi (es. trovare intersezioni o unioni usando gli operatori standard `+`, `-`, `*` che sono stati sovraccaricati per i set).</p>
         <pre><code><span class="kw">metti</span> <span class="kw">set</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> S1
-<span class="kw">scrivi</span> S1 <span class="com"># Output: set(1, 2, 3) (i duplicati vengono ignorati)</span></code></pre>
+<span class="kw">scrivi</span> S1 <span class="com">// Output: set(1, 2, 3) (i duplicati vengono ignorati)</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
@@ -688,7 +779,7 @@
 
         <h3>Costrutto <code>se</code> e <code>altrimenti se</code></h3>
         <p>Le strutture di controllo condizionali permettono di eseguire blocchi di codice solo al verificarsi di determinate condizioni. L'istruzione fondamentale è <code>se</code>. La sintassi è: <code>se (CONDIZIONE) allora ( ... ) altrimenti ( ... )</code>.</p>
-        <p>Per le condizioni si utilizzano gli operatori di confronto: <code>uguale a</code>, <code>vale</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>!=</code>.</p>
+        <p>Per le condizioni si utilizzano gli operatori di confronto: <code>=</code>, <code>==</code>, <code>uguale a</code>, <code>vale</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>&lt;&gt;</code>, <code>!=</code>, <code>!==</code>, <code>diverso da</code>.</p>
         
         <p>È possibile concatenare più condizioni in cascata utilizzando il comando <code>altrimenti se</code>:</p>
         <pre><code><span class="kw">cancella schermo</span>
@@ -766,7 +857,7 @@
             <p>Esempio di misurazione:</p>
             <pre><code><span class="kw">scrivi</span> <span class="str">"Misurazione avviata..."</span>
 <span class="kw">accapo</span>
-<span class="kw">tick</span> <span class="com"># Avvia il cronometro</span>
+<span class="kw">tick</span> <span class="com">// Avvia il cronometro</span>
 <span class="kw">aspetta</span> <span class="num">1500</span> <span class="kw">ms</span>
 <span class="kw">scrivi</span> <span class="str">"Tempo trascorso: "</span> + tock + <span class="str">" ms"</span></code></pre>
             <p><strong>Nota</strong>: Se si tenta di leggere il valore di <code>tock</code> senza aver prima eseguito <code>tick</code>, il programma segnalerà un errore.</p>
@@ -783,41 +874,41 @@
         <pre><code><span class="kw">metti</span> <span class="str">"Ciao"</span> <span class="kw">in</span> Testo
 <span class="kw">metti</span> <span class="kw">scomponi</span>(Testo) <span class="kw">in</span> ListaCaratteri
 <span class="kw">scrivi</span> ListaCaratteri
-<span class="com"># Output:  (C, i, a, o)</span></code></pre>
+<span class="com">// Output:  (C, i, a, o)</span></code></pre>
 
         <h3>Dividere per separatore: <code>dividi</code></h3>
         <p>A differenza di <code>scomponi</code>, che separa ogni singolo carattere, il comando <code>dividi(testo, separatore)</code> divide una stringa in base a un carattere specifico (come lo spazio o la virgola).</p>
         <pre><code><span class="kw">metti</span> <span class="str">"rosso,verde,blu"</span> <span class="kw">in</span> CSV
 <span class="kw">metti</span> <span class="kw">dividi</span>(CSV, <span class="str">","</span>) <span class="kw">in</span> Colori
 <span class="kw">scrivi</span> Colori
-<span class="com"># Output:  (rosso, verde, blu)</span></code></pre>
+<span class="com">// Output:  (rosso, verde, blu)</span></code></pre>
 
         <h3>Scomposizione Specifica</h3>
         <p>Il comando <code>scomposizione(valore, TIPO)</code> offre un controllo maggiore rispetto a <code>scomponi</code>. I tipi target disponibili sono: <code>CIFRE</code>, <code>CARATTERI</code> e <code>PAROLE</code>.</p>
-        <pre><code><span class="com"># Dividere una frase in parole</span>
+        <pre><code><span class="com">// Dividere una frase in parole</span>
 <span class="kw">metti</span> <span class="str">"Matita è divertente"</span> <span class="kw">in</span> Frase
 <span class="kw">metti</span> <span class="kw">scomposizione</span>(Frase, <span class="str">"PAROLE"</span>) <span class="kw">in</span> ListaParole
 <span class="kw">scrivi</span> ListaParole
-<span class="com"># Output:  (Matita, è, divertente)</span>
+<span class="com">// Output:  (Matita, è, divertente)</span>
 
-<span class="com"># Dividere un numero in cifre</span>
+<span class="com">// Dividere un numero in cifre</span>
 <span class="kw">metti</span> <span class="num">123.45</span> <span class="kw">in</span> Numero
 <span class="kw">metti</span> <span class="kw">scomposizione</span>(Numero, <span class="str">"CIFRE"</span>) <span class="kw">in</span> ListaCifre
 <span class="kw">scrivi</span> ListaCifre
-<span class="com"># Output:  (1, 2, 3, ., 4, 5)</span></code></pre>
+<span class="com">// Output:  (1, 2, 3, ., 4, 5)</span></code></pre>
 
         <h3>Composizione</h3>
         <p>L'operazione inversa alla scomposizione è la <code>composizione(lista, TIPO)</code>, che unisce gli elementi di una lista in un singolo valore. I tipi target disponibili sono <code>TESTO</code> e <code>NUMERO</code>.</p>
         <pre><code><span class="kw">metti</span> (<span class="str">"M"</span>, <span class="str">"a"</span>, <span class="str">"r"</span>, <span class="str">"e"</span>) <span class="kw">in</span> Lettere
 <span class="kw">metti</span> <span class="kw">composizione</span>(Lettere, <span class="str">"TESTO"</span>) <span class="kw">in</span> Parola
 <span class="kw">scrivi</span> Parola
-<span class="com"># Output:  Mare</span>
+<span class="com">// Output:  Mare</span>
 
-<span class="com"># Creare un numero da cifre</span>
+<span class="com">// Creare un numero da cifre</span>
 <span class="kw">metti</span> (<span class="num">3</span>, <span class="str">"."</span>, <span class="num">1</span>, <span class="num">4</span>) <span class="kw">in</span> Cifre
 <span class="kw">metti</span> <span class="kw">composizione</span>(Cifre, <span class="str">"NUMERO"</span>) <span class="kw">in</span> Valore
-<span class="kw">scrivi</span> Valore * <span class="num">2</span> <span class="com"># Possiamo fare calcoli perché è un numero</span>
-<span class="com"># Output:  6.28</span></code></pre>
+<span class="kw">scrivi</span> Valore * <span class="num">2</span> <span class="com">// Possiamo fare calcoli perché è un numero</span>
+<span class="com">// Output:  6.28</span></code></pre>
 
         <h3>Ispezione dei Tipi</h3>
         <p>In Matita, le variabili possono cambiare tipo dinamicamente. È possibile verificare la natura di un dato tramite le seguenti funzioni:</p>
@@ -826,11 +917,11 @@
             <li><code>numerico(x)</code> (o l'equivalente <code>è_numero(x)</code>): Restituisce <code>vero</code> se l'argomento è un numero valido e finito, <code>falso</code> altrimenti.</li>
         </ul>
         <pre><code><span class="kw">metti</span> <span class="num">42</span> <span class="kw">in</span> X
-<span class="kw">scrivi</span> <span class="kw">tipo</span>(X)        <span class="com"># Output: number</span>
-<span class="kw">scrivi</span> <span class="kw">numerico</span>(X)    <span class="com"># Output: vero</span>
+<span class="kw">scrivi</span> <span class="kw">tipo</span>(X)        <span class="com">// Output: number</span>
+<span class="kw">scrivi</span> <span class="kw">numerico</span>(X)    <span class="com">// Output: vero</span>
 
 <span class="kw">metti</span> <span class="str">"Ciao"</span> <span class="kw">in</span> Y
-<span class="kw">scrivi</span> <span class="kw">numerico</span>(Y)    <span class="com"># Output: falso</span></code></pre>
+<span class="kw">scrivi</span> <span class="kw">numerico</span>(Y)    <span class="com">// Output: falso</span></code></pre>
 
         <h3>Conversione di Tipo (Casting)</h3>
         <p>Talora è necessario trattare un numero come se fosse testo, ad esempio per concatenarlo ad altre parole, o -viceversa- per usarlo in un calcolo matematico. Il comando <code>cast</code> esegue l'operazione di conversione di tipo.
@@ -841,25 +932,25 @@
         </ul>
         <p>Esempio:</p>
         <pre><code><span class="kw">cancella schermo</span>
-<span class="com"># Test da Stringa a Numero</span>
+<span class="com">// Test da Stringa a Numero</span>
 <span class="kw">metti</span> <span class="str">"10"</span> <span class="kw">in</span> S1
 <span class="kw">metti</span> <span class="str">"3.14"</span> <span class="kw">in</span> S2
 <span class="kw">metti</span> <span class="str">"-50"</span> <span class="kw">in</span> S3
-<span class="kw">metti</span> <span class="str">"1.2e3"</span> <span class="kw">in</span> S4  <span class="com"># 1200 in notazione scientifica</span>
+<span class="kw">metti</span> <span class="str">"1.2e3"</span> <span class="kw">in</span> S4  <span class="com">// 1200 in notazione scientifica</span>
 
 <span class="kw">metti</span> <span class="kw">cast</span>(S1, <span class="str">"numero"</span>) + <span class="kw">cast</span>(S2, <span class="str">"numero"</span>) + <span class="kw">cast</span>(S3, <span class="str">"numero"</span>) + <span class="kw">cast</span>(S4, <span class="str">"numero"</span>) <span class="kw">in</span> Totale
 <span class="kw">scrivi</span> <span class="str">"Somma dei cast: "</span> + Totale 
 <span class="kw">accapo</span>
 
-<span class="com"># Test da Numero a Stringa (Concatenazione)</span>
+<span class="com">// Test da Numero a Stringa (Concatenazione)</span>
 <span class="kw">metti</span> <span class="num">500</span> <span class="kw">in</span> N1
 <span class="kw">metti</span> <span class="num">12.5</span> <span class="kw">in</span> N2
-<span class="com"># Somma le stringhe (concatenazione) invece dei numeri</span>
+<span class="com">// Somma le stringhe (concatenazione) invece dei numeri</span>
 <span class="kw">scrivi</span> <span class="str">"Concatenazione: "</span> + <span class="kw">cast</span>(N1, <span class="str">"testo"</span>) + <span class="kw">cast</span>(N2, <span class="str">"testo"</span>)
 
-<span class="com"># Output atteso:</span>
-<span class="com">#  Somma dei cast: 1163.14</span>
-<span class="com">#  Concatenazione: 50012.5</span></code></pre>
+<span class="com">// Output atteso:</span>
+<span class="com">//  Somma dei cast: 1163.14</span>
+<span class="com">//  Concatenazione: 50012.5</span></code></pre>
 
         <h3>Funzione Unicode</h3>
         <p>Unicode è uno standard internazionale che assegna un codice numerico univoco a ogni carattere o simbolo usato nei sistemi informatici, incluse le lettere di tutti gli alfabeti, e le Emoji.</p>
@@ -869,16 +960,16 @@
             <li><strong>Da Simbolo a Numero</strong>: Se l'argomento è una stringa, restituisce il codice numerico del primo carattere.</li>
         </ul>
         <p>Esempio:</p>
-        <pre><code><span class="com"># Esempio 1: Generare un simbolo dal codice (Razzo)</span>
+        <pre><code><span class="com">// Esempio 1: Generare un simbolo dal codice (Razzo)</span>
 <span class="kw">metti</span> <span class="kw">unicode</span>(<span class="num">128640</span>) <span class="kw">in</span> SimboloRazzo
 <span class="kw">scrivi</span> <span class="str">"Verso l'infinito... "</span> + SimboloRazzo
-<span class="com"># Output:  Verso l'infinito... 🚀</span>
+<span class="com">// Output:  Verso l'infinito... 🚀</span>
 <span class="kw">accapo</span>
 
-<span class="com"># Esempio 2: Ottenere il codice da un simbolo (Faccina)</span>
+<span class="com">// Esempio 2: Ottenere il codice da un simbolo (Faccina)</span>
 <span class="kw">metti</span> <span class="kw">unicode</span>(<span class="str">"🙂"</span>) <span class="kw">in</span> CodiceFaccina
 <span class="kw">scrivi</span> <span class="str">"Il codice della faccina è: "</span> + CodiceFaccina
-<span class="com"># Output:  Il codice della faccina è: 128578</span></code></pre>
+<span class="com">// Output:  Il codice della faccina è: 128578</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
@@ -895,13 +986,13 @@
 
         <h3>Procedure</h3>
         <p>Esempio di definizione e chiamata di una procedura:</p>
-        <pre><code><span class="com"># Definizione</span>
+        <pre><code><span class="com">// Definizione</span>
 <span class="kw">definisci</span> <span class="kw">procedura</span> saluta(nome) (
   <span class="kw">scrivi</span> <span class="str">"Ciao, "</span> + nome + <span class="str">". Benvenuto in Matita."</span>
   <span class="kw">accapo</span>
 )
 
-<span class="com"># Chiamata</span>
+<span class="com">// Chiamata</span>
 saluta(<span class="str">"Alex"</span>)
 saluta(<span class="str">"Maria"</span>)</code></pre>
 
@@ -924,18 +1015,18 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <h3>Ricorsione</h3>
         <p>La ricorsione è una tecnica di programmazione in cui una funzione invoca se stessa. È particolarmente efficace per risolvere problemi che possono essere suddivisi in sottoproblemi identici ma di dimensione inferiore. L'esempio classico è il calcolo del fattoriale (𝑛!).</p>
         <pre><code><span class="kw">definisci</span> <span class="kw">funzione</span> fattoriale(n) (
-  <span class="com"># Caso base: condizione di terminazione.</span>
+  <span class="com">// Caso base: condizione di terminazione.</span>
   <span class="kw">se</span> (n <span class="kw">uguale</span> <span class="kw">a</span> <span class="num">0</span>) <span class="kw">allora</span> (
     <span class="kw">restituisci</span> <span class="num">1</span>
   ) <span class="kw">altrimenti</span> (
-    <span class="com"># Passo ricorsivo</span>
+    <span class="com">// Passo ricorsivo</span>
     <span class="kw">restituisci</span> n * fattoriale(n - <span class="num">1</span>)
   )
 )
 
 <span class="kw">metti</span> <span class="num">5</span> <span class="kw">in</span> Numero
 <span class="kw">metti</span> fattoriale(Numero) <span class="kw">in</span> Risultato
-<span class="kw">scrivi</span> Numero + <span class="str">"! = "</span> + risultato <span class="com"># Mostrerà 120</span></code></pre>
+<span class="kw">scrivi</span> Numero + <span class="str">"! = "</span> + risultato <span class="com">// Mostrerà 120</span></code></pre>
 
         <p>Se la catena di chiamate ricorsive è eccessiva, si verifica un overflow dello stack (limite di ricorsione superato).</p>
     </section>
@@ -958,7 +1049,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
   <span class="kw">scrivi</span> Numero
   <span class="kw">accapo</span>
 )
-<span class="com"># ora siamo fuori dal blocco locale</span>
+<span class="com">// ora siamo fuori dal blocco locale</span>
 <span class="kw">scrivi</span> <span class="str">"Valore finale: "</span> + Numero</code></pre>
         <p>Output:</p>
         <pre><code> Avviso: La variabile locale 'Numero' sta nascondendo una variabile globale con lo stesso nome.
@@ -980,7 +1071,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
   <span class="kw">scrivi</span> Numero
   <span class="kw">accapo</span>
 )
-<span class="com"># ora siamo fuori dal blocco</span>
+<span class="com">// ora siamo fuori dal blocco</span>
 <span class="kw">scrivi</span> <span class="str">"Valore finale: "</span> + Numero</code></pre>
         <p>Output:</p>
         <pre><code> 2
@@ -991,15 +1082,15 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
  Valore finale: 6</code></pre>
         
         <p>È possibile dichiarare più variabili globali contemporaneamente separandole con una virgola:</p>
-        <pre><code><span class="kw">globale</span> Nome1, Nome2 <span class="com"># più variabili separate da virgole</span></code></pre>
+        <pre><code><span class="kw">globale</span> Nome1, Nome2 <span class="com">// più variabili separate da virgole</span></code></pre>
 
         <h3>Semantica per valore</h3>
         <p>L'interprete Matita adotta, per impostazione predefinita, una <strong>Semantica di Valore</strong> (Value Semantics). Ogni operazione di assegnazione tramite il comando <code>metti</code> comporta una <strong>Deep Copy</strong> (copia profonda) del dato.</p>
         <p>Ciò significa che assegnare una lista o un oggetto complesso a una nuova variabile crea un clone indipendente e distinto in memoria. Questo previene alterazioni impreviste e rende la programmazione più sicura e comprensibile, specie a livello didattico.</p>
         <pre><code><span class="kw">metti</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> A
-<span class="kw">metti</span> A <span class="kw">in</span> B      <span class="com"># B è una copia clale di A</span>
+<span class="kw">metti</span> A <span class="kw">in</span> B      <span class="com">// B è una copia locale di A</span>
 <span class="kw">metti</span> <span class="num">99</span> <span class="kw">in</span> <span class="kw">elemento</span> <span class="num">1</span> <span class="kw">di</span> B
-<span class="com"># A rimane (1, 2, 3), B diventa (99, 2, 3)</span></code></pre>
+<span class="com">// A rimane (1, 2, 3), B diventa (99, 2, 3)</span></code></pre>
 
         <h3>Accesso per riferimento: <code>alias</code></h3>
         <p>In diversi linguaggi, fra cui Python e Java, l'istruzione <code>B = A</code> fa sì che entrambe le variabili puntino allo stesso oggetto in memoria. Si dice che tali linguaggi adottano implicitamente una <strong>semantica di riferimento</strong> e A e B sono alias, ossia repliche, una dell'altra. Un alias non contiene dunque dati propri, ma agisce come un puntatore verso un'altra variabile target.</p>
@@ -1019,13 +1110,91 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
             <li><strong>Passaggio per riferimento (tramite la parola chiave <em>inout</em>):</strong> Utilizzando la parola chiave <code>inout</code>, l'interprete crea un <strong>alias locale</strong> che punta alla variabile passata dal chiamante.</li>
         </ol>
         <pre><code><span class="kw">definisci</span> <span class="kw">procedura</span> Incrementa(<span class="kw">inout</span> X) (
-    <span class="kw">metti</span> X + <span class="num">1</span> <span class="kw">in</span> X  <span class="com"># Modifica direttamente la variabile esterna</span>
+    <span class="kw">metti</span> X + <span class="num">1</span> <span class="kw">in</span> X  <span class="com">// Modifica direttamente la variabile esterna</span>
 )</code></pre>
 
         <h3>Liberare memoria: <code>null</code></h3>
         <p>La parola chiave <code>null</code> indica un valore speciale corrispondente ad <em>assenza di dati</em>. Tale parola chiave consente di svuotare una variabile.</p>
-        <p>Scrivendo ad esempio <code>metti null in VAR</code>, il nome <code>VAR</code> viene scollegato dal suo contenuto precedente, il che segnala al computer che quel contenuto non serve più e la memoria che occupava può essere liberata.</p>
+        <p>Scrivendo ad esempio <code>metti null in VAR</code>, il nome <code>VAR</code> viene scollegato dal suo contenuto precedente, il che segnalerà al computer che quel contenuto non serve più e la memoria che occupava può essere liberata.</p>
         <p>L'uso di <code>null</code> è utile per liberare la memoria del computer quando oggetti pesanti, come immagini o liste molto lunghe, non sono più necessari.</p>
+    </section>
+
+    <div class="pagebreak"></div>
+    <section id="oop">
+        <h2>Programmazione a Oggetti (OOP)</h2>
+        <p>La Programmazione Orientata agli Oggetti (OOP) è un paradigma che permette di modellare il software raggruppando dati e comportamenti (variabili e procedure) in entità uniche, chiamate <strong>oggetti</strong>. Questo approccio rende il codice più organizzato, modulare e vicino al modo in cui pensiamo al mondo reale.</p>
+
+        <h3>Classi e Istanze</h3>
+        <p>Una <strong>classe</strong> è il "progetto" o "stampo" che definisce la struttura di un oggetto. L'oggetto concreto creato a partire da quello stampo è chiamato <strong>istanza</strong>.</p>
+        <p>Per definire una classe si usa la parola chiave <code>classe</code> seguita dal nome e dai suoi campi (le variabili interne che compongono lo stato dell'oggetto). Si possono poi creare copie dell'oggetto chiamando il nome della classe come se fosse una funzione:</p>
+        <pre><code><span class="com">// Definizione della classe</span>
+<span class="kw">definisci classe</span> Giocatore (nome, punteggio) (
+  <span class="com">// Qui andranno i metodi (procedure e funzioni interne)</span>
+)
+
+<span class="com">// Creazione di un'istanza</span>
+<span class="kw">metti</span> Giocatore(<span class="str">"Alex"</span>, <span class="num">0</span>) <span class="kw">in</span> P1
+<span class="kw">scrivi</span> P1.nome <span class="com">// Output: Alex</span></code></pre>
+
+        <h3>Costruttore personalizzato: <code>INIZIALIZZA</code></h3>
+        <p>Quando si crea un'istanza, Matita assegna automaticamente i valori passati ai campi della classe in ordine. Tuttavia, se si desidera eseguire codice specifico al momento della creazione (ad esempio, per fare calcoli o validazioni), è possibile definire una procedura speciale chiamata <code>INIZIALIZZA</code> all'interno della classe.</p>
+
+        <h3>Metodi e Incapsulamento (Privacy)</h3>
+        <p>Le procedure e le funzioni definite dentro una classe sono dette <strong>metodi</strong>. I metodi possono accedere direttamente ai campi della classe senza doverli passare come parametri. Per fare riferimento all'istanza stessa all'interno dei metodi si può usare la parola chiave <code>questo</code>.</p>
+        <p>Una buona pratica dell'OOP è l'<strong>incapsulamento</strong>: nascondere i dati sensibili all'esterno e permetterne la modifica solo tramite metodi controllati. In Matita, qualsiasi campo che inizia con un trattino basso (<code>_</code>) viene considerato <strong>privato</strong>. Se si tenta di accedervi direttamente dall'esterno, il programma non andrà in errore per non interrompere l'esecuzione, ma stamperà un <span class="warn-tag">Avviso</span> in console per scoraggiarne l'uso.</p>
+        
+        <pre><code><span class="kw">definisci classe</span> ContoBancario (titolare, _saldo) (
+  
+  <span class="kw">definisci procedura</span> INIZIALIZZA(t, s) (
+    <span class="kw">metti</span> t <span class="kw">in</span> titolare
+    <span class="kw">metti</span> s <span class="kw">in</span> _saldo
+  )
+
+  <span class="kw">definisci procedura</span> deposita(cifra) (
+    <span class="kw">metti</span> _saldo + cifra <span class="kw">in</span> _saldo  <span class="com">// OK: accesso interno lecito</span>
+  )
+
+  <span class="kw">definisci funzione</span> leggi_saldo() (
+    <span class="kw">restituisci</span> _saldo            <span class="com">// OK: accesso interno lecito</span>
+  )
+)
+
+<span class="kw">metti</span> ContoBancario(<span class="str">"Alice"</span>, <span class="num">100</span>) <span class="kw">in</span> MioConto
+
+MioConto.deposita(<span class="num">50</span>)
+<span class="kw">scrivi</span> MioConto.leggi_saldo() <span class="com">// Modo corretto: stampa 150</span>
+<span class="kw">accapo</span>
+
+<span class="com">// Genera un "Avviso alla riga: '_saldo' è un membro privato..."</span>
+<span class="kw">scrivi</span> MioConto._saldo</code></pre>
+
+        <h3>Ereditarietà (<code>estende</code>) e la direttiva <code>SOVRA</code></h3>
+        <p>L'ereditarietà permette di creare una nuova classe basata su una classe esistente (genitore), ereditandone i campi e i metodi. Si realizza tramite la parola chiave <code>estende</code>.</p>
+        <p>Se la classe figlia definisce un metodo con lo stesso nome di quello del genitore, lo sovrascrive (<em>override</em>). Per invocare comunque il metodo originale della classe genitore, si utilizza la parola chiave <code>SOVRA</code>.</p>
+
+        <pre><code><span class="kw">definisci classe</span> Animale (nome) (
+  <span class="kw">definisci procedura</span> verso() (
+    <span class="kw">scrivi</span> <span class="str">"Faccio un verso generico."</span>
+  )
+)
+
+<span class="com">// Il Cane estende l'Animale, ereditandone il campo 'nome'</span>
+<span class="kw">definisci classe</span> Cane <span class="kw">estende</span> Animale (razza) (
+  <span class="kw">definisci procedura</span> verso() (
+    <span class="kw">scrivi</span> <span class="str">"Bau! Mi chiamo "</span> + nome + <span class="str">". "</span>
+    SOVRA.verso() <span class="com">// Chiama il metodo verso() di Animale</span>
+  )
+)
+
+<span class="kw">metti</span> Cane(<span class="str">"Fido"</span>, <span class="str">"Beagle"</span>) <span class="kw">in</span> MioCane
+MioCane.verso()
+<span class="com">// Output: Bau! Mi chiamo Fido. Faccio un verso generico.</span></code></pre>
+
+        <h3>Polimorfismo: <code>classedi()</code></h3>
+        <p>Per scoprire a quale classe appartiene un'istanza durante l'esecuzione del programma (utile ad esempio in collisioni tra oggetti in un videogioco), si utilizza la funzione <code>classedi(oggetto)</code>. Essa restituisce il nome della classe sotto forma di stringa testuale minuscola.</p>
+        <pre><code><span class="kw">se</span> (<span class="kw">classedi</span>(MioCane) <span class="kw">uguale a</span> <span class="str">"cane"</span>) <span class="kw">allora</span> (
+  <span class="kw">scrivi</span> <span class="str">"È decisamente un cane!"</span>
+)</code></pre>
     </section>
 
     <div class="pagebreak"></div>
@@ -1043,9 +1212,9 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
 <span class="kw">scrivi</span> CoordinataX</code></pre>
 
         <p>Per modificare una singola coordinata, si usa il comando <code>imposta</code>. Questa operazione è fondamentale per gestire il movimento degli oggetti.</p>
-        <pre><code><span class="com"># Sposta il punto 10 passi in giù senza cambiare la x</span>
+        <pre><code><span class="com">// Sposta il punto 10 passi in giù senza cambiare la x</span>
 <span class="kw">imposta</span> <span class="kw">y</span> <span class="kw">di</span> MioPunto <span class="kw">a</span> (<span class="kw">y</span> <span class="kw">di</span> MioPunto - <span class="num">10</span>)
-<span class="kw">scrivi</span> <span class="kw">y</span> <span class="kw">di</span> MioPunto <span class="com"># Mostrerà 34</span></code></pre>
+<span class="kw">scrivi</span> <span class="kw">y</span> <span class="kw">di</span> MioPunto <span class="com">// Mostrerà 34</span></code></pre>
     </section>
 
     <section id="colors">
@@ -1086,54 +1255,54 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <p>Esempio composito:</p>
         <pre><code><span class="kw">cancella grafica</span>
 
-<span class="kw">metti</span> <span class="num">15</span> <span class="kw">in</span> S       <span class="com"># Spessore di ogni arco</span>
-<span class="kw">metti</span> <span class="num">260</span> <span class="kw">in</span> R      <span class="com"># Raggio del colore più esterno (Rosso)</span>
-<span class="kw">metti</span> <span class="num">-160</span> <span class="kw">in</span> Y     <span class="com"># Altezza dell'orizzonte (dove finisce il prato)</span>
+<span class="kw">metti</span> <span class="num">15</span> <span class="kw">in</span> S       <span class="com">// Spessore di ogni arco</span>
+<span class="kw">metti</span> <span class="num">260</span> <span class="kw">in</span> R      <span class="com">// Raggio del colore più esterno (Rosso)</span>
+<span class="kw">metti</span> <span class="num">-160</span> <span class="kw">in</span> Y     <span class="com">// Altezza dell'orizzonte (dove finisce il prato)</span>
 
-<span class="com"># --- CIELO E SFONDO ---</span>
+<span class="com">// --- CIELO E SFONDO ---</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">68</span>, <span class="num">85</span>, <span class="num">90</span>)
 <span class="kw">dipingi</span> <span class="kw">sfondo</span>
 
-<span class="com"># --- PRATO ---</span>
+<span class="com">// --- PRATO ---</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">16</span>, <span class="num">65</span>, <span class="num">27</span>)
 <span class="kw">rettangolo</span> <span class="kw">da</span> (<span class="num">-360</span>, <span class="num">-250</span>) <span class="kw">a</span> (<span class="num">360</span>, Y)
 
-<span class="com"># --- SOLE ---</span>
+<span class="com">// --- SOLE ---</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">87</span>, <span class="num">0</span>)
 <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">70</span> <span class="kw">in</span> (<span class="num">250</span>, <span class="num">180</span>)
 
-<span class="com"># --- ARCOBALENO ---</span>
-<span class="com"># 1. Rosso</span>
+<span class="com">// --- ARCOBALENO ---</span>
+<span class="com">// 1. Rosso</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">90</span>, <span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">arco</span> <span class="kw">raggio</span> R <span class="kw">spessore</span> S <span class="kw">da</span> (R, Y) <span class="kw">a</span> (-R, Y)
-<span class="kw">metti</span> R - S <span class="kw">in</span> R  <span class="com"># Rimpicciolisco il raggio per il prossimo colore</span>
+<span class="kw">metti</span> R - S <span class="kw">in</span> R  <span class="com">// Rimpicciolisco il raggio per il prossimo colore</span>
 
-<span class="com"># 2. Arancione</span>
+<span class="com">// 2. Arancione</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">90</span>, <span class="num">50</span>, <span class="num">0</span>)
 <span class="kw">arco</span> <span class="kw">raggio</span> R <span class="kw">spessore</span> S <span class="kw">da</span> (R, Y) <span class="kw">a</span> (-R, Y)
 <span class="kw">metti</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 3. Giallo</span>
+<span class="com">// 3. Giallo</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">90</span>, <span class="num">90</span>, <span class="num">0</span>)
 <span class="kw">arco</span> <span class="kw">raggio</span> R <span class="kw">spessore</span> S <span class="kw">da</span> (R, Y) <span class="kw">a</span> (-R, Y)
 <span class="kw">metti</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 4. Verde</span>
+<span class="com">// 4. Verde</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">0</span>, <span class="num">70</span>, <span class="num">0</span>)
 <span class="kw">arco</span> <span class="kw">raggio</span> R <span class="kw">spessore</span> S <span class="kw">da</span> (R, Y) <span class="kw">a</span> (-R, Y)
 <span class="kw">metti</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 5. Blu</span>
+<span class="com">// 5. Blu</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">90</span>)
 <span class="kw">arco</span> <span class="kw">raggio</span> R <span class="kw">spessore</span> S <span class="kw">da</span> (R, Y) <span class="kw">a</span> (-R, Y)
 <span class="kw">metti</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 6. Indaco / Viola</span>
+<span class="com">// 6. Indaco / Viola</span>
 <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">40</span>, <span class="num">0</span>, <span class="num">70</span>)
 <span class="kw">arco</span> <span class="kw">raggio</span> R <span class="kw">spessore</span> S <span class="kw">da</span> (R, Y) <span class="kw">a</span> (-R, Y)
 
-<span class="com"># --- PALLONCINO ---</span>
-<span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">80</span>, <span class="num">0</span>, <span class="num">90</span>) <span class="com"># Un viola più acceso</span>
+<span class="com">// --- PALLONCINO ---</span>
+<span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">80</span>, <span class="num">0</span>, <span class="num">90</span>) <span class="com">// Un viola più acceso</span>
 <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">25</span> <span class="kw">in</span> (<span class="num">-100</span>, <span class="num">-50</span>)
 <span class="kw">linea</span> <span class="kw">spessore</span> <span class="num">2</span> <span class="kw">da</span> (<span class="num">-100</span>, <span class="num">-75</span>) <span class="kw">a</span> (<span class="num">-100</span>, Y)</code></pre>
     </section>
@@ -1156,9 +1325,9 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <p>Il comando <code>inquadra grafica</code> regola automaticamente la telecamera (pan e zoom) in modo che tutti gli oggetti attualmente presenti nell'area grafica (canvas) siano visibili e centrati nella finestra.</p>
         <p>Questo comando è utile per fare in modo che la scena si adatti dinamicamente allo schermo. Esegue implicitamente anche un ridisegno, per cui il suo uso rende non necessario usare <code>ridisegna</code>.</p>
         <pre><code><span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
-<span class="com"># Disegna un cerchio molto grande, lontano dall'origine</span>
+<span class="com">// Disegna un cerchio molto grande, lontano dall'origine</span>
 <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">500</span> <span class="kw">in</span> (<span class="num">2000</span>, <span class="num">2000</span>)
-<span class="com"># Adatta la vista per mostrarlo tutto</span>
+<span class="com">// Adatta la vista per mostrarlo tutto</span>
 <span class="kw">inquadra grafica</span></code></pre>
     </section>
 
@@ -1221,10 +1390,10 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
     <span class="kw">imposta</span> <span class="kw">x</span> <span class="kw">di</span> posGiocatore <span class="kw">a</span> (<span class="kw">x</span> <span class="kw">di</span> posGiocatore - <span class="num">5</span>)
   )
 
-  <span class="com"># Uscita di emergenza</span>
+  <span class="com">// Uscita di emergenza</span>
   <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"x"</span> <span class="kw">viene</span> <span class="kw">premuto</span>) <span class="kw">allora</span> (<span class="kw">stop</span>)
 
-  <span class="com"># Disegno</span>
+  <span class="com">// Disegno</span>
   <span class="kw">cancella grafica</span>
   <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">0</span>, <span class="num">100</span>, <span class="num">100</span>)
   <span class="kw">rettangolo</span> <span class="kw">da</span> (-lim, -lim) <span class="kw">a</span> (lim, lim)
@@ -1234,7 +1403,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
 
   <span class="kw">ridisegna</span>
 
-  <span class="com"># Refresh rate (circa 60 fps)</span>
+  <span class="com">// Refresh rate (circa 60 fps)</span>
   <span class="kw">aspetta</span> <span class="num">16</span> <span class="kw">ms</span>
 )</code></pre>
     </section>
@@ -1245,23 +1414,23 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <p>Per ottimizzare il codice e riutilizzare gruppi di forme, è possibile definire delle <strong>etichette</strong>. Un'etichetta raggruppa una serie di istruzioni di disegno in un unico oggetto riutilizzabile. Sintassi: <code>etichetta (...) come NOME</code>.</p>
         
         <p>Esempio di definizione e utilizzo:</p>
-        <pre><code><span class="com"># Definizione del modello</span>
+        <pre><code><span class="com">// Definizione del modello</span>
 <span class="kw">etichetta</span> (
-  <span class="com"># Corpo</span>
-  <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="com"># Bianco</span>
+  <span class="com">// Corpo</span>
+  <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="com">// Bianco</span>
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">30</span> <span class="kw">in</span> (<span class="num">0</span>, <span class="num">0</span>)
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">20</span> <span class="kw">in</span> (<span class="num">0</span>, <span class="num">45</span>)
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">15</span> <span class="kw">in</span> (<span class="num">0</span>, <span class="num">75</span>)
 
-  <span class="com"># Dettagli</span>
-  <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="com"># Nero</span>
+  <span class="com">// Dettagli</span>
+  <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="com">// Nero</span>
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">2</span> <span class="kw">in</span> (<span class="num">-5</span>, <span class="num">78</span>)
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">2</span> <span class="kw">in</span> (<span class="num">5</span>, <span class="num">78</span>)
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">2</span> <span class="kw">in</span> (<span class="num">0</span>, <span class="num">50</span>)
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">2</span> <span class="kw">in</span> (<span class="num">0</span>, <span class="num">40</span>)
 
-  <span class="com"># Naso</span>
-  <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">60</span>, <span class="num">0</span>) <span class="com"># Arancione</span>
+  <span class="com">// Naso</span>
+  <span class="kw">imposta</span> <span class="kw">colore</span> (<span class="num">100</span>, <span class="num">60</span>, <span class="num">0</span>) <span class="com">// Arancione</span>
   <span class="kw">triangolo</span> <span class="kw">con</span> <span class="kw">vertici</span> (<span class="num">0</span>, <span class="num">75</span>), (<span class="num">0</span>, <span class="num">73</span>), (<span class="num">8</span>, <span class="num">74</span>)
 ) <span class="kw">come</span> PupazzoDiNeve
 
@@ -1307,7 +1476,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <h3>Importare Codice Esterno (Librerie)</h3>
         <p>È possibile dividere programmi complessi su più file. Utilizzando il comando <code>importa</code> senza la parola chiave <code>come</code>, Matita leggerà un file di testo contenente codice sorgente (es. procedure o funzioni utili) e lo eseguirà come se fosse stato scritto direttamente nel file principale.</p>
         <pre><code><span class="kw">importa</span> <span class="str">"mia_libreria.txt"</span>
-<span class="com"># Ora si possono usare funzioni definite in mia_libreria.txt</span></code></pre>
+<span class="com">// Ora si possono usare funzioni definite in mia_libreria.txt</span></code></pre>
     </section>
     
     <div class="pagebreak"></div>
@@ -1316,28 +1485,28 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <p>Matita integra un motore di sintesi sonora per aggiungere effetti audio e musica (sintetizzatore ADSR). Si basa su comandi per definire le proprietà fisiche del suono, riprodurlo, controllarne il volume e applicare dissolvenze.</p>
 
         <h3>Definire e riprodurre un suono</h3>
-        <p>Si utilizza il comando <code>suono</code> seguito da un nome a scelta, aprendo poi un blocco di configurazione. Le configurazioni principali possono generare un `rumore`, uno sweep continuo di frequenza (`scivola`), oppure una sequenza di `note`.</p>
-        <pre><code><span class="com"># Crea un semplice beep (sweep da 800Hz a 200Hz)</span>
+        <p>Si utilizza il comando <code>suono</code> seguito da un nome a scelta, aprendo poi un blocco di configurazione. Le configurazioni principali possono generare un <code>rumore</code>, uno sweep continuo di frequenza (<code>scivola</code>), oppure una sequenza di <code>note</code>.</p>
+        <pre><code><span class="com">// Crea un semplice beep (sweep da 800Hz a 200Hz)</span>
 <span class="kw">suono</span> Beep (
   <span class="kw">scivola</span> <span class="kw">da</span> <span class="num">800</span> <span class="kw">a</span> <span class="num">200</span> hz
-  <span class="kw">onda</span> <span class="str">"sine"</span> <span class="com"># Opzioni: "sine", "square", "sawtooth", "triangle"</span>
+  <span class="kw">onda</span> <span class="str">"sine"</span> <span class="com">// Opzioni: "sine", "square", "sawtooth", "triangle"</span>
   <span class="kw">durata</span> <span class="num">300</span> <span class="kw">ms</span>
 )
 
-<span class="com"># Crea un rumore (ottimo per le esplosioni)</span>
+<span class="com">// Crea un rumore (ottimo per le esplosioni)</span>
 <span class="kw">suono</span> Esplosione (
   <span class="kw">rumore</span>
   <span class="kw">durata</span> <span class="num">500</span> <span class="kw">ms</span>
   <span class="kw">decadimento</span> <span class="num">400</span> <span class="kw">ms</span>
 )
 
-<span class="com"># Crea una melodia</span>
+<span class="com">// Crea una melodia</span>
 <span class="kw">suono</span> Melodia (
-  <span class="kw">note</span> (<span class="num">440</span>:<span class="num">200</span>, <span class="num">523</span>:<span class="num">400</span>, <span class="num">659</span>:<span class="num">600</span>) <span class="com"># Frequenza : Durata</span>
+  <span class="kw">note</span> (<span class="num">440</span>:<span class="num">200</span>, <span class="num">523</span>:<span class="num">400</span>, <span class="num">659</span>:<span class="num">600</span>) <span class="com">// Frequenza : Durata</span>
   <span class="kw">onda</span> <span class="str">"square"</span>
 )
 
-<span class="com"># Riproduzione</span>
+<span class="com">// Riproduzione</span>
 <span class="kw">play</span> Beep
 <span class="kw">aspetta</span> <span class="num">500</span> <span class="kw">ms</span>
 <span class="kw">play</span> Esplosione</code></pre>
@@ -1370,7 +1539,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
         <h3>Pan e Zoom</h3>
         <p>È possibile navigare all'interno dell'area grafica senza alterare le coordinate originali degli oggetti:</p>
         <ul>
-            <li><strong>Pan (Trascinamento)</strong>: Tenendo premuto il <strong>tasto destro</strong> del mouse (oppure il tasto centrale, o <code>Shift</code> + tasto sinistro) e muovendo il cursore, è possibile traslare la vista in qualsiasi direzione.</li>
+            <li><strong>Pan (Trascinamento)</strong>: Tenendo premuto il <strong>tasto destro</strong> del mouse (oppure il tasto centrale, o <span class="kbd">Shift</span> + tasto sinistro) e muovendo il cursore, è possibile traslare la vista in qualsiasi direzione.</li>
             <li><strong>Zoom</strong>: Utilizzando la <strong>rotellina del mouse</strong>, si ingrandisce o si rimpicciolisce la vista. L'ingrandimento è centrato sul cursore, ovvero punta verso le coordinate in cui si trova il mouse in quel momento.</li>
         </ul>
 
@@ -1393,15 +1562,15 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
     <section id="project">
         <h2>Esercizio guidato: faccina interattiva</h2>
         <p>Il seguente codice integra definizione di etichette, input utente e ciclo di rendering per creare un oggetto controllabile.</p>
-        <pre><code><span class="com"># Definiamo i colori</span>
+        <pre><code><span class="com">// Definiamo i colori</span>
 <span class="kw">metti</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="kw">in</span> Bianco
 <span class="kw">metti</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Nero
 <span class="kw">metti</span> (<span class="num">100</span>, <span class="num">90</span>, <span class="num">10</span>) <span class="kw">in</span> Giallo
 
-<span class="com"># Dimensioni dello sfondo bianco </span>
+<span class="com">// Dimensioni dello sfondo bianco </span>
 <span class="kw">metti</span> <span class="num">300</span> <span class="kw">in</span> lim
 
-<span class="com"># Definiamo la Faccina come oggetto grafico (etichetta)</span>
+<span class="com">// Definiamo la Faccina come oggetto grafico (etichetta)</span>
 <span class="kw">etichetta</span> (
   <span class="kw">imposta</span> <span class="kw">colore</span> Giallo
   <span class="kw">cerchio</span> <span class="kw">raggio</span> <span class="num">120</span> <span class="kw">in</span> <span class="kw">punto</span>(<span class="num">0</span>, <span class="num">0</span>)
@@ -1412,7 +1581,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
   <span class="kw">arco</span> <span class="kw">raggio</span> <span class="num">60</span> <span class="kw">spessore</span> <span class="num">8</span> <span class="kw">da</span> (<span class="num">-50</span>, <span class="num">-25</span>) <span class="kw">a</span> (<span class="num">50</span>, <span class="num">-25</span>)
 ) <span class="kw">come</span> Faccina
 
-<span class="com"># Inizializzazione variabili</span>
+<span class="com">// Inizializzazione variabili</span>
 <span class="kw">metti</span> <span class="kw">punto</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Posizione
 <span class="kw">metti</span> <span class="num">0</span> <span class="kw">in</span> Angolo
 
@@ -1420,14 +1589,14 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
 <span class="kw">scrivi</span> <span class="str">"Controlli: Tasti Freccia (Muovi), A/D (Ruota), X (Esci)"</span>
 <span class="kw">accapo</span>
 
-<span class="com"># Ciclo principale di gioco</span>
+<span class="com">// Ciclo principale di gioco</span>
 <span class="kw">fintanto</span> (<span class="kw">vero</span>) <span class="kw">esegui</span> (
-  <span class="com"># Variabili globali che modifichiamo nel loop</span>
+  <span class="com">// Variabili globali che modifichiamo nel loop</span>
   <span class="kw">globale</span> Posizione, Angolo
 
   <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"x"</span> <span class="kw">viene</span> <span class="kw">premuto</span>) <span class="kw">allora</span> (<span class="kw">stop</span>)
 
-  <span class="com"># Movimento</span>
+  <span class="com">// Movimento</span>
   <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"UP"</span> <span class="kw">viene</span> <span class="kw">premuto</span>) <span class="kw">allora</span> (
     <span class="kw">imposta</span> <span class="kw">y</span> <span class="kw">di</span> Posizione <span class="kw">a</span> (<span class="kw">y</span> <span class="kw">di</span> Posizione + <span class="num">5</span>)
   )
@@ -1441,7 +1610,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
     <span class="kw">imposta</span> <span class="kw">x</span> <span class="kw">di</span> Posizione <span class="kw">a</span> (<span class="kw">x</span> <span class="kw">di</span> Posizione - <span class="num">5</span>)
   )
 
-  <span class="com"># Rotazione</span>
+  <span class="com">// Rotazione</span>
   <span class="kw">se</span> (<span class="kw">tasto</span> <span class="str">"a"</span> <span class="kw">viene</span> <span class="kw">premuto</span>) <span class="kw">allora</span> (
     <span class="kw">metti</span> Angolo + <span class="num">5</span> <span class="kw">in</span> Angolo
   )
@@ -1546,6 +1715,9 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>metti lista(A, B) in NOME</code></td><td>Crea una lista posizionale.</td></tr>
             <tr><td><code>metti { "chiave": V } in D</code></td><td>Crea un Dizionario. Accessibile con <code>D["chiave"]</code>.</td></tr>
             <tr><td><code>record NOME(campo1, campo2)</code></td><td>Definisce una struttura Record. Accessibile con <code>NOME.campo1</code>.</td></tr>
+            <tr><td><code>classe NOME estende CLASSE_GENITORE</code></td><td>Definisce una Classe OOP. Supporta metodi interni e il costruttore <code>INIZIALIZZA</code>.</td></tr>
+            <tr><td><code>questo</code> / <code>SOVRA</code></td><td><code>questo</code> fa riferimento all'istanza corrente. <code>SOVRA</code> richiama metodi e proprietà della classe genitore.</td></tr>
+            <tr><td><code>classedi(VAR)</code></td><td>Restituisce il nome in minuscolo della classe dell'istanza.</td></tr>
             <tr><td><code>metti set(A, B) in NOME</code></td><td>Crea un Set (collezione senza duplicati).</td></tr>
             <tr><td><code>dimensione di NOME</code></td><td>Numero di elementi (Lista o Dizionario).</td></tr>
             <tr><td><code>elemento N di NOME</code></td><td>Accesso all'elemento N (1-based, per le Liste).</td></tr>
@@ -1564,9 +1736,10 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
     <section id="troubleshoot">
         <h2>Appendice B: Errori Comuni e Soluzioni</h2>
         <table>
-            <tr><th>Tipo</th><th>Messaggio e Significato</th></tr>
-            <tr><td><span class="warn-tag">Avviso</span></td><td><code>Avviso: La variabile locale 'NOME' sta nascondendo una variabile globale...</code><br>Stai usando lo stesso nome per una variabile locale e una globale (Shadowing). Usa <code>globale NOME</code>.</td></tr>
-            <tr><td><span class="warn-tag">Avviso</span></td><td><code>Alias creato...</code><br>Due nomi di variabile puntano ora alla stessa cella di memoria.</td></tr>
+            <tr><th>Tipo</th><th>Messaggio e Significato</th></tr>
+            <tr><td><span class="warn-tag">Avviso</span></td><td><code>Avviso alla riga X: 'NOME' è un membro privato...</code><br>Stai tentando di accedere a una proprietà o a un metodo interno (che inizia con <code>_</code>) dall'esterno della classe. Per preservare l'incapsulamento, è buona norma interagire con l'oggetto solo tramite i suoi metodi pubblici.</td></tr>
+            <tr><td><span class="warn-tag">Avviso</span></td><td><code>Avviso: La variabile locale 'NOME' sta nascondendo una variabile globale...</code><br>Stai usando lo stesso nome per una variabile locale e una globale (Shadowing). Usa <code>globale NOME</code>.</td></tr>
+            <tr><td><span class="warn-tag">Avviso</span></td><td><code>Alias creato...</code><br>Due nomi di variabile puntano ora alla stessa cella di memoria.</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Non riesco a trovare una variabile di nome 'NOME'</code><br>Variabile non inizializzata o errore di battitura.</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Limite di ricorsione superato</code><br>Stack Overflow (probabile ricorsione infinita).</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Argomenti non validi per la chiamata di procedura</code><br>Sintassi errata. Usa <code>Nome(arg)</code> o <code>Nome con (arg)</code>.</td></tr>
@@ -1575,8 +1748,9 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Non si può rimuovere elementi da una lista vuota</code><br>Operazione non valida su lista vuota.</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Valore per una coordinata non numerico</code><br>Hai passato testo o altro invece di un numero a un punto.</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Colore non valido</code><br>Usa una lista di 3 numeri (r, g, b) con valori da 0 a 100.</td></tr>
-            <tr><td><span class="error-tag">Errore</span></td><td><code>Questa variabile non è un dizionario / record</code><br>Stai cercando di usare una sintassi chiave-valore su un intero, una lista o testo
-            <tr><td><span class="error-tag">Errore</span></td><td><code>Impossibile caricare l'immagine</code><br>File non trovato o corrotto. Verifica che sia nella stessa cartella.</td></tr>
+            <tr><td><span class="error-tag">Errore</span></td><td><code>Questa variabile non è un dizionario / record</code><br>Stai cercando di usare una sintassi chiave-valore o l'operatore punto su un intero, una lista o un testo.</td></tr>
+            <tr><td><span class="error-tag">Errore</span></td><td><code>Chiave record non trovata: NOME</code><br>Stai tentando di leggere o modificare una proprietà o un metodo che non esiste in quel Record o Oggetto.</td></tr>
+            <tr><td><span class="error-tag">Errore</span></td><td><code>Impossibile caricare l'immagine</code><br>File non trovato o corrotto. Verifica che sia nella stessa cartella.</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Comando 'graffiti' malformato</code><br>Sintassi errata. Controlla grandezza, posizione e testo.</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Etichetta già esistente / non trovata</code><br>Nome duplicato o riferimento a etichetta mai definita.</td></tr>
             <tr><td><span class="error-tag">Errore</span></td><td><code>Il loop ha superato il numero massimo di iterazioni</code><br>Probabile ciclo infinito (es. <code>fintanto (vero)</code> senza <code>stop</code>).</td></tr>
@@ -1586,7 +1760,7 @@ saluta(<span class="str">"Maria"</span>)</code></pre>
 </main>
 
 <footer>
-    <span class="chip">Matita v0.9.3</span>
+    <span class="chip">Matita v1.0.0</span>
     <span class="chip">Guida (Informatica)</span>
 </footer>
 

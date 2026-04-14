@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Matita v0.9.3 - User Manual</title>
+    <title>Matita v1.0.0 - Complete Guide</title>
     <meta name="author" content="Dino Accoto" />
-    <meta name="description" content="A complete guide to programming with Matita v0.9.3." />
+    <meta name="description" content="A complete guide to programming with Matita v1.0.0." />
     <meta name="subject" content="Operational guide to programming with Matita (English syntax)" />
     <meta name="keywords" content="programming, graphics, Matita, loops, variables, interactivity, lists, dictionaries, records, audio, alias, inout, null, procedures, functions, scope, global, labels, dimension, newline, write, cast, unicode" />
     <style>
@@ -16,6 +16,7 @@
             --DarkText: #212529;
             --CodeBackground: #1e293b;
             --CodeText: #f8fafc;
+            --SidebarBg: #0f172a;
             --PaperW: 900px;
         }
 
@@ -24,8 +25,78 @@
             padding: 0;
             background: #fff;
             color: var(--DarkText);
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif;
             line-height: 1.7;
+        }
+
+        /* --- LAYOUT WITH LEFT MENU --- */
+        @media (min-width: 1024px) {
+            body {
+                padding-left: 320px; /* Space for the left sidebar */
+            }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 320px;
+                height: 100vh;
+                background: var(--SidebarBg);
+                color: #cbd5e1;
+                overflow-y: auto;
+                padding: 30px 20px;
+                box-sizing: border-box;
+                box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+                z-index: 20;
+            }
+            header {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .sidebar {
+                width: 100%;
+                background: var(--SidebarBg);
+                color: #cbd5e1;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            header {
+                width: 100%;
+            }
+        }
+
+        /* Sidebar Styles */
+        .sidebar h2 {
+            color: #fff;
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        .sidebar ol {
+            padding-left: 15px;
+            list-style-type: decimal;
+            margin-bottom: 1.5rem;
+        }
+        .sidebar li {
+            margin-bottom: 8px;
+        }
+        .sidebar li > ol {
+            margin-top: 6px;
+            list-style-type: disc;
+            padding-left: 20px;
+            font-size: 0.95em;
+        }
+        .sidebar a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .sidebar a:hover {
+            color: #38bdf8;
+            text-decoration: underline;
         }
 
         header {
@@ -48,12 +119,12 @@
         header .left { font-weight: 700; color: var(--PrimaryBlue); }
         header .right { color: #6b7280; }
 
-        main { max-width: var(--PaperW); margin: 0 auto; padding: 16px; }
+        main { max-width: var(--PaperW); margin: 0 auto; padding: 24px 32px; }
 
         h1, h2, h3, h4 { line-height: 1.25; }
         h1 { font-size: 2.2rem; margin: 24px 0 8px; }
-        h2 { font-size: 1.7rem; margin: 24px 0 8px; border-bottom: 2px solid #f3f4f6; padding-bottom: 6px; }
-        h3 { font-size: 1.2rem; margin: 18px 0 6px; }
+        h2 { font-size: 1.7rem; margin: 32px 0 12px; border-bottom: 2px solid #f3f4f6; padding-bottom: 6px; color: #111827; }
+        h3 { font-size: 1.25rem; margin: 24px 0 8px; color: #1f2937; }
         h4 { font-size: 1.05rem; margin: 16px 0 4px; }
 
         .title {
@@ -65,21 +136,11 @@
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 24px;
+            margin-bottom: 30px;
         }
 
         .title img { max-width: 45%; height: auto; border-radius: 8px; }
         .muted { color: #6b7280; font-size: 1.2rem; }
-
-        .toc {
-            background: var(--White);
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .toc ol { padding-left: 20px; }
-        .toc a { color: var(--PrimaryBlue); text-decoration: none; }
-        .toc a:hover { text-decoration: underline; }
 
         code, .code {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -87,10 +148,12 @@
 
         pre {
             background: var(--CodeBackground);
-            padding: 12px 14px;
+            padding: 16px;
             border-radius: 10px;
             overflow: auto;
             border: 1px solid #475569;
+            margin: 16px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         pre code {
@@ -101,7 +164,7 @@
         code:not(pre code) {
             color: #0369a1;
             background-color: #f1f5f9;
-            padding: 2px 5px;
+            padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.9em;
             border: 1px solid #e2e8f0;
@@ -116,16 +179,29 @@
         figcaption { font-size: .9rem; color: #6b7280; margin-top: 6px; }
 
         .note {
-            background: #fff8e1;
-            border: 1px solid #ffe082;
-            padding: 10px 12px;
-            border-radius: 8px;
+            background: #f8fafc;
+            border-left: 4px solid var(--PrimaryBlue);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
         }
 
-        table { border-collapse: collapse; width: 100%; margin: 8px 0; }
-        th, td { border: 1px solid #e5e7eb; padding: 8px; vertical-align: top; text-align: left; }
-        th { background: #f3f4f6; }
-        /* Row alternation like LaTeX style */
+        .badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            vertical-align: middle;
+            margin-left: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.95rem; }
+        th, td { border: 1px solid #e5e7eb; padding: 10px 12px; vertical-align: top; text-align: left; }
+        th { background: #f8fafc; color: #334155; }
         tr:nth-child(even) { background-color: #f9fafb; }
 
         .kbd {
@@ -136,6 +212,7 @@
             border-radius: 6px;
             background: #fff;
             font-family: inherit;
+            font-size: 0.85em;
         }
 
         footer { max-width: var(--PaperW); margin: 24px auto 40px; color: #6b7280; text-align: center; }
@@ -151,9 +228,9 @@
             margin: 2px;
         }
 
-        .pagebreak { height: 1px; background: #e5e7eb; margin: 32px 0; }
+        .pagebreak { height: 1px; background: #e5e7eb; margin: 40px 0; }
 
-        .top-links { text-align: center; margin-bottom: 30px; font-weight: 500; font-size: 1.5rem; }
+        .top-links { text-align: center; margin-bottom: 30px; font-weight: 600; font-size: 1.2rem; }
         .top-links a { text-decoration: none; color: var(--PrimaryBlue); transition: color 0.2s; }
         .top-links a:hover { text-decoration: underline; color: #0056b3; }
         .separator { margin: 0 10px; color: #cbd5e1; }
@@ -165,18 +242,65 @@
 <body>
 <header>
     <div class="bar">
-        <div class="left">Matita v0.9.3</div>
-        <div class="right">User Manual</div>
+        <div class="left">Matita v1.0.0</div>
+        <div class="right">User Guide</div>
     </div>
 </header>
-<main>
 
+<aside class="sidebar">
+    <h2>Table of Contents</h2>
+    <nav aria-label="Table of Contents">
+        <ol>
+            <li><strong>Programming Fundamentals</strong>
+                <ol>
+                    <li><a href="#intro">Language Basics</a></li>
+                    <li><a href="#output">First Commands</a></li>
+                    <li><a href="#variables">Variables</a></li>
+                    <li><a href="#math">Mathematics</a></li>
+                    <li><a href="#lists">Lists</a></li>
+                    <li><a href="#dictionaries">Dictionaries, Records, and Sets</a></li>
+                    <li><a href="#logic">Flow Control</a></li>
+                    <li><a href="#manipulation">Data Manipulation</a></li>
+                    <li><a href="#procedures-functions">Procedures and Functions</a></li>
+                    <li><a href="#memory">Memory Management</a></li>
+                    <li><a href="#oop">Object-Oriented Programming</a></li>
+                </ol>
+            </li>
+            <li style="margin-top: 15px;"><strong>Graphics and Interactivity</strong>
+                <ol>
+                    <li><a href="#coordinates">Graphical Elements</a></li>
+                    <li><a href="#colors">Colors and Backgrounds</a></li>
+                    <li><a href="#shapes">Drawing Shapes</a></li>
+                    <li><a href="#graffiti">Graffiti</a></li>
+                    <li><a href="#redraw">Redrawing a Scene</a></li>
+                    <li><a href="#frame">Framing Graphics</a></li>
+                    <li><a href="#animations">Animations</a></li>
+                    <li><a href="#input">Keyboard and Mouse Input</a></li>
+                    <li><a href="#labels">Graphical Labels</a></li>
+                    <li><a href="#transformations">Transformations</a></li>
+                    <li><a href="#images">Images</a></li>
+                    <li><a href="#audio">Audio and Sounds</a></li>
+                    <li><a href="#canvas-interaction">Interacting with the Canvas</a></li>
+                    <li><a href="#project">Guided Project</a></li>
+                </ol>
+            </li>
+            <li style="margin-top: 15px;"><strong>Appendices</strong>
+                <ol>
+                    <li><a href="#ref">A: Quick Reference</a></li>
+                    <li><a href="#troubleshoot">B: Common Errors</a></li>
+                </ol>
+            </li>
+        </ol>
+    </nav>
+</aside>
+
+<main>
     <div class="top-links">
         <a href="storiaEN.html" target="_blank">Motivation</a>
         <span class="separator">&mdash;</span>
         <a href="infoEN.html" target="_blank">Features</a>
         <span class="separator">&mdash;</span>
-        <a href="../Ex/examples.php" target="_blank">Example programs</a>
+        <a href="../Ex/examples.php" target="_blank">Example Programs</a>
     </div>
 
     <section class="title" id="top">
@@ -186,96 +310,56 @@
         </figure>
     </section>
 
-    <nav class="toc" aria-label="Table of Contents">
-        <strong>Table of Contents</strong>
-        <ol>
-            <li><strong>Part One: Programming Fundamentals</strong>
-                <ol>
-                    <li><a href="#intro">Language Basics</a></li>
-                    <li><a href="#write">The First Commands</a></li>
-                    <li><a href="#variables">Variables</a></li>
-                    <li><a href="#math">Mathematics</a></li>
-                    <li><a href="#lists">Lists</a></li>
-                    <li><a href="#dictionaries">Dictionaries, Records, and Sets</a></li>
-                    <li><a href="#logic">Control Flow</a></li>
-                    <li><a href="#manipulation">Text and Number Manipulation</a></li>
-                    <li><a href="#procedures-functions">Procedures and Functions</a></li>
-                    <li><a href="#memory">Memory Management</a></li>
-                </ol>
-            </li>
-            <li><strong>Part Two: Graphics and Interactivity</strong>
-                <ol>
-                    <li><a href="#coordinates">Graphic Elements</a></li>
-                    <li><a href="#colors">Colors and Backgrounds</a></li>
-                    <li><a href="#shapes">Drawing Basic Shapes</a></li>
-                    <li><a href="#graffiti">Graffiti (Text)</a></li>
-                    <li><a href="#redraw">Redrawing a Scene</a></li>
-                    <li><a href="#frame">Framing the Graphics</a></li>
-                    <li><a href="#animations">Creating Animations</a></li>
-                    <li><a href="#input">Keyboard and Mouse Input</a></li>
-                    <li><a href="#labels">Graphic Labels</a></li>
-                    <li><a href="#transformations">Transformations</a></li>
-                    <li><a href="#images">Images</a></li>
-                    <li><a href="#audio">Audio and Sounds</a></li>
-                    <li><a href="#canvas-interaction">Interacting with the Canvas</a></li>
-                    <li><a href="#project">Guided Exercise</a></li>
-                </ol>
-            </li>
-            <li><a href="#ref">Appendix A: Quick Reference</a></li>
-            <li><a href="#troubleshoot">Appendix B: Common Errors</a></li>
-        </ol>
-    </nav>
-
     <div class="pagebreak"></div>
     <h1>Part One: Programming Fundamentals</h1>
 
     <section id="intro">
         <h2>Language Basics</h2>
-        <p>Programming is the activity of creating an ordered set of instructions that a computer can execute to perform specific tasks. Unlike natural language, which can be ambiguous, communicating with a computer requires the use of a precise <strong>formal language</strong>.</p>
-        <p>Through the writing of <strong>source code</strong> (or simply "code"), the programmer implements <strong>algorithms</strong>, which are logical procedures that transform input data into the desired output results.</p>
+        <p>Programming is the activity that leads to creating an ordered set of instructions that a computer can execute to perform specific tasks. Unlike natural language, which can be ambiguous, communicating with a computer requires the use of a precise <strong>formal language</strong>.</p>
+        <p>By writing <strong>source code</strong> (or simply "code"), the programmer implements <strong>algorithms</strong>, which are logical procedures that transform input data into the desired output.</p>
 
         <h3>The Integrated Development Environment</h3>
-        <p>An "Integrated Development Environment" (IDE) consists of all the necessary tools to write, execute, debug a program, and display the results.</p>
-        <p>The Matita user interface presents three main parts:</p>
+        <p>An "Integrated Development Environment" (IDE) consists of all the tools necessary to write a program, execute it, debug it, and view the results.</p>
+        <p>Matita's user interface has three main parts:</p>
         <ul>
             <li><strong>Editor</strong>: The area dedicated to writing the source code.</li>
             <li><strong>Graphics Area (Canvas)</strong>: The visual space where drawings and animations are rendered.</li>
             <li><strong>Console</strong>: The textual interface for message output and diagnostics.</li>
         </ul>
 
-        <p>At the top of the editor, there is a menu with some functional buttons:</p>
+        <p>At the top of the editor is a menu with several functional buttons:</p>
         <ul>
-            <li><strong>Open / Save</strong>: Allow opening and saving Matita programs as text files with a <code>.txt</code> extension.</li>
-            <li><strong>Download Matita</strong>: Allows saving the entire development environment as a single HTML file on your computer. This lets you work locally, without the need for an internet connection. Furthermore, we will see that using a local copy makes it possible to work with images saved on your device.</li>
-            <li><strong>Language Toggle (EN/IT/NL)</strong>: Changes the interface language, but that's not all. It automatically translates the entire source code written in the editor from English to Italian or Dutch (and vice versa), preserving comments and text strings intact.</li>
+            <li><strong>Open / Save</strong>: Allows you to open and save Matita programs as text files with a <code>.txt</code> extension.</li>
+            <li><strong>Download</strong>: Allows you to save the entire development environment as a single HTML file on your computer. This allows you to work locally, without the need for an internet connection. Furthermore, working locally makes it possible to use images saved on your device.</li>
+            <li><strong>Change Language (EN/IT/NL)</strong>: Changes the interface language. Automatically translates the entire source code written in the editor from English to Italian or Dutch and vice versa, preserving comments and text strings.</li>
             <li><strong>Help</strong>: Opens the technical documentation in a new window.</li>
-            <li><strong>Run</strong>: The main button. It sends the command to the computer to interpret and execute the instructions.</li>
+            <li><strong>Run</strong>: The main button. Sends the order to the computer to interpret and execute the instructions.</li>
         </ul>
 
         <h4>Keyboard Shortcuts</h4>
-        <p>To speed up writing and testing code, the IDE supports several useful key combinations:</p>
+        <p>To speed up writing and testing code, the IDE supports several useful keyboard shortcuts:</p>
         <ul>
-            <li><code>Ctrl + Enter</code>: Equivalent to the <strong>Run</strong> button. Immediately starts interpreting the current program.</li>
-            <li><code>Ctrl + Space</code>: Activates the <strong>automatic suggestions</strong> (IntelliSense) system. If typed while writing a word, it opens a list of commands compatible with what has been typed.</li>
-            <li><code>TAB</code>: If the suggestions menu is open, the TAB key accepts and automatically inserts the selected command into the editor. Furthermore, TAB is useful to indent the code and keep it organized.</li>
-            <li><code>ESC</code>: Closes the suggestions window or other modal windows (like the Graphics Area if in the foreground), returning control to the editor.</li>
+            <li><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span>: Equivalent to the <strong>Run</strong> button. Immediately starts the interpretation of the current program.</li>
+            <li><span class="kbd">Ctrl</span> + <span class="kbd">Space</span>: Activates the <strong>auto-suggestions</strong> system (IntelliSense). If typed while writing a word, it opens a list of commands compatible with what you have typed.</li>
+            <li><span class="kbd">TAB</span>: If the suggestions menu is open, accepts and automatically inserts the selected command. It is also useful for indenting code and keeping it tidy.</li>
+            <li><span class="kbd">ESC</span>: Closes the suggestions window or other modal windows.</li>
         </ul>
     </section>
 
     <div class="pagebreak"></div>
-    <section id="write">
-        <h2>The First Commands: <code>write</code> and <code>clear</code></h2>
+    <section id="output">
+        <h2>First Commands: <code>write</code> and <code>clear screen</code></h2>
         <p>The <code>write</code> command sends text messages to the console. Consider the following example:</p>
         <pre><code><span class="kw">write</span> <span class="str">"Hello world"</span></code></pre>
-        <p>In the console, the output will appear as:</p>
-        <p><code>Hello World</code></p>
+        <p>The console will output:</p>
+        <p><code>Hello world</code></p>
         
-        <p>Matita executes the program by <em>interpreting</em> the instructions sequentially, from the first to the last:</p>
+        <p>Matita executes the program by <em>interpreting</em> the instructions sequentially, from first to last:</p>
         <pre><code><span class="kw">write</span> <span class="str">"A"</span>
 <span class="kw">write</span> <span class="str">"B"</span></code></pre>
         <p>The previous code will produce the output <code>AB</code>.</p>
 
-        <p>To insert a line break, the <code>newline</code> command is used:</p>
+        <p>To insert a line break, use the <code>newline</code> command:</p>
         <pre><code><span class="kw">write</span> <span class="str">"A"</span>
 <span class="kw">newline</span>
 <span class="kw">write</span> <span class="str">"B"</span></code></pre>
@@ -284,53 +368,55 @@
         <pre><code><span class="kw">write</span> <span class="str">"A\n"</span>
 <span class="kw">write</span> <span class="str">"B"</span></code></pre>
 
-        <p>It is possible to concatenate multiple strings using the <code>+</code> operator. Example:</p>
+        <p>You can concatenate multiple strings using the <code>+</code> operator. Example:</p>
         <pre><code><span class="kw">write</span> <span class="str">"Hello "</span> + <span class="str">"World.\n"</span></code></pre>
 
-        <h4>Formatting and Alignment</h4>
-        <p>The <code>write</code> command can be extended to format the output into columns, a very useful feature for creating tidy tables. By adding a colon <code>:</code> and a number, you reserve an exact number of spaces for the text. You can add a second modifier for the alignment: <code>c</code> for center, <code>l</code> for left-align, and <code>r</code> for right-align.</p>
+        <h4>Formatting and Columns</h4>
+        <p>The <code>write</code> command can be extended to format the output into columns, a very useful feature for creating tidy tables. By adding a colon <code>:</code> and a number, you reserve an exact number of spaces for the text. You can add a second modifier for alignment: <code>c</code> for center, <code>l</code> for left-align, <code>r</code> for right-align.</p>
         <ul>
             <li><code>write:10</code>: Reserves 10 spaces and right-aligns (default behavior).</li>
             <li><code>write:10:c</code>: Reserves 10 spaces and centers the text.</li>
             <li><code>write:10:l</code>: Reserves 10 spaces and left-aligns.</li>
         </ul>
-        <pre><code><span class="kw">write:10:l</span> <span class="str">"Name"</span>; <span class="kw">write:6:r</span> <span class="str">"Score"</span>; <span class="kw">newline</span>
+        <pre><code><span class="kw">write:10:l</span> <span class="str">"Name"</span>; <span class="kw">write:6:r</span> <span class="str">"Grade"</span>; <span class="kw">newline</span>
 <span class="kw">write:10:l</span> <span class="str">"Alex"</span>; <span class="kw">write:6:r</span> <span class="num">8.5</span>; <span class="kw">newline</span>
 <span class="kw">write:10:l</span> <span class="str">"Maria"</span>; <span class="kw">write:6:r</span> <span class="num">10</span></code></pre>
 
-        <p>To clear the console of all previous text, the <code>clear screen</code> command is used.</p>
+        <p>To clear the console of all previous text, use the <code>clear screen</code> command.</p>
         <pre><code><span class="kw">clear screen</span>
 <span class="kw">write</span> <span class="str">"First line."</span>
 <span class="kw">newline</span>
 <span class="kw">write</span> <span class="str">"Second line."</span></code></pre>
 
-        <p>A fundamental syntactic element is the <code>#</code> character, which indicates the start of a <strong>comment</strong>. The text following this character is ignored by the interpreter. Comments are useful for documenting the code:</p>
-        <pre><code><span class="com"># this is a comment.</span>
-<span class="kw">put</span> <span class="num">31</span> <span class="kw">in</span> DaysInMarch <span class="com"># number of days in the month of March</span>
-<span class="com"># Let's show how many days March has:</span>
-<span class="kw">write</span> <span class="str">"March has "</span> + DaysInMarch + <span class="str">" days."</span></code></pre>
+        <h3>Comments <span class="badge">V1.0.0</span></h3>
+        <p>A fundamental syntactic element is the <strong>comment</strong>, which is ignored by the interpreter and is extremely useful for documenting or disabling parts of the code. Matita supports both the hash <code>#</code> and the double slash <code>//</code>:</p>
+        <pre><code><span class="com"># this is a traditional comment.</span>
+<span class="com">// this is also a valid comment.</span>
+<span class="kw">put</span> <span class="num">31</span> <span class="kw">in</span> MarchDays <span class="com">// number of days in the month of March</span>
+<span class="kw">write</span> <span class="str">"March has "</span> + MarchDays + <span class="str">" days."</span></code></pre>
 
         <div class="note">
-            <strong>Syntax highlighting and suggestions</strong><br>
-            The Matita IDE uses a color code to highlight the different syntactic elements of a program. Additionally, it offers suggestions as a mnemonic aid for using constructs.
+            <strong>Syntax Highlighting and Suggestions</strong><br>
+            Matita's IDE uses a color code to highlight the different syntactic elements of a program. It also offers suggestions as a mnemonic aid for using constructs.
         </div>
 
         <h3>Multiple commands on one line</h3>
-        <p>To insert multiple instructions on the same line, they must be separated with a semicolon (;):</p>
+        <p>To insert multiple instructions on the same line, you must separate them with a semicolon (;):</p>
         <pre><code><span class="kw">write</span> <span class="str">"hello."</span>; <span class="kw">newline</span></code></pre>
 
-        <h3>Single command across multiple lines</h3>
-        <p>Should a command be too long for a single line, it is possible to break it using a backslash <code>\</code> at the end of the line. The interpreter will consider the lines separated by <code>\</code> as a single instruction:</p>
+        <h3>Line Continuation <span class="badge">V1.0.0</span></h3>
+        <p>If an instruction is too long for a single line, it can be broken up using a backslash, i.e., the <code>\</code> character at the end of the line. The interpreter will automatically join the lines ignoring the line breaks:</p>
         <pre><code><span class="kw">write</span> \
-<span class="str">"instruction on two lines"</span></code></pre>
+<span class="str">"very long instruction written "</span> + \
+<span class="str">"on multiple lines for convenience"</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="variables">
         <h2>Variables</h2>
-        <p>A variable represents a memory area identified by a symbolic name (label), intended to hold a value (number, text, or complex data structures). Using variables allows writing programs that operate on dynamic data, abstracting from the specific value held inside.</p>
+        <p>A variable represents a memory area identified by a symbolic name (label), intended to hold a value (number, text, or complex data structures). Using variables allows you to write programs that operate on dynamic data, abstracting from the specific value contained.</p>
         
-        <p>To declare a variable and assign it a value (initialization), the command is used:
+        <p>To declare a variable and assign it a value (initialization), use the command:
         <code>put ... in VariableName</code>.</p>
         
         <p>Consider the following example:</p>
@@ -343,21 +429,17 @@
         <pre><code> The value in A is 5
  Computer Science</code></pre>
 
-        <p>Note that text strings must be enclosed in quotation marks, for example "Computer Science".</p>
+        <p>To read the content of a variable, simply write the variable's name within an expression. In Matita, variable names are <strong>case-insensitive</strong>: <code>Name</code>, <code>name</code>, <code>nAmE</code>, <code>NAME</code> refer to the same memory location. A valid identifier must start with a letter and can contain numbers or the underscore <code>_</code>. Accented or special characters are not allowed.</p>
 
-        <p>To read the content of a variable, it is sufficient to write the variable name within an expression (as in the previous example with <code>A</code> and <code>B</code>). In other words, the name is the <em>identifier</em> that allows accessing the stored value.</p>
-
-        <p>In Matita, variable names are <strong>case-insensitive</strong>: <code>Name</code>, <code>name</code>, <code>nAmE</code>, <code>NAME</code> all refer to the same memory location. A valid identifier can contain numbers but must start with a letter. Accented or special characters are not allowed to define the name.</p>
-
-        <p>To update the value of a variable, the <code>put</code> command is used again.</p>
+        <p>To update the value of a variable, use the <code>put</code> command again.</p>
         <pre><code><span class="kw">put</span> <span class="num">100</span> <span class="kw">in</span> health
 <span class="kw">write</span> <span class="str">"Initial health: "</span> + health
 <span class="kw">newline</span>
-<span class="kw">put</span> health - <span class="num">15</span> <span class="kw">in</span> health <span class="com"># The player takes 15 damage</span>
-<span class="kw">write</span> <span class="str">"Status updated. The health is now: "</span> + health</code></pre>
+<span class="kw">put</span> health - <span class="num">15</span> <span class="kw">in</span> health <span class="com">// The player takes 15 damage</span>
+<span class="kw">write</span> <span class="str">"State updated. Health is now: "</span> + health</code></pre>
 
-        <h3>User input: <code>get</code></h3>
-        <p>The <code>get ... saying ...</code> command triggers a dialog window (prompt) that allows the user to enter data via the keyboard. The entered value is stored in the specified variable.</p>
+        <h3>User Input: <code>get</code></h3>
+        <p>The <code>get ... saying ...</code> command activates a dialog box (prompt) that allows the user to enter data via the keyboard. The entered value is stored in the specified variable.</p>
         <pre><code><span class="kw">get</span> PlayerName <span class="kw">saying</span> <span class="str">"Enter username:"</span>
 <span class="kw">write</span> <span class="str">"Registered name: "</span> + PlayerName + <span class="str">". Procedure started."</span></code></pre>
     </section>
@@ -367,7 +449,7 @@
         <h2>Mathematics</h2>
         
         <h3>Arithmetic Operations and Precision</h3>
-        <p>Expressions can be evaluated and directly assigned to variables.</p>
+        <p>Expressions can be evaluated and assigned directly to variables.</p>
         <pre><code><span class="kw">put</span> <span class="num">10</span> <span class="kw">in</span> A
 <span class="kw">put</span> <span class="num">5</span> <span class="kw">in</span> B
 <span class="kw">put</span> A+B <span class="kw">in</span> Sum
@@ -375,159 +457,168 @@
 <span class="kw">write</span> <span class="str">"A + B = "</span> + Sum; <span class="kw">newline</span>
 <span class="kw">write</span> <span class="str">"A * B = "</span> + Product</code></pre>
 
-        <p>The <code>mod</code> operator ("<em>modulo</em>") returns the remainder of an integer division. For example, <code>10 mod 3</code> returns 1.</p>
+        <p>Calculating the remainder of a division (<strong>Modulo</strong> operation) is done using the word <code>mod</code>, or <code>%</code>, or the new safe variant <code>%%</code>.</p>
         <pre><code><span class="kw">clear screen</span>
 <span class="kw">put</span> <span class="num">39</span> <span class="kw">in</span> A
 <span class="kw">put</span> <span class="num">7</span> <span class="kw">in</span> B
-<span class="kw">put</span> A <span class="kw">mod</span> B <span class="kw">in</span> C
-<span class="kw">write</span> <span class="str">"The remainder of "</span> + A + <span class="str">"/"</span> + B + <span class="str">" is "</span> + C</code></pre>
+<span class="kw">put</span> A <span class="kw">%%</span> B <span class="kw">in</span> C
+<span class="kw">write</span> <span class="str">"The remainder of "</span> + A + <span class="str">"/"</span> + B + <span class="str">" is "</span> + C  <span class="com">// Result: 4</span></code></pre>
 
         <h3>Operators and Expressions</h3>
-        <p>In Matita, an expression is a combination of operands (numbers, texts, lists, points) and operators. The result can be assigned to a variable or used as a logical condition.</p>
+        <p>In Matita, an expression is a combination of operands (numbers, texts, lists, points) and operators.</p>
         <ul>
             <li><strong>Boolean values</strong>: <code>true</code>, <code>false</code></li>
             <li><strong>Logical operators</strong>: <code>and</code>, <code>or</code>, <code>not</code></li>
             <li><strong>Comparisons</strong>:
                 <ul>
-                    <li>Equality: <code>equals</code>, <code>is</code></li>
-                    <li>Inequality: <code>different</code> (or <code>!=</code>)</li>
+                    <li>Equality: <code>=</code>, <code>==</code>, <code>===</code>, <code>equals</code>, <code>is</code></li>
+                    <li>Inequality: <code>&lt;&gt;</code>, <code>!=</code>, <code>!==</code>, <code>different from</code></li>
                     <li>Numeric comparisons: <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></li>
                 </ul>
             </li>
             <li><strong>Arithmetic operators</strong>: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code></li>
-            <li><strong>Remainder</strong>: <code>mod</code></li>
-            <li><strong>Power</strong>: <code>^</code> (e.g. <code>2^3</code>)</li>
+            <li><strong>Remainder (Modulo)</strong>: <code>mod</code>, <code>%</code>, <code>%%</code></li>
+            <li><strong>Power</strong>: <code>^</code> or <code>**</code></li>
             <li><strong>Negation (unary)</strong>: <code>-X</code></li>
         </ul>
 
         <p>Power example:</p>
-        <pre><code><span class="kw">put</span> <span class="num">2</span>^<span class="num">3</span> <span class="kw">in</span> Cube
-<span class="kw">write</span> Cube <span class="com"># Output: 8</span></code></pre>
+        <pre><code><span class="kw">put</span> <span class="num">2</span>**<span class="num">3</span> <span class="kw">in</span> Cube
+<span class="kw">write</span> Cube <span class="com">// Output: 8</span></code></pre>
 
-        <h3>Constants and Mathematical Functions</h3>
-        <p>Matita includes various ready-to-use constants and mathematical functions. A complete list of predefined functions is available in Appendix A.</p>
+        <h3>Mathematical Constants and Functions <span class="badge">V1.0.0</span></h3>
+        <p>Matita 1.0.0 includes multiple constants and advanced mathematical functions, very handy for physics and geometry:</p>
         <ul>
             <li><strong>Constants</strong>: <code>pi</code> (or π), <code>infinity</code>, <code>nan</code> (Not a Number)</li>
-            <li><strong>Trigonometric and calculus functions</strong>: <code>abs(x)</code>, <code>sin(x)</code>, <code>cos(x)</code>, <code>squareroot(x)</code>, etc.</li>
+            <li><strong>Geometric and calculation functions</strong>: 
+                <ul>
+                    <li><code>abs(x)</code>: Absolute value.</li>
+                    <li><code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code>: Trigonometry (radians).</li>
+                    <li><code>atan2(y, x)</code>: Arctangent (in radians, useful for calculating vector angles).</li>
+                    <li><code>squareroot(x)</code>: Square root.</li>
+                    <li><code>log(x)</code>, <code>log10(x)</code>: Logarithms.</li>
+                    <li><code>sign(x)</code>: Returns -1, 0, or 1 depending on the sign of the number.</li>
+                </ul>
+            </li>
             <li><strong>Rounding functions</strong>:
                 <ul>
                     <li><code>round(x)</code>: Rounds to the nearest integer.</li>
-                    <li><code>trunc(x)</code>: Removes the decimal part without rounding (truncation towards zero).</li>
-                    <li><code>ceil(x)</code>: Rounds to the next higher integer (upwards).</li>
+                    <li><code>trunc(x)</code>: Removes the decimal part.</li>
+                    <li><code>ceil(x)</code>: Rounds up to the next integer (upwards).</li>
                 </ul>
             </li>
         </ul>
 
         <p>Rounding example:</p>
-        <pre><code><span class="kw">write</span> <span class="kw">trunc</span>(<span class="num">3.9</span>) <span class="com"># Output: 3</span>
+        <pre><code><span class="kw">write</span> <span class="kw">trunc</span>(<span class="num">3.9</span>) <span class="com">// Output: 3</span>
 <span class="kw">newline</span>
-<span class="kw">write</span> <span class="kw">ceil</span>(<span class="num">3.1</span>)  <span class="com"># Output: 4</span></code></pre>
+<span class="kw">write</span> <span class="kw">ceil</span>(<span class="num">3.1</span>)   <span class="com">// Output: 4</span></code></pre>
 
         <h3>Points and Coordinates: <code>point</code></h3>
-        <p>Besides simple numbers, Matita allows working with Cartesian coordinates via the <strong>point</strong> object. This is essential for graphics, but it can also be used for vector or geometric calculations.</p>
+        <p>In addition to simple numbers, Matita allows you to work with Cartesian coordinates via the <strong>point</strong> object. This is essential for graphics but can also be used for vector or geometric calculations.</p>
         <ul>
             <li><code>point(x, y)</code>: Creates a point object with the specified coordinates.</li>
-            <li><code>x of P</code> / <code>y of P</code>: Accesses the horizontal and vertical coordinate of the point P, respectively.</li>
+            <li><code>x of P</code> / <code>y of P</code>: Accesses the horizontal and vertical coordinate of point P, respectively.</li>
         </ul>
 
         <pre><code><span class="kw">put</span> <span class="kw">point</span>(<span class="num">10</span>, <span class="num">50</span>) <span class="kw">in</span> P1
 <span class="kw">put</span> <span class="kw">point</span>(<span class="num">20</span>, <span class="num">50</span>) <span class="kw">in</span> P2
 
-<span class="com"># Distance calculation (simplified, X-axis only)</span>
-<span class="kw">put</span> (<span class="kw">x of</span> P2) - (<span class="kw">x of</span> P1) <span class="kw">in</span> Distance
+<span class="com"># Distance calculation (simplified, only on X axis)</span>
+<span class="kw">put</span> (<span class="kw">x</span> <span class="kw">of</span> P2) - (<span class="kw">x</span> <span class="kw">of</span> P1) <span class="kw">in</span> Distance
 <span class="kw">write</span> <span class="str">"Horizontal distance: "</span> + Distance 
 <span class="com"># Output:  Horizontal distance: 10</span></code></pre>
 
-        <h3>Generating Random Numbers</h3>
+        <h3>Random Number Generation</h3>
         <p>Generating random numbers is essential for simulations and games. Matita offers several options via the <code>random</code> and <code>dice</code> commands:</p>
         <ul>
             <li><code>random()</code>: Without arguments, it returns a real number between 0.0 (inclusive) and 1.0 (exclusive).</li>
             <li><code>random(MAX)</code>: Returns a real number between 0.0 and MAX.</li>
             <li><code>random(MIN, MAX)</code>: Returns a real number between MIN and MAX.</li>
-            <li><code>dice(N)</code>: The command simulates rolling a die with N faces, so it returns an <strong>integer number</strong> between 1 and N, inclusive.</li>
+            <li><code>dice(N)</code>: The command simulates rolling a die with N faces, so it returns an <strong>integer</strong> between 1 and N, inclusive.</li>
         </ul>
 
         <p>Examples:</p>
-        <pre><code><span class="kw">put</span> <span class="kw">random</span>() <span class="kw">in</span> Probability <span class="com"># e.g. 0.453</span>
-<span class="kw">put</span> <span class="kw">random</span>(<span class="num">100</span>) <span class="kw">in</span> Percentage <span class="com"># e.g. 87.21</span>
-<span class="kw">put</span> <span class="kw">random</span>(<span class="num">10</span>, <span class="num">20</span>) <span class="kw">in</span> Temperature <span class="com"># e.g. 14.5</span>
-<span class="kw">put</span> <span class="kw">dice</span>(<span class="num">6</span>) <span class="kw">in</span> Toss <span class="com"># e.g. 4 (gives an integer between 1 and 6)</span></code></pre>
+        <pre><code><span class="kw">put</span> <span class="kw">random</span>() <span class="kw">in</span> Probability <span class="com">// e.g. 0.453</span>
+<span class="kw">put</span> <span class="kw">random</span>(<span class="num">100</span>) <span class="kw">in</span> Percentage <span class="com">// e.g. 87.21</span>
+<span class="kw">put</span> <span class="kw">random</span>(<span class="num">10</span>, <span class="num">20</span>) <span class="kw">in</span> Temperature <span class="com">// e.g. 14.5</span>
+<span class="kw">put</span> <span class="kw">dice</span>(<span class="num">6</span>) <span class="kw">in</span> Roll <span class="com">// e.g. 4 (gives an integer between 1 and 6)</span></code></pre>
 
         <h3>Defining Numeric Precision</h3>
-        <p>To control the number of decimal places displayed in the <code>write</code> command, the <code>digits</code> command can be used. This command only affects the <em>display</em> of the output in the console, not the internal value of the variable.</p>
+        <p>To control the number of decimal places displayed in the <code>write</code> command, you can use the <code>digits</code> command. This command only affects the <em>display</em> of the output in the console, not the internal value of the variable.</p>
         <pre><code><span class="kw">digits</span> <span class="num">2</span>
 <span class="kw">put</span> <span class="num">10</span> / <span class="num">3</span> <span class="kw">in</span> Result
-<span class="kw">write</span> Result <span class="com"># Output: 3.33</span>
+<span class="kw">write</span> Result <span class="com">// Output: 3.33</span>
 <span class="kw">newline</span>
 <span class="kw">digits</span> <span class="num">5</span>
-<span class="kw">write</span> Result <span class="com"># Output: 3.33333</span></code></pre>
+<span class="kw">write</span> Result <span class="com">// Output: 3.33333</span></code></pre>
 
         <h3>Scientific Notation: <code>scientific</code></h3>
         <p>When Matita handles very large numbers, the system can automatically switch to displaying in <strong>scientific notation</strong> to improve readability. The format used is "<code>number e exponent</code>".</p>
-        <p>By default, the threshold for enabling scientific notation is <code>1e6</code>.</p>
-        <p>This threshold can be modified using the <code>scientific(N)</code> command.</p>
-        <p>If a value for <code>digits</code> is also set, this will affect the number of digits shown in the mantissa.</p>
-        <pre><code><span class="com"># Let's set a low threshold to see the effect immediately</span>
-<span class="kw">scientific</span>(<span class="num">100</span>) 
+        <p>By default, the threshold for activating scientific notation is <code>1e6</code>.</p>
+        <p>You can change this threshold using the <code>scientific(N)</code> command.</p>
+        <p>If you also set a value for <code>digits</code>, this will affect the number of digits shown in the mantissa.</p>
+        <pre><code><span class="com">// Set a low threshold to see the effect immediately</span>
+<span class="kw">scientific</span> <span class="num">100</span> 
 <span class="kw">put</span> <span class="num">150</span> <span class="kw">in</span> Value
 
 <span class="kw">write</span> Value 
-<span class="com"># Output:  1.5e+2</span>
+<span class="com">// Output:  1.5e2</span>
 
-<span class="com"># Let's change the decimals displayed in the mantissa</span>
+<span class="com">// Change the displayed decimals in the mantissa</span>
 <span class="kw">digits</span> <span class="num">4</span>
 <span class="kw">write</span> Value
-<span class="com"># Output:  1.5000e+2</span></code></pre>
+<span class="com">// Output:  1.5000e2</span></code></pre>
 
         <h3>Operator Precedence</h3>
         <ol>
             <li><code>or</code></li>
             <li><code>and</code></li>
-            <li>Comparisons (<code>equals</code>, <code>different</code>, <code>&lt;</code>, etc.)</li>
+            <li>Comparisons (<code>equals</code>, <code>different from</code>, <code>&lt;</code>, etc.)</li>
             <li><code>+</code>, <code>-</code></li>
-            <li><code>*</code>, <code>/</code>, <code>mod</code></li>
-            <li><code>^</code> (Power)</li>
-            <li>Property or element access (e.g., <code>x of P</code>, <code>item N of LIST</code>)</li>
+            <li><code>*</code>, <code>/</code>, <code>mod</code>, <code>%%</code></li>
+            <li><code>^</code>, <code>**</code> (Power)</li>
+            <li>Property or item access (e.g., <code>x of P</code>, <code>item N of LIST</code>)</li>
         </ol>
     </section>
 
     <div class="pagebreak"></div>
     <section id="lists">
         <h2>Lists</h2>
-        <p>The <code>list</code> is the fundamental data structure in Matita that allows storing an ordered sequence of elements. Unlike a simple variable, which holds a single piece of data, a list holds multiple data accessible via their position, called <em>index</em>.</p>
-        <p>Lists in Matita are heterogeneous, meaning they can contain different data types, and dynamic, meaning their size can vary during execution.</p>
+        <p>The <code>list</code> is the fundamental data structure in Matita that allows you to store an ordered sequence of items. Unlike a simple variable, which holds a single piece of data, a list contains multiple pieces of data accessible via their position, called an <em>index</em>.</p>
+        <p>Lists in Matita are heterogeneous, meaning they can contain different types of data, and dynamic, meaning their size can change during execution.</p>
 
         <h3>Creation</h3>
-        <p>To instantiate a list, group the elements in parentheses:</p>
+        <p>To instantiate a list, you group the items within parentheses:</p>
         <pre><code><span class="kw">put</span> (<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>) <span class="kw">in</span> myList</code></pre>
-        <p>For greater semantic clarity, the <code>list</code> keyword can be used:</p>
+        <p>For greater semantic clarity, you can use the <code>list</code> keyword:</p>
         <pre><code><span class="kw">put</span> <span class="kw">list</span>(<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>) <span class="kw">in</span> myList
 <span class="kw">put</span> <span class="kw">list</span>() <span class="kw">in</span> EmptyList</code></pre>
 
-        <h3>Operations on Lists</h3>
-        <p>Matita provides a set of instructions for manipulating lists.</p>
+        <h3>List Operations</h3>
+        <p>Matita provides a set of instructions for list manipulation.</p>
 
-        <h4>Accessing Individual Elements</h4>
-        <p>To read a value at a specific position, the <code>item ... of ...</code> syntax is used.</p>
-        <p><strong>Indexing in Matita is 1-based</strong>: the first element is at index 1, the second at index 2, etc.</p>
+        <h4>Accessing Individual Items</h4>
+        <p>To read a value at a specific position, use the <code>item ... of ...</code> syntax.</p>
+        <p><strong>Indexing in Matita is 1-based</strong>: the first item is at index 1, the second at index 2, etc.</p>
         <pre><code><span class="kw">put</span> (<span class="num">100</span>, <span class="num">200</span>, <span class="num">300</span>) <span class="kw">in</span> data
-<span class="kw">put</span> <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> data <span class="kw">in</span> Value <span class="com"># Value now contains 200</span>
-<span class="kw">write</span> Value <span class="com"># Prints 200</span></code></pre>
+<span class="kw">put</span> <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> data <span class="kw">in</span> Value <span class="com">// Value now contains 200</span>
+<span class="kw">write</span> Value <span class="com">// Prints 200</span></code></pre>
 
-        <p><strong>Searching for an element</strong>: To find the position of a specific value within the list, the <code>indexof(list, value)</code> command is used. If the element is found, its index is returned (starting from 1), otherwise 0 is returned.</p>
-        <pre><code><span class="kw">put</span> (<span class="str">"Apple"</span>, <span class="str">"Pear"</span>, <span class="str">"Banana"</span>) <span class="kw">in</span> Fruits
-<span class="kw">put</span> <span class="kw">indexof</span>(Fruits, <span class="str">"Pear"</span>) <span class="kw">in</span> Position
-<span class="kw">write</span> <span class="str">"The Pear is at position "</span> + Position <span class="com"># Output: 2</span></code></pre>
+        <p><strong>Searching for an item</strong>: To find the position of a specific value within the list, use the <code>indexof(list, value)</code> command. If the item is found, its index is returned (starting from 1), otherwise 0 is returned.</p>
+        <pre><code><span class="kw">put</span> (<span class="str">"Apple"</span>, <span class="str">"Pear"</span>, <span class="str">"Banana"</span>) <span class="kw">in</span> Fruit
+<span class="kw">put</span> <span class="kw">indexof</span>(Fruit, <span class="str">"Pear"</span>) <span class="kw">in</span> Position
+<span class="kw">write</span> <span class="str">"The Pear is at position "</span> + Position <span class="com">// Output: 2</span></code></pre>
 
         <h4>Determining the Dimension</h4>
-        <p>To get the cardinality of the list (number of elements), use the <code>dimension of</code> operator.</p>
+        <p>To obtain the cardinality of the list (number of items), use the <code>dimension of</code> operator.</p>
         <pre><code><span class="kw">put</span> (<span class="str">"red"</span>, <span class="str">"green"</span>, <span class="str">"blue"</span>, <span class="str">"yellow"</span>) <span class="kw">in</span> ColorList
-<span class="kw">put</span> <span class="kw">dimension of</span> ColorList <span class="kw">in</span> N <span class="com"># N now contains 4</span>
+<span class="kw">put</span> <span class="kw">dimension</span> <span class="kw">of</span> ColorList <span class="kw">in</span> N <span class="com">// N now contains 4</span>
 <span class="kw">write</span> ColorList + <span class="str">" are "</span> + N + <span class="str">" colors\n"</span>
 <span class="kw">write</span> <span class="str">"the second color is "</span> + <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> ColorList</code></pre>
 
         <p>The output will be:</p>
-        <pre><code> red,green,blue,yellow are 4 colors
+        <pre><code> (red, green, blue, yellow) are 4 colors
  the second color is green</code></pre>
 
         <h4>Maximum and minimum of a list of values</h4>
@@ -536,56 +627,56 @@
             <li><code>min(list)</code>: Returns the lowest value.</li>
             <li><code>max(list)</code>: Returns the highest value.</li>
         </ul>
-        <p>When working with "hybrid" lists that contain both numbers and text, or when it is necessary to know not only the extreme value but also its position (index), advanced functions are used:</p>
+        <p>When working with "hybrid" lists that contain both numbers and text, or when you need to know not only the extreme value but also its position (index), use the advanced functions:</p>
         <ul>
-            <li><code>valmin(list)</code> / <code>valmax(list)</code>: Calculate the minimum and maximum <strong>ignoring</strong> non-numeric values (such as strings or nulls).</li>
-            <li><code>argmin(list)</code> / <code>argmax(list)</code>: Return the <strong>index</strong> (the position) where the minimum or maximum value is located, respectively.</li>
+            <li><code>valmin(list)</code> / <code>valmax(list)</code>: Calculate minimum and maximum <strong>ignoring</strong> non-numeric values (like strings or nulls).</li>
+            <li><code>argmin(list)</code> / <code>argmax(list)</code>: Return the <strong>index</strong> (position) where the minimum or maximum value is located, respectively.</li>
         </ul>
-        <p>Below is a complete example of how to use these functions to analyze a data set.</p>
-        <pre><code><span class="com"># Let's introduce the data to work on.</span>
-<span class="com"># Note that the heights list is hybrid, because it doesn't contain </span>
-<span class="com"># only numeric values: the header, in fact, is a string.</span>
+        <p>Below is a complete example of how to use these functions to analyze a dataset.</p>
+        <pre><code><span class="com">// Let's introduce the data to work on.</span>
+<span class="com">// Note that the list of heights is hybrid, because it doesn't contain </span>
+<span class="com">// only numeric values: the header, in fact, is a string.</span>
 
 <span class="kw">put</span> ((<span class="str">"Name"</span>, <span class="str">"Height"</span>),\ 
-(<span class="str">"Marco"</span>, <span class="num">175</span>), (<span class="str">"Anna"</span>, <span class="num">182</span>), (<span class="str">"Luca"</span>, <span class="num">185</span>), (<span class="str">"Giulia"</span>, <span class="num">176</span>), (<span class="str">"Paolo"</span>, <span class="num">189</span>),\
-(<span class="str">"Sofia"</span>, <span class="num">168</span>), (<span class="str">"Davide"</span>, <span class="num">178</span>), (<span class="str">"Elena"</span>, <span class="num">165</span>), (<span class="str">"Matteo"</span>, <span class="num">181</span>),\
-(<span class="str">"Chiara"</span>, <span class="num">173</span>) ) <span class="kw">in</span> Group
+(<span class="str">"Mark"</span>, <span class="num">175</span>), (<span class="str">"Anna"</span>, <span class="num">182</span>), (<span class="str">"Luke"</span>, <span class="num">185</span>), (<span class="str">"Julia"</span>, <span class="num">176</span>), (<span class="str">"Paul"</span>, <span class="num">189</span>),\
+(<span class="str">"Sofia"</span>, <span class="num">168</span>), (<span class="str">"David"</span>, <span class="num">178</span>), (<span class="str">"Helen"</span>, <span class="num">165</span>), (<span class="str">"Matthew"</span>, <span class="num">181</span>),\
+(<span class="str">"Claire"</span>, <span class="num">173</span>) ) <span class="kw">in</span> Group
 
-<span class="com"># We create the list of heights</span>
-<span class="kw">put</span> () <span class="kw">in</span> HeightsList <span class="com"># Initialization</span>
-<span class="kw">for each</span> P <span class="kw">in</span> Group <span class="kw">you do</span> ( <span class="kw">add</span> <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> P <span class="kw">to</span> HeightsList )
+<span class="com">// Let's create the list of heights</span>
+<span class="kw">put</span> () <span class="kw">in</span> HeightList <span class="com">// Initialization</span>
+<span class="kw">for each</span> P <span class="kw">in</span> Group <span class="kw">you do</span> ( <span class="kw">add</span> <span class="kw">item</span> <span class="num">2</span> <span class="kw">of</span> P <span class="kw">to</span> HeightList )
 
-<span class="com"># Let's find where the shortest and tallest members of the group are respectively:</span>
-<span class="kw">put</span> <span class="kw">argmin</span>(HeightsList) <span class="kw">in</span> MinIndex
-<span class="kw">put</span> <span class="kw">argmax</span>(HeightsList) <span class="kw">in</span> MaxIndex
+<span class="com">// Let's find where the shortest and tallest members of the group are respectively:</span>
+<span class="kw">put</span> <span class="kw">argmin</span>(HeightList) <span class="kw">in</span> MinIndex
+<span class="kw">put</span> <span class="kw">argmax</span>(HeightList) <span class="kw">in</span> MaxIndex
 
-<span class="com"># Let's retrieve the names:</span>
+<span class="com">// Let's retrieve the names:</span>
 <span class="kw">put</span> <span class="kw">item</span> <span class="num">1</span> <span class="kw">of</span> (<span class="kw">item</span> MinIndex <span class="kw">of</span> Group) <span class="kw">in</span> ShortName
 <span class="kw">put</span> <span class="kw">item</span> <span class="num">1</span> <span class="kw">of</span> (<span class="kw">item</span> MaxIndex <span class="kw">of</span> Group) <span class="kw">in</span> TallName
 
-<span class="com"># Finally, output:</span>
+<span class="com">// Finally, output:</span>
 <span class="kw">clear screen</span>
-<span class="kw">write</span> <span class="str">"Shortest member: "</span> + ShortName + <span class="str">" ("</span> + <span class="kw">valmin</span>(HeightsList) + <span class="str">")"</span>; <span class="kw">newline</span>
-<span class="kw">write</span> <span class="str">"Tallest member:  "</span> + TallName  + <span class="str">" ("</span> + <span class="kw">valmax</span>(HeightsList) + <span class="str">")"</span></code></pre>
+<span class="kw">write</span> <span class="str">"Shortest member: "</span> + ShortName + <span class="str">" ("</span> + <span class="kw">valmin</span>(HeightList) + <span class="str">")"</span>; <span class="kw">newline</span>
+<span class="kw">write</span> <span class="str">"Tallest member:  "</span> + TallName  + <span class="str">" ("</span> + <span class="kw">valmax</span>(HeightList) + <span class="str">")"</span></code></pre>
         
         <p>Expected output:</p>
-        <pre><code> Shortest member: Elena (165)
- Tallest member: Paolo (189)</code></pre>
+        <pre><code> Shortest member: Helen (165)
+ Tallest member: Paul (189)</code></pre>
 
         <h4>Modification</h4>
         <p>Lists are mutable through specific commands.</p>
         
-        <p><strong>Adding elements</strong>: The <code>add</code> command inserts a new element at the end of the list. Syntax: <code>add &lt;value&gt; to &lt;listName&gt;</code></p>
+        <p><strong>Adding items</strong>: The <code>add</code> command inserts a new item at the end of the list. Syntax: <code>add &lt;value&gt; to &lt;listName&gt;</code></p>
         <pre><code><span class="kw">put</span> <span class="kw">list</span>(<span class="num">1</span>, <span class="num">2</span>) <span class="kw">in</span> numbers
-<span class="kw">add</span> <span class="num">3</span> <span class="kw">to</span> numbers <span class="com"># numbers is now (1, 2, 3)</span></code></pre>
+<span class="kw">add</span> <span class="num">3</span> <span class="kw">to</span> numbers <span class="com">// numbers is now (1, 2, 3)</span></code></pre>
 
-        <p><strong>Inserting at a specific position</strong>: To insert a value at an arbitrary position, shifting subsequent elements, use <code>insert ... in item ... of ...</code>. Syntax: <code>insert &lt;value&gt; in item &lt;index&gt; of &lt;listName&gt;</code></p>
+        <p><strong>Inserting at a specific position</strong>: To insert a value at an arbitrary position, shifting subsequent items, use <code>insert ... at item ... of ...</code>. Syntax: <code>insert &lt;value&gt; at item &lt;index&gt; of &lt;listName&gt;</code></p>
         <pre><code><span class="kw">put</span> (<span class="str">"A"</span>, <span class="str">"C"</span>) <span class="kw">in</span> Letters
-<span class="kw">insert</span> <span class="str">"B"</span> <span class="kw">in item</span> <span class="num">2</span> <span class="kw">of</span> Letters
+<span class="kw">insert</span> <span class="str">"B"</span> <span class="kw">at item</span> <span class="num">2</span> <span class="kw">of</span> Letters
 <span class="kw">write</span> Letters
-<span class="com"># Output:  (A, B, C)</span></code></pre>
+<span class="com">// Output:  (A, B, C)</span></code></pre>
 
-        <p><strong>Removing at the head or tail</strong>:</p>
+        <p><strong>Removal at the head or tail</strong>:</p>
         <pre><code><span class="kw">put</span> (<span class="str">"red"</span>, <span class="str">"green"</span>, <span class="str">"blue"</span>, <span class="str">"yellow"</span>) <span class="kw">in</span> ColorList
 <span class="kw">remove first item from</span> ColorList
 <span class="kw">write</span> ColorList
@@ -603,7 +694,7 @@
 <span class="kw">write</span> LetterList</code></pre>
         <p>Output: <code> (A, B, D)</code></p>
 
-        <p><strong>Updating an element</strong>: To overwrite a value at a given position, combine <code>put</code> with the element access.</p>
+        <p><strong>Updating an item</strong>: To overwrite a value at a given position, combine <code>put</code> with item access.</p>
         <pre><code><span class="kw">put</span> (<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>) <span class="kw">in</span> Data
 <span class="kw">write</span> Data; <span class="kw">newline</span>
 <span class="kw">put</span> <span class="num">99</span> <span class="kw">in item</span> <span class="num">2</span> <span class="kw">of</span> Data
@@ -613,18 +704,18 @@
  (10, 99, 30)</code></pre>
 
         <h4>Iteration</h4>
-        <p>To execute a block of instructions for each element of the list, the <code>for each</code> construct is used. The specified variable (e.g. <code>n</code>) sequentially takes the value of each element in the list.
-        <strong>Note</strong>: The iterating variable contains a <em>copy</em> of the value. Modifying <code>n</code> within the loop does not modify the original list.</p>
+        <p>To execute a block of instructions for each item in the list, use the <code>for each</code> construct. The specified variable (e.g., <code>n</code>) sequentially takes the value of each item in the list.
+        <strong>Note</strong>: The iterator variable contains a <em>copy</em> of the value. Modifying <code>n</code> within the loop does not modify the original list.</p>
         <pre><code><span class="kw">put</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> Numbers
 <span class="kw">for each</span> n <span class="kw">in</span> Numbers <span class="kw">you do</span> (
   <span class="kw">put</span> n * <span class="num">2</span> <span class="kw">in</span> Double
   <span class="kw">write</span> Double
   <span class="kw">newline</span>
 )
-<span class="com"># Output:</span>
-<span class="com">#  2</span>
-<span class="com">#  4</span>
-<span class="com">#  6</span></code></pre>
+<span class="com">// Output:</span>
+<span class="com">//  2</span>
+<span class="com">//  4</span>
+<span class="com">//  6</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
@@ -633,19 +724,19 @@
         <p>In addition to lists, Matita offers more complex data structures to manage information in a structured way: <strong>Dictionaries</strong>, <strong>Records</strong>, and <strong>Sets</strong>.</p>
 
         <h3>Dictionaries</h3>
-        <p>Dictionaries (or "maps") allow storing values by associating them not to a numerical index, but to a keyword (a string). They are defined using curly braces <code>{}</code>.</p>
+        <p>Dictionaries (or "maps") allow you to store values by associating them not with a numeric index, but with a keyword (a string). They are defined using curly braces <code>{}</code>.</p>
         
         <p><strong>Creation and Initialization:</strong></p>
-        <pre><code><span class="com"># Create an empty dictionary</span>
+        <pre><code><span class="com">// Create an empty dictionary</span>
 <span class="kw">put</span> {} <span class="kw">in</span> Player
 
-<span class="com"># Create an already populated dictionary</span>
+<span class="com">// Create an already populated dictionary</span>
 <span class="kw">put</span> {<span class="str">"name"</span>: <span class="str">"Alex"</span>, <span class="str">"lives"</span>: <span class="num">3</span>} <span class="kw">in</span> Player</code></pre>
 
-        <p><strong>Reading and Writing:</strong> You access the value of a dictionary using square brackets <code>[]</code>.</p>
-        <pre><code><span class="kw">write</span> Player[<span class="str">"name"</span>] <span class="com"># Output: Alex</span>
+        <p><strong>Reading and Writing:</strong> You access a dictionary value using square brackets <code>[]</code>.</p>
+        <pre><code><span class="kw">write</span> Player[<span class="str">"name"</span>] <span class="com">// Output: Alex</span>
 <span class="kw">newline</span>
-<span class="com"># Update a value or add a new key</span>
+<span class="com">// Let's update a value or add a new key</span>
 <span class="kw">put</span> <span class="num">4</span> <span class="kw">in</span> Player[<span class="str">"lives"</span>]
 <span class="kw">put</span> <span class="num">1500</span> <span class="kw">in</span> Player[<span class="str">"score"</span>]</code></pre>
 
@@ -662,33 +753,33 @@
 )</code></pre>
 
         <h3>Records</h3>
-        <p><strong>Records</strong> offer a formal and compact way to create custom data types with named fields. Unlike dictionaries, in records the fields (the "keys") are declared in advance, and access occurs with the dot operator <code>.</code>.</p>
+        <p><strong>Records</strong> offer a formal and compact way to create custom data types with named fields. Unlike dictionaries, in records fields (the "keys") are declared in advance, and access is done with the dot operator <code>.</code>.</p>
         
-        <p>To use a record, you must first declare its structure with the <code>record</code> command, and then instances (copies) are created by passing parameters in order.</p>
-        <pre><code><span class="com"># Definition of the structure</span>
+        <p>To use a record, you must first declare its structure with the <code>record</code> command, and then you instantiate copies of it passing the parameters in order.</p>
+        <pre><code><span class="com">// Structure definition</span>
 <span class="kw">record</span> Person(name, age, city)
 
-<span class="com"># Instantiation of a record (creation of a "copy")</span>
+<span class="com">// Instantiation of a record (creation of a "copy")</span>
 <span class="kw">put</span> Person(<span class="str">"Julia"</span>, <span class="num">28</span>, <span class="str">"Rome"</span>) <span class="kw">in</span> User1
 
-<span class="com"># Reading and writing fields via the dot operator</span>
+<span class="com">// Reading and writing fields via the dot operator</span>
 <span class="kw">write</span> User1.name + <span class="str">" is "</span> + User1.age + <span class="str">" years old."</span>
-<span class="kw">put</span> <span class="num">29</span> <span class="kw">in</span> User1.age <span class="com"># Updates the value</span></code></pre>
+<span class="kw">put</span> <span class="num">29</span> <span class="kw">in</span> User1.age <span class="com">// Updates the value</span></code></pre>
 
         <h3>Sets</h3>
         <p>Sets are unordered collections that, unlike lists, <strong>do not contain duplicates</strong>.</p>
-        <p>They are created with the <code>set(...)</code> command. They are particularly useful in combination with set mathematics to compare elements (e.g., finding intersections or unions using the standard `+`, `-`, `*` operators which are overloaded for sets).</p>
+        <p>They are created with the <code>set(...)</code> command. They are particularly useful in combination with set mathematics to compare elements (e.g., finding intersections or unions using the standard operators `+`, `-`, `*` which have been overloaded for sets).</p>
         <pre><code><span class="kw">put</span> <span class="kw">set</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> S1
-<span class="kw">write</span> S1 <span class="com"># Output: set(1, 2, 3) (duplicates are ignored)</span></code></pre>
+<span class="kw">write</span> S1 <span class="com">// Output: set(1, 2, 3) (duplicates are ignored)</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="logic">
-        <h2>Control Flow</h2>
+        <h2>Flow Control</h2>
 
-        <h3>The <code>if</code> and <code>otherwise if</code> construct</h3>
-        <p>Conditional control structures allow executing blocks of code only when certain conditions occur. The fundamental instruction is <code>if</code>. The syntax is: <code>if (CONDITION) then ( ... ) otherwise ( ... )</code>.</p>
-        <p>For conditions, comparison operators are used: <code>equals</code>, <code>is</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>!=</code>.</p>
+        <h3><code>if</code> and <code>otherwise if</code> Construct</h3>
+        <p>Conditional control structures allow you to execute blocks of code only when certain conditions are met. The fundamental instruction is <code>if</code>. The syntax is: <code>if (CONDITION) then ( ... ) otherwise ( ... )</code>.</p>
+        <p>For conditions, comparison operators are used: <code>=</code>, <code>==</code>, <code>equals</code>, <code>is</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>&lt;&gt;</code>, <code>!=</code>, <code>!==</code>, <code>different from</code>.</p>
         
         <p>You can chain multiple conditions using the <code>otherwise if</code> command:</p>
         <pre><code><span class="kw">clear screen</span>
@@ -703,16 +794,16 @@
 )</code></pre>
 
         <h3>Loops</h3>
-        <p>Loops allow iterating a block of instructions multiple times, optimizing the code writing.</p>
+        <p>Loops allow you to iterate a block of instructions multiple times, optimizing code writing.</p>
 
         <h4>Simple Iteration: <code>repeat</code></h4>
-        <p>If you need to execute an action a precise number of times without the need for a variable index, you can use the <code>repeat ... times</code> construct.</p>
+        <p>If you need to perform an action a specific number of times without the need for a variable index, you can use the <code>repeat ... times</code> construct.</p>
         <pre><code><span class="kw">repeat</span> <span class="num">3</span> <span class="kw">times</span> (
   <span class="kw">write</span> <span class="str">"Hooray!"</span>; <span class="kw">newline</span>
 )</code></pre>
 
-        <h4>Definite Iteration: <code>index</code></h4>
-        <p>To execute instructions needing a counter, the <code>index</code> loop is used. A local variable (often named <code>i</code>) is created and automatically incremented from the start value up to the end value.</p>
+        <h4>Defined Iteration: <code>index</code></h4>
+        <p>To execute instructions needing a counter, use the <code>index</code> loop. A local variable (often named <code>i</code>) is created and automatically incremented from the start value up to the end value.</p>
         <p>Syntax: <code>index i goes from START to END and you do ( ... )</code></p>
         <pre><code><span class="kw">index</span> i <span class="kw">goes from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">5</span> <span class="kw">and you do</span> (
   <span class="kw">write</span> <span class="str">"Iteration number "</span> + i
@@ -725,8 +816,8 @@
  Iteration number 4
  Iteration number 5</code></pre>
 
-        <h4>Indefinite Iteration: <code>as long as</code></h4>
-        <p>This loop runs as long as the specified condition remains true. It is suitable when the number of iterations is not known in advance.</p>
+        <h4>Undefined Iteration: <code>as long as</code></h4>
+        <p>This loop is executed as long as the specified condition remains true. It is suitable when the number of iterations is not known in advance.</p>
         <p>Syntax: <code>as long as (CONDITION) you do ( ... )</code></p>
         
         <p>Countdown example:</p>
@@ -741,8 +832,8 @@
 <span class="kw">write</span> <span class="str">"Start."</span></code></pre>
         <p>The program decrements the variable every second and terminates when the condition <code>countdown &gt; 0</code> becomes false.</p>
 
-        <h3>Stopping execution: <code>stop</code></h3>
-        <p>The <code>stop</code> command immediately halts the execution of the entire program. It is often used within a conditional structure to terminate a loop or game when a certain condition is met.</p>
+        <h3>Interrupting execution: <code>stop</code></h3>
+        <p>The <code>stop</code> command immediately halts the execution of the entire program. It is often used within a conditional structure to terminate a loop or a game when a certain condition is met.</p>
         <pre><code><span class="kw">if</span> (LivesLeft <span class="kw">equals</span> <span class="num">0</span>) <span class="kw">then</span> (
   <span class="kw">write</span> <span class="str">"Game Over"</span>
   <span class="kw">stop</span>
@@ -751,8 +842,8 @@
         <section id="timing">
             <h3>Time Management</h3>
             
-            <h4>Waiting for time: <code>wait</code></h4>
-            <p>The execution of instructions is sequential and immediate. However, in contexts like animations, it is necessary to introduce pauses. The <code>wait</code> command suspends execution for a given interval.
+            <h4>Waiting time: <code>wait</code></h4>
+            <p>The execution of instructions is sequential and immediate. However, in contexts such as animations, it is necessary to introduce pauses. The <code>wait</code> command suspends execution for a given interval.
             The unit of measurement is the millisecond (ms). Example:</p>
             <pre><code><span class="kw">wait</span> <span class="num">45</span> <span class="kw">ms</span></code></pre>
             <p>This instruction forces the processor to pause for 45 milliseconds before moving to the next instruction.</p>
@@ -760,22 +851,22 @@
             <h4>Stopwatch: <code>tick</code> and <code>tock</code></h4>
             <p>To measure elapsed time, Matita provides an integrated stopwatch.</p>
             <ul>
-                <li><code>tick</code>: This is a command that starts or resets the stopwatch to the current moment.</li>
-                <li><code>tock</code>: This is a special variable that contains the number of milliseconds elapsed since the last <code>tick</code> command.</li>
+                <li><code>tick</code>: A command that starts or resets the stopwatch at the current moment.</li>
+                <li><code>tock</code>: A special variable that contains the number of milliseconds elapsed since the last <code>tick</code> command.</li>
             </ul>
             <p>Measurement example:</p>
             <pre><code><span class="kw">write</span> <span class="str">"Measurement started..."</span>
 <span class="kw">newline</span>
-<span class="kw">tick</span> <span class="com"># Start the stopwatch</span>
+<span class="kw">tick</span> <span class="com">// Starts the stopwatch</span>
 <span class="kw">wait</span> <span class="num">1500</span> <span class="kw">ms</span>
 <span class="kw">write</span> <span class="str">"Elapsed time: "</span> + tock + <span class="str">" ms"</span></code></pre>
-            <p><strong>Note</strong>: If you attempt to read the value of <code>tock</code> without having first executed <code>tick</code>, the program will report an error.</p>
+            <p><strong>Note</strong>: If you try to read the value of <code>tock</code> without first having executed <code>tick</code>, the program will report an error.</p>
         </section>
     </section>
 
     <div class="pagebreak"></div>
     <section id="manipulation">
-        <h2>Text and Number Manipulation</h2>
+        <h2>Data Manipulation</h2>
         <p>Matita offers simple commands to analyze and transform strings and numbers by treating them as lists of characters or digits.</p>
 
         <h3>Transforming a string into a list</h3>
@@ -783,124 +874,124 @@
         <pre><code><span class="kw">put</span> <span class="str">"Hello"</span> <span class="kw">in</span> Text
 <span class="kw">put</span> <span class="kw">decomposition</span>(Text) <span class="kw">in</span> CharacterList
 <span class="kw">write</span> CharacterList
-<span class="com"># Output:  (H, e, l, l, o)</span></code></pre>
+<span class="com">// Output:  (H, e, l, l, o)</span></code></pre>
 
         <h3>Splitting by separator: <code>split</code></h3>
-        <p>Unlike simple character splitting, the <code>split(text, separator)</code> command divides a string based on a specific character (like a space or a comma).</p>
+        <p>Unlike <code>decomposition</code>, which separates every single character, the <code>split(text, separator)</code> command divides a string based on a specific character (such as a space or comma).</p>
         <pre><code><span class="kw">put</span> <span class="str">"red,green,blue"</span> <span class="kw">in</span> CSV
 <span class="kw">put</span> <span class="kw">split</span>(CSV, <span class="str">","</span>) <span class="kw">in</span> Colors
 <span class="kw">write</span> Colors
-<span class="com"># Output:  (red, green, blue)</span></code></pre>
+<span class="com">// Output:  (red, green, blue)</span></code></pre>
 
         <h3>Specific Decomposition</h3>
-        <p>The <code>decomposition(value, TYPE)</code> command offers greater control. The available target types are: <code>DIGITS</code>, <code>CHARACTERS</code>, and <code>WORDS</code>.</p>
-        <pre><code><span class="com"># Divide a sentence into words</span>
+        <p>The <code>decomposition(value, TYPE)</code> command offers more control. The available target types are: <code>DIGITS</code>, <code>CHARACTERS</code>, and <code>WORDS</code>.</p>
+        <pre><code><span class="com">// Split a sentence into words</span>
 <span class="kw">put</span> <span class="str">"Matita is fun"</span> <span class="kw">in</span> Sentence
 <span class="kw">put</span> <span class="kw">decomposition</span>(Sentence, <span class="str">"WORDS"</span>) <span class="kw">in</span> WordList
 <span class="kw">write</span> WordList
-<span class="com"># Output:  (Matita, is, fun)</span>
+<span class="com">// Output:  (Matita, is, fun)</span>
 
-<span class="com"># Divide a number into digits</span>
+<span class="com">// Split a number into digits</span>
 <span class="kw">put</span> <span class="num">123.45</span> <span class="kw">in</span> Number
 <span class="kw">put</span> <span class="kw">decomposition</span>(Number, <span class="str">"DIGITS"</span>) <span class="kw">in</span> DigitList
 <span class="kw">write</span> DigitList
-<span class="com"># Output:  (1, 2, 3, ., 4, 5)</span></code></pre>
+<span class="com">// Output:  (1, 2, 3, ., 4, 5)</span></code></pre>
 
         <h3>Composition</h3>
         <p>The inverse operation to decomposition is <code>composition(list, TYPE)</code>, which joins the elements of a list into a single value. The available target types are <code>TEXT</code> and <code>NUMBER</code>.</p>
         <pre><code><span class="kw">put</span> (<span class="str">"S"</span>, <span class="str">"e"</span>, <span class="str">"a"</span>) <span class="kw">in</span> Letters
 <span class="kw">put</span> <span class="kw">composition</span>(Letters, <span class="str">"TEXT"</span>) <span class="kw">in</span> Word
 <span class="kw">write</span> Word
-<span class="com"># Output:  Sea</span>
+<span class="com">// Output:  Sea</span>
 
-<span class="com"># Create a number from digits</span>
+<span class="com">// Create a number from digits</span>
 <span class="kw">put</span> (<span class="num">3</span>, <span class="str">"."</span>, <span class="num">1</span>, <span class="num">4</span>) <span class="kw">in</span> Digits
 <span class="kw">put</span> <span class="kw">composition</span>(Digits, <span class="str">"NUMBER"</span>) <span class="kw">in</span> Value
-<span class="kw">write</span> Value * <span class="num">2</span> <span class="com"># We can do calculations because it's a number</span>
-<span class="com"># Output:  6.28</span></code></pre>
+<span class="kw">write</span> Value * <span class="num">2</span> <span class="com">// We can do calculations because it's a number</span>
+<span class="com">// Output:  6.28</span></code></pre>
 
         <h3>Type Inspection</h3>
-        <p>In Matita, variables can change their type dynamically. It is possible to verify the nature of a data item using the following functions:</p>
+        <p>In Matita, variables can change type dynamically. You can check the nature of a datum using the following functions:</p>
         <ul>
-            <li><code>type(x)</code>: Returns a string describing the type of data (e.g., "number", "string", "list", "point", "boolean").</li>
-            <li><code>numeric(x)</code> (or the equivalent <code>is_number(x)</code>): Returns <code>true</code> if the argument is a valid, finite number, <code>false</code> otherwise.</li>
+            <li><code>type(x)</code>: Returns a string describing the data type (e.g., "number", "string", "list", "point", "boolean").</li>
+            <li><code>numeric(x)</code>: Returns <code>true</code> if the argument is a valid and finite number, <code>false</code> otherwise.</li>
         </ul>
         <pre><code><span class="kw">put</span> <span class="num">42</span> <span class="kw">in</span> X
-<span class="kw">write</span> <span class="kw">type</span>(X)        <span class="com"># Output: number</span>
-<span class="kw">write</span> <span class="kw">numeric</span>(X)    <span class="com"># Output: true</span>
+<span class="kw">write</span> <span class="kw">type</span>(X)        <span class="com">// Output: number</span>
+<span class="kw">write</span> <span class="kw">numeric</span>(X)     <span class="com">// Output: true</span>
 
 <span class="kw">put</span> <span class="str">"Hello"</span> <span class="kw">in</span> Y
-<span class="kw">write</span> <span class="kw">numeric</span>(Y)    <span class="com"># Output: false</span></code></pre>
+<span class="kw">write</span> <span class="kw">numeric</span>(Y)     <span class="com">// Output: false</span></code></pre>
 
         <h3>Type Conversion (Casting)</h3>
-        <p>Sometimes it is necessary to treat a number as if it were text, for instance to concatenate it with other words, or conversely, to use it in a mathematical calculation. The <code>cast</code> command performs the type conversion operation.</p>
+        <p>Sometimes it is necessary to treat a number as if it were text, for example to concatenate it with other words, or conversely, to use it in a mathematical calculation. The <code>cast</code> command performs the type conversion operation.</p>
         <ul>
-            <li><code>cast(NUMBER)</code>: Returns a <strong>string</strong> containing the number.</li>
-            <li><code>cast(STRING)</code>: Returns a <strong>number</strong> (supports positive and negative integers, decimals, and scientific notation).</li>
+            <li><code>cast(NUMBER, "string")</code>: Returns a <strong>string</strong> containing the number.</li>
+            <li><code>cast(STRING, "number")</code>: Returns a <strong>number</strong> (supports positive, negative, decimal integers and scientific notation).</li>
         </ul>
         <p>Example:</p>
         <pre><code><span class="kw">clear screen</span>
-<span class="com"># Test String to Number</span>
+<span class="com">// Test from String to Number</span>
 <span class="kw">put</span> <span class="str">"10"</span> <span class="kw">in</span> S1
 <span class="kw">put</span> <span class="str">"3.14"</span> <span class="kw">in</span> S2
 <span class="kw">put</span> <span class="str">"-50"</span> <span class="kw">in</span> S3
-<span class="kw">put</span> <span class="str">"1.2e3"</span> <span class="kw">in</span> S4  <span class="com"># 1200 in scientific notation</span>
+<span class="kw">put</span> <span class="str">"1.2e3"</span> <span class="kw">in</span> S4  <span class="com">// 1200 in scientific notation</span>
 
 <span class="kw">put</span> <span class="kw">cast</span>(S1, <span class="str">"number"</span>) + <span class="kw">cast</span>(S2, <span class="str">"number"</span>) + <span class="kw">cast</span>(S3, <span class="str">"number"</span>) + <span class="kw">cast</span>(S4, <span class="str">"number"</span>) <span class="kw">in</span> Total
 <span class="kw">write</span> <span class="str">"Sum of casts: "</span> + Total 
 <span class="kw">newline</span>
 
-<span class="com"># Test Number to String (Concatenation)</span>
+<span class="com">// Test from Number to String (Concatenation)</span>
 <span class="kw">put</span> <span class="num">500</span> <span class="kw">in</span> N1
 <span class="kw">put</span> <span class="num">12.5</span> <span class="kw">in</span> N2
-<span class="com"># Sums the strings (concatenation) instead of the numbers</span>
-<span class="kw">write</span> <span class="str">"Concatenation: "</span> + <span class="kw">cast</span>(N1, <span class="str">"text"</span>) + <span class="kw">cast</span>(N2, <span class="str">"text"</span>)
+<span class="com">// Add the strings (concatenation) instead of numbers</span>
+<span class="kw">write</span> <span class="str">"Concatenation: "</span> + <span class="kw">cast</span>(N1, <span class="str">"string"</span>) + <span class="kw">cast</span>(N2, <span class="str">"string"</span>)
 
-<span class="com"># Expected output:</span>
-<span class="com">#  Sum of casts: 1163.14</span>
-<span class="com">#  Concatenation: 50012.5</span></code></pre>
+<span class="com">// Expected Output:</span>
+<span class="com">//  Sum of casts: 1163.14</span>
+<span class="com">//  Concatenation: 50012.5</span></code></pre>
 
         <h3>Unicode Function</h3>
-        <p>Unicode is an international standard that assigns a unique numerical code to every character or symbol used in computing systems, including letters of all alphabets and Emojis.</p>
+        <p>Unicode is an international standard that assigns a unique numeric code to every character or symbol used in computer systems, including letters of all alphabets, and Emojis.</p>
         <p>The <code>unicode(x)</code> command acts as a bridge between numbers and symbols:</p>
         <ul>
             <li><strong>From Number to Symbol</strong>: If the argument is a number, it returns the associated character.</li>
             <li><strong>From Symbol to Number</strong>: If the argument is a string, it returns the numeric code of the first character.</li>
         </ul>
         <p>Example:</p>
-        <pre><code><span class="com"># Example 1: Generate a symbol from the code (Rocket)</span>
+        <pre><code><span class="com">// Example 1: Generate a symbol from the code (Rocket)</span>
 <span class="kw">put</span> <span class="kw">unicode</span>(<span class="num">128640</span>) <span class="kw">in</span> RocketSymbol
 <span class="kw">write</span> <span class="str">"To infinity... "</span> + RocketSymbol
-<span class="com"># Output:  To infinity... 🚀</span>
+<span class="com">// Output:  To infinity... 🚀</span>
 <span class="kw">newline</span>
 
-<span class="com"># Example 2: Get the code from a symbol (Smiley)</span>
+<span class="com">// Example 2: Get the code from a symbol (Smiley)</span>
 <span class="kw">put</span> <span class="kw">unicode</span>(<span class="str">"🙂"</span>) <span class="kw">in</span> SmileyCode
-<span class="kw">write</span> <span class="str">"The code of the smiley is: "</span> + SmileyCode
-<span class="com"># Output:  The code of the smiley is: 128578</span></code></pre>
+<span class="kw">write</span> <span class="str">"The smiley code is: "</span> + SmileyCode
+<span class="com">// Output:  The smiley code is: 128578</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="procedures-functions">
         <h2>Procedures and Functions</h2>
-        <p>Using loops allows solving many problems. However, as complexity increases, it becomes necessary to organize the code in a <em>modular</em> way to promote readability and maintainability.</p>
-        <p>Matita supports procedural programming allowing the definition of custom commands. To avoid code duplication and encapsulate logic, <strong>Procedures</strong> and <strong>Functions</strong> are used:</p>
+        <p>Using loops allows you to solve many problems. However, as complexity increases, it becomes necessary to organize the code in a <em>modular</em> way to promote readability and maintainability.</p>
+        <p>Matita supports procedural programming by allowing the definition of custom commands. To avoid code duplication and encapsulate logic, we use <strong>Procedures</strong> and <strong>Functions</strong>:</p>
         <ul>
-            <li>A <strong>Procedure</strong> is a block of instructions that performs a well-defined task. Instructions that can be used in multiple points of the code are grouped into procedures. Procedures can apply the same operations on different parameters, provided as input. A procedure executes instructions but does not produce an output value.</li>
-            <li>A <strong>Function</strong> performs operations and returns a value (output) usable in other expressions via the <code>return</code> command.</li>
+            <li>A <strong>Procedure</strong> is a block of instructions that performs a well-defined task. Instructions that can be used in multiple places in the code are grouped into procedures. Procedures can apply the same operations on different parameters, provided as input. A procedure executes instructions but does not produce an output value.</li>
+            <li>A <strong>Function</strong> performs operations and returns a value (output) that can be used in other expressions via the <code>return</code> command.</li>
         </ul>
 
-        <p><strong>Important</strong>: The Matita interpreter reads and executes the code line by line. Therefore, it is crucial that every procedure or function is defined <strong>before</strong> the line where the first call occurs.</p>
+        <p><strong>Important</strong>: The Matita interpreter reads and executes the code line by line. Therefore, it is essential that each procedure or function is defined <strong>before</strong> the line where the first call occurs.</p>
 
         <h3>Procedures</h3>
         <p>Example of defining and calling a procedure:</p>
-        <pre><code><span class="com"># Definition</span>
+        <pre><code><span class="com">// Definition</span>
 <span class="kw">define procedure</span> greet(name) (
   <span class="kw">write</span> <span class="str">"Hello, "</span> + name + <span class="str">". Welcome to Matita."</span>
   <span class="kw">newline</span>
 )
 
-<span class="com"># Call</span>
+<span class="com">// Call</span>
 greet(<span class="str">"Alex"</span>)
 greet(<span class="str">"Maria"</span>)</code></pre>
 
@@ -917,26 +1008,26 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 <span class="kw">newline</span></code></pre>
 
         <div class="note">
-            <strong>Identifying constructs and built-in functions.</strong> Some expressions are <em>identifying</em>: they recall a part or property of something that already exists (e.g., <code>x of pointP</code>, <code>item 3 of myList</code>, <code>dimension of myList</code>). Other expressions are <em>generative</em> and produce a new value (built-in functions), for example <code>point(10,20)</code>, <code>list(1,2,3)</code>, <code>sin(angle)</code>, <code>squareroot(9)</code>.
+            <strong>Identifying constructs vs built-in functions.</strong> Some expressions are <em>identifying</em>: they refer to a part or property of something that already exists (e.g., <code>x of pointP</code>, <code>item 3 of myList</code>, <code>dimension of myList</code>). Other expressions are <em>generative</em> and produce a new value (built-in functions), for example <code>point(10,20)</code>, <code>list(1,2,3)</code>, <code>sin(angle)</code>, <code>squareroot(9)</code>.
         </div>
 
         <h3>Recursion</h3>
-        <p>Recursion is a programming technique in which a function calls itself. It is particularly effective for solving problems that can be broken down into identical but smaller subproblems. The classic example is the calculation of the factorial (𝑛!).</p>
+        <p>Recursion is a programming technique in which a function calls itself. It is particularly effective for solving problems that can be broken down into identical subproblems of a smaller size. The classic example is the calculation of the factorial (𝑛!).</p>
         <pre><code><span class="kw">define function</span> factorial(n) (
-  <span class="com"># Base case: termination condition.</span>
+  <span class="com">// Base case: termination condition.</span>
   <span class="kw">if</span> (n <span class="kw">equals</span> <span class="num">0</span>) <span class="kw">then</span> (
     <span class="kw">return</span> <span class="num">1</span>
   ) <span class="kw">otherwise</span> (
-    <span class="com"># Recursive step</span>
+    <span class="com">// Recursive step</span>
     <span class="kw">return</span> n * factorial(n - <span class="num">1</span>)
   )
 )
 
 <span class="kw">put</span> <span class="num">5</span> <span class="kw">in</span> Number
 <span class="kw">put</span> factorial(Number) <span class="kw">in</span> Result
-<span class="kw">write</span> Number + <span class="str">"! = "</span> + Result <span class="com"># Will show 120</span></code></pre>
+<span class="kw">write</span> Number + <span class="str">"! = "</span> + Result <span class="com">// Will show 120</span></code></pre>
 
-        <p>If the chain of recursive calls is excessive, a stack overflow will occur (recursion limit exceeded).</p>
+        <p>If the chain of recursive calls is excessive, a stack overflow occurs (recursion limit exceeded).</p>
     </section>
 
     <div class="pagebreak"></div>
@@ -944,7 +1035,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <h2>Memory Management</h2>
         
         <h3>Variable Scope</h3>
-        <p>The <strong>scope</strong> is the visibility area of a variable. In nested code blocks (inside <code>you do</code>, <code>as long as</code>, <code>if</code>, <code>for each</code>, etc.), the variables created with <code>put</code> are <strong>local</strong> to the block itself.</p>
+        <p><strong>Scope</strong> is the visibility area of a variable. In nested code blocks (inside <code>you do</code>, <code>as long as</code>, <code>if</code>, <code>for each</code>, etc.), the variables created with <code>put</code> are <strong>local</strong> to the block itself.</p>
         
         <p>Variables defined in the main flow are called <strong>global</strong>. A global variable is readable within a local block, but if you try to assign a value to a variable with the same name in the local block, a new local variable is created that "hides" the global one (<em>shadowing</em>). In these cases, Matita issues a warning:</p>
         <pre><code> Warning: Local variable 'Number' is shadowing a global variable with the same name.</code></pre>
@@ -957,7 +1048,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
   <span class="kw">write</span> Number
   <span class="kw">newline</span>
 )
-<span class="com"># now we are out of the local block</span>
+<span class="com">// we are now outside the local block</span>
 <span class="kw">write</span> <span class="str">"Final value: "</span> + Number</code></pre>
         <p>Output:</p>
         <pre><code> Warning: Local variable 'Number' is shadowing a global variable with the same name.
@@ -967,10 +1058,10 @@ greet(<span class="str">"Maria"</span>)</code></pre>
  5
  6
  Final value: 1</code></pre>
-        <p>As evident, the variable <code>Number</code> inside the loop is distinct from the external one. At the end of the loop, the global variable maintains its original value, which is 1.</p>
+        <p>As can be seen, the <code>Number</code> variable inside the loop is distinct from the external one. At the end of the loop, the global variable retains its original value, which is 1.</p>
 
         <h4>The <code>global</code> directive</h4>
-        <p>To modify a global variable within a local scope, it is necessary to declare it explicitly with the <code>global</code> directive:</p>
+        <p>To modify a global variable inside a local scope, you must explicitly declare it with the <code>global</code> directive:</p>
         <pre><code><span class="kw">clear screen</span>
 <span class="kw">put</span> <span class="num">1</span> <span class="kw">in</span> Number
 <span class="kw">global</span> Number
@@ -979,7 +1070,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
   <span class="kw">write</span> Number
   <span class="kw">newline</span>
 )
-<span class="com"># now we are out of the block</span>
+<span class="com">// we are now outside the block</span>
 <span class="kw">write</span> <span class="str">"Final value: "</span> + Number</code></pre>
         <p>Output:</p>
         <pre><code> 2
@@ -989,81 +1080,157 @@ greet(<span class="str">"Maria"</span>)</code></pre>
  6
  Final value: 6</code></pre>
         
-        <p>It is possible to declare multiple global variables at the same time by separating them with a comma:</p>
-        <pre><code><span class="kw">global</span> Name1, Name2 <span class="com"># multiple variables separated by commas</span></code></pre>
+        <p>You can declare multiple global variables simultaneously by separating them with a comma:</p>
+        <pre><code><span class="kw">global</span> Name1, Name2 <span class="com">// multiple variables separated by commas</span></code></pre>
 
         <h3>Value Semantics</h3>
-        <p>The Matita interpreter adopts, by default, <strong>Value Semantics</strong>. Every assignment operation using the <code>put</code> command implies a <strong>Deep Copy</strong> of the data.</p>
-        <p>This means that assigning a list or a complex object to a new variable creates an independent and distinct clone in memory. This prevents unexpected alterations and makes programming safer and more understandable, especially at an educational level.</p>
+        <p>The Matita interpreter adopts, by default, a <strong>Value Semantics</strong>. Every assignment operation via the <code>put</code> command involves a <strong>Deep Copy</strong> of the data.</p>
+        <p>This means that assigning a list or a complex object to a new variable creates an independent and distinct clone in memory. This prevents unexpected alterations and makes programming safer and more understandable, especially for educational purposes.</p>
         <pre><code><span class="kw">put</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>) <span class="kw">in</span> A
-<span class="kw">put</span> A <span class="kw">in</span> B      <span class="com"># B is a deep copy of A</span>
+<span class="kw">put</span> A <span class="kw">in</span> B      <span class="com">// B is a local copy of A</span>
 <span class="kw">put</span> <span class="num">99</span> <span class="kw">in item</span> <span class="num">1</span> <span class="kw">of</span> B
-<span class="com"># A remains (1, 2, 3), B becomes (99, 2, 3)</span></code></pre>
+<span class="com">// A remains (1, 2, 3), B becomes (99, 2, 3)</span></code></pre>
 
-        <h3>Access by Reference: <code>alias</code></h3>
-        <p>In several languages, including Python and Java, the instruction <code>B = A</code> makes both variables point to the same object in memory. It is said that such languages implicitly adopt a <strong>reference semantics</strong> and A and B are aliases, that is, replicas of each other. An alias therefore contains no data of its own, but acts as a pointer towards another target variable.</p>
-        <p>To create a shared reference in Matita, for example to allow data sharing or resource optimization, the concept of <strong>explicit aliasing</strong> is introduced.</p>
-        <p>An alias is created via explicit request using the command: <code>B alias A</code>, where <code>A</code> is an existing variable.</p>
+        <h3>Access by reference: <code>alias</code></h3>
+        <p>In various languages, including Python and Java, the instruction <code>B = A</code> causes both variables to point to the same object in memory. It is said that such languages implicitly adopt a <strong>reference semantics</strong> and A and B are aliases, that is, replicas of each other. An alias therefore does not contain its own data, but acts as a pointer to another target variable.</p>
+        <p>To create a shared reference in Matita, for example to allow data sharing or resource optimization, we introduce the concept of <strong>explicit aliasing</strong>.</p>
+        <p>An alias is created via an explicit request through the command: <code>B alias A</code>, where <code>A</code> is an existing variable.</p>
         <p>Any read or write operation performed on <code>B</code> is intercepted by the interpreter and redirected to the target variable <code>A</code>. The following code:</p>
         <pre><code><span class="kw">put</span> <span class="num">4</span> <span class="kw">in</span> A
 <span class="kw">put</span> <span class="num">56</span> <span class="kw">in</span> (B <span class="kw">alias</span> A)
 <span class="kw">write</span> <span class="str">"A: "</span> + A + <span class="str">"; B: "</span> + B</code></pre>
-        <p>produces as output:</p>
+        <p>produces the output:</p>
         <p><code> A: 56; B: 56</code></p>
 
-        <h3>Passing by Reference to Procedures: <code>inout</code></h3>
-        <p>Matita supports two modes of passing parameters to a procedure.</p>
+        <h3>Pass by Reference to Procedures: <code>inout</code></h3>
+        <p>Matita supports two ways of passing parameters to a procedure.</p>
         <ol>
-            <li><strong>Pass by value (default):</strong> The value of the argument is copied into the local scope of the procedure. Changes do not propagate to the caller.</li>
-            <li><strong>Pass by reference (via the <em>inout</em> keyword):</strong> By using the <code>inout</code> keyword, the interpreter creates a <strong>local alias</strong> that points to the variable passed by the caller.</li>
+            <li><strong>Pass by value (default):</strong> The value of the argument is copied into the local scope of the procedure. Modifications do not propagate to the caller.</li>
+            <li><strong>Pass by reference (using the <em>inout</em> keyword):</strong> Using the <code>inout</code> keyword, the interpreter creates a <strong>local alias</strong> that points to the variable passed by the caller.</li>
         </ol>
         <pre><code><span class="kw">define procedure</span> Increment(<span class="kw">inout</span> X) (
-    <span class="kw">put</span> X + <span class="num">1</span> <span class="kw">in</span> X  <span class="com"># Directly modifies the external variable</span>
+    <span class="kw">put</span> X + <span class="num">1</span> <span class="kw">in</span> X  <span class="com">// Directly modifies the external variable</span>
 )</code></pre>
 
         <h3>Freeing memory: <code>null</code></h3>
-        <p>The <code>null</code> keyword indicates a special value corresponding to the <em>absence of data</em>. This keyword allows emptying a variable.</p>
-        <p>For example, writing <code>put null in VAR</code> disconnects the name <code>VAR</code> from its previous content, which signals the computer that the content is no longer needed and the memory it occupied can be freed.</p>
-        <p>Using <code>null</code> is useful for freeing computer memory when heavy objects, such as images or very long lists, are no longer necessary.</p>
+        <p>The keyword <code>null</code> indicates a special value corresponding to the <em>absence of data</em>. This keyword allows you to empty a variable.</p>
+        <p>For example, by writing <code>put null in VAR</code>, the name <code>VAR</code> is disconnected from its previous content, which will signal the computer that that content is no longer needed and the memory it occupied can be freed.</p>
+        <p>Using <code>null</code> is useful for freeing the computer's memory when heavy objects, such as images or very long lists, are no longer needed.</p>
+    </section>
+
+    <div class="pagebreak"></div>
+    <section id="oop">
+        <h2>Object-Oriented Programming (OOP)</h2>
+        <p>Object-Oriented Programming (OOP) is a paradigm that allows modeling software by grouping data and behaviors (variables and procedures) into unique entities, called <strong>objects</strong>. This approach makes the code more organized, modular, and closer to how we think about the real world.</p>
+
+        <h3>Classes and Instances</h3>
+        <p>A <strong>class</strong> is the "blueprint" or "mold" that defines the structure of an object. The concrete object created from that mold is called an <strong>instance</strong>.</p>
+        <p>To define a class, use the keyword <code>class</code> followed by the name and its fields (the internal variables that make up the state of the object). You can then create copies of the object by calling the class name as if it were a function:</p>
+        <pre><code><span class="com">// Class definition</span>
+<span class="kw">define class</span> Player (name, score) (
+  <span class="com">// Methods (internal procedures and functions) will go here</span>
+)
+
+<span class="com">// Creating an instance</span>
+<span class="kw">put</span> Player(<span class="str">"Alex"</span>, <span class="num">0</span>) <span class="kw">in</span> P1
+<span class="kw">write</span> P1.name <span class="com">// Output: Alex</span></code></pre>
+
+        <h3>Custom constructor: <code>INITIALIZE</code></h3>
+        <p>When an instance is created, Matita automatically assigns the passed values to the class fields in order. However, if you want to execute specific code at the time of creation (for example, to do calculations or validations), you can define a special procedure called <code>INITIALIZE</code> within the class.</p>
+
+        <h3>Methods and Encapsulation (Privacy)</h3>
+        <p>Procedures and functions defined inside a class are called <strong>methods</strong>. Methods can access class fields directly without having to pass them as parameters. To refer to the instance itself within methods, you can use the keyword <code>this</code>.</p>
+        <p>A good practice in OOP is <strong>encapsulation</strong>: hiding sensitive data from the outside and allowing its modification only through controlled methods. In Matita, any field that starts with an underscore (<code>_</code>) is considered <strong>private</strong>. If you try to access it directly from the outside, the program will not error out to avoid interrupting execution, but will print a <span class="warn-tag">Warning</span> in the console to discourage its use.</p>
+        
+        <pre><code><span class="kw">define class</span> BankAccount (owner, _balance) (
+  
+  <span class="kw">define procedure</span> INITIALIZE(t, s) (
+    <span class="kw">put</span> t <span class="kw">in</span> owner
+    <span class="kw">put</span> s <span class="kw">in</span> _balance
+  )
+
+  <span class="kw">define procedure</span> deposit(amount) (
+    <span class="kw">put</span> _balance + amount <span class="kw">in</span> _balance  <span class="com">// OK: legal internal access</span>
+  )
+
+  <span class="kw">define function</span> read_balance() (
+    <span class="kw">return</span> _balance             <span class="com">// OK: legal internal access</span>
+  )
+)
+
+<span class="kw">put</span> BankAccount(<span class="str">"Alice"</span>, <span class="num">100</span>) <span class="kw">in</span> MyAccount
+
+MyAccount.deposit(<span class="num">50</span>)
+<span class="kw">write</span> MyAccount.read_balance() <span class="com">// Correct way: prints 150</span>
+<span class="kw">newline</span>
+
+<span class="com">// Generates a "Warning on line: '_balance' is a private member..."</span>
+<span class="kw">write</span> MyAccount._balance</code></pre>
+
+        <h3>Inheritance (<code>extends</code>) and the <code>SUPER</code> directive</h3>
+        <p>Inheritance allows you to create a new class based on an existing class (parent), inheriting its fields and methods. It is achieved using the keyword <code>extends</code>.</p>
+        <p>If the child class defines a method with the same name as the parent's, it overwrites it (<em>override</em>). To still invoke the original method of the parent class, use the keyword <code>SUPER</code>.</p>
+
+        <pre><code><span class="kw">define class</span> Animal (name) (
+  <span class="kw">define procedure</span> sound() (
+    <span class="kw">write</span> <span class="str">"I make a generic sound."</span>
+  )
+)
+
+<span class="com">// The Dog extends the Animal, inheriting the 'name' field</span>
+<span class="kw">define class</span> Dog <span class="kw">extends</span> Animal (breed) (
+  <span class="kw">define procedure</span> sound() (
+    <span class="kw">write</span> <span class="str">"Woof! My name is "</span> + name + <span class="str">". "</span>
+    SUPER.sound() <span class="com">// Calls the sound() method of Animal</span>
+  )
+)
+
+<span class="kw">put</span> Dog(<span class="str">"Fido"</span>, <span class="str">"Beagle"</span>) <span class="kw">in</span> MyDog
+MyDog.sound()
+<span class="com">// Output: Woof! My name is Fido. I make a generic sound.</span></code></pre>
+
+        <h3>Polymorphism: <code>classof()</code></h3>
+        <p>To find out which class an instance belongs to during program execution (useful for example in collisions between objects in a video game), use the <code>classof(object)</code> function. It returns the name of the class as a lowercase text string.</p>
+        <pre><code><span class="kw">if</span> (<span class="kw">classof</span>(MyDog) <span class="kw">equals</span> <span class="str">"dog"</span>) <span class="kw">then</span> (
+  <span class="kw">write</span> <span class="str">"It's definitely a dog!"</span>
+)</code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <h1>Part Two: Graphics and Interactivity</h1>
 
     <section id="coordinates">
-        <h2>Graphic Elements</h2>
+        <h2>Graphical Elements</h2>
         
         <p>The graphics area uses a Cartesian coordinate system. The position of each element is defined by a pair of coordinates <code>(x, y)</code>. The origin <code>(0, 0)</code> is located at the center of the area. Positive values of <code>x</code> indicate positions to the right, negative values to the left. Positive values of <code>y</code> indicate positions upwards, negative values downwards.</p>
         
-        <p>Coordinates are represented as lists of two numbers. The explicit syntax <code>point(x, y)</code> can be used. To access the individual components of a point, the <code>x of</code> and <code>y of</code> properties are used.</p>
+        <p>Coordinates are represented as lists of two numbers. You can use the explicit syntax <code>point(x, y)</code>. To access the individual components of a point, you use the <code>x of</code> and <code>y of</code> properties.</p>
         
         <pre><code><span class="kw">put</span> <span class="kw">point</span>(<span class="num">10</span>, <span class="num">44</span>) <span class="kw">in</span> MyPoint
-<span class="kw">put</span> <span class="kw">x of</span> MyPoint <span class="kw">in</span> XCoordinate
-<span class="kw">write</span> XCoordinate</code></pre>
+<span class="kw">put</span> <span class="kw">x</span> <span class="kw">of</span> MyPoint <span class="kw">in</span> CoordinateX
+<span class="kw">write</span> CoordinateX</code></pre>
 
-        <p>To modify a single coordinate, the <code>set</code> command is used. This operation is fundamental to manage the movement of objects.</p>
-        <pre><code><span class="com"># Move the point 10 steps down without changing the x</span>
-<span class="kw">set</span> <span class="kw">y of</span> MyPoint <span class="kw">to</span> (<span class="kw">y of</span> MyPoint - <span class="num">10</span>)
-<span class="kw">write</span> <span class="kw">y of</span> MyPoint <span class="com"># Will show 34</span></code></pre>
+        <p>To change a single coordinate, use the <code>set</code> command. This operation is fundamental for managing object movement.</p>
+        <pre><code><span class="com">// Move the point 10 steps down without changing the x</span>
+<span class="kw">set</span> <span class="kw">y</span> <span class="kw">of</span> MyPoint <span class="kw">to</span> (<span class="kw">y</span> <span class="kw">of</span> MyPoint - <span class="num">10</span>)
+<span class="kw">write</span> <span class="kw">y</span> <span class="kw">of</span> MyPoint <span class="com">// Will show 34</span></code></pre>
     </section>
 
     <section id="colors">
         <h2>Colors and Backgrounds</h2>
+        <p>Matita uses the RGB color model. Colors are defined via a list of three values <code>(R, G, B)</code>, respectively representing the percentages of Red, Green, and Blue, ranging from 0 to 100, inclusive.</p>
         
-        <p>Matita uses the RGB color model. Colors are defined by a list of three values <code>(R, G, B)</code>, representing respectively the percentages of Red, Green, and Blue, ranging from 0 to 100, inclusive.</p>
-        
-        <p>Example setting the background:</p>
+        <p>Example of setting the background:</p>
         <pre><code><span class="kw">put</span> (<span class="num">68</span>, <span class="num">85</span>, <span class="num">90</span>) <span class="kw">in</span> skyBlue
 <span class="kw">set color</span> skyBlue
 <span class="kw">paint background</span></code></pre>
-        <p>To erase the contents of the graphic area, for example before drawing a new frame in an animation, the <code>clear graphics</code> command is used.</p>
+        <p>To erase the content of the graphics area, for example before drawing a new frame in an animation, use the <code>clear graphics</code> command.</p>
     </section>
 
     <div class="pagebreak"></div>
     <section id="shapes">
         <h2>Drawing Basic Shapes</h2>
-        
-        <p>After setting the current color, it is possible to draw graphic primitives.</p>
+        <p>After setting the current color, you can draw graphical primitives.</p>
 
         <p><strong>Circle</strong>: Syntax <code>circle radius R at POS</code>. Draws a filled disk.</p>
         <pre><code><span class="kw">set color</span> (<span class="num">100</span>, <span class="num">87</span>, <span class="num">0</span>)
@@ -1076,113 +1243,114 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <p><strong>Line</strong>: Syntax <code>line thickness S from P1 to P2</code>. Draws a segment between two points.</p>
         <pre><code><span class="kw">set color</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">line thickness</span> <span class="num">2</span> <span class="kw">from</span> (<span class="num">-200</span>, <span class="num">-75</span>) <span class="kw">to</span> (<span class="num">-200</span>, <span class="num">-160</span>)</code></pre>
+
         <p><strong>Triangle</strong>: Syntax <code>triangle with vertices P1, P2, P3</code>. Draws a filled triangle connecting the three specified points separated by commas.</p>
         <pre><code><span class="kw">set color</span> (<span class="num">0</span>, <span class="num">50</span>, <span class="num">100</span>)
 <span class="kw">triangle with vertices</span> (<span class="num">0</span>, <span class="num">50</span>), (<span class="num">-50</span>, <span class="num">-50</span>), (<span class="num">50</span>, <span class="num">-50</span>)</code></pre>
-        <p><strong>Arc</strong>: Syntax <code>arc radius R thickness S from P1 to P2</code>. Draws a circular arc of a given radius, passing through the two given points. Since there are at most two circumferences of a given radius passing through two assigned points in the plane, the code will draw the arc that goes from the first to the second point rotating counterclockwise. This implies that if you reverse the order of the two points, you will get an arc with inverted concavity.</p>
+        <p><strong>Arc</strong>: Syntax <code>arc radius R thickness S from P1 to P2</code>. Draws a circular arc of a given radius, passing through the two given points. Since there are at most two circles of a given radius passing through two assigned points in the plane, the code will draw the arc that goes from the first to the second point rotating counterclockwise. This implies that if you invert the order of the two points, you will get an arc with an inverted concavity.</p>
         <pre><code><span class="kw">set color</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">arc radius</span> <span class="num">240</span> <span class="kw">thickness</span> <span class="num">12</span> <span class="kw">from</span> (<span class="num">-220</span>, <span class="num">-160</span>) <span class="kw">to</span> (<span class="num">220</span>, <span class="num">-160</span>)</code></pre>
 
         <p>Composite example:</p>
         <pre><code><span class="kw">clear graphics</span>
 
-<span class="kw">put</span> <span class="num">15</span> <span class="kw">in</span> S       <span class="com"># Thickness of each arc</span>
-<span class="kw">put</span> <span class="num">260</span> <span class="kw">in</span> R      <span class="com"># Radius of the outermost color (Red)</span>
-<span class="kw">put</span> <span class="num">-160</span> <span class="kw">in</span> Y     <span class="com"># Horizon height (where the grass ends)</span>
+<span class="kw">put</span> <span class="num">15</span> <span class="kw">in</span> S       <span class="com">// Thickness of each arc</span>
+<span class="kw">put</span> <span class="num">260</span> <span class="kw">in</span> R      <span class="com">// Radius of the outermost color (Red)</span>
+<span class="kw">put</span> <span class="num">-160</span> <span class="kw">in</span> Y     <span class="com">// Horizon height (where the grass ends)</span>
 
-<span class="com"># --- SKY AND BACKGROUND ---</span>
+<span class="com">// --- SKY AND BACKGROUND ---</span>
 <span class="kw">set color</span> (<span class="num">68</span>, <span class="num">85</span>, <span class="num">90</span>)
 <span class="kw">paint background</span>
 
-<span class="com"># --- GRASS ---</span>
+<span class="com">// --- GRASS ---</span>
 <span class="kw">set color</span> (<span class="num">16</span>, <span class="num">65</span>, <span class="num">27</span>)
 <span class="kw">rectangle from</span> (<span class="num">-360</span>, <span class="num">-250</span>) <span class="kw">to</span> (<span class="num">360</span>, Y)
 
-<span class="com"># --- SUN ---</span>
+<span class="com">// --- SUN ---</span>
 <span class="kw">set color</span> (<span class="num">100</span>, <span class="num">87</span>, <span class="num">0</span>)
 <span class="kw">circle radius</span> <span class="num">70</span> <span class="kw">at</span> (<span class="num">250</span>, <span class="num">180</span>)
 
-<span class="com"># --- RAINBOW ---</span>
-<span class="com"># 1. Red</span>
+<span class="com">// --- RAINBOW ---</span>
+<span class="com">// 1. Red</span>
 <span class="kw">set color</span> (<span class="num">90</span>, <span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">arc radius</span> R <span class="kw">thickness</span> S <span class="kw">from</span> (R, Y) <span class="kw">to</span> (-R, Y)
-<span class="kw">put</span> R - S <span class="kw">in</span> R  <span class="com"># Shrink the radius for the next color</span>
+<span class="kw">put</span> R - S <span class="kw">in</span> R  <span class="com">// Shrink the radius for the next color</span>
 
-<span class="com"># 2. Orange</span>
+<span class="com">// 2. Orange</span>
 <span class="kw">set color</span> (<span class="num">90</span>, <span class="num">50</span>, <span class="num">0</span>)
 <span class="kw">arc radius</span> R <span class="kw">thickness</span> S <span class="kw">from</span> (R, Y) <span class="kw">to</span> (-R, Y)
 <span class="kw">put</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 3. Yellow</span>
+<span class="com">// 3. Yellow</span>
 <span class="kw">set color</span> (<span class="num">90</span>, <span class="num">90</span>, <span class="num">0</span>)
 <span class="kw">arc radius</span> R <span class="kw">thickness</span> S <span class="kw">from</span> (R, Y) <span class="kw">to</span> (-R, Y)
 <span class="kw">put</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 4. Green</span>
+<span class="com">// 4. Green</span>
 <span class="kw">set color</span> (<span class="num">0</span>, <span class="num">70</span>, <span class="num">0</span>)
 <span class="kw">arc radius</span> R <span class="kw">thickness</span> S <span class="kw">from</span> (R, Y) <span class="kw">to</span> (-R, Y)
 <span class="kw">put</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 5. Blue</span>
+<span class="com">// 5. Blue</span>
 <span class="kw">set color</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">90</span>)
 <span class="kw">arc radius</span> R <span class="kw">thickness</span> S <span class="kw">from</span> (R, Y) <span class="kw">to</span> (-R, Y)
 <span class="kw">put</span> R - S <span class="kw">in</span> R
 
-<span class="com"># 6. Indigo / Violet</span>
+<span class="com">// 6. Indigo / Violet</span>
 <span class="kw">set color</span> (<span class="num">40</span>, <span class="num">0</span>, <span class="num">70</span>)
 <span class="kw">arc radius</span> R <span class="kw">thickness</span> S <span class="kw">from</span> (R, Y) <span class="kw">to</span> (-R, Y)
 
-<span class="com"># --- BALLOON ---</span>
-<span class="kw">set color</span> (<span class="num">80</span>, <span class="num">0</span>, <span class="num">90</span>) <span class="com"># A brighter purple</span>
+<span class="com">// --- BALLOON ---</span>
+<span class="kw">set color</span> (<span class="num">80</span>, <span class="num">0</span>, <span class="num">90</span>) <span class="com">// A brighter purple</span>
 <span class="kw">circle radius</span> <span class="num">25</span> <span class="kw">at</span> (<span class="num">-100</span>, <span class="num">-50</span>)
 <span class="kw">line thickness</span> <span class="num">2</span> <span class="kw">from</span> (<span class="num">-100</span>, <span class="num">-75</span>) <span class="kw">to</span> (<span class="num">-100</span>, Y)</code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="graffiti">
-        <h2>Graffiti (Text)</h2>
-        <p>The <code>graffiti</code> command allows inserting text directly into the graphic area.</p>
+        <h2>Graffiti (Graphical Text)</h2>
+        <p>The <code>graffiti</code> command allows you to insert text directly into the graphics area.</p>
         <pre><code><span class="kw">set color</span> (<span class="num">10</span>, <span class="num">10</span>, <span class="num">10</span>)
-<span class="kw">graffiti size</span> <span class="num">30</span> <span class="kw">at point</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="str">"Center."</span></code></pre>
+<span class="kw">graffiti size</span> <span class="num">30</span> <span class="kw">at</span> <span class="kw">point</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="str">"Center."</span></code></pre>
     </section>
 
     <section id="redraw">
-        <h2>Redrawing a Scene</h2>
-        <p>The <code>redraw</code> command forces an update of the graphic area (canvas). This command is essential for displaying changes that have occurred in the scene stored in memory.</p>
+        <h2>Redrawing a scene</h2>
+        <p>The <code>redraw</code> command forces the update of the graphics area (canvas). This command is essential to display the changes that occurred in the scene stored in memory.</p>
     </section>
 
     <section id="frame">
-        <h2>Framing the Graphics (Auto-framing)</h2>
-        <p>The <code>frame graphics</code> command automatically adjusts the camera (pan and zoom) so that all objects currently present in the graphic area (canvas) are visible and centered in the window.</p>
-        <p>This command is useful for making the scene dynamically fit the screen. It also implicitly performs a redraw, so using it makes <code>redraw</code> unnecessary.</p>
+        <h2>Framing graphics (Auto-framing)</h2>
+        <p>The <code>frame graphics</code> command automatically adjusts the camera (pan and zoom) so that all objects currently present in the graphics area (canvas) are visible and centered in the window.</p>
+        <p>This command is useful for making the scene dynamically fit the screen. It also implicitly performs a redraw, so its use makes it unnecessary to use <code>redraw</code>.</p>
         <pre><code><span class="kw">set color</span> (<span class="num">100</span>, <span class="num">0</span>, <span class="num">0</span>)
-<span class="com"># Draws a very large circle, far from the origin</span>
+<span class="com">// Draw a very large circle, far from the origin</span>
 <span class="kw">circle radius</span> <span class="num">500</span> <span class="kw">at</span> (<span class="num">2000</span>, <span class="num">2000</span>)
-<span class="com"># Adjust the view to show it all</span>
+<span class="com">// Adjust the view to show it all</span>
 <span class="kw">frame graphics</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="animations">
         <h2>Creating Animations</h2>
-        <p>To achieve the movement and animation of objects in Matita, the principle of persistence of vision is used: a series of static images, slightly different from each other, shown in rapid succession, creates the illusion of movement.</p>
+        <p>To achieve movement and animation of objects in Matita, we exploit the principle of persistence of vision: a series of static images, slightly different from each other, shown in rapid succession, creates the illusion of movement.</p>
         <p>The typical structure of an animation loop involves the following steps:</p>
         <ol>
             <li>Start a loop (usually <code>as long as (true)</code>).</li>
             <li>Clear the previous graphics (with <code>clear graphics</code> or <code>paint background</code>).</li>
-            <li>Update the coordinates of the objects (for example, by moving a point).</li>
+            <li>Update the coordinates of the objects (for example, moving a point).</li>
             <li>Draw the objects in the new positions.</li>
-            <li>Force the graphical update with <code>redraw</code> (optional if using <code>wait</code>, which does it implicitly).</li>
-            <li>Wait a short time interval (e.g., <code>wait 16 ms</code> for approximately 60 frames per second).</li>
+            <li>Force the graphical update with <code>redraw</code> (optional if you use <code>wait</code>, which does it implicitly).</li>
+            <li>Wait for a short time interval (e.g., <code>wait 16 ms</code> for about 60 frames per second).</li>
         </ol>
 
-<p>Simple animation example:</p>
-<pre><code><span class="kw">put</span> <span class="num">-150</span> <span class="kw">in</span> X
+        <p>Example of a simple animation:</p>
+        <pre><code><span class="kw">put</span> <span class="num">-150</span> <span class="kw">in</span> X
 <span class="kw">global</span> X
 <span class="kw">as long as</span> (X < <span class="num">150</span>) <span class="kw">you do</span> (
   <span class="kw">put</span> X + <span class="num">2</span> <span class="kw">in</span> X
   <span class="kw">clear graphics</span>
-  <span class="kw">circle radius</span> <span class="num">20</span> <span class="kw">at point</span>(X, <span class="num">0</span>)
+  <span class="kw">circle radius</span> <span class="num">20</span> <span class="kw">at</span> <span class="kw">point</span>(X, <span class="num">0</span>)
   <span class="kw">wait</span> <span class="num">16</span> <span class="kw">ms</span>
   <span class="kw">redraw</span>
 )</code></pre>
@@ -1192,39 +1360,39 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <h2>Keyboard and Mouse Input</h2>
         
         <h3>Keyboard</h3>
-        <p>To achieve real-time interactions, the state of the keys is checked. The expression <code>key "KEY_NAME" is pressed</code> returns <code>true</code> if the indicated key is currently being pressed. The directional keys are mapped as <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>.</p>
-        <p>Other control keys: <code>SPACE</code>, <code>ENTER</code>, <code>ESC</code>, <code>TAB</code>, <code>BACKSPACE</code>, <code>SHIFT</code>, <code>CTRL</code>, <code>ALT</code>. Alphanumeric characters are simply indicated with their symbol ("A", "x", etc.).</p>
+        <p>To create real-time interactions, you check the state of the keys. The expression <code>key "KEY_NAME" is pressed</code> returns <code>true</code> if the indicated key is currently pressed. The directional keys are mapped as <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>.</p>
+        <p>Other control keys: <code>SPACE</code>, <code>ENTER</code>, <code>ESC</code>, <code>TAB</code>, <code>BACKSPACE</code>, <code>SHIFT</code>, <code>CTRL</code>, <code>ALT</code>. Alphanumeric characters are simply indicated by their symbol ("A", "x", etc.).</p>
 
         <h3>Mouse</h3>
-        <p>Matita also allows detecting the mouse pointer position and the state of the main button:</p>
+        <p>Matita also allows you to detect the position of the mouse pointer and the state of the main button:</p>
         <ul>
-            <li><code>mouse_x()</code> and <code>mouse_y()</code>: Return the coordinates in the graphic plane based on the cursor position.</li>
+            <li><code>mouse_x()</code> and <code>mouse_y()</code>: Return the coordinates in the graphical plane based on the cursor position.</li>
             <li><code>mouse_pressed()</code>: Returns <code>true</code> as long as the left mouse button is held down on the canvas.</li>
         </ul>
 
         <p>Example of controlling an object via keyboard:</p>
-        <pre><code><span class="kw">put point</span>(<span class="num">0</span>,<span class="num">0</span>) <span class="kw">in</span> playerPos
+        <pre><code><span class="kw">put</span> <span class="kw">point</span>(<span class="num">0</span>,<span class="num">0</span>) <span class="kw">in</span> playerPos
 <span class="kw">put</span> <span class="num">300</span> <span class="kw">in</span> lim
 
 <span class="kw">as long as</span> (<span class="kw">true</span>) <span class="kw">you do</span> (
 
   <span class="kw">if</span> (<span class="kw">key</span> <span class="str">"UP"</span> <span class="kw">is pressed</span>) <span class="kw">then</span> (
-    <span class="kw">set</span> <span class="kw">y of</span> playerPos <span class="kw">to</span> (<span class="kw">y of</span> playerPos + <span class="num">5</span>)
+    <span class="kw">set</span> <span class="kw">y</span> <span class="kw">of</span> playerPos <span class="kw">to</span> (<span class="kw">y</span> <span class="kw">of</span> playerPos + <span class="num">5</span>)
   )
   <span class="kw">if</span> (<span class="kw">key</span> <span class="str">"DOWN"</span> <span class="kw">is pressed</span>) <span class="kw">then</span> (
-    <span class="kw">set</span> <span class="kw">y of</span> playerPos <span class="kw">to</span> (<span class="kw">y of</span> playerPos - <span class="num">5</span>)
+    <span class="kw">set</span> <span class="kw">y</span> <span class="kw">of</span> playerPos <span class="kw">to</span> (<span class="kw">y</span> <span class="kw">of</span> playerPos - <span class="num">5</span>)
   )
   <span class="kw">if</span> (<span class="kw">key</span> <span class="str">"RIGHT"</span> <span class="kw">is pressed</span>) <span class="kw">then</span> (
-    <span class="kw">set</span> <span class="kw">x of</span> playerPos <span class="kw">to</span> (<span class="kw">x of</span> playerPos + <span class="num">5</span>)
+    <span class="kw">set</span> <span class="kw">x</span> <span class="kw">of</span> playerPos <span class="kw">to</span> (<span class="kw">x</span> <span class="kw">of</span> playerPos + <span class="num">5</span>)
   )
   <span class="kw">if</span> (<span class="kw">key</span> <span class="str">"LEFT"</span> <span class="kw">is pressed</span>) <span class="kw">then</span> (
-    <span class="kw">set</span> <span class="kw">x of</span> playerPos <span class="kw">to</span> (<span class="kw">x of</span> playerPos - <span class="num">5</span>)
+    <span class="kw">set</span> <span class="kw">x</span> <span class="kw">of</span> playerPos <span class="kw">to</span> (<span class="kw">x</span> <span class="kw">of</span> playerPos - <span class="num">5</span>)
   )
 
-  <span class="com"># Emergency exit</span>
+  <span class="com">// Emergency exit</span>
   <span class="kw">if</span> (<span class="kw">key</span> <span class="str">"x"</span> <span class="kw">is pressed</span>) <span class="kw">then</span> (<span class="kw">stop</span>)
 
-  <span class="com"># Drawing</span>
+  <span class="com">// Drawing</span>
   <span class="kw">clear graphics</span>
   <span class="kw">set color</span> (<span class="num">0</span>, <span class="num">100</span>, <span class="num">100</span>)
   <span class="kw">rectangle from</span> (-lim, -lim) <span class="kw">to</span> (lim, lim)
@@ -1234,192 +1402,193 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 
   <span class="kw">redraw</span>
 
-  <span class="com"># Refresh rate (around 60 fps)</span>
+  <span class="com">// Refresh rate (about 60 fps)</span>
   <span class="kw">wait</span> <span class="num">16</span> <span class="kw">ms</span>
 )</code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="labels">
-        <h2>Graphic Labels</h2>
-        <p>To optimize the code and reuse groups of shapes, you can define <strong>labels</strong>. A label groups a series of drawing instructions into a single reusable object. Syntax: <code>label (...) as NAME</code>.</p>
+        <h2>Graphical Labels</h2>
+        <p>To optimize code and reuse groups of shapes, you can define <strong>labels</strong>. A label groups a series of drawing instructions into a single reusable object. Syntax: <code>label (...) as NAME</code>.</p>
         
-        <p>Example of definition and usage:</p>
-        <pre><code><span class="com"># Model definition</span>
+        <p>Example of definition and use:</p>
+        <pre><code><span class="com">// Model definition</span>
 <span class="kw">label</span> (
-  <span class="com"># Body</span>
-  <span class="kw">set color</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="com"># White</span>
+  <span class="com">// Body</span>
+  <span class="kw">set color</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="com">// White</span>
   <span class="kw">circle radius</span> <span class="num">30</span> <span class="kw">at</span> (<span class="num">0</span>, <span class="num">0</span>)
   <span class="kw">circle radius</span> <span class="num">20</span> <span class="kw">at</span> (<span class="num">0</span>, <span class="num">45</span>)
   <span class="kw">circle radius</span> <span class="num">15</span> <span class="kw">at</span> (<span class="num">0</span>, <span class="num">75</span>)
 
-  <span class="com"># Details</span>
-  <span class="kw">set color</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="com"># Black</span>
+  <span class="com">// Details</span>
+  <span class="kw">set color</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="com">// Black</span>
   <span class="kw">circle radius</span> <span class="num">2</span> <span class="kw">at</span> (<span class="num">-5</span>, <span class="num">78</span>)
   <span class="kw">circle radius</span> <span class="num">2</span> <span class="kw">at</span> (<span class="num">5</span>, <span class="num">78</span>)
   <span class="kw">circle radius</span> <span class="num">2</span> <span class="kw">at</span> (<span class="num">0</span>, <span class="num">50</span>)
   <span class="kw">circle radius</span> <span class="num">2</span> <span class="kw">at</span> (<span class="num">0</span>, <span class="num">40</span>)
 
-  <span class="com"># Nose</span>
-  <span class="kw">set color</span> (<span class="num">100</span>, <span class="num">60</span>, <span class="num">0</span>) <span class="com"># Orange</span>
+  <span class="com">// Nose</span>
+  <span class="kw">set color</span> (<span class="num">100</span>, <span class="num">60</span>, <span class="num">0</span>) <span class="com">// Orange</span>
   <span class="kw">triangle with vertices</span> (<span class="num">0</span>, <span class="num">75</span>), (<span class="num">0</span>, <span class="num">73</span>), (<span class="num">8</span>, <span class="num">74</span>)
 ) <span class="kw">as</span> Snowman
 
 <span class="kw">set color</span> (<span class="num">50</span>,<span class="num">50</span>,<span class="num">50</span>)
 <span class="kw">paint background</span>
-<span class="kw">draw</span> Snowman <span class="kw">at point</span>(<span class="num">150</span>, <span class="num">0</span>)
-<span class="kw">draw</span> Snowman <span class="kw">at point</span>(<span class="num">-100</span>, <span class="num">0</span>)</code></pre>
+<span class="kw">draw</span> Snowman <span class="kw">at</span> <span class="kw">point</span>(<span class="num">150</span>, <span class="num">0</span>)
+<span class="kw">draw</span> Snowman <span class="kw">at</span> <span class="kw">point</span>(<span class="num">-100</span>, <span class="num">0</span>)</code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="transformations">
-        <h2>Transformations: Scaling and Rotation</h2>
-        
+        <h2>Transformations: Scale and Rotation</h2>
         <p>Labeled objects can undergo geometric transformations.</p>
 
         <h3>Scaling</h3>
         <p>The <code>scale</code> command resizes the label. A factor of 2 doubles the dimensions, 0.5 halves them.</p>
         <p><strong>Note</strong>: The scaling operation is permanent for the label to which it is applied.</p>
         <pre><code><span class="kw">scale</span> Snowman <span class="kw">by</span> <span class="num">0.5</span>
-<span class="kw">draw</span> Snowman <span class="kw">at point</span>(<span class="num">0</span>, <span class="num">100</span>)
-<span class="kw">draw</span> Snowman <span class="kw">at point</span>(<span class="num">0</span>, <span class="num">-100</span>)</code></pre>
+<span class="kw">draw</span> Snowman <span class="kw">at</span> <span class="kw">point</span>(<span class="num">0</span>, <span class="num">100</span>)
+<span class="kw">draw</span> Snowman <span class="kw">at</span> <span class="kw">point</span>(<span class="num">0</span>, <span class="num">-100</span>)</code></pre>
 
         <h3>Rotation</h3>
         <p>It is possible to rotate an object with respect to the center of its bounding box. The angle is expressed in sexagesimal degrees (0-360), with counterclockwise rotation for positive values.</p>
-        <pre><code><span class="kw">rotate</span> Snowman <span class="kw">of</span> <span class="num">45</span> <span class="kw">deg and place it at</span> (<span class="num">300</span>, <span class="num">-300</span>)</code></pre>
+        <pre><code><span class="kw">rotate</span> Snowman <span class="kw">of</span> <span class="num">45</span> <span class="kw">deg</span> <span class="kw">and place it at</span> (<span class="num">300</span>, <span class="num">-300</span>)</code></pre>
     </section>
 
     <section id="images">
         <h2>Images</h2>
-        <p>External image files can be imported for use as graphic objects or backgrounds. The files must reside in the same directory as the <code>matita.html</code> file.</p>
+        <p>It is possible to import external image files to use them as graphical objects or backgrounds. The files must reside in the same directory as the <code>matita.html</code> file.</p>
         
         <h3>Images as Labels</h3>
-        <p>An imported image is treated as a label and can therefore be drawn, scaled, and rotated.</p>
-        <pre><code><span class="kw">import</span> <span class="str">"Filename.png"</span> <span class="kw">as</span> kitten
+        <p>A loaded image is treated as a label and can therefore be drawn, scaled, and rotated.</p>
+        <pre><code><span class="kw">import</span> <span class="str">"FileName.png"</span> <span class="kw">as</span> kitten
 <span class="kw">draw</span> kitten <span class="kw">at</span> (<span class="num">0</span>, <span class="num">0</span>)
 <span class="kw">scale</span> kitten <span class="kw">by</span> <span class="num">0.5</span>
-<span class="kw">rotate</span> kitten <span class="kw">of</span> <span class="num">15</span> <span class="kw">deg and place it at</span> (<span class="num">-120</span>, <span class="num">-60</span>)</code></pre>
+<span class="kw">rotate</span> kitten <span class="kw">of</span> <span class="num">15</span> <span class="kw">deg</span> <span class="kw">and place it at</span> (<span class="num">-120</span>, <span class="num">-60</span>)</code></pre>
 
         <h3>Images as Backgrounds</h3>
-        <p>To set an image as the background of the entire graphic area:</p>
+        <p>To set an image as the background of the entire graphics area:</p>
         <pre><code><span class="kw">load</span> <span class="str">"grass.png"</span> <span class="kw">scale</span> <span class="num">0.5</span> <span class="kw">as background</span>
 <span class="kw">paint background</span></code></pre>
-    
-        <h3>Importing External Code (Libraries)</h3>
-        <p>It is possible to split complex programs across multiple files. By using the <code>import</code> command without the <code>as</code> keyword, Matita will read a text file containing source code (e.g., useful procedures or functions) and execute it as if it were written directly in the main file.</p>
-        <pre><code><span class="kw">import</span> <span class="str">"my_library.txt"</span>
-<span class="com"># Now you can use the functions defined in my_library.txt</span></code></pre>
-    </section>
 
+        <h3>Importing External Code (Libraries)</h3>
+        <p>It is possible to divide complex programs into multiple files. Using the <code>import</code> command without the keyword <code>as</code>, Matita will read a text file containing source code (e.g., useful procedures or functions) and execute it as if it had been written directly in the main file.</p>
+        <pre><code><span class="kw">import</span> <span class="str">"my_library.txt"</span>
+<span class="com">// Now you can use functions defined in my_library.txt</span></code></pre>
+    </section>
+    
     <div class="pagebreak"></div>
     <section id="audio">
         <h2>Audio and Sounds</h2>
-        <p>Matita integrates a sound synthesis engine to add audio effects and music (ADSR synthesizer). It relies on commands to define the physical properties of the sound, play it, control its volume, and apply fades.</p>
+        <p>Matita integrates a sound synthesis engine to add audio effects and music (ADSR synthesizer). It is based on commands to define the physical properties of the sound, play it, control its volume, and apply fades.</p>
 
-        <h3>Defining and Playing a Sound</h3>
-        <p>Use the <code>sound</code> command followed by a name of your choice, then open a configuration block. The main configurations can generate <code>noise</code>, a continuous frequency sweep (<code>sweep from ... to ... hz</code>), or a sequence of <code>notes</code>.</p>
-        <pre><code><span class="com"># Create a simple beep (sweep from 800Hz to 200Hz)</span>
+        <h3>Defining and playing a sound</h3>
+        <p>You use the <code>sound</code> command followed by a name of your choice, then open a configuration block. The main configurations can generate a <code>noise</code>, a continuous frequency <code>sweep</code>, or a sequence of <code>notes</code>.</p>
+        <pre><code><span class="com">// Creates a simple beep (sweep from 800Hz to 200Hz)</span>
 <span class="kw">sound</span> Beep (
-  <span class="kw">sweep from</span> <span class="num">800</span> <span class="kw">to</span> <span class="num">200</span> <span class="kw">hz</span>
-  <span class="kw">wave</span> <span class="str">"sine"</span> <span class="com"># Options: "sine", "square", "sawtooth", "triangle"</span>
+  <span class="kw">sweep from</span> <span class="num">800</span> <span class="kw">to</span> <span class="num">200</span> hz
+  <span class="kw">wave</span> <span class="str">"sine"</span> <span class="com">// Options: "sine", "square", "sawtooth", "triangle"</span>
   <span class="kw">duration</span> <span class="num">300</span> <span class="kw">ms</span>
 )
 
-<span class="com"># Create a noise (great for explosions)</span>
+<span class="com">// Creates a noise (great for explosions)</span>
 <span class="kw">sound</span> Explosion (
   <span class="kw">noise</span>
   <span class="kw">duration</span> <span class="num">500</span> <span class="kw">ms</span>
   <span class="kw">decay</span> <span class="num">400</span> <span class="kw">ms</span>
 )
 
-<span class="com"># Create a melody</span>
+<span class="com">// Creates a melody</span>
 <span class="kw">sound</span> Melody (
-  <span class="kw">notes</span> (<span class="num">440</span>:<span class="num">200</span>, <span class="num">523</span>:<span class="num">400</span>, <span class="num">659</span>:<span class="num">600</span>) <span class="com"># Frequency : Duration</span>
+  <span class="kw">notes</span> (<span class="num">440</span>:<span class="num">200</span>, <span class="num">523</span>:<span class="num">400</span>, <span class="num">659</span>:<span class="num">600</span>) <span class="com">// Frequency : Duration</span>
   <span class="kw">wave</span> <span class="str">"square"</span>
 )
 
-<span class="com"># Playback</span>
+<span class="com">// Playback</span>
 <span class="kw">play</span> Beep
 <span class="kw">wait</span> <span class="num">500</span> <span class="kw">ms</span>
 <span class="kw">play</span> Explosion</code></pre>
 
-        <h3>Loops and Controls</h3>
-        <p>By adding the <code>loop true</code> parameter to a sound configuration, it will continue playing indefinitely. You will need to use control commands to stop it.</p>
+        <h3>Looping and Controls</h3>
+        <p>By adding the <code>repeat true</code> parameter to a sound's configuration, it will continue to play indefinitely. You will need to use control commands to stop it.</p>
         <ul>
             <li><code>play NAME</code>: Plays the sound.</li>
             <li><code>stop NAME</code>: Immediately stops the playback of the sound.</li>
             <li><code>volume NAME 50</code>: Adjusts the volume of the sound (from 0 to 100).</li>
-            <li><code>fade NAME out 1000 ms</code>: Smoothly reduces the volume to 0 in the specified time. Use `in` instead of `out` to fade in.</li>
+            <li><code>fade NAME out 1000 ms</code>: Smoothly reduces the volume to 0 in the specified time. Use `in` instead of `out` to fade the volume in.</li>
             <li><code>is playing NAME</code>: Function that returns `true` if the sound is currently playing.</li>
         </ul>
-        <pre><code><span class="kw">sound</span> Motor (
+        <pre><code><span class="kw">sound</span> Engine (
   <span class="kw">noise</span>
-  <span class="kw">loop true</span>
+  <span class="kw">repeat</span> <span class="kw">true</span>
 )
 
-<span class="kw">play</span> Motor
-<span class="kw">volume</span> Motor <span class="num">20</span>
+<span class="kw">play</span> Engine
+<span class="kw">volume</span> Engine <span class="num">20</span>
 <span class="kw">wait</span> <span class="num">3000</span> <span class="kw">ms</span>
-<span class="kw">fade</span> Motor <span class="kw">out</span> <span class="num">1500</span> <span class="kw">ms</span></code></pre>
+<span class="kw">fade</span> Engine <span class="kw">out</span> <span class="num">1500</span> <span class="kw">ms</span></code></pre>
     </section>
 
     <div class="pagebreak"></div>
     <section id="canvas-interaction">
-        <h2>Interacting with the Canvas</h2>
-        <p>Besides rendering the graphics generated by the code, Matita's graphics area (the <em>canvas</em>) offers interactive tools to inspect the drawing space and locate points.</p>
+        <h2>Interacting with the canvas</h2>
+        <p>In addition to rendering the graphics generated by the code, Matita's graphics area (the <em>canvas</em>) offers interactive tools to inspect the drawing space and locate points.</p>
         
         <h3>Pan and Zoom</h3>
-        <p>You can navigate inside the graphic area without altering the original coordinates of the objects:</p>
+        <p>You can navigate inside the graphics area without altering the original coordinates of the objects:</p>
         <ul>
-            <li><strong>Pan (Dragging)</strong>: By holding down the <strong>right mouse button</strong> (or the middle button, or <code>Shift</code> + left click) and moving the cursor, it's possible to translate the view in any direction.</li>
-            <li><strong>Zoom</strong>: Using the <strong>mouse wheel</strong>, you enlarge or shrink the view. The magnification is centered on the cursor, pointing towards the coordinates where the mouse is at that moment.</li>
+            <li><strong>Pan (Dragging)</strong>: By holding down the <strong>right mouse button</strong> (or the middle button, or <span class="kbd">Shift</span> + left button) and moving the cursor, you can translate the view in any direction.</li>
+            <li><strong>Zoom</strong>: By using the <strong>mouse wheel</strong>, you zoom in or out of the view. The zoom is centered on the cursor, i.e., it points towards the coordinates where the mouse is at that moment.</li>
         </ul>
 
         <h3>Orthogonal Constraints (Ortho) and Magnet (Snap)</h3>
 
-        <p>The buttons located on the top bar of the canvas window allow activating geometric precision tools:</p>
+        <p>The buttons located on the top bar of the canvas window allow you to activate geometric precision tools:</p>
         <ul>
-            <li><strong>Snap</strong>: If active, the cursor is attracted and hooked to notable points of the objects already drawn (circle centers, rectangle vertices, line midpoints, etc.).</li>
-            <li><strong>Ortho (⟂) and Alpha Angle (α)</strong>: By activating the Ortho tool, you can draw lines to support alignment. With a <strong>single click</strong> on the canvas, a base point is fixed; moving the mouse, the crosshair will be constrained to move only horizontally or vertically. By clicking the <strong>α</strong> button and entering a numeric value in the adjacent field, you can freely rotate the orthogonal axes by that number of degrees. A <strong>second click</strong> releases the base point.</li>
-            <li><strong>Save PNG</strong>: Instantly exports and downloads the current content of the canvas as a <code>.png</code> image.</li>
-            <li><strong>Fit to Window (⛶)</strong>: Automatically adjusts the zoom and camera position to perfectly frame all drawn objects within the graphic window.</li>
+            <li><strong>Magnet (Snap)</strong>: If active, the cursor is attracted and snapped to notable points of already drawn objects (centers of circles, vertices of rectangles, midpoints of lines, etc.).</li>
+            <li><strong>Ortho (⟂) and Alpha Angle (α)</strong>: By activating the Ortho tool, it is possible to draw lines to support alignment. With a <strong>single click</strong> on the canvas, you fix a base point; moving the mouse, the crosshair will be constrained to move only horizontally or vertically. By clicking the <strong>α</strong> button and entering a numerical value in the field next to it, you can freely rotate the orthogonal axes by that number of degrees. A <strong>second click</strong> releases the base point.</li>
+            <li><strong>Save PNG</strong>: Downloads the contents of the canvas as a <code>.png</code> image.</li>
+            <li><strong>Fit to Window (⛶)</strong>: Adjusts the zoom and position of the camera to frame all the objects within the graphics window.</li>
         </ul>
 
-        <h3>Coordinate Transfer</h3>
-        <p>To speed up coding and object positioning, Matita allows picking up positional data directly from the graphic area and inserting them into the text editor.</p>
-        <p>Performing a <strong>long click</strong> with the left button on a point in the canvas, the coordinates of that point (for example, <code>(15.2, 30.5)</code>) will be automatically typed into the code Editor at the text cursor. If this operation is performed while the Snap is active and hooked to a point whose coordinates are saved in a global variable, the name of that variable will be pasted directly into the Editor instead of the numerical values, preserving code consistency.</p>
+        <h3>Transfer of Coordinates</h3>
+        <p>To speed up writing code and positioning objects, Matita allows you to grab positional data directly from the graphics area and insert it into the text editor.</p>
+        <p>By performing a <strong>long click</strong> with the left mouse button on a point on the canvas, the coordinates of that point (for example, <code>(15.2, 30.5)</code>) will be automatically typed into the Code Editor, at the text cursor. If this operation is performed while the Magnet is running and is snapped to a point whose coordinates are saved in a global variable, the name of that variable will be pasted directly into the Editor instead of the numerical values, preserving the consistency of the code.</p>
     </section>
 
     <div class="pagebreak"></div>
     <section id="project">
-        <h2>Guided Exercise: Interactive Smiley</h2>
+        <h2>Guided Project: Interactive Smiley</h2>
         <p>The following code integrates label definitions, user input, and a rendering loop to create a controllable object.</p>
-        <pre><code><span class="com"># Define the colors</span>
+        <pre><code><span class="com">// Let's define the colors</span>
 <span class="kw">put</span> (<span class="num">100</span>, <span class="num">100</span>, <span class="num">100</span>) <span class="kw">in</span> White
 <span class="kw">put</span> (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Black
 <span class="kw">put</span> (<span class="num">100</span>, <span class="num">90</span>, <span class="num">10</span>) <span class="kw">in</span> Yellow
 
-<span class="com"># Dimensions of the white background </span>
+<span class="com">// Dimensions of the white background </span>
 <span class="kw">put</span> <span class="num">300</span> <span class="kw">in</span> lim
 
-<span class="com"># Define the Smiley as a graphic object (label)</span>
+<span class="com">// Let's define the Smiley as a graphic object (label)</span>
 <span class="kw">label</span> (
   <span class="kw">set color</span> Yellow
-  <span class="kw">circle radius</span> <span class="num">120</span> <span class="kw">at point</span>(<span class="num">0</span>, <span class="num">0</span>)
+  <span class="kw">circle radius</span> <span class="num">120</span> <span class="kw">at</span> <span class="kw">point</span>(<span class="num">0</span>, <span class="num">0</span>)
   <span class="kw">set color</span> Black
-  <span class="kw">circumference radius</span> <span class="num">120</span> <span class="kw">thickness</span> <span class="num">8</span> <span class="kw">at point</span>(<span class="num">0</span>, <span class="num">0</span>)
-  <span class="kw">circle radius</span> <span class="num">12</span> <span class="kw">at point</span>(<span class="num">-40</span>, <span class="num">30</span>)
-  <span class="kw">circle radius</span> <span class="num">12</span> <span class="kw">at point</span>(<span class="num">40</span>, <span class="num">30</span>)
+  <span class="kw">circumference radius</span> <span class="num">120</span> <span class="kw">thickness</span> <span class="num">8</span> <span class="kw">at</span> <span class="kw">point</span>(<span class="num">0</span>, <span class="num">0</span>)
+  <span class="kw">circle radius</span> <span class="num">12</span> <span class="kw">at</span> <span class="kw">point</span>(<span class="num">-40</span>, <span class="num">30</span>)
+  <span class="kw">circle radius</span> <span class="num">12</span> <span class="kw">at</span> <span class="kw">point</span>(<span class="num">40</span>, <span class="num">30</span>)
   <span class="kw">arc radius</span> <span class="num">60</span> <span class="kw">thickness</span> <span class="num">8</span> <span class="kw">from</span> (<span class="num">-50</span>, <span class="num">-25</span>) <span class="kw">to</span> (<span class="num">50</span>, <span class="num">-25</span>)
 ) <span class="kw">as</span> Smiley
 
-<span class="com"># Variable Initialization</span>
-<span class="kw">put point</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Position
+<span class="com">// Variable initialization</span>
+<span class="kw">put</span> <span class="kw">point</span>(<span class="num">0</span>, <span class="num">0</span>) <span class="kw">in</span> Position
 <span class="kw">put</span> <span class="num">0</span> <span class="kw">in</span> Angle
 
 <span class="kw">clear screen</span>
 <span class="kw">write</span> <span class="str">"Controls: Arrow Keys (Move), A/D (Rotate), X (Exit)"</span>
 <span class="kw">newline</span>
+
+
 
 <span class="com"># Main game loop</span>
 <span class="kw">as long as</span> (<span class="kw">true</span>) <span class="kw">you do</span> (
@@ -1491,7 +1660,11 @@ greet(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>dice(N)</code></td><td>Returns an <strong>integer</strong> number between 1 and N.</td></tr>
             <tr><td><code>round(X)</code> / <code>trunc(X)</code> / <code>ceil(X)</code></td><td>Rounds or truncates X to the integer.</td></tr>
             <tr><td><code>squareroot(X)</code> / <code>abs(X)</code></td><td>Square root / Absolute value.</td></tr>
-            <tr><td><code>sin(X)</code> / <code>cos(X)</code></td><td>Trigonometric functions (input in radians).</td></tr>
+            <tr><td><code>sin(X)</code> / <code>cos(X)</code> / <code>tan(X)</code> / <code>atan2(Y, X)</code></td><td>Trigonometric functions (input in radians).</td></tr>
+            <tr><td><code>log(X)</code> / <code>log10(X)</code></td><td>Natural and base-10 logarithms.</td></tr>
+            <tr><td><code>min(L)</code> / <code>max(L)</code></td><td>Returns the minimum/maximum value in a list.</td></tr>
+            <tr><td><code>valmin(L)</code> / <code>valmax(L)</code></td><td>Returns the min/max numeric value (ignoring text).</td></tr>
+            <tr><td><code>argmin(L)</code> / <code>argmax(L)</code></td><td>Returns the index (1-based) of the min/max numeric value.</td></tr>
         </table>
 
         <h3>Logic, Loops and Input</h3>
@@ -1559,6 +1732,16 @@ greet(<span class="str">"Maria"</span>)</code></pre>
             <tr><td><code>cast(VAL, "TYPE")</code> / <code>unicode(X)</code></td><td>Type conversion / Character encoding.</td></tr>
             <tr><td><code>type(VAR)</code> / <code>numeric(VAR)</code></td><td>Type checking functions.</td></tr>
         </table>
+
+        <h3>Object-Oriented Programming (OOP)</h3>
+        <table>
+            <tr><th>Command</th><th>Description</th></tr>
+            <tr><td><code>define class NAME(fields) (...)</code></td><td>Defines a new class with the given fields.</td></tr>
+            <tr><td><code>define class NAME extends PARENT (...)</code></td><td>Defines a child class that inherits from a parent.</td></tr>
+            <tr><td><code>this</code></td><td>References the current instance inside a method.</td></tr>
+            <tr><td><code>SUPER.method()</code></td><td>Calls a method from the parent class.</td></tr>
+            <tr><td><code>classof(OBJ)</code></td><td>Returns the class name of the given instance as a string.</td></tr>
+        </table>
     </section>
 
     <div class="pagebreak"></div>
@@ -1567,17 +1750,22 @@ greet(<span class="str">"Maria"</span>)</code></pre>
         <table>
             <tr><th>Type</th><th>Message and Meaning</th></tr>
             <tr><td><span class="warn-tag">Warning</span></td><td><code>Warning: Local variable 'NAME' is shadowing a global variable...</code><br>You are using the same name for a local and a global variable (Shadowing). Use <code>global NAME</code>.</td></tr>
-            <tr><td><span class="warn-tag">Warning</span></td><td><code>Alias created...</code><br>Two variable names now point to the same memory cell.</td></tr>
+            <tr><td><span class="warn-tag">Warning</span></td><td><code>'PROP' is a private member (starts with '_'). Access from outside the class is discouraged.</code><br>You are trying to read or write a private field directly. Use getter/setter methods instead.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>I can't find a variable named 'NAME'</code><br>Uninitialized variable or typo.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>Recursion limit exceeded...</code><br>Stack Overflow (likely infinite recursion).</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>Invalid arguments for procedure call...</code><br>Incorrect syntax. Use <code>Name(arg)</code> or <code>Name with (arg)</code>.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>Function finished without a 'return' command.</code><br>Missing return value in one of the function's paths.</td></tr>
-            <tr><td><span class="error-tag">Error</span></td><td><code>Index I is not valid for the list 'NAME'.</code><br>Out of Bounds access attempt. Remember that indices start from 1.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>Index I is not valid for the list 'NAME'</code> / <code>Index out of bounds: I</code><br>Out of Bounds access attempt. Remember that indices start from 1.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>You cannot remove items from an empty list.</code><br>Invalid operation on an empty list.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>The value for a coordinate must be a number.</code><br>You passed text or something else instead of a number to a point.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>Invalid color.</code><br>Use a list of 3 numbers (r, g, b) with values from 0 to 100.</td></tr>
-            <tr><td><span class="error-tag">Error</span></td><td><code>This variable is not a dictionary / record.</code><br>You are trying to use key-value syntax on an integer, a list, or text.</td></tr>
-            <tr><td><span class="error-tag">Error</span></td><td><code>Key (or record key) not found.</code><br>The key you entered with <code>D["key"]</code> or <code>R.field</code> does not exist.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>This variable is not a dictionary.</code><br>You are trying to use key-value syntax on an integer, a list, or text.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>Key 'K' not found in the dictionary.</code><br>The key you entered with <code>D["key"]</code> does not exist.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>This variable is not a record.</code><br>You used dot notation on a variable that is not a record.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>Record key not found: K</code><br>The field you entered does not exist in the record.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>This variable is not a class instance.</code><br>You are trying to call a method on a variable that hasn't been instantiated as an object.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>This class has no parent class ('super' not available).</code><br>You used <code>SUPER</code> in a class that does not <code>extend</code> another class.</td></tr>
+            <tr><td><span class="error-tag">Error</span></td><td><code>Method not found: M</code><br>You called a method that doesn't exist on this object.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>I can't find a sound named...</code><br>Sound name not defined before <code>play</code>.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>Could not load the image.</code><br>File not found or corrupted. Check that it is in the same folder.</td></tr>
             <tr><td><span class="error-tag">Error</span></td><td><code>Malformed 'graffiti' command.</code><br>Incorrect syntax. Check size, position, and text.</td></tr>
@@ -1589,7 +1777,7 @@ greet(<span class="str">"Maria"</span>)</code></pre>
 </main>
 
 <footer>
-    <span class="chip">Matita v0.9.3</span>
+    <span class="chip">Matita v1.0.0</span>
     <span class="chip">Manual (Computer Science)</span>
 </footer>
 

@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Matita v0.9.3 - Gebruikershandleiding</title>
+    <title>Matita v1.0.0 - Gebruikershandleiding</title>
     <meta name="author" content="Dino Accoto" />
-    <meta name="description" content="Een complete handleiding voor het programmeren met Matita v0.9.3." />
+    <meta name="description" content="Een complete handleiding voor het programmeren met Matita v1.0.0." />
     <meta name="subject" content="Gebruikershandleiding voor programmeren met Matita (Nederlandse syntaxis)" />
-    <meta name="keywords" content="programmeren, grafiek, Matita, lussen, variabelen, interactiviteit, lijsten, woordenboeken, records, audio, alias, inout, null, procedures, functies, scope, globaal, labels, dimensie, nieuwe regel, schrijf, cast, unicode" />
+    <meta name="keywords" content="programmeren, grafiek, Matita, lussen, variabelen, interactiviteit, lijsten, woordenboeken, records, audio, alias, inout, null, procedures, functies, scope, globaal, labels, dimensie, nieuwe regel, schrijf, cast, unicode, objecten, klassen" />
     <style>
         :root {
             --PrimaryBlue: #007BFF;
@@ -15,27 +15,51 @@
             --DarkText: #212529;
             --CodeBackground: #1e293b;
             --CodeText: #f8fafc;
+            --SidebarBg: #0f172a;
             --PaperW: 900px;
         }
         html, body { margin:0; padding:0; background:#fff; color:var(--DarkText);
             font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
             line-height:1.7; }
+
+        /* --- LAYOUT MET ZIJMENU --- */
+        @media (min-width: 1024px) {
+            body { padding-left: 320px; }
+            .sidebar {
+                position: fixed; top: 0; left: 0; width: 320px; height: 100vh;
+                background: var(--SidebarBg); color: #cbd5e1; overflow-y: auto;
+                padding: 30px 20px; box-sizing: border-box;
+                box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 20;
+            }
+            header { width: 100%; }
+        }
+        @media (max-width: 1023px) {
+            .sidebar {
+                width: 100%; background: var(--SidebarBg); color: #cbd5e1;
+                padding: 20px; box-sizing: border-box;
+            }
+            header { width: 100%; }
+        }
+
+        .sidebar h2 { color: #fff; font-size: 1.4rem; margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .sidebar ol { padding-left: 15px; list-style-type: decimal; margin-bottom: 1.5rem; }
+        .sidebar li { margin-bottom: 8px; }
+        .sidebar li > ol { margin-top: 6px; list-style-type: disc; padding-left: 20px; font-size: 0.95em; }
+        .sidebar a { color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .sidebar a:hover { color: #38bdf8; text-decoration: underline; }
+
         header { position:sticky; top:0; background:white; border-bottom:1px solid #e5e7eb; z-index:10; }
         header .bar { max-width:var(--PaperW); margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:10px 16px; }
         header .left { font-weight:700; color:var(--PrimaryBlue); }
         header .right { color:#6b7280; }
-        main { max-width:var(--PaperW); margin:0 auto; padding:16px; }
+        main { max-width:var(--PaperW); margin:0 auto; padding:24px 32px; }
         h1,h2,h3,h4 { line-height:1.25; }
         h1 { font-size:2.2rem; margin:24px 0 8px; }
-        h2 { font-size:1.7rem; margin:24px 0 8px; border-bottom:2px solid #f3f4f6; padding-bottom:6px; }
-        h3 { font-size:1.2rem; margin:18px 0 6px; }
+        h2 { font-size:1.7rem; margin:32px 0 12px; border-bottom:2px solid #f3f4f6; padding-bottom:6px; color: #111827; }
+        h3 { font-size:1.25rem; margin:24px 0 8px; color: #1f2937; }
         h4 { font-size:1.05rem; margin:16px 0 4px; }
-        .title { display:flex; flex-direction:column; align-items:center; text-align:center; border:1px solid #e5e7eb; border-radius:12px; padding:24px; }
+        .title { display:flex; flex-direction:column; align-items:center; text-align:center; border:1px solid #e5e7eb; border-radius:12px; padding:24px; margin-bottom: 30px; }
         .title img { max-width:45%; height:auto; border-radius:8px; }
-        .toc { background:var(--White); border:1px solid #e5e7eb; border-radius:12px; padding:16px; }
-        .toc ol { padding-left:20px; }
-        .toc a { color:var(--PrimaryBlue); text-decoration:none; }
-        .toc a:hover { text-decoration:underline; }
         code,.code { font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
         pre { background:var(--CodeBackground); padding:12px 14px; border-radius:10px; overflow:auto; border:1px solid #475569; margin-bottom:4px; }
         pre code { font-size:0.95rem; color:var(--CodeText); }
@@ -75,26 +99,14 @@
 <body>
 <header>
     <div class="bar">
-        <div class="left">Matita v0.9.3</div>
+        <div class="left">Matita v1.0.0</div>
         <div class="right">Gebruikershandleiding</div>
     </div>
 </header>
-<main>
-    <div class="top-links">
-        <a href="storiaNL.html" target="_blank" rel="noopener">Motivatie</a>
-        <span class="separator">&mdash;</span>
-        <a href="infoNL.html" target="_blank" rel="noopener">Kenmerken</a>
-        <span class="separator">&mdash;</span>
-        <a href="../Ex/examples.php" target="_blank" rel="noopener">Voorbeeldprogramma's</a>
-    </div>
 
-    <section class="title" id="top">
-        <h1><strong>Programmeren in Matita</strong></h1>
-        <figure><img src="../graphics/matita.png" alt="Logo van Matita" /></figure>
-    </section>
-
-    <nav class="toc" aria-label="Inhoudsopgave">
-        <strong>Inhoudsopgave</strong>
+<aside class="sidebar">
+    <h2>Inhoudsopgave</h2>
+    <nav aria-label="Inhoudsopgave">
         <ol>
             <li><strong>Deel Een: Basisprincipes</strong>
                 <ol>
@@ -108,9 +120,10 @@
                     <li><a href="#manipulation">Tekst- en datamanipulatie</a></li>
                     <li><a href="#procedures-functions">Procedures en functies</a></li>
                     <li><a href="#memory">Scope, alias en geheugen</a></li>
+                    <li><a href="#oop">Objectgeoriënteerd programmeren</a></li>
                 </ol>
             </li>
-            <li><strong>Deel Twee: Grafiek en Interactiviteit</strong>
+            <li style="margin-top: 15px;"><strong>Grafiek en Interactiviteit</strong>
                 <ol>
                     <li><a href="#coordinates">Coördinaten en punten</a></li>
                     <li><a href="#colors">Kleuren en achtergronden</a></li>
@@ -128,12 +141,32 @@
                     <li><a href="#project">Geleide oefening</a></li>
                 </ol>
             </li>
-            <li><a href="#ref">Bijlage A: Snelle referentie</a></li>
-            <li><a href="#troubleshoot">Bijlage B: Veelvoorkomende fouten</a></li>
+            <li style="margin-top: 15px;"><strong>Bijlagen</strong>
+                <ol>
+                    <li><a href="#ref">A: Snelle referentie</a></li>
+                    <li><a href="#troubleshoot">B: Veelvoorkomende fouten</a></li>
+                </ol>
+            </li>
         </ol>
     </nav>
+</aside>
+
+<main>
+    <div class="top-links">
+        <a href="storiaNL.html" target="_blank" rel="noopener">Motivatie</a>
+        <span class="separator">&mdash;</span>
+        <a href="infoNL.html" target="_blank" rel="noopener">Kenmerken</a>
+        <span class="separator">&mdash;</span>
+        <a href="../Ex/examples.php" target="_blank" rel="noopener">Voorbeeldprogramma's</a>
+    </div>
+
+    <section class="title" id="top">
+        <h1><strong>Programmeren in Matita</strong></h1>
+        <figure><img src="../graphics/matita.png" alt="Logo van Matita" /></figure>
+    </section>
 
     <div class="pagebreak"></div>
+
     <h1>Deel Een: Basisprincipes</h1>
 
     <section id="intro">
@@ -305,7 +338,7 @@ Maria           10</div>
             <li><strong>Booleans</strong>: <code>waar</code>, <code>onwaar</code></li>
             <li><strong>Logica</strong>: <code>en</code>, <code>of</code>, <code>niet</code></li>
             <li><strong>Gelijkheid</strong>: <code>is</code> of <code>gelijk</code></li>
-            <li><strong>Ongelijkheid</strong>: <code>verschillend van</code> (Let op: de vorige spelfout is gecorrigeerd in v0.9.3, maar `!=` mag ook).</li>
+            <li><strong>Ongelijkheid</strong>: <code>verschillend van</code> (of <code>!=</code>).</li>
             <li><strong>Vergelijkingen</strong>: <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></li>
             <li><strong>Negatie (unair)</strong>: <code>-X</code></li>
         </ul>
@@ -319,7 +352,16 @@ Maria           10</div>
  true</div>
 
         <h3>Constanten en functies</h3>
-        <p>Beschikbare constanten zijn o.a. <code>pi</code>, <code>oneindig</code> en <code>nan</code>. Ingebouwde functies zijn o.a. <code>abs</code>, <code>sin</code>, <code>cos</code>, <code>wortel</code>, <code>afronden</code>, <code>afkappen</code>, <code>ceil</code>.</p>
+        <p>Beschikbare constanten zijn o.a. <code>pi</code>, <code>oneindig</code> en <code>nan</code>. Ingebouwde functies omvatten o.a.:</p>
+        <ul>
+            <li><code>abs(x)</code>: Absolute waarde.</li>
+            <li><code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code>: Trigonometrie (radialen).</li>
+            <li><code>atan2(y, x)</code>: Boogtangens (in radialen, handig voor hoeken van vectoren).</li>
+            <li><code>wortel(x)</code>: Vierkantswortel.</li>
+            <li><code>log(x)</code>, <code>log10(x)</code>: Logaritmen.</li>
+            <li><code>sign(x)</code>: Geeft -1, 0 of 1 terug afhankelijk van het teken.</li>
+            <li><code>afronden(x)</code>, <code>afkappen(x)</code>, <code>ceil(x)</code>: Afrondingsfuncties.</li>
+        </ul>
         <pre class="has-output"><code><span class="kw">schrijf</span> <span class="kw">wortel</span>(<span class="num">9</span>)
 <span class="kw">nieuwe regel</span>
 <span class="kw">schrijf</span> <span class="kw">afronden</span>(<span class="num">3.6</span>)
@@ -767,6 +809,82 @@ Verhoog(Teller)
     </section>
 
     <div class="pagebreak"></div>
+    <section id="oop">
+        <h2>Objectgeoriënteerd programmeren (OOP)</h2>
+        <p>Objectgeoriënteerd programmeren (OOP) is een paradigma waarmee software wordt gemodelleerd door gegevens en gedragingen (variabelen en procedures) te groeperen in unieke entiteiten, <strong>objecten</strong> genaamd. Deze aanpak maakt de code georganiseerder en modulairder.</p>
+
+        <h3>Klassen en Instanties</h3>
+        <p>Een <strong>klasse</strong> is de "blauwdruk" of "mal" die de structuur van een object definieert. Het concrete object dat met die mal is gemaakt, wordt een <strong>instantie</strong> genoemd.</p>
+        <p>U definieert een klasse met het sleutelwoord <code>klasse</code>, gevolgd door de naam en de velden (de interne variabelen). Vervolgens kunt u kopieën maken door de klassenaam als een functie aan te roepen:</p>
+        <pre><code><span class="com"># Klasse definitie</span>
+<span class="kw">definieer klasse</span> Speler (naam, score) (
+  <span class="com"># Methoden (interne procedures en functies) komen hier</span>
+)
+
+<span class="com"># Een instantie maken</span>
+<span class="kw">zet</span> Speler(<span class="str">"Alex"</span>, <span class="num">0</span>) <span class="kw">in</span> S1
+<span class="kw">schrijf</span> S1.naam <span class="com"># Uitvoer: Alex</span></code></pre>
+
+        <h3>Aangepaste constructor: <code>INITIALIZE</code></h3>
+        <p>Wanneer een instantie wordt gemaakt, wijst Matita de doorgegeven waarden automatisch in volgorde toe aan de klassevelden. Wilt u echter specifieke code uitvoeren bij het aanmaken, dan kunt u een speciale procedure genaamd <code>INITIALIZE</code> binnen de klasse definiëren.</p>
+
+        <h3>Methoden en Inkapseling (Privacy)</h3>
+        <p>Procedures en functies die binnen een klasse zijn gedefinieerd, worden <strong>methoden</strong> genoemd. Methoden hebben direct toegang tot klassevelden zonder ze als parameters door te geven. Om binnen methoden naar de instantie zelf te verwijzen, gebruikt u het sleutelwoord <code>dit</code>.</p>
+        <p>In Matita wordt elk veld dat begint met een onderstrepingsteken (<code>_</code>) beschouwd als <strong>privé</strong>. Als u hier van buitenaf direct toegang toe probeert te krijgen, zal het programma niet crashen, maar wordt er een <span class="warn-tag">Waarschuwing</span> weergegeven.</p>
+        
+        <pre><code><span class="kw">definieer klasse</span> Bankrekening (eigenaar, _saldo) (
+  
+  <span class="kw">definieer procedure</span> INITIALIZE(e, s) (
+    <span class="kw">zet</span> e <span class="kw">in</span> eigenaar
+    <span class="kw">zet</span> s <span class="kw">in</span> _saldo
+  )
+
+  <span class="kw">definieer procedure</span> stort(bedrag) (
+    <span class="kw">zet</span> _saldo + bedrag <span class="kw">in</span> _saldo  <span class="com"># OK: legale interne toegang</span>
+  )
+
+  <span class="kw">definieer functie</span> lees_saldo() (
+    <span class="kw">geef</span> _saldo <span class="kw">terug</span>              <span class="com"># OK: legale interne toegang</span>
+  )
+)
+
+<span class="kw">zet</span> Bankrekening(<span class="str">"Alice"</span>, <span class="num">100</span>) <span class="kw">in</span> MijnRekening
+
+MijnRekening.stort(<span class="num">50</span>)
+<span class="kw">schrijf</span> MijnRekening.lees_saldo() <span class="com"># Juiste manier: toont 150</span>
+<span class="kw">nieuwe regel</span>
+
+<span class="com"># Genereert een waarschuwing: '_saldo' is een privélid...</span>
+<span class="kw">schrijf</span> MijnRekening._saldo</code></pre>
+
+        <h3>Overerving (<code>uitbreidt</code>) en het <code>OUDER</code> commando</h3>
+        <p>Met overerving (inheritance) kunt u een nieuwe klasse baseren op een bestaande klasse (ouder). Dit doet u met het sleutelwoord <code>uitbreidt</code>. Om een overschreven (override) methode van de ouderklasse aan te roepen, gebruikt u het sleutelwoord <code>OUDER</code> (equivalent aan 'super').</p>
+        <pre><code><span class="kw">definieer klasse</span> Dier (naam) (
+  <span class="kw">definieer procedure</span> geluid() (
+    <span class="kw">schrijf</span> <span class="str">"Ik maak een generiek geluid."</span>
+  )
+)
+
+<span class="com"># Hond breidt Dier uit, en erft het veld 'naam'</span>
+<span class="kw">definieer klasse</span> Hond <span class="kw">uitbreidt</span> Dier (ras) (
+  <span class="kw">definieer procedure</span> geluid() (
+    <span class="kw">schrijf</span> <span class="str">"Woef! Mijn naam is "</span> + naam + <span class="str">". "</span>
+    OUDER.geluid() <span class="com"># Roept de geluid() methode van Dier aan</span>
+  )
+)
+
+<span class="kw">zet</span> Hond(<span class="str">"Fido"</span>, <span class="str">"Beagle"</span>) <span class="kw">in</span> MijnHond
+MijnHond.geluid()
+<span class="com"># Uitvoer: Woef! Mijn naam is Fido. Ik maak een generiek geluid.</span></code></pre>
+
+        <h3>Polymorfisme: <code>klassevan()</code></h3>
+        <p>Om te bepalen tot welke klasse een instantie behoort, gebruikt u de functie <code>klassevan(object)</code>. Deze geeft de naam van de klasse terug als een tekst in kleine letters.</p>
+        <pre><code><span class="kw">als</span> (<span class="kw">klassevan</span>(MijnHond) <span class="kw">is</span> <span class="str">"hond"</span>) <span class="kw">dan</span> (
+  <span class="kw">schrijf</span> <span class="str">"Het is zeker een hond!"</span>
+)</code></pre>
+    </section>
+
+    <div class="pagebreak"></div>
     <h1>Deel Twee: Grafiek en Interactiviteit</h1>
 
     <section id="coordinates">
@@ -938,7 +1056,7 @@ Verhoog(Teller)
         <p>Animatie berust in Matita op hetzelfde mechanisme als in de bioscoop: teken razendsnel na elkaar het beeld net een beetje anders. Een structuur in code hiervoor is:</p>
         <ol>
             <li>Een oneindige lus maken (zoals <code>zolang (waar) herhaal je</code>).</li>
-            <li>In elke stap de canvas wissen (<code>wis canvas</code>).</li>
+            <li>In elke stap de canvas wissen (<code>wis canvas</code> of <code>vul achtergrond in</code>).</li>
             <li>Een positie updaten (bijv. van een puntvariabele).</li>
             <li>Het object tekenen op die bijgewerkte positie.</li>
             <li>Een frame-delay instellen (met <code>wacht 16 ms</code> behaalt u ~60 FPS (Frames Per Second)).</li>
@@ -1263,7 +1381,11 @@ Verhoog(Teller)
             <tr><td><code>dobbelsteen(N)</code></td><td>Genereert een willekeurig geheel getal van 1 tot en met N.</td></tr>
             <tr><td><code>afronden(X)</code> / <code>afkappen(X)</code> / <code>ceil(X)</code></td><td>Rondt X af naar het dichtstbijzijnde gehele getal, verwijdert de decimalen, of rondt af naar boven.</td></tr>
             <tr><td><code>wortel(X)</code> / <code>abs(X)</code></td><td>Berekent de vierkantswortel of de absolute (positieve) waarde van X.</td></tr>
-            <tr><td><code>sin(X)</code> / <code>cos(X)</code></td><td>Berekent de sinus of cosinus van hoek X (in radialen).</td></tr>
+            <tr><td><code>sin(X)</code> / <code>cos(X)</code> / <code>tan(X)</code> / <code>atan2(Y, X)</code></td><td>Trigonometrische functies (invoer in radialen).</td></tr>
+            <tr><td><code>log(X)</code> / <code>log10(X)</code></td><td>Natuurlijke en basis-10 logaritmen.</td></tr>
+            <tr><td><code>min(L)</code> / <code>max(L)</code></td><td>Geeft de minimum/maximum waarde in een lijst.</td></tr>
+            <tr><td><code>minwaarde(L)</code> / <code>maxwaarde(L)</code></td><td>Geeft de min/max numerieke waarde (negeert tekst).</td></tr>
+            <tr><td><code>minindex(L)</code> / <code>maxindex(L)</code></td><td>Geeft de positie (1-gebaseerd) van de min/max numerieke waarde.</td></tr>
         </table>
 
         <h3>Besturingsstroom en Logica (Flow Control)</h3>
@@ -1329,6 +1451,16 @@ Verhoog(Teller)
             <tr><td><code>cast(VAL, "TYPE")</code> / <code>unicode(X)</code></td><td>Converteert een waarde naar een ander type (bijv. tekst naar getal), of werkt met Unicode-tekencodes.</td></tr>
             <tr><td><code>type(VAR)</code> / <code>numeriek(VAR)</code></td><td>Geeft het datatype van een variabele, of controleert of het een geldig getal is.</td></tr>
         </table>
+
+        <h3>Objectgeoriënteerd programmeren (OOP)</h3>
+        <table>
+            <tr><th>Commando</th><th>Beschrijving</th></tr>
+            <tr><td><code>definieer klasse NAAM(velden) (...)</code></td><td>Definieert een nieuwe klasse met de gegeven velden.</td></tr>
+            <tr><td><code>definieer klasse NAAM uitbreidt OUDER (...)</code></td><td>Definieert een subklasse die overerft van een ouderklasse.</td></tr>
+            <tr><td><code>dit</code></td><td>Verwijst naar de huidige instantie binnen een methode.</td></tr>
+            <tr><td><code>OUDER.methode()</code></td><td>Roept een methode van de ouderklasse aan (super).</td></tr>
+            <tr><td><code>klassevan(OBJ)</code></td><td>Geeft de klassenaam van de gegeven instantie als een string.</td></tr>
+        </table>
     </section>
 
     <div class="pagebreak"></div>
@@ -1344,8 +1476,8 @@ Verhoog(Teller)
             </tr>
             <tr>
                 <td><span class="warn-tag">Waarschuwing</span></td>
-                <td><code>Alias gemaakt...</code><br>
-                Twee variabelen verwijzen nu naar exact dezelfde locatie in het geheugen. Een wijziging in de één zal ook de ander wijzigen.</td>
+                <td><code>'PROP' is een privélid (begint met '_'). Toegang van buiten de klasse wordt afgeraden.</code><br>
+                U probeert direct een privéveld te lezen of te schrijven. Gebruik bij voorkeur getter- en settermethoden.</td>
             </tr>
             <tr>
                 <td><span class="error-tag">Fout</span></td>
@@ -1369,7 +1501,7 @@ Verhoog(Teller)
             </tr>
             <tr>
                 <td><span class="error-tag">Fout</span></td>
-                <td><code>Index I is ongeldig voor lijst 'NAAM'</code><br>
+                <td><code>Index I is ongeldig voor lijst 'NAAM'</code> / <code>Index buiten bereik: I</code><br>
                 De opgegeven index valt buiten de grenzen van de lijst. Vergeet niet dat lijsten in Matita 1-gebaseerd zijn (het eerste element is index 1, niet 0).</td>
             </tr>
             <tr>
@@ -1389,13 +1521,38 @@ Verhoog(Teller)
             </tr>
             <tr>
                 <td><span class="error-tag">Fout</span></td>
-                <td><code>Deze variabele is geen woordenboek / record.</code><br>
-                U probeert bewerkingen voor woordenboeken of records (zoals <code>D["sleutel"]</code> of <code>Object.veld</code>) uit te voeren op een variabele die een getal, tekst of lijst is.</td>
+                <td><code>Deze variabele is geen woordenboek.</code><br>
+                U probeert een sleutel-waarde bewerking uit te voeren op een getal, lijst of tekst.</td>
             </tr>
             <tr>
                 <td><span class="error-tag">Fout</span></td>
-                <td><code>Sleutel (of record sleutel) niet gevonden.</code><br>
-                U probeert een waarde op te vragen via een sleutel die niet bestaat in het opgegeven woordenboek of record.</td>
+                <td><code>Sleutel 'K' niet gevonden in het woordenboek.</code><br>
+                U probeert een waarde op te vragen via een sleutel (zoals <code>D["sleutel"]</code>) die niet bestaat.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Deze variabele is geen record.</code><br>
+                U heeft de punt-notatie gebruikt op een variabele die geen record is.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Record sleutel niet gevonden: K</code><br>
+                Het veld dat u probeert aan te roepen bestaat niet in dit record.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>This variable is not a class instance.</code> <i>(of vergelijkbaar)</i><br>
+                U probeert een methode aan te roepen op een variabele die niet is geïnstantieerd als object.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>This class has no parent class ('super' not available).</code><br>
+                U heeft <code>OUDER</code> gebruikt in een klasse die geen andere klasse <code>uitbreidt</code>.</td>
+            </tr>
+            <tr>
+                <td><span class="error-tag">Fout</span></td>
+                <td><code>Method not found: M</code><br>
+                U heeft een methode aangeroepen die niet bestaat op dit object.</td>
             </tr>
             <tr>
                 <td><span class="error-tag">Fout</span></td>
@@ -1434,6 +1591,13 @@ Verhoog(Teller)
 <figure style="max-width:var(--PaperW);margin:18px auto 40px;text-align:center;padding:0 18px;">
     <img src="../graphics/coolcoder.png" alt="Cool Coder" style="max-width:520px;width:90%;height:auto;border-radius:12px;border:1px solid #e5e7eb;" />
 </figure>
+
+<footer>
+    <div style="text-align:center; margin-bottom: 40px;">
+        <span class="chip">Matita v1.0.0</span>
+        <span class="chip">Gebruikershandleiding</span>
+    </div>
+</footer>
 
 </body>
 </html>
