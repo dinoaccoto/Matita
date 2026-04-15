@@ -1761,8 +1761,8 @@ const dictEnToNl = {
       case "ScientificThreshold": return K("sci_")    + " " + sx(node.valExpr);
       case "Output":
         let wStr = K("write");
-        if (node.width !== null && node.width !== undefined) {
-          wStr += ":" + node.width;
+        if (node.widthExpr !== null && node.widthExpr !== undefined) {
+          wStr += ":" + sx(node.widthExpr);
           if (node.align !== "r") wStr += ":" + node.align;
         }
         return wStr + " " + sx(node.expr);
@@ -4117,6 +4117,7 @@ function redrawAll(objects, context) {
     // Convenience for KW entries
     matchKW(name){ return this.matchPhrase(KW[name]); }
     expectKW(name, lineForErr){
+      this.skipSeparators();
       const t=this.matchKW(name);
       if (!t) this.throwParse(uiStrings[lang].expectedKeyword(name), (lineForErr ?? this.peek().line));
       return t;
@@ -4143,6 +4144,7 @@ function redrawAll(objects, context) {
     }
 
     parseBlock() {
+      this.skipSeparators(); // Salta eventuali accapo prima dell'apertura del blocco
       const lp=this.matchType("LPAREN");
       if (!lp) this.throwParse(uiStrings[lang].expectedParenAfterKeyword, this.peek().line);
       const stmts=[];
@@ -4642,30 +4644,29 @@ function redrawAll(objects, context) {
 
       // output/scrivi
       if (this.matchKW("OUTPUT")) {
-        let width = null;
+        let widthExpr = null;
         let align = "r"; // default: allineamento a destra
         
-        // Controlla se c'è un modificatore di larghezza
-        if (this.peek().type === "COLON") {
+        // Controllo se c'è un modificatore di larghezza:
+        if (this.peek().type=== "COLON") {
           this.consume(); // consuma il primo ":"
-          const wTok = this.matchType("NUMBER");
-          if (wTok) {
-            width = parseInt(wTok.value, 10);
-          }
           
-          // Controlla se c'è un modificatore di allineamento
+          // Ora accetta un'intera espressione (variabile, calcolo o numero):
+          widthExpr = this.parseExpression(0, null);
+          
+          // Controllo se c'è un modificatore di allineamento:
           if (this.peek().type === "COLON") {
             this.consume(); // consuma il secondo ":"
             const aTok = this.matchType("IDENT");
             if (aTok) {
               const mod = aTok.value.toLowerCase();
-              if (mod === "c" || mod === "l" || mod === "r") align = mod;
+              if (mod === "c" || mod ==="l" || mod === "r") align = mod;
             }
           }
         }
         
         const expr = this.parseExpression(0, null);
-        return { type: "Output", expr, width, align, line: t.line };
+        return { type: "Output", expr, widthExpr, align, line: t.line };
       }
 
       if (this.matchKW("SOUND")) {
@@ -4853,6 +4854,7 @@ function redrawAll(objects, context) {
 
       // rectangle from P1 to P2
       if (this.matchKW("RECTANGLE")) {
+        this.skipSeparators();
         const fromTok=this.matchPhrase([["from"],["da"],["van"],["di"]]);
         if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
         const p1=this.parseExpression(0, new Set(["to","a","tot"]));
@@ -4865,6 +4867,7 @@ function redrawAll(objects, context) {
       if (this.matchKW("LINE")) {
         this.expectKW("THICKNESS", t.line);
         const th=this.parseExpression(0, new Set(["from","da","van"]));
+        this.skipSeparators();
         const fromTok=this.matchPhrase([["from"],["da"],["van"],["di"]]);
         if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
         const p1=this.parseExpression(0, new Set(["to","a","tot"]));
@@ -4881,10 +4884,12 @@ function redrawAll(objects, context) {
         const p1 = this.parseExpression(0, null);
         // Si aspetta una virgola
         if (!this.matchType("COMMA")) this.throwParse(uiStrings[lang].expectedComma, t.line);
+        this.skipSeparators();
         // Legge il secondo vertice
         const p2 = this.parseExpression(0, null);
         // Si aspetta una virgola
         if (!this.matchType("COMMA")) this.throwParse(uiStrings[lang].expectedComma, t.line);
+        this.skipSeparators();
         // Legge il terzo vertice
         const p3 = this.parseExpression(0, null);
         
@@ -4897,6 +4902,7 @@ function redrawAll(objects, context) {
         const r=this.parseExpression(0, new Set(["thickness","spessore","dikte"]));
         this.expectKW("THICKNESS", t.line);
         const th=this.parseExpression(0, new Set(["from","da","van"]));
+        this.skipSeparators();
         const fromTok=this.matchPhrase([["from"],["da"],["van"],["di"]]);
         if (!fromTok) this.throwParse(uiStrings[lang].expectedFrom, t.line);
         const p1=this.parseExpression(0, new Set(["to","a","tot"]));
@@ -4956,6 +4962,7 @@ function redrawAll(objects, context) {
       if (this.matchKW("ROTATE")) {
         const nameTok=this.parseIdentifier();
         // "of/di"
+        this.skipSeparators();
         this.matchPhrase([["of"],["di"],["met"]]) || this.throwParse(uiStrings[lang].expectedOf, t.line);
         const angleExpr=this.parseExpression(0, new Set(["deg","gradi"]));
         this.expectKW("DEG", t.line);
@@ -4971,6 +4978,7 @@ function redrawAll(objects, context) {
       // scale NAME by FACTOR
       if (this.matchKW("SCALE")) {
         const nameTok=this.parseIdentifier();
+        this.skipSeparators();
         this.matchPhrase([["by"],["di"],["met"]]) || this.throwParse(uiStrings[lang].expectedBy, t.line);
         const factorExpr=this.parseExpression(0, null);
         return { type:"Scale", name:nameTok.value, factorExpr, line: t.line };
@@ -5098,13 +5106,15 @@ function redrawAll(objects, context) {
 
         // remove first/last item from LIST
         if (this.matchKW("FIRST")) {
-          this.expectKW("ITEM", t.line);
-          this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
+          this.expectKW("ITEM", t.line);
+          this.skipSeparators();
+          this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
           const listTok=this.parseIdentifier();
           return { type:"RemoveFirst", listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
         }
         if (this.matchKW("LAST")) {
           this.expectKW("ITEM", t.line);
+          this.skipSeparators();
           this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
           const listTok=this.parseIdentifier();
           return { type:"RemoveLast", listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
@@ -5112,7 +5122,8 @@ function redrawAll(objects, context) {
         // remove item <idx> from LIST
         if (this.matchKW("ITEM")) {
           const idx=this.parseExpression(0, new Set(["from","da","uit"]));
-          this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
+          this.skipSeparators();
+          this.matchPhrase([["from"],["da"],["uit"],["van"]]) || this.throwParse("Expected 'from/da/uit/van'.", t.line);
           const listTok=this.parseIdentifier();
           return { type:"RemoveAt", idx, listName:listTok.value, listNameUpper: listTok.value.toUpperCase(), line: t.line };
         }
@@ -5203,6 +5214,7 @@ function redrawAll(objects, context) {
         const tokVar=this.matchKW("VARIABLE");
         if (tokVar) {
           const varTok=this.parseIdentifier();
+          this.skipSeparators();
           const tokGF=this.matchKW("GOES_FROM");
           if (!tokGF) this.throwParse(uiStrings[lang].expectedGoesFrom, tokVar.line);
           const startExpr=this.parseExpression(0, new Set(["to","a","tot"]));
@@ -6789,8 +6801,8 @@ function extractListPath(expr, isAsync) {
       case "ScientificThreshold": code += `${indent}rt.setSciThreshold(${compileExpr(node.valExpr, isAsync)});\n`; break;
       case "Newline": code += `${indent}rt.write("\\n");\n`; break;
       case "Output":
-        if (node.width !== null && node.width !== undefined) {
-          code += `${indent}rt.writeFormatted(${compileExpr(node.expr, isAsync)}, ${node.width}, "${node.align}");\n`;
+        if (node.widthExpr !== null && node.widthExpr !== undefined) {
+          code += `${indent}rt.writeFormatted(${compileExpr(node.expr, isAsync)}, Math.max(0, rt.toInt(${compileExpr(node.widthExpr, isAsync)}) || 0), "${node.align}");\n`;
         } else {
           code += `${indent}rt.write(${compileExpr(node.expr, isAsync)});\n`;
         }
