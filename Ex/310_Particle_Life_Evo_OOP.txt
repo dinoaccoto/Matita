@@ -1,0 +1,191 @@
+# *****
+# Name: Particle Life (N colors, OOP)
+# Category: Maths, Game
+# Program ver: 1.0
+# Date: 15-04-2026
+# Author: DA
+# Language: EN
+# Matita ver: 1.0
+# Description: Particle Life simulation with arbitrary N colors. Shorter (but a bit slower) code thanks to OOP.
+# *****
+
+clear screen
+clear graphics
+
+write "Initializing Particle Life with N colors..."
+newline
+
+# ==================================================
+# --- CONFIGURATION CONSTANTS ---
+# ==================================================
+global NumParticles, NumColors, CanvasSize, ImpenetrableBorders
+global ParticleRadius, WallMin, WallMax, SpawnMin, SpawnMax
+global InteractionRadius, RepulsionRadius, MidRadius, HalfRange
+global ForceFactor, Friction, DelayMs, BgColorR, BgColorG, BgColorB
+global Palette, C, C1, C2, DX, DY, D, F, FX, FY, R_VAL, DIST_FACTOR
+global Particles, P, P2, RulesDict, SpatialGrid, CellKey, TempList
+global GX, GY, offsetX, offsetY, NeighborKey, AbsDX, AbsDY
+global CenterX, CenterY, SpawnRadius, R, Theta, I
+
+# -- General Parameters --
+put 700 in NumParticles  
+put 20 in NumColors       # Numero arbitrario di tipi di particelle!
+put 1200 in CanvasSize
+put false in ImpenetrableBorders
+
+# -- Physics & Ranges --
+put 80 in InteractionRadius; put 30 in RepulsionRadius
+put 0.8 in ForceFactor; put 0.8 in Friction; put 0 in DelayMs
+put (InteractionRadius + RepulsionRadius) / 2 in MidRadius
+put (InteractionRadius - RepulsionRadius) / 2 in HalfRange
+
+# -- Visuals & Boundaries (Centered at 0,0) --
+put 3 in ParticleRadius
+put -(CanvasSize / 2) in WallMin; put (CanvasSize / 2) in WallMax
+put 2 in BgColorR; put 3 in BgColorG; put 8 in BgColorB
+
+# ==================================================
+# --- DYNAMIC PALETTE & RULES (Arbitrary N) ---
+# ==================================================
+put {} in Palette; put {} in RulesDict
+
+# 1. Genera una tavolozza di colori casuali
+index C goes from 1 to NumColors and you do
+(
+    # Colori RGB in Matita vanno da 0 a 100
+    put (trunc(random(10, 100)), trunc(random(10, 100)), trunc(random(10, 100))) in Palette[C]
+)
+
+# 2. Genera una matrice NxN di regole casuali
+index C1 goes from 1 to NumColors and you do
+(
+    index C2 goes from 1 to NumColors and you do
+    (
+        # Forza di interazione casuale tra -1.0 e +1.0
+        put random(-1.0, 1.0) in RulesDict[C1 + "_" + C2]
+    )
+)
+
+# OOP: Definisco la singola particella e creo l'unica lista necessaria
+record Particle(x, y, vx, vy, c)
+put list() in Particles
+
+# Calcoliamo il centro e il raggio per lo spawn circolare (centrato nell'origine)
+put 0 in CenterX; put 0 in CenterY
+put (CanvasSize / 2) - 50 in SpawnRadius
+
+index I goes from 1 to NumParticles and you do
+(
+    # Coordinate polari casuali (distribuzione uniforme nel cerchio)
+    put squareroot(random(0, 1)) * SpawnRadius in R
+    put random(0, 2 * pi) in Theta
+    
+    # Conversione in cartesiane, Velocità casuale iniziale, Assegna un colore/tipo da 1 a N
+    add Particle(CenterX + (R * cos(Theta)), CenterY + (R * sin(Theta)), random(-1.5, 1.5), random(-1.5, 1.5), dice(NumColors)) to Particles
+)
+
+write "Particles generated. Running N-color simulation..."
+newline; write "Press 'x' to stop the simulation."; newline
+write "Use Mouse Wheel to Zoom, and Drag to Pan."; newline
+
+# ==================================================
+# --- MAIN SIMULATION LOOP ---
+# ==================================================
+as long as (true) you do
+(
+    if (key "x" is pressed) then ( write "Simulation stopped by user."; newline; stop )
+
+    clear graphics
+    set color (BgColorR, BgColorG, BgColorB)
+    paint background
+
+    # ==================================================
+    # --- SPATIAL HASHING ---
+    # ==================================================
+    put {} in SpatialGrid
+    
+    for each P in Particles you do
+    (
+        put trunc(P.x / InteractionRadius) + "_" + trunc(P.y / InteractionRadius) in CellKey
+        if (has key CellKey in SpatialGrid) then ( put SpatialGrid[CellKey] in TempList )
+        otherwise ( put list() in TempList )
+        
+        add P to TempList
+        put TempList in SpatialGrid[CellKey]
+    )
+
+    for each P in Particles you do
+    (
+        put 0 in FX; put 0 in FY
+        put trunc(P.x / InteractionRadius) in GX; put trunc(P.y / InteractionRadius) in GY
+
+        index offsetX goes from -1 to 1 and you do
+        (
+            index offsetY goes from -1 to 1 and you do
+            (
+                put (GX + offsetX) + "_" + (GY + offsetY) in NeighborKey
+                
+                if (has key NeighborKey in SpatialGrid) then
+                (
+                    for each P2 in SpatialGrid[NeighborKey] you do
+                    (
+                        # Ottimizzazione visiva: uso il nuovo operatore di negazione !
+                        if !(P == P2) then
+                        (
+                            # Pre-filter (avoid squareroot if too far away)
+                            put P2.x - P.x in DX; put abs(DX) in AbsDX
+                            
+                            if (AbsDX <= InteractionRadius) then
+                            (
+                                put P2.y - P.y in DY; put abs(DY) in AbsDY
+                                
+                                if (AbsDY <= InteractionRadius) then
+                                (
+                                    put squareroot(DX*DX + DY*DY) in D
+
+                                    if (D > 0 and D < InteractionRadius) then
+                                    (
+                                        put 0 in F
+                                        
+                                        if (D < RepulsionRadius) then ( put (D / RepulsionRadius) - 1 in F )
+                                        otherwise
+                                        (
+                                            put RulesDict[P.c + "_" + P2.c] in R_VAL
+                                            put abs(D - MidRadius) / HalfRange in DIST_FACTOR
+                                            put R_VAL * (1 - DIST_FACTOR) in F
+                                        )
+
+                                        put FX + (F * DX / D) in FX
+                                        put FY + (F * DY / D) in FY
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        put (P.vx + FX * ForceFactor) * Friction in P.vx
+        put (P.vy + FY * ForceFactor) * Friction in P.vy
+
+        put P.x + P.vx in P.x
+        put P.y + P.vy in P.y
+
+        if (ImpenetrableBorders is true) then
+        (
+            if (P.x < WallMin) then ( put WallMin in P.x; put P.vx * -1 in P.vx )
+            if (P.x > WallMax) then ( put WallMax in P.x; put P.vx * -1 in P.vx )
+            if (P.y < WallMin) then ( put WallMin in P.y; put P.vy * -1 in P.vy )
+            if (P.y > WallMax) then ( put WallMax in P.y; put P.vy * -1 in P.vy )
+        )
+
+        # Assegna il colore prelevandolo dinamicamente dalla Palette
+        set color Palette[P.c]
+        circle radius ParticleRadius at point(P.x, P.y)
+    )
+
+    # Ridisegna a scala e posizione correnti (mantiene lo zoom manuale dell'utente)
+    redraw
+    wait DelayMs ms
+)

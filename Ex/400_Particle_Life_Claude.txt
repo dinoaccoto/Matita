@@ -1,0 +1,261 @@
+# *****
+# Name: Particle Life (optimized)
+# Category: Maths, Game
+# Program ver: 4.0
+# Date: 16-04-2026
+# Author: Claude Sonnet 4.6 Extended
+# Language: EN
+# Matita ver: 0.9
+# Description: Particle Life - optimized for Matita 0.9
+#
+# Optimizations vs 3.0:
+#   1. redraw instead of frame graphics  → eliminates bounding box over 500 objects per frame
+#   2. flat list for rules               → no string key creation + no dict hash lookup
+#   3. integer spatial hash keys         → arithmetic instead of string concatenation
+#   4. RuleBase pre-computed per particle → (CI-1)*3 computed once, not per interaction
+#   5. 1/D pre-computed                  → 1 division instead of 2 for force direction
+#   6. CJ read only when needed          → skipped entirely in repulsion case
+#   7. color lookup via list             → 3 indexed reads instead of 3 if-checks
+# *****
+
+clear screen
+clear graphics
+
+write "Initializing Particle Life (optimized) ..."
+newline
+
+# ==================================================
+# --- GLOBALS ---
+# ==================================================
+global NumParticles, NumColors, CanvasSize, ImpenetrableBorders
+global ParticleRadius, WallMin, WallMax, SpawnMin, SpawnMax
+global InteractionRadius, RepulsionRadius, MidRadius, HalfRange
+global ForceFactor, Friction, DelayMs
+global BgColorR, BgColorG, BgColorB
+
+global I, J, XI, YI, CI, XJ, YJ, CJ
+global DX, DY, D, InvD, F, FX, FY, R_VAL, DIST_FACTOR, VXI, VYI
+global RuleBase
+
+global X_list, Y_list, VX_list, VY_list, Color_list
+global ColorR_list, ColorG_list, ColorB_list
+global RulesList
+
+global SpatialGrid, CellKey, TempList, GX, GY, offsetX, offsetY
+global NeighborKey, CellParticles, AbsDX, AbsDY
+
+# ==================================================
+# --- CONFIGURATION ---
+# ==================================================
+put 500 in NumParticles
+put 3 in NumColors
+put 1200 in CanvasSize
+put false in ImpenetrableBorders
+
+put 80 in InteractionRadius
+put 30 in RepulsionRadius
+put 0.8 in ForceFactor
+put 0.8 in Friction
+put 0 in DelayMs
+
+put (InteractionRadius + RepulsionRadius) / 2 in MidRadius
+put (InteractionRadius - RepulsionRadius) / 2 in HalfRange
+
+put 3 in ParticleRadius
+put ParticleRadius + 1 in WallMin
+put CanvasSize - WallMin in WallMax
+put 10 in SpawnMin
+put CanvasSize - 10 in SpawnMax
+
+put 2 in BgColorR
+put 3 in BgColorG
+put 8 in BgColorB
+
+# --- OPT 7: Pre-built color component lists ---
+# item CI gives the component directly, no if-chain per particle
+# Color1 (cyan):        R=0,   G=95,  B=100
+# Color2 (purple):      R=100, G=10,  B=80
+# Color3 (yellow-green):R=90,  G=100, B=10
+put (0,   100,  90) in ColorR_list
+put (95,   10, 100) in ColorG_list
+put (100,  80,  10) in ColorB_list
+
+# --- OPT 2: Flat rules matrix (replaces RulesDict with string keys) ---
+# Access: item ((CI-1)*3 + CJ) of RulesList
+# Layout (row = CI, col = CJ):
+#         CJ=1   CJ=2   CJ=3
+# CI=1: [ 0.2,   0.8,  -0.5 ]   indices 1,2,3
+# CI=2: [-0.5,   0.2,   0.8 ]   indices 4,5,6
+# CI=3: [ 0.8,  -0.5,   0.2 ]   indices 7,8,9
+put (0.2, 0.8, -0.5, -0.5, 0.2, 0.8, 0.8, -0.5, 0.2) in RulesList
+
+# ==================================================
+# --- PARTICLE INITIALIZATION ---
+# ==================================================
+put list() in X_list
+put list() in Y_list
+put list() in VX_list
+put list() in VY_list
+put list() in Color_list
+
+index I goes from 1 to NumParticles and you do (
+    add random(SpawnMin, SpawnMax) to X_list
+    add random(SpawnMin, SpawnMax) to Y_list
+    add 0 to VX_list
+    add 0 to VY_list
+    add dice(NumColors) to Color_list
+)
+
+# --- OPT 1: Set camera ONCE before the main loop ---
+# frame graphics inside the loop calls computeFitCamera() which iterates
+# all 500 objects to compute a bounding box on every single frame.
+# We call it once here with two anchor points, then use redraw in the loop.
+set color (BgColorR, BgColorG, BgColorB)
+paint background
+circle radius 1 at (0, 0)
+circle radius 1 at (CanvasSize, CanvasSize)
+frame graphics
+clear graphics
+
+write "Particles ready. Running..."
+newline
+write "Press 'x' to stop."
+newline
+
+# ==================================================
+# --- MAIN SIMULATION LOOP ---
+# ==================================================
+as long as (true) you do (
+
+    if (key "x" is pressed) then (
+        write "Simulation stopped by user."
+        newline
+        stop
+    )
+
+    clear graphics
+    set color (BgColorR, BgColorG, BgColorB)
+    paint background
+
+    # ==================================================
+    # --- SPATIAL HASHING ---
+    # OPT 3: integer key GX*10000+GY replaces string GX+"_"+GY
+    # Avoids 2 rt.addOps() calls with string concatenation per particle.
+    # Multiplier 10000 is safe: GY = trunc(Y/80), collision requires
+    # two particles with Y differing by 800000 units — impossible in practice.
+    # ==================================================
+    put {} in SpatialGrid
+
+    index I goes from 1 to NumParticles and you do (
+        put trunc((item I of X_list) / InteractionRadius) in GX
+        put trunc((item I of Y_list) / InteractionRadius) in GY
+        put GX * 10000 + GY in CellKey
+
+        if (has key CellKey in SpatialGrid) then (
+            put SpatialGrid[CellKey] in TempList
+        ) otherwise (
+            put list() in TempList
+        )
+        add I to TempList
+        put TempList in SpatialGrid[CellKey]
+    )
+
+    # ==================================================
+    # --- PHYSICS + RENDERING ---
+    # ==================================================
+    index I goes from 1 to NumParticles and you do (
+
+        put item I of X_list in XI
+        put item I of Y_list in YI
+        put item I of Color_list in CI
+
+        put 0 in FX
+        put 0 in FY
+
+        put trunc(XI / InteractionRadius) in GX
+        put trunc(YI / InteractionRadius) in GY
+
+        # OPT 4: compute rule row index once per particle, not per interaction
+        put (CI - 1) * 3 in RuleBase
+
+        index offsetX goes from -1 to 1 and you do (
+            index offsetY goes from -1 to 1 and you do (
+
+                # OPT 3: integer neighbor key
+                put (GX + offsetX) * 10000 + (GY + offsetY) in NeighborKey
+
+                if (has key NeighborKey in SpatialGrid) then (
+                    put SpatialGrid[NeighborKey] in CellParticles
+
+                    for each J in CellParticles you do (
+                        if (I != J) then (
+
+                            put item J of X_list in XJ
+                            put item J of Y_list in YJ
+
+                            put XJ - XI in DX
+                            put abs(DX) in AbsDX
+                            if (AbsDX <= InteractionRadius) then (
+
+                                put YJ - YI in DY
+                                put abs(DY) in AbsDY
+                                if (AbsDY <= InteractionRadius) then (
+
+                                    put squareroot(DX*DX + DY*DY) in D
+
+                                    if (D > 0 and D < InteractionRadius) then (
+
+                                        if (D < RepulsionRadius) then (
+                                            put (D / RepulsionRadius) - 1 in F
+                                        ) otherwise (
+                                            # OPT 6: CJ read only here, not in repulsion case
+                                            put item J of Color_list in CJ
+                                            # OPT 2: flat list, no string key creation
+                                            put item (RuleBase + CJ) of RulesList in R_VAL
+                                            put abs(D - MidRadius) / HalfRange in DIST_FACTOR
+                                            put R_VAL * (1 - DIST_FACTOR) in F
+                                        )
+
+                                        # OPT 5: pre-compute 1/D → 1 division instead of 2
+                                        put 1 / D in InvD
+                                        put FX + F * DX * InvD in FX
+                                        put FY + F * DY * InvD in FY
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        put item I of VX_list in VXI
+        put item I of VY_list in VYI
+
+        put (VXI + FX * ForceFactor) * Friction in VXI
+        put (VYI + FY * ForceFactor) * Friction in VYI
+
+        put XI + VXI in XI
+        put YI + VYI in YI
+
+        if (ImpenetrableBorders is true) then (
+            if (XI < WallMin) then ( put WallMin in XI; put VXI * -1 in VXI )
+            if (XI > WallMax) then ( put WallMax in XI; put VXI * -1 in VXI )
+            if (YI < WallMin) then ( put WallMin in YI; put VYI * -1 in VYI )
+            if (YI > WallMax) then ( put WallMax in YI; put VYI * -1 in VYI )
+        )
+
+        put VXI in item I of VX_list
+        put VYI in item I of VY_list
+        put XI in item I of X_list
+        put YI in item I of Y_list
+
+        # OPT 7: single color lookup via list, no if-chain
+        set color (item CI of ColorR_list, item CI of ColorG_list, item CI of ColorB_list)
+        circle radius ParticleRadius at point(XI, YI)
+    )
+
+    # OPT 1: redraw uses the camera set before the loop, no bounding box
+    redraw
+    wait DelayMs ms
+)
